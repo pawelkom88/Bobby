@@ -89,10 +89,11 @@ export function validateDomain(): boolean {
  * Initialize agent with appropriate authentication
  */
 export async function initializeAgentAuth(): Promise<{ agentId: string; signedUrl?: string }> {
+  // Agent ID is public - it's just an identifier, not a secret
   const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
 
   if (!agentId) {
-    throw new Error('Agent ID not configured');
+    throw new Error('NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID not configured');
   }
 
   const authMethod = getAuthMethod();

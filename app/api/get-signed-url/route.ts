@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify agent ID is configured
-    const agentId = process.env.ELEVEN_LABS_AGENT_ID;
+    // Verify agent ID is configured (use the public one since it's just an identifier)
+    const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
     if (!agentId) {
-      console.error('ELEVEN_LABS_AGENT_ID not configured');
+      console.error('NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID not configured');
       return NextResponse.json(
         { error: 'ElevenLabs agent ID not configured' },
         { status: 500 }
