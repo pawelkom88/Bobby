@@ -39,6 +39,8 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   const [agentConnected, setAgentConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentTranscript, setCurrentTranscript] = useState('');
   
   const conversationRef = useRef<any>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
