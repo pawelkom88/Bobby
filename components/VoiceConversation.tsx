@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { requestMicrophonePermission, createSpeechRecognition, startSpeechRecognition } from '@/lib/speech';
-import { isElevenLabsConfigured, connectToAgent, sendMessageToAgent, handleElevenLabsError } from '@/lib/elevenlabs';
+import { isElevenLabsConfigured, connectToAgent, sendMessageToAgent, handleElevenLabsError, playAudioResponse } from '@/lib/elevenlabs';
 import { getSettings } from '@/lib/storage';
+import LoadingSpinner from './LoadingSpinner';
 import type { AgeTier, Service, AgentConnection } from '@/types';
 
 interface ConversationMessage {
@@ -29,6 +30,8 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [agentConnected, setAgentConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const recognitionRef = useRef<ReturnType<typeof createSpeechRecognition>>(null);
   const agentConnectionRef = useRef<AgentConnection | null>(null);
@@ -69,12 +72,15 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       return;
     }
 
+    setIsConnecting(true);
+    setError(null);
+
     try {
       // Connect to agent
       const connection = await connectToAgent();
       agentConnectionRef.current = connection;
       setAgentConnected(true);
-      setError(null);
+      setIsConnecting(false);
 
       // Initialize speech recognition
       const recognition = createSpeechRecognition({
@@ -108,6 +114,7 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
             setConversation((prev) => [...prev, userMessage]);
 
             // Send to agent and get response
+            setIsLoading(true);
             try {
               const agentResponse = await sendMessageToAgent(connection, result.final);
               
@@ -121,12 +128,18 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
               // Play audio if available
               if (agentResponse.audio) {
-                // Audio playback would be handled here
-                // await playAudioResponse(agentResponse.audio);
+                try {
+                  await playAudioResponse(agentResponse.audio);
+                } catch (audioError) {
+                  console.error('Error playing audio:', audioError);
+                  // Continue even if audio playback fails
+                }
               }
+              setIsLoading(false);
             } catch (err) {
               console.error('Error sending message to agent:', err);
               setError(handleElevenLabsError(err as Error));
+              setIsLoading(false);
             }
           }
         },
@@ -146,6 +159,8 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     } catch (err) {
       console.error('Error starting conversation:', err);
       setError(handleElevenLabsError(err as Error));
+      setIsConnecting(false);
+      setAgentConnected(false);
     }
   };
 
@@ -193,21 +208,29 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       <p className="conversation-subtitle">Stay calm, you're doing great!</p>
 
       {!agentConnected && (
-        <button
-          type="button"
-          className="start-conversation-button"
-          onClick={startConversation}
-          disabled={!permissionGranted}
-          aria-label="Start conversation with Bobby"
-        >
-          Start Conversation
-        </button>
+        <div className="conversation-start-section">
+          {isConnecting ? (
+            <LoadingSpinner message="Connecting to Bobby..." />
+          ) : (
+            <button
+              type="button"
+              className="start-conversation-button"
+              onClick={startConversation}
+              disabled={!permissionGranted || isConnecting}
+              aria-label="Start conversation with Bobby"
+            >
+              Start Conversation
+            </button>
+          )}
+        </div>
       )}
 
       {agentConnected && (
         <>
           <div className="conversation-status" aria-live="polite">
-            {isListening ? (
+            {isLoading ? (
+              <LoadingSpinner size="small" message="Bobby is thinking..." />
+            ) : isListening ? (
               <span className="listening-indicator">🎤 Listening...</span>
             ) : (
               <span className="not-listening">Not listening</span>

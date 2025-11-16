@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import AgeSelector from '@/components/AgeSelector';
 import SituationSelector from '@/components/SituationSelector';
 import DialPad from '@/components/DialPad';
@@ -79,83 +80,95 @@ export default function AppPage() {
   // Welcome Screen
   if (currentStep === STEPS.WELCOME) {
     return (
-      <main className="app-page" role="main">
-        <div className="welcome-screen">
-          <h1 className="welcome-title">Welcome back!</h1>
-          
-          <div className="welcome-progress">
-            <LevelProgress showLabel={true} />
-          </div>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <div className="welcome-screen">
+            <h1 className="welcome-title">Welcome back!</h1>
+            
+            <div className="welcome-progress">
+              <LevelProgress showLabel={true} />
+            </div>
 
-          <div className="welcome-badges">
-            <h2>Your Badges</h2>
-            <BadgeDisplay showAll={false} />
-          </div>
+            <div className="welcome-badges">
+              <h2>Your Badges</h2>
+              <BadgeDisplay showAll={false} />
+            </div>
 
-          <button
-            type="button"
-            className="call-bobby-button"
-            onClick={handleCallBobby}
-            aria-label="Start training with Bobby"
-          >
-            Call Bobby
-          </button>
-        </div>
-      </main>
+            <button
+              type="button"
+              className="call-bobby-button"
+              onClick={handleCallBobby}
+              aria-label="Start training with Bobby"
+            >
+              Call Bobby
+            </button>
+          </div>
+        </main>
+      </ErrorBoundary>
     );
   }
 
   // Age Selection
   if (currentStep === STEPS.AGE_SELECTION) {
     return (
-      <main className="app-page" role="main">
-        <AgeSelector onSelect={handleAgeSelected} />
-      </main>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <AgeSelector onSelect={handleAgeSelected} />
+        </main>
+      </ErrorBoundary>
     );
   }
 
   // Situation Selection
   if (currentStep === STEPS.SITUATION_SELECTION) {
     return (
-      <main className="app-page" role="main">
-        <SituationSelector onSelect={handleSituationSelected} />
-      </main>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <SituationSelector onSelect={handleSituationSelected} />
+        </main>
+      </ErrorBoundary>
     );
   }
 
   // Number Dialing
   if (currentStep === STEPS.DIALING) {
     return (
-      <main className="app-page" role="main">
-        <DialPad onCorrectNumber={handleCorrectNumber} />
-      </main>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <DialPad onCorrectNumber={handleCorrectNumber} />
+        </main>
+      </ErrorBoundary>
     );
   }
 
   // Voice Conversation
   if (currentStep === STEPS.CONVERSATION) {
     return (
-      <main className="app-page" role="main">
-        <VoiceConversation
-          ageTier={selectedAgeTier?.id}
-          situation={selectedSituation?.id}
-          onComplete={handleConversationComplete}
-        />
-      </main>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <VoiceConversation
+            ageTier={selectedAgeTier?.id}
+            situation={selectedSituation?.id}
+            onComplete={handleConversationComplete}
+          />
+        </main>
+      </ErrorBoundary>
     );
   }
 
   // Completion Screen
   if (currentStep === STEPS.COMPLETION) {
     return (
-      <main className="app-page" role="main">
-        <CompletionScreen
-          service={selectedSituation?.id}
-          ageTier={selectedAgeTier?.id}
-          performance={performance}
-          onContinue={handleContinue}
-        />
-      </main>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <CompletionScreen
+            service={selectedSituation?.id}
+            ageTier={selectedAgeTier?.id}
+            performance={performance}
+            onContinue={handleContinue}
+          />
+        </main>
+      </ErrorBoundary>
     );
   }
 
