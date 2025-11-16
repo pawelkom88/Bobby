@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { requestMicrophonePermission, createSpeechRecognition, startSpeechRecognition } from '@/lib/speech';
 import { isElevenLabsConfigured, connectToAgent, sendMessageToAgent, handleElevenLabsError, playAudioResponse } from '@/lib/elevenlabs';
 import { getSettings } from '@/lib/storage';
+import { sanitizeText } from '@/lib/validation';
 import LoadingSpinner from './LoadingSpinner';
 import type { AgeTier, Service, AgentConnection } from '@/types';
 
@@ -105,10 +106,17 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
           
           if (result.final) {
             setCurrentTranscript('');
+            // Sanitize and validate user input
+            const sanitizedText = sanitizeText(result.final);
+            if (!sanitizedText) {
+              // Skip empty messages
+              return;
+            }
+
             // Add user message to conversation
             const userMessage: ConversationMessage = {
               type: 'user',
-              text: result.final,
+              text: sanitizedText,
               timestamp: new Date().toISOString(),
             };
             setConversation((prev) => [...prev, userMessage]);
@@ -116,7 +124,7 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
             // Send to agent and get response
             setIsLoading(true);
             try {
-              const agentResponse = await sendMessageToAgent(connection, result.final);
+              const agentResponse = await sendMessageToAgent(connection, sanitizedText);
               
               // Add agent response to conversation
               const agentMessage: ConversationMessage = {

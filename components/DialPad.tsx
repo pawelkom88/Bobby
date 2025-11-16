@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { validateEmergencyNumber } from '@/lib/validation';
 
 const CORRECT_NUMBER = '999';
 const NUMBER_PAD: string[][] = [
@@ -42,7 +43,7 @@ export default function DialPad({ onCorrectNumber, targetNumber = CORRECT_NUMBER
       
       // Check if complete and correct
       if (newInput.length === targetNumber.length) {
-        if (newInput === targetNumber) {
+        if (validateEmergencyNumber(newInput, targetNumber)) {
           // Correct number
           if (onCorrectNumber) {
             onCorrectNumber();

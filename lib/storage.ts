@@ -7,6 +7,7 @@ import {
   getXPToNextLevel,
   getBadgeForLevel,
 } from './gamification';
+import { validateAgeTier, validateService, validateXP, validateTimestamp } from './validation';
 import type { UserData, UserSettings, Conversation, Service, AgeTier, Badge, LevelUpResult } from '@/types';
 
 const STORAGE_KEY = 'bobby-app-data';
@@ -76,6 +77,24 @@ export function saveConversation(
   ageTier: AgeTier,
   xpEarned: number
 ): void {
+  // Validate inputs
+  if (!validateTimestamp(timestamp)) {
+    console.error('Invalid timestamp:', timestamp);
+    return;
+  }
+  if (!validateService(service)) {
+    console.error('Invalid service:', service);
+    return;
+  }
+  if (!validateAgeTier(ageTier)) {
+    console.error('Invalid age tier:', ageTier);
+    return;
+  }
+  if (!validateXP(xpEarned)) {
+    console.error('Invalid XP amount:', xpEarned);
+    return;
+  }
+
   const data = getUserData();
   data.conversations.push({
     timestamp,
@@ -90,9 +109,20 @@ export function saveConversation(
  * Add XP and check for level up
  */
 export function addXP(amount: number): LevelUpResult {
+  // Validate XP amount
+  if (!validateXP(amount)) {
+    console.error('Invalid XP amount:', amount);
+    return {
+      newLevel: getLevel(),
+      leveledUp: false,
+      badgeAwarded: null,
+      totalXP: getXP(),
+    };
+  }
+
   const data = getUserData();
   const oldLevel = data.level;
-  data.totalXP += amount;
+  data.totalXP = Math.max(0, data.totalXP + amount); // Ensure non-negative
   data.level = calculateLevel(data.totalXP);
   const newLevel = data.level;
   const leveledUp = newLevel > oldLevel;
