@@ -91,11 +91,11 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     setIsConnecting(true);
     setError(null);
 
-    try {
-      const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
-      if (!agentId) {
-        throw new Error('Agent ID not configured. Set NEXT_PUBLIC_ELEVENLABS_AGENT_ID in .env.local');
-      }
+        try {
+          const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
+          if (!agentId) {
+            throw new Error('Agent ID not configured. Set NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID in .env.local');
+          }
 
       logger.info('Starting ElevenLabs agent conversation', { agentId });
 

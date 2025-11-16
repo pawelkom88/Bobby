@@ -89,7 +89,7 @@ export function validateDomain(): boolean {
  * Initialize agent with appropriate authentication
  */
 export async function initializeAgentAuth(): Promise<{ agentId: string; signedUrl?: string }> {
-  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
+  const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
 
   if (!agentId) {
     throw new Error('Agent ID not configured');
