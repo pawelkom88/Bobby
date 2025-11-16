@@ -66,7 +66,14 @@ export async function startAgentConversation(agentId: string): Promise<Conversat
 
     return conversation;
   } catch (error) {
-    logger.error('Failed to start agent conversation', error);
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : '';
+    console.error('Failed to start agent conversation:', {
+      message,
+      stack,
+      error,
+    });
+    logger.error('Failed to start agent conversation', { message, stack });
     throw error;
   }
 }

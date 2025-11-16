@@ -173,8 +173,14 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
       logger.info('Voice conversation started successfully');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      logger.error('Error starting conversation', err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorStack = err instanceof Error ? err.stack : '';
+      console.error('Error starting conversation:', {
+        message: errorMessage,
+        stack: errorStack,
+        error: err,
+      });
+      logger.error('Error starting conversation', { message: errorMessage, stack: errorStack });
       setError(handleElevenLabsError(err instanceof Error ? err : new Error(errorMessage)));
       setIsConnecting(false);
       setAgentConnected(false);

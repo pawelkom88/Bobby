@@ -82,11 +82,19 @@ export async function POST(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating signed URL:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : '';
+    console.error('Error generating signed URL:', {
+      message,
+      stack,
+      error,
+    });
     
-    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: `Failed to generate signed URL: ${message}` },
+      { 
+        error: `Failed to generate signed URL: ${message}`,
+        details: stack 
+      },
       { status: 500 }
     );
   }
