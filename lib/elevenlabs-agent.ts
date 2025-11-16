@@ -13,7 +13,15 @@ import { logger } from './logger';
 let activeConversation: Conversation | null = null;
 
 /**
- * Start a conversation with ElevenLabs agent
+ * Start a conversation with ElevenLabs agent using signed URL
+ * 
+ * Flow:
+ * 1. Request signed URL from backend (/api/get-signed-url)
+ * 2. Backend generates secure signed URL using API key
+ * 3. Client connects to agent using the signed URL
+ * 4. WebSocket connection is established
+ * 
+ * Reference: https://elevenlabs.io/docs/agents-platform/customization/authentication#using-signed-urls
  */
 export async function startAgentConversation(agentId: string): Promise<Conversation> {
   try {
@@ -24,12 +32,33 @@ export async function startAgentConversation(agentId: string): Promise<Conversat
       await navigator.mediaDevices.getUserMedia({ audio: true });
     }
 
-    // Initialize conversation with agent
+    // Get signed URL from backend API
+    // This ensures the API key never reaches the client
+    logger.info('Requesting signed URL from backend');
+    const signedUrlResponse = await fetch('/api/get-signed-url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!signedUrlResponse.ok) {
+      const errorData = await signedUrlResponse.json();
+      throw new Error(errorData.error || 'Failed to get signed URL');
+    }
+
+    const { signed_url: signedUrl } = await signedUrlResponse.json();
+
+    if (!signedUrl) {
+      throw new Error('No signed URL received from backend');
+    }
+
+    logger.info('Signed URL received, initiating connection');
+
+    // Initialize conversation using the signed URL
+    // Reference: https://elevenlabs.io/docs/agents-platform/customization/authentication#connecting-to-your-agent-using-a-signed-url
     const conversation = await Conversation.startSession({
-      agentId,
-      connectionType: 'websocket', // Use WebSocket for real-time streaming
-      // Optional: specify output device
-      // outputDeviceId: 'device-id',
+      signedUrl, // Use signed URL for authentication
     });
 
     activeConversation = conversation;

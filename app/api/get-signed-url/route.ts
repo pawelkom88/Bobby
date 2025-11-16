@@ -1,12 +1,12 @@
 /**
  * API Route to generate signed URLs for ElevenLabs agent authentication
  * 
- * This is a secure server-side endpoint that:
- * 1. Uses the ElevenLabs API key (never exposed to client)
+ * Server-side endpoint that:
+ * 1. Uses the ElevenLabs SDK with API key (never exposed to client)
  * 2. Generates short-lived signed URLs for client-side agent connection
  * 3. Validates the request and returns the signed URL
  * 
- * Reference: https://elevenlabs.io/docs/agents-platform/overview#signed-urls
+ * Reference: https://elevenlabs.io/docs/agents-platform/customization/authentication#using-signed-urls
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     // Verify API key is configured
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) {
+      console.error('ELEVENLABS_API_KEY not configured');
       return NextResponse.json(
         { error: 'ElevenLabs API key not configured' },
         { status: 500 }
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
     // Verify agent ID is configured
     const agentId = process.env.ELEVENLABS_AGENT_ID;
     if (!agentId) {
+      console.error('ELEVENLABS_AGENT_ID not configured');
       return NextResponse.json(
         { error: 'ElevenLabs agent ID not configured' },
         { status: 500 }
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin');
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
     
-    if (origin && !allowedOrigins.includes(origin)) {
+    if (origin && !allowedOrigins.some(allowed => origin.includes(allowed.trim()))) {
       console.warn(`Unauthorized origin: ${origin}`);
       return NextResponse.json(
         { error: 'Origin not allowed' },
@@ -43,40 +45,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate signed URL using ElevenLabs API
-    // For now, this is a placeholder - the actual implementation depends on the ElevenLabs
-    // REST API endpoint for generating signed URLs
-    // 
-    // Reference: https://elevenlabs.io/docs/agents-platform/authentication
+    console.log('Generating signed URL for agent:', agentId);
+
+    // Generate signed URL using ElevenLabs REST API
+    // Reference: https://elevenlabs.io/docs/agents-platform/customization/authentication#generate-a-signed-url-via-the-api
+    const signedUrlEndpoint = `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agentId)}`;
     
-    // In a real implementation, this would call the ElevenLabs API:
-    // POST https://api.elevenlabs.io/v1/agents/{agentId}/signed-url
-    
-    const response = await fetch(`https://api.elevenlabs.io/v1/agents/${agentId}/signed-url`, {
-      method: 'POST',
+    const response = await fetch(signedUrlEndpoint, {
+      method: 'GET',
       headers: {
         'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        expiresIn: 3600, // URL expires in 1 hour
-      }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`ElevenLabs API error: ${response.status} - ${error}`);
+      const errorData = await response.text();
+      throw new Error(`ElevenLabs API error: ${response.status} - ${errorData}`);
     }
 
     const data = await response.json();
-    const signedUrl = (data as any).signedUrl;
+    const signedUrl = (data as any).signed_url;
 
     if (!signedUrl) {
-      throw new Error('No signed URL in API response');
+      throw new Error('No signed URL in response');
     }
 
+    console.log('Signed URL generated successfully');
+
     return NextResponse.json(
-      { signedUrl },
+      { signed_url: signedUrl },
       { 
         status: 200,
         headers: {
