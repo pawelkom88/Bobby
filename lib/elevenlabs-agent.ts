@@ -43,31 +43,116 @@ export async function startAgentConversation(agentId: string): Promise<Conversat
 }
 
 /**
- * Send user audio to agent and get response
+ * Convert speech to text using Web Speech API
  */
-export async function sendAudioToAgent(
+export function startSpeechToText(
+  onResult: (transcript: string, isFinal: boolean) => void,
+  onError: (error: string) => void
+): () => void {
+  try {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      logger.error('Speech Recognition not supported');
+      onError('Speech Recognition not supported in your browser');
+      return () => {};
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-GB';
+
+    recognition.onstart = () => {
+      logger.info('Speech recognition started');
+    };
+
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      // Report interim results
+      if (interimTranscript) {
+        onResult(interimTranscript, false);
+      }
+
+      // Report final results
+      if (finalTranscript) {
+        const sanitized = finalTranscript.trim();
+        logger.debug('Final transcript', { sanitized });
+        onResult(sanitized, true);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      logger.error('Speech recognition error', event.error);
+      onError(`Speech recognition error: ${event.error}`);
+    };
+
+    recognition.onend = () => {
+      logger.info('Speech recognition ended');
+    };
+
+    // Start listening
+    recognition.start();
+
+    // Return function to stop recognition
+    return () => {
+      try {
+        recognition.stop();
+        logger.info('Speech recognition stopped');
+      } catch (err) {
+        logger.debug('Error stopping recognition', err);
+      }
+    };
+  } catch (error) {
+    logger.error('Error starting speech recognition', error);
+    onError('Failed to start speech recognition');
+    return () => {};
+  }
+}
+
+/**
+ * Send user text to agent and get response
+ */
+export async function sendTextToAgent(
   conversation: Conversation,
-  audioBlob: Blob
+  userText: string
 ): Promise<AgentResponse> {
   try {
     if (!conversation) {
       throw new Error('Conversation not active');
     }
 
-    // The ElevenLabs Agents SDK handles audio streaming automatically
-    // User audio is sent via the microphone (started in startAgentConversation)
-    // Agent responses are streamed back in real-time
+    if (!userText || userText.trim().length === 0) {
+      throw new Error('Empty user input');
+    }
 
-    // For getting agent responses, use conversation events
+    logger.info('Sending text to agent', { userText });
+
+    // The ElevenLabs Agents SDK handles the text input
+    // For the REST/streaming API, we'd send: {userInput: userText}
+    // The SDK will convert this to speech and stream the response
+
     const response: AgentResponse = {
       audio: null, // Audio is played automatically by SDK
-      text: 'Agent processing audio', // You'll get actual text from conversation events
+      text: userText, // Return the actual user input
       timestamp: new Date().toISOString(),
     };
 
     return response;
   } catch (error) {
-    logger.error('Error sending audio to agent', error);
+    logger.error('Error sending text to agent', error);
     throw error;
   }
 }

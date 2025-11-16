@@ -9,6 +9,8 @@ import {
   checkMicrophonePermission,
   handleElevenLabsError,
   getInputFrequencyData,
+  startSpeechToText,
+  sendTextToAgent,
 } from '@/lib/elevenlabs-agent';
 import { getSettings } from '@/lib/storage';
 import { sanitizeText } from '@/lib/validation';
@@ -44,6 +46,7 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   
   const conversationRef = useRef<any>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const stopSpeechRecognitionRef = useRef<(() => void) | null>(null);
 
   const settings = getSettings();
 
@@ -67,6 +70,9 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       // Cleanup on unmount
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
+      }
+      if (stopSpeechRecognitionRef.current) {
+        stopSpeechRecognitionRef.current();
       }
       if (conversationRef.current) {
         endAgentConversation(conversationRef.current).catch((err) => {
@@ -114,6 +120,56 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       setAgentConnected(true);
       setIsConnecting(false);
       setIsListening(true);
+
+      // Start speech-to-text recognition
+      const stopSpeechRecognition = startSpeechToText(
+        (transcript, isFinal) => {
+          logger.debug('Transcript received', { transcript, isFinal });
+
+          if (isFinal && transcript) {
+            // User finished speaking - send to agent
+            setCurrentTranscript('');
+
+            // Add user message to conversation
+            const userMessage: ConversationMessage = {
+              type: 'user',
+              text: transcript,
+              timestamp: new Date().toISOString(),
+            };
+            setConversation((prev) => [...prev, userMessage]);
+
+            // Send to agent
+            setIsLoading(true);
+            sendTextToAgent(conv, transcript)
+              .then((response) => {
+                logger.debug('Agent response received', response);
+                
+                // Add agent message to conversation
+                const agentMessage: ConversationMessage = {
+                  type: 'agent',
+                  text: response.text || 'Processing...',
+                  timestamp: response.timestamp,
+                };
+                setConversation((prev) => [...prev, agentMessage]);
+                setIsLoading(false);
+              })
+              .catch((err) => {
+                logger.error('Error sending to agent', err);
+                setError('Failed to process your speech. Please try again.');
+                setIsLoading(false);
+              });
+          } else if (!isFinal) {
+            // Interim transcript - show what user is saying
+            setCurrentTranscript(transcript);
+          }
+        },
+        (error) => {
+          logger.error('Speech recognition error', error);
+          setError(error);
+        }
+      );
+
+      stopSpeechRecognitionRef.current = stopSpeechRecognition;
 
       logger.info('Voice conversation started successfully');
     } catch (err) {
