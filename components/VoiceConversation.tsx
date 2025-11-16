@@ -1,12 +1,20 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { requestMicrophonePermission, createSpeechRecognition, startSpeechRecognition } from '@/lib/speech';
-import { isElevenLabsConfigured, connectToAgent, sendMessageToAgent, handleElevenLabsError, playAudioResponse } from '@/lib/elevenlabs';
+import { Conversation } from '@elevenlabs/client';
+import {
+  startAgentConversation,
+  onAgentResponse,
+  endAgentConversation,
+  checkMicrophonePermission,
+  handleElevenLabsError,
+  getInputFrequencyData,
+} from '@/lib/elevenlabs-agent';
 import { getSettings } from '@/lib/storage';
 import { sanitizeText } from '@/lib/validation';
+import { logger } from '@/lib/logger';
 import LoadingSpinner from './LoadingSpinner';
-import type { AgeTier, Service, AgentConnection } from '@/types';
+import type { AgeTier, Service } from '@/types';
 
 interface ConversationMessage {
   type: 'user' | 'agent';
@@ -28,48 +36,47 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
-  const [currentTranscript, setCurrentTranscript] = useState('');
   const [agentConnected, setAgentConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   
-  const recognitionRef = useRef<ReturnType<typeof createSpeechRecognition>>(null);
-  const agentConnectionRef = useRef<AgentConnection | null>(null);
-  const stopRecognitionRef = useRef<(() => void) | null>(null);
+  const conversationRef = useRef<any>(null);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const settings = getSettings();
 
   useEffect(() => {
-    // Request microphone permission on mount
-    requestMicrophonePermission()
+    // Check microphone permission on mount
+    checkMicrophonePermission()
       .then((granted) => {
         setPermissionGranted(granted);
         if (!granted) {
-          setPermissionError('Microphone access is required for this app to work. Please enable microphone permissions in your browser settings.');
+          setPermissionError(
+            'Microphone access is required for voice chat. Please allow microphone access in your browser settings.'
+          );
         }
       })
       .catch((err) => {
-        setPermissionError('Could not access microphone. Please check your browser settings.');
-        console.error('Microphone permission error:', err);
+        logger.error('Microphone permission check failed', err);
+        setPermissionError('Could not check microphone access. Please allow it in your browser settings.');
       });
 
-    // Check ElevenLabs configuration
-    if (!isElevenLabsConfigured()) {
-      setError('ElevenLabs is not configured. Please check your API key.');
-    }
-
     return () => {
-      // Cleanup
-      if (stopRecognitionRef.current) {
-        stopRecognitionRef.current();
+      // Cleanup on unmount
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+      if (conversationRef.current) {
+        endAgentConversation(conversationRef.current).catch((err) => {
+          logger.error('Error cleaning up conversation', err);
+        });
       }
     };
   }, []);
 
   const startConversation = async () => {
     if (!permissionGranted) {
-      setPermissionError('Microphone permission is required.');
+      setPermissionError('Microphone permission is required for voice chat.');
       return;
     }
 
@@ -77,107 +84,63 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     setError(null);
 
     try {
-      // Connect to agent
-      const connection = await connectToAgent();
-      agentConnectionRef.current = connection;
-      setAgentConnected(true);
-      setIsConnecting(false);
-
-      // Initialize speech recognition
-      const recognition = createSpeechRecognition({
-        continuous: true,
-        interimResults: true,
-        lang: 'en-GB',
-      });
-
-      if (!recognition) {
-        setError('Speech recognition is not available in your browser.');
-        return;
+      const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
+      if (!agentId) {
+        throw new Error('Agent ID not configured. Set NEXT_PUBLIC_ELEVENLABS_AGENT_ID in .env.local');
       }
 
-      recognitionRef.current = recognition;
+      logger.info('Starting ElevenLabs agent conversation', { agentId });
 
-      // Start speech recognition
-      const stopFn = startSpeechRecognition(recognition, {
-        onResult: async (result) => {
-          if (result.interim) {
-            setCurrentTranscript(result.interim);
-          }
-          
-          if (result.final) {
-            setCurrentTranscript('');
-            // Sanitize and validate user input
-            const sanitizedText = sanitizeText(result.final);
-            if (!sanitizedText) {
-              // Skip empty messages
-              return;
-            }
+      // Start real-time conversation with ElevenLabs agent
+      const conv = await startAgentConversation(agentId);
+      conversationRef.current = conv;
 
-            // Add user message to conversation
-            const userMessage: ConversationMessage = {
-              type: 'user',
-              text: sanitizedText,
-              timestamp: new Date().toISOString(),
-            };
-            setConversation((prev) => [...prev, userMessage]);
+      // Set up listener for agent responses
+      const unsubscribe = onAgentResponse(conv, (response) => {
+        logger.debug('Agent responded', response);
 
-            // Send to agent and get response
-            setIsLoading(true);
-            try {
-              const agentResponse = await sendMessageToAgent(connection, sanitizedText);
-              
-              // Add agent response to conversation
-              const agentMessage: ConversationMessage = {
-                type: 'agent',
-                text: agentResponse.text || 'I understand. Can you tell me more?',
-                timestamp: new Date().toISOString(),
-              };
-              setConversation((prev) => [...prev, agentMessage]);
-
-              // Play audio if available
-              if (agentResponse.audio) {
-                try {
-                  await playAudioResponse(agentResponse.audio);
-                } catch (audioError) {
-                  console.error('Error playing audio:', audioError);
-                  // Continue even if audio playback fails
-                }
-              }
-              setIsLoading(false);
-            } catch (err) {
-              console.error('Error sending message to agent:', err);
-              setError(handleElevenLabsError(err as Error));
-              setIsLoading(false);
-            }
-          }
-        },
-        onError: (error) => {
-          console.error('Speech recognition error:', error);
-          setError('Speech recognition error. Please try again.');
-        },
-        onStart: () => {
-          setIsListening(true);
-        },
-        onEnd: () => {
-          setIsListening(false);
-        },
+        // Add agent message to conversation
+        const agentMessage: ConversationMessage = {
+          type: 'agent',
+          text: response.text || 'I am listening...',
+          timestamp: response.timestamp,
+        };
+        setConversation((prev) => [...prev, agentMessage]);
       });
 
-      stopRecognitionRef.current = stopFn;
+      unsubscribeRef.current = unsubscribe;
+      setAgentConnected(true);
+      setIsConnecting(false);
+      setIsListening(true);
+
+      logger.info('Voice conversation started successfully');
     } catch (err) {
-      console.error('Error starting conversation:', err);
-      setError(handleElevenLabsError(err as Error));
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      logger.error('Error starting conversation', err);
+      setError(handleElevenLabsError(err instanceof Error ? err : new Error(errorMessage)));
       setIsConnecting(false);
       setAgentConnected(false);
     }
   };
 
-  const stopConversation = () => {
-    if (stopRecognitionRef.current) {
-      stopRecognitionRef.current();
-      stopRecognitionRef.current = null;
+  const stopConversation = async () => {
+    try {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+
+      if (conversationRef.current) {
+        await endAgentConversation(conversationRef.current);
+        conversationRef.current = null;
+      }
+
+      setIsListening(false);
+      setAgentConnected(false);
+      logger.info('Voice conversation stopped');
+    } catch (err) {
+      logger.error('Error stopping conversation', err);
     }
-    setIsListening(false);
   };
 
   const endConversation = () => {
