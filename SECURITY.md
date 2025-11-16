@@ -2,6 +2,8 @@
 
 This document covers security best practices for deploying Bobby with ElevenLabs agents.
 
+**→ For detailed Signed URL setup, see [SIGNED_URL_SETUP.md](./SIGNED_URL_SETUP.md)**
+
 ## Authentication Methods
 
 ### 1. Allowlist Approach (Web Apps)
