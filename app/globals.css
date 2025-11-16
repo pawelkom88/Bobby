@@ -1,0 +1,58 @@
+/**
+ * Global styles for accessibility features
+ * User will add their own styling, but these classes are available for:
+ * - Dyslexia-friendly font
+ * - High contrast mode
+ * - Reduced sensory mode
+ * - Font size adjustments
+ */
+
+:root {
+  --font-size-base: 16px;
+}
+
+/* Dyslexia-friendly font class */
+.dyslexia-font {
+  /* User can add OpenDyslexic or similar font here */
+}
+
+/* High contrast mode */
+.high-contrast {
+  /* User can add high contrast color scheme here */
+}
+
+/* Reduced sensory mode */
+.reduced-sensory * {
+  /* User can reduce animations, simplify effects here */
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Ensure minimum touch target sizes (44x44px) */
+button,
+a,
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
