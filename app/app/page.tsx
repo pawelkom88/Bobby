@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import AgeSelector from '@/components/AgeSelector';
 import SituationSelector from '@/components/SituationSelector';
@@ -30,19 +30,50 @@ export default function AppPage() {
     step: Step;
     ageTier: AgeTier | null;
     situation: Service | null;
+    fromDialing?: boolean;
   };
 
   const [session, setSession, clearSession] = useLocalStorage<CallSession>('bobby-call-session', {
     step: STEPS.WELCOME,
     ageTier: null,
     situation: null,
+    fromDialing: false,
   });
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
 
   const progress = getUserProgress();
 
+  // Validate session integrity - reset if incomplete or invalid
+  const isSessionValid = (): boolean => {
+    // If in conversation or completion, must have both ageTier and situation
+    if (session.step === STEPS.CONVERSATION || session.step === STEPS.COMPLETION) {
+      return session.ageTier !== null && session.situation !== null;
+    }
+    // For other steps, validation is more lenient
+    return true;
+  };
+
+  // Reset to welcome if session is invalid
+  useEffect(() => {
+    if (!isSessionValid()) {
+      setSession((prev) => ({
+        ...prev,
+        step: STEPS.WELCOME,
+        ageTier: null,
+        situation: null,
+        fromDialing: false,
+      }));
+    }
+  }, [session.step, session.ageTier, session.situation]);
+
   const handleCallBobby = () => {
-    setSession((prev) => ({ ...prev, step: STEPS.AGE_SELECTION }));
+    setSession((prev) => ({
+      ...prev,
+      step: STEPS.AGE_SELECTION,
+      ageTier: null,
+      situation: null,
+      fromDialing: false,
+    }));
   };
 
   const handleAgeSelected = (tier: AgeTierConfig) => {
@@ -62,7 +93,7 @@ export default function AppPage() {
   };
 
   const handleCorrectNumber = () => {
-    setSession((prev) => ({ ...prev, step: STEPS.CONVERSATION }));
+    setSession((prev) => ({ ...prev, step: STEPS.CONVERSATION, fromDialing: true }));
   };
 
   const handleConversationComplete = (conversation: ConversationMessage[]) => {
@@ -86,11 +117,33 @@ export default function AppPage() {
   const handleContinue = () => {
     // Reset for new scenario
     setPerformance({});
-    clearSession();
+    setSession((prev) => ({
+      ...prev,
+      step: STEPS.WELCOME,
+      ageTier: null,
+      situation: null,
+      fromDialing: false,
+    }));
   };
 
   const handleViewAchievements = () => {
     clearSession();
+  };
+
+  const handleBackFromAge = () => {
+    setSession((prev) => ({ ...prev, step: STEPS.WELCOME, ageTier: null }));
+  };
+
+  const handleBackFromSituation = () => {
+    setSession((prev) => ({ ...prev, step: STEPS.AGE_SELECTION }));
+  };
+
+  const handleBackFromDial = () => {
+    setSession((prev) => ({ ...prev, step: STEPS.SITUATION_SELECTION }));
+  };
+
+  const handleBackFromConversation = () => {
+    setSession((prev) => ({ ...prev, step: STEPS.DIALING }));
   };
 
   // Welcome Screen
@@ -129,7 +182,7 @@ export default function AppPage() {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
-          <AgeSelector onSelect={handleAgeSelected} selectedTier={session.ageTier} />
+          <AgeSelector onSelect={handleAgeSelected} selectedTier={session.ageTier} onBack={handleBackFromAge} />
         </main>
       </ErrorBoundary>
     );
@@ -140,7 +193,7 @@ export default function AppPage() {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
-          <SituationSelector onSelect={handleSituationSelected} selectedSituation={session.situation} />
+          <SituationSelector onSelect={handleSituationSelected} selectedSituation={session.situation} onBack={handleBackFromSituation} />
         </main>
       </ErrorBoundary>
     );
@@ -151,7 +204,7 @@ export default function AppPage() {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
-          <DialPad onCorrectNumber={handleCorrectNumber} />
+          <DialPad onCorrectNumber={handleCorrectNumber} onBack={handleBackFromDial} />
         </main>
       </ErrorBoundary>
     );
@@ -166,6 +219,8 @@ export default function AppPage() {
             ageTier={session.ageTier ?? undefined}
             situation={session.situation ?? undefined}
             onComplete={handleConversationComplete}
+            onBack={handleBackFromConversation}
+            autoStart={session.fromDialing === true}
           />
         </main>
       </ErrorBoundary>

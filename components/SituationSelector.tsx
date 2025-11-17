@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import CartoonButton from './CartoonButton';
 import type { Situation, Service } from '@/types';
 
 const SITUATIONS: Situation[] = [
@@ -24,12 +25,13 @@ const SITUATIONS: Situation[] = [
 interface SituationSelectorProps {
   onSelect?: (situation: Situation) => void;
   selectedSituation?: Service | null;
+  onBack?: () => void;
 }
 
 /**
  * Situation selector component with three situation tiles
  */
-export default function SituationSelector({ onSelect, selectedSituation = null }: SituationSelectorProps) {
+export default function SituationSelector({ onSelect, selectedSituation = null, onBack }: SituationSelectorProps) {
   const [selected, setSelected] = useState<Service | null>(selectedSituation);
 
   const handleSelect = (situation: Situation) => {
@@ -41,24 +43,28 @@ export default function SituationSelector({ onSelect, selectedSituation = null }
 
   return (
     <div className="situation-selector" role="radiogroup" aria-label="Select emergency situation">
-      <h2 className="situation-selector-title">WHAT HAPPENED</h2>
+      <div className="selector-header">
+        <h2 className="situation-selector-title">WHAT HAPPENED</h2>
+        {onBack && (
+          <CartoonButton
+            onClick={onBack}
+            ariaLabel="Go back to age selection"
+          >
+            ← Back
+          </CartoonButton>
+        )}
+      </div>
       <p className="situation-selector-subtitle">Choose situation</p>
       
       <div className="situation-tiles">
         {SITUATIONS.map((situation) => (
-          <button
+          <CartoonButton
             key={situation.id}
-            type="button"
-            className={`situation-tile ${selected === situation.id ? 'selected' : ''}`}
             onClick={() => handleSelect(situation)}
-            aria-pressed={selected === situation.id}
-            aria-label={`${situation.label} emergency`}
+            ariaLabel={`${situation.label} emergency`}
           >
-            <span className="situation-icon" aria-hidden="true">
-              {situation.icon}
-            </span>
-            <span className="situation-label">{situation.label.toUpperCase()}</span>
-          </button>
+            {situation.icon} {situation.label.toUpperCase()}
+          </CartoonButton>
         ))}
       </div>
     </div>

@@ -30,9 +30,14 @@ type AssessmentOptions = {
 };
 
 const EMERGENCY_KEYWORDS: Record<Service, string[]> = {
-  fire: ['fire', 'smoke', 'burn', 'burning', 'flames', 'hot', 'kitchen', 'house on fire'],
-  ambulance: ['ambulance', 'hurt', 'injured', 'bleeding', 'not breathing', 'passed out', 'sick', 'medical'],
-  police: ['police', 'intruder', 'break in', 'stole', 'stealing', 'kidnap', 'danger', 'fight'],
+  fire: ['fire', 'smoke', 'burn', 'burning', 'flames', 'hot', 'kitchen', 'house on fire', 'blaze', 'combustion'],
+  ambulance: [
+    'ambulance', 'hurt', 'injured', 'bleeding', 'not breathing', 'passed out', 'sick', 'medical',
+    'pain', 'hurt', 'accident', 'twisted', 'broken', 'fracture', 'sprain', 'wound', 'emergency',
+    'help', 'ill', 'illness', 'injury', 'injure', 'emergency', 'problem', 'issue',
+    'fell', 'fall', 'cut', 'bruise', 'emergency', 'please', 'need help', 'urgent'
+  ],
+  police: ['police', 'intruder', 'break in', 'stole', 'stealing', 'kidnap', 'danger', 'fight', 'crime', 'help', 'emergency'],
 };
 
 const LOCATION_KEYWORDS = [
@@ -84,6 +89,23 @@ const CONDITION_KEYWORDS = [
   'collapsed',
   'fainted',
   'seizure',
+  'twisted',
+  'broken',
+  'fracture',
+  'sprain',
+  'pain',
+  'aching',
+  'bruise',
+  'bruised',
+  'swollen',
+  'limp',
+  'wound',
+  'cut',
+  'bleeding',
+  'unconscious',
+  'choking',
+  'suffocating',
+  'drowning',
 ];
 
 const IRRELEVANT_KEYWORDS = [

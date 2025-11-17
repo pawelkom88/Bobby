@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Confetti from './Confetti';
 import BadgeDisplay from './BadgeDisplay';
 import LevelProgress from './LevelProgress';
+import CartoonButton from './CartoonButton';
 import { getLevel, addXP, saveConversation } from '@/lib/storage';
 import { calculateXPEarned } from '@/lib/gamification';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
@@ -164,22 +165,18 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
         )}
 
         <div className="completion-actions">
-          <button
-            type="button"
-            className="continue-button"
+          <CartoonButton
             onClick={handleContinue}
-            aria-label="Continue to next scenario"
+            ariaLabel="Continue to next scenario"
           >
             Try Another Scenario
-          </button>
-          <button
-            type="button"
-            className="achievements-button"
+          </CartoonButton>
+          <CartoonButton
             onClick={handleViewAchievements}
-            aria-label="View achievements"
+            ariaLabel="View achievements"
           >
             View Achievements
-          </button>
+          </CartoonButton>
         </div>
       </div>
     </div>

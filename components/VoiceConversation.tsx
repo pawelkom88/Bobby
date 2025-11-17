@@ -16,6 +16,7 @@ import { getSettings } from '@/lib/storage';
 import { sanitizeText } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 import LoadingSpinner from './LoadingSpinner';
+import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
 import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
@@ -24,12 +25,20 @@ interface VoiceConversationProps {
   ageTier?: AgeTier;
   situation?: Service;
   onComplete?: (conversation: ConversationMessage[]) => void;
+  onBack?: () => void;
+  autoStart?: boolean;
 }
 
 /**
  * Voice conversation component with microphone and ElevenLabs integration
  */
-export default function VoiceConversation({ ageTier, situation, onComplete }: VoiceConversationProps) {
+export default function VoiceConversation({
+  ageTier,
+  situation,
+  onComplete,
+  onBack,
+  autoStart = false,
+}: VoiceConversationProps) {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -48,6 +57,20 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   const settings = getSettings();
   const { soundEnabled } = useSound();
 
+  // Clear session localStorage before navigating away during error
+  const clearSessionAndNavigate = (url: string) => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('bobby-call-session');
+      }
+      window.location.href = url;
+    } catch (error) {
+      logger.error('Error clearing session', error);
+      window.location.href = url;
+    }
+  };
+
+  // Auto-start conversation when component mounts with autoStart flag
   useEffect(() => {
     // Check microphone permission on mount
     checkMicrophonePermission()
@@ -83,6 +106,18 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       }
     };
   }, []);
+
+  // Auto-start conversation if autoStart is true and permissions are granted
+  useEffect(() => {
+    if (autoStart && permissionGranted && !agentConnected) {
+      logger.info('Auto-starting conversation');
+      // Small delay to ensure component is mounted
+      const timer = setTimeout(() => {
+        void startConversation();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoStart, permissionGranted, agentConnected]);
 
   const startConversation = async () => {
     if (!permissionGranted) {
@@ -275,8 +310,33 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     return (
       <div className="voice-conversation" role="alert">
         <div className="connection-error">
-          <h3>Connection Error</h3>
-          <p>{error}</p>
+          <div className="error-header">
+            <h3>Connection Error</h3>
+            <p>We couldn't connect to Bobby. Please try again.</p>
+          </div>
+          <p className="error-details">{error}</p>
+          <div className="error-action-buttons">
+            {onBack && (
+              <CartoonButton
+                onClick={onBack}
+                ariaLabel="Go back to previous step"
+              >
+                ← Go Back
+              </CartoonButton>
+            )}
+            <CartoonButton
+              onClick={() => clearSessionAndNavigate('/')}
+              ariaLabel="Return to home"
+            >
+              Home
+            </CartoonButton>
+            <CartoonButton
+              onClick={() => clearSessionAndNavigate('/contact')}
+              ariaLabel="Contact us for support"
+            >
+              Contact Us
+            </CartoonButton>
+          </div>
         </div>
       </div>
     );
@@ -284,24 +344,35 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
   return (
     <div className="voice-conversation" role="region" aria-label="Voice conversation">
-      <h2 className="conversation-title">CALL WITH BOBBY</h2>
+      <div className="conversation-header">
+        <h2 className="conversation-title">CALL WITH BOBBY</h2>
+        {onBack && !agentConnected && (
+          <button
+            type="button"
+            className="back-button"
+            onClick={onBack}
+            aria-label="Go back to dial pad"
+          >
+            ← Back
+          </button>
+        )}
+      </div>
       <p className="conversation-subtitle">Stay calm, you're doing great!</p>
 
       {!agentConnected && (
         <div className="conversation-start-section">
           {isConnecting ? (
             <LoadingSpinner message="Connecting to Bobby..." />
+          ) : autoStart ? (
+            <LoadingSpinner message="Connecting to Bobby..." />
           ) : (
-            <button
-              type="button"
-              className="start-conversation-button"
+            <CartoonButton
               onClick={startConversation}
               disabled={!permissionGranted || isConnecting}
-              aria-label="Start conversation with Bobby"
-              aria-disabled={!permissionGranted || isConnecting}
+              ariaLabel="Start conversation with Bobby"
             >
               Start Conversation
-            </button>
+            </CartoonButton>
           )}
         </div>
       )}
@@ -349,32 +420,26 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
           <div className="conversation-controls">
             {isListening ? (
-              <button
-                type="button"
-                className="stop-button"
+              <CartoonButton
                 onClick={stopConversation}
-                aria-label="Stop listening"
+                ariaLabel="Stop listening"
               >
                 Stop Listening
-              </button>
+              </CartoonButton>
             ) : (
-              <button
-                type="button"
-                className="start-button"
+              <CartoonButton
                 onClick={startConversation}
-                aria-label="Start listening"
+                ariaLabel="Start listening"
               >
                 Start Listening
-              </button>
+              </CartoonButton>
             )}
-            <button
-              type="button"
-              className="end-button"
+            <CartoonButton
               onClick={endConversation}
-              aria-label="End conversation"
+              ariaLabel="End conversation"
             >
               End Call
-            </button>
+            </CartoonButton>
           </div>
         </>
       )}

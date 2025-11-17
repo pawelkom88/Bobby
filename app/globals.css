@@ -20,20 +20,27 @@
 @import url('https://fonts.googleapis.com');
 @import url('https://fonts.gstatic.com');
 
-/* Import Google Fonts - League Gothic + Source Sans 3 with full weight range */
-@import url('https://fonts.googleapis.com/css2?family=League+Gothic&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+/* Import Google Fonts - Kavoon for all cartoon elements */
+@import url('https://fonts.googleapis.com/css?family=Kavoon');
 
 /* ============================================================================
    CSS CUSTOM PROPERTIES - Font families and base styling
    ============================================================================ */
 
 :root {
-  /* Font families - League Gothic for headings, Source Sans 3 for body */
-  --font-family-heading: 'League Gothic', sans-serif;
-  --font-family-body: 'Source Sans 3', sans-serif;
+  /* Font family - Kavoon for all elements */
+  --font-family-body: 'Kavoon', cursive;
+  --font-family-heading: 'Kavoon', cursive;
+  --font-family-cartoon: 'Kavoon', cursive;
   
   /* Font sizing */
   --font-size-base: 16px;
+
+  /* Cartoon Button Colors */
+  --btn-color: #fccb39;
+  --btn-border-color: #eb6934;
+  --btn-text-color: #9a431f;
+  --btn-light-color: #ffda66;
 }
 
 /* ============================================================================
@@ -67,27 +74,15 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ============================================================================
-   HEADING UTILITY CLASSES - Source Sans 3 weight variants
+   HEADING UTILITY CLASSES - Kavoon font variants
    ============================================================================ */
-
-.font-light {
-  font-weight: 200;
-}
 
 .font-regular {
   font-weight: 400;
 }
 
-.font-semibold {
-  font-weight: 600;
-}
-
 .font-bold {
-  font-weight: 700;
-}
-
-.font-extrabold {
-  font-weight: 800;
+  font-weight: bold;
 }
 
 .font-italic {
@@ -95,51 +90,28 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ============================================================================
-   HEADING STYLES - League Gothic with variations
+   HEADING STYLES - Kavoon
    ============================================================================ */
 
-.heading-league,
-.league-gothic {
-  font-family: var(--font-family-heading);
-  font-optical-sizing: auto;
+.heading-cartoon,
+.kavoon {
+  font-family: var(--font-family-cartoon);
   font-weight: 400;
-  font-style: normal;
-  font-variation-settings: 'wdth' 100;
 }
 
 /* ============================================================================
-   BODY TEXT STYLES - Source Sans 3 with variations
+   BODY TEXT STYLES - Kavoon
    ============================================================================ */
 
-.body-text-light,
-.source-sans-3-light {
+.body-text-regular {
   font-family: var(--font-family-body);
-  font-optical-sizing: auto;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.body-text-regular,
-.source-sans-3 {
-  font-family: var(--font-family-body);
-  font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
 
-.body-text-semibold,
-.source-sans-3-semibold {
+.body-text-bold {
   font-family: var(--font-family-body);
-  font-optical-sizing: auto;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.body-text-bold,
-.source-sans-3-bold {
-  font-family: var(--font-family-body);
-  font-optical-sizing: auto;
-  font-weight: 700;
+  font-weight: bold;
   font-style: normal;
 }
 
@@ -591,5 +563,892 @@ a,
 }
 
 /* ============================================================================
-   ???
+   APP PAGE & MAIN LAYOUT
    ============================================================================ */
+
+.app-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  width: 100%;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   AGE SELECTOR STYLES
+   ============================================================================ */
+
+.age-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.age-selector-title {
+  margin: 0;
+  font-size: 2.5rem;
+  text-align: center;
+  font-family: var(--font-family-cartoon);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.age-selector-subtitle {
+  margin: 0;
+  color: #666;
+  text-align: center;
+}
+
+.age-tier-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.age-tier-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 2px solid #ddd;
+  border-radius: 1rem;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 140px;
+}
+
+.age-tier-button:hover {
+  border-color: #fbbf24;
+  background: #fffbeb;
+  transform: translateY(-2px);
+}
+
+.age-tier-button.selected {
+  border-color: #fbbf24;
+  background: #fef3c7;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+}
+
+.age-tier-button:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.age-tier-icon {
+  font-size: 2.5rem;
+}
+
+.age-tier-label {
+  font-size: 0.9rem;
+}
+
+/* ============================================================================
+   SITUATION SELECTOR STYLES
+   ============================================================================ */
+
+.situation-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.situation-selector-title {
+  margin: 0;
+  font-size: 2.5rem;
+  text-align: center;
+  font-family: var(--font-family-cartoon);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.situation-selector-subtitle {
+  margin: 0;
+  color: #666;
+  text-align: center;
+}
+
+.situation-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.situation-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 2px solid #ddd;
+  border-radius: 1rem;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-height: 160px;
+}
+
+.situation-tile:hover {
+  border-color: #fbbf24;
+  background: #fffbeb;
+  transform: translateY(-2px);
+}
+
+.situation-tile.selected {
+  border-color: #fbbf24;
+  background: #fef3c7;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+}
+
+.situation-tile:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.situation-icon {
+  font-size: 3rem;
+}
+
+.situation-label {
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* ============================================================================
+   DIAL PAD STYLES
+   ============================================================================ */
+
+.dial-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dial-pad-title {
+  margin: 0;
+  font-size: 2.5rem;
+  text-align: center;
+  font-family: var(--font-family-cartoon);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.dial-pad-subtitle {
+  margin: 0;
+  color: #666;
+  text-align: center;
+}
+
+.dial-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 0.75rem;
+  border: 2px solid #ddd;
+}
+
+.dial-number {
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 0.5rem;
+  color: #111;
+  font-family: 'Courier New', monospace;
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-number.error {
+  color: #dc2626;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.dial-error-message {
+  color: #dc2626;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.number-pad-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.number-button {
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 2px solid #ddd;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-height: 60px;
+  font-family: var(--font-family-body);
+}
+
+.number-button:not(:disabled):hover {
+  border-color: #fbbf24;
+  background: #fffbeb;
+  transform: scale(1.05);
+}
+
+.number-button:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+.number-button:disabled {
+  opacity: 0;
+  cursor: default;
+  pointer-events: none;
+}
+
+.number-button:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.number-pad.error-state .number-button:not(:disabled) {
+  border-color: #dc2626;
+}
+
+/* ============================================================================
+   CARTOON DIAL PAD STYLES
+   ============================================================================ */
+
+.cartoon-dial-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  padding: 2rem 1rem;
+  overflow: visible;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.dial-pad-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.dial-pad-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  gap: 1rem;
+}
+
+.phone-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.phone {
+  background: linear-gradient(145deg, #ff6b6b, #ee5a6f);
+  border-radius: 40px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 8px solid #fff;
+  width: 100%;
+  max-width: 400px;
+}
+
+.display {
+  background: #2d3561;
+  color: #4effb8;
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: right;
+  font-size: 32px;
+  min-height: 50px;
+  font-weight: bold;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 4px solid #1a1f3a;
+  letter-spacing: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.key {
+  background: linear-gradient(145deg, #ffd93d, #ffbe0b);
+  border: 5px solid #fff;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2d3561;
+  box-shadow: 0 8px 0 #d4a000, 0 12px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s;
+  user-select: none;
+  border: none;
+  font-family: var(--font-family-body);
+}
+
+.key:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #d4a000, 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.key:hover {
+  background: linear-gradient(145deg, #ffe770, #ffd93d);
+  transform: scale(1.05);
+}
+
+.key:focus-visible {
+  outline: 3px solid var(--color-yellow-400);
+  outline-offset: 2px;
+}
+
+.key .letters {
+  font-size: 10px;
+  color: #555;
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+
+.key.star,
+.key.hash {
+  background: linear-gradient(145deg, #4ecdc4, #44a8a0);
+  font-size: 36px;
+}
+
+.key.star:hover,
+.key.hash:hover {
+  background: linear-gradient(145deg, #6de4dc, #4ecdc4);
+}
+
+.key.zero {
+  background: linear-gradient(145deg, #95e1d3, #7ad1c2);
+}
+
+.key.zero:hover {
+  background: linear-gradient(145deg, #b0efe2, #95e1d3);
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 15px;
+  border-radius: 20px;
+  border: 5px solid #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s;
+  color: white;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2), 0 8px 15px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-family-body);
+}
+
+.action-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn:focus-visible {
+  outline: 3px solid var(--color-yellow-400);
+  outline-offset: 2px;
+}
+
+.call-btn {
+  background: linear-gradient(145deg, #51cf66, #37b24d);
+}
+
+.call-btn:hover:not(:disabled) {
+  background: linear-gradient(145deg, #69db7c, #51cf66);
+}
+
+.call-btn:disabled {
+  background: linear-gradient(145deg, #cbd5e0, #a0aec0);
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.1), 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.call-btn:disabled:active {
+  transform: none;
+}
+
+.clear-btn {
+  background: linear-gradient(145deg, #ff6b6b, #fa5252);
+}
+
+.clear-btn:hover {
+  background: linear-gradient(145deg, #ff8787, #ff6b6b);
+}
+
+/* ============================================================================
+   CARTOON ERROR SPEECH BUBBLE
+   ============================================================================ */
+
+.error-bubble {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 9999;
+  animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 300px;
+  width: auto;
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+
+.bubble-content {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border: 4px solid #fff;
+  border-radius: 30px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 0 4px #fff;
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+  font-family: var(--font-family-body);
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.bubble-tail {
+  position: absolute;
+  bottom: -15px;
+  left: 30px;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 0 solid transparent;
+  border-top: 15px solid #fbbf24;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+  z-index: 1;
+}
+
+@keyframes slideInBounce {
+  0% {
+    opacity: 0;
+    transform: translateX(-120px) translateY(-80px) scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(8px) translateY(5px) scale(1.1);
+  }
+  80% {
+    transform: translateX(-3px) translateY(0) scale(0.98);
+  }
+  100% {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .error-bubble {
+    top: 10px;
+    left: 10px;
+    max-width: 240px;
+  }
+
+  .bubble-content {
+    padding: 0.9rem 1.1rem;
+    font-size: 0.85rem;
+    border-radius: 25px;
+    border: 3px solid #fff;
+  }
+
+  .bubble-tail {
+    bottom: -12px;
+    left: 25px;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #fbbf24;
+  }
+}
+
+@media (max-width: 480px) {
+  .error-bubble {
+    top: 8px;
+    left: 8px;
+    max-width: 200px;
+  }
+
+  .bubble-content {
+    padding: 0.8rem 1rem;
+    font-size: 0.75rem;
+    border-radius: 20px;
+    border: 3px solid #fff;
+  }
+
+  .bubble-tail {
+    bottom: -10px;
+    left: 20px;
+    border-left: 10px solid transparent;
+    border-top: 10px solid #fbbf24;
+  }
+}
+
+/* ============================================================================
+   CARTOON BUTTON STYLES - 3D effect with perspective
+   ============================================================================ */
+
+.question {
+  font-size: 2rem;
+  color: var(--btn-text-color);
+  font-family: var(--font-family-cartoon);
+}
+
+.btn-container {
+  display: inline-flex;
+  transform-style: preserve-3d;
+  perspective: 200px;
+  margin: 0.5rem;
+}
+
+.cartoon-btn {
+  --rotate-angle: 15deg;
+  --direction: -1;
+  border: 0.25rem solid var(--btn-border-color);
+  padding: 0.5rem 2rem;
+  border-radius: 0.5rem;
+  transform: rotateY(calc(var(--rotate-angle) * var(--direction)));
+  transform-style: preserve-3d;
+  box-shadow: calc(var(--direction) * 0.1rem) 0.5rem 0rem 0.05rem var(--btn-text-color);
+  background-color: var(--btn-color);
+  text-decoration: none;
+  color: var(--btn-text-color);
+  font-weight: 700;
+  font-family: var(--font-family-cartoon);
+  outline: 0;
+  position: relative;
+  overflow: hidden;
+  transition: all ease 0.15s;
+  top: 0;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.cartoon-btn:active {
+  top: 0.25rem;
+  box-shadow: calc(var(--direction) * 0.1rem) 0.2rem 0rem 0.05rem var(--btn-text-color);
+}
+
+.cartoon-btn::after {
+  content: "";
+  position: absolute;
+  height: 80%;
+  width: 99%;
+  background-color: var(--btn-light-color);
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.cartoon-btn:focus {
+  outline: 0;
+}
+
+.cartoon-btn span {
+  position: relative;
+  transform: rotateY(calc(var(--rotate-angle) * var(--direction) * -1));
+  z-index: 2;
+}
+
+.cartoon-btn:hover:not(:disabled) {
+  transform: rotateY(calc(var(--rotate-angle) * var(--direction))) scale(1.05);
+}
+
+.cartoon-btn:focus-visible {
+  outline: 3px solid var(--btn-text-color);
+  outline-offset: 2px;
+}
+
+.cartoon-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   BACK BUTTON & NAVIGATION HEADER STYLES
+   ============================================================================ */
+
+.selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--color-gray-700);
+  color: var(--color-gray-100);
+  border: 2px solid var(--color-gray-600);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-family-body);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.back-button:hover:not(:disabled) {
+  background-color: var(--color-gray-600);
+  border-color: var(--color-gray-500);
+  transform: translateX(-2px);
+}
+
+.back-button:active:not(:disabled) {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-700);
+  transform: translateX(-1px);
+}
+
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.back-button:focus-visible {
+  outline: 3px solid var(--color-yellow-400);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   ERROR HANDLING - Connection errors with action buttons
+   ============================================================================ */
+
+.connection-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #fef2f2;
+  border: 2px solid #ef4444;
+  border-radius: 0.5rem;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.error-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.connection-error h3 {
+  color: #dc2626;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.connection-error p {
+  color: #7f1d1d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.error-details {
+  color: #991b1b;
+  font-size: 0.9rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.375rem;
+  border-left: 4px solid #dc2626;
+}
+
+.error-action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  background-color: #7c3aed;
+  color: white;
+  border: 2px solid #6d28d9;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-family-body);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.home-button:hover:not(:disabled) {
+  background-color: #6d28d9;
+  border-color: #5b21b6;
+  transform: translateY(-2px);
+}
+
+.home-button:active:not(:disabled) {
+  background-color: #5b21b6;
+  border-color: #4c1d95;
+  transform: translateY(0);
+}
+
+.home-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.home-button:focus-visible {
+  outline: 3px solid var(--color-yellow-400);
+  outline-offset: 2px;
+}
+
+.contact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  background-color: #2563eb;
+  color: white;
+  border: 2px solid #1d4ed8;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-family-body);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.contact-button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  border-color: #1e40af;
+  transform: translateY(-2px);
+}
+
+.contact-button:active:not(:disabled) {
+  background-color: #1e40af;
+  border-color: #1e3a8a;
+  transform: translateY(0);
+}
+
+.contact-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.contact-button:focus-visible {
+  outline: 3px solid var(--color-yellow-400);
+  outline-offset: 2px;
+}
