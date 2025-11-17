@@ -57,18 +57,6 @@ export default function VoiceConversation({
   const settings = getSettings();
   const { soundEnabled } = useSound();
 
-  // Clear session localStorage before navigating away during error
-  const clearSessionAndNavigate = (url: string) => {
-    try {
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('bobby-call-session');
-      }
-      window.location.href = url;
-    } catch (error) {
-      logger.error('Error clearing session', error);
-      window.location.href = url;
-    }
-  };
 
   // Auto-start conversation when component mounts with autoStart flag
   useEffect(() => {
@@ -325,13 +313,13 @@ export default function VoiceConversation({
               </CartoonButton>
             )}
             <CartoonButton
-              onClick={() => clearSessionAndNavigate('/')}
+              onClick={() => window.location.href = '/'}
               ariaLabel="Return to home"
             >
               Home
             </CartoonButton>
             <CartoonButton
-              onClick={() => clearSessionAndNavigate('/contact')}
+              onClick={() => window.location.href = '/contact'}
               ariaLabel="Contact us for support"
             >
               Contact Us
