@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { validateEmergencyNumber } from '@/lib/validation';
+import { useSound } from './SoundProvider';
+import { playUiClick } from '@/lib/uiSound';
 
 const CORRECT_NUMBER = '999';
 const NUMBER_PAD: string[][] = [
@@ -22,6 +24,7 @@ interface DialPadProps {
 export default function DialPad({ onCorrectNumber, targetNumber = CORRECT_NUMBER }: DialPadProps) {
   const [input, setInput] = useState('');
   const [hasError, setHasError] = useState(false);
+  const { soundEnabled } = useSound();
 
   useEffect(() => {
     // Clear error when user starts typing again
@@ -31,6 +34,10 @@ export default function DialPad({ onCorrectNumber, targetNumber = CORRECT_NUMBER
   }, [input, hasError]);
 
   const handleNumberClick = (value: string) => {
+    // UI click sound for any non-empty key (numbers and backspace)
+    if (value) {
+      void playUiClick(soundEnabled);
+    }
     if (value === '⌫') {
       // Backspace
       setInput((prev) => prev.slice(0, -1));

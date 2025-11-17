@@ -16,6 +16,8 @@ import { getSettings } from '@/lib/storage';
 import { sanitizeText } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 import LoadingSpinner from './LoadingSpinner';
+import { useSound } from './SoundProvider';
+import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 
 interface VoiceConversationProps {
@@ -41,8 +43,10 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
   const conversationRef = useRef<any>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const stopSpeechRecognitionRef = useRef<(() => void) | null>(null);
+  const stopConnectingSoundRef = useRef<(() => void) | null>(null);
 
   const settings = getSettings();
+  const { soundEnabled } = useSound();
 
   useEffect(() => {
     // Check microphone permission on mount
@@ -62,6 +66,10 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
     return () => {
       // Cleanup on unmount
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
       }
@@ -84,6 +92,12 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
     setIsConnecting(true);
     setError(null);
+    // Start connecting sound (UI SFX)
+    if (stopConnectingSoundRef.current) {
+      stopConnectingSoundRef.current();
+      stopConnectingSoundRef.current = null;
+    }
+    stopConnectingSoundRef.current = startConnectingSound(soundEnabled);
 
         try {
           const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
@@ -114,6 +128,11 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       setAgentConnected(true);
       setIsConnecting(false);
       setIsListening(true);
+      // Stop connecting sound once connected
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
 
       // Start speech-to-text recognition
       const stopSpeechRecognition = startSpeechToText(
@@ -178,6 +197,11 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
       setError(handleElevenLabsError(err instanceof Error ? err : new Error(errorMessage)));
       setIsConnecting(false);
       setAgentConnected(false);
+      // Stop connecting sound on error
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
     }
   };
 
@@ -203,6 +227,8 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
 
   const endConversation = () => {
     stopConversation();
+    // Play end-of-conversation UI sound (does not affect agent audio policy)
+    void playEndConversationSound(soundEnabled);
     if (onComplete) {
       onComplete(conversation);
     }
@@ -210,6 +236,28 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     setConversation([]);
     setCurrentTranscript('');
   };
+
+  // Keep connecting sound in sync with UI toggle while connecting
+  useEffect(() => {
+    if (!isConnecting) {
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
+      return;
+    }
+    // isConnecting
+    if (soundEnabled) {
+      if (!stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current = startConnectingSound(true);
+      }
+    } else {
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
+    }
+  }, [isConnecting, soundEnabled]);
 
   if (permissionError) {
     return (
@@ -250,6 +298,7 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
               onClick={startConversation}
               disabled={!permissionGranted || isConnecting}
               aria-label="Start conversation with Bobby"
+              aria-disabled={!permissionGranted || isConnecting}
             >
               Start Conversation
             </button>
