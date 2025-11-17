@@ -11,7 +11,8 @@ import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import { getUserProgress } from '@/lib/storage';
 import { assessConversation } from '@/lib/assessment';
-import type { AgeTierConfig, Situation, PerformanceMetrics, ConversationMessage } from '@/types';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import type { AgeTierConfig, Situation, PerformanceMetrics, ConversationMessage, AgeTier, Service } from '@/types';
 
 type Step = 'welcome' | 'age_selection' | 'situation_selection' | 'dialing' | 'conversation' | 'completion';
 
@@ -24,42 +25,50 @@ const STEPS: Record<string, Step> = {
   COMPLETION: 'completion',
 };
 
-interface ConversationMessage {
-  type: 'user' | 'agent';
-  text: string;
-  timestamp: string;
-}
-
 export default function AppPage() {
-  const [currentStep, setCurrentStep] = useState<Step>(STEPS.WELCOME);
-  const [selectedAgeTier, setSelectedAgeTier] = useState<AgeTierConfig | null>(null);
-  const [selectedSituation, setSelectedSituation] = useState<Situation | null>(null);
+  type CallSession = {
+    step: Step;
+    ageTier: AgeTier | null;
+    situation: Service | null;
+  };
+
+  const [session, setSession, clearSession] = useLocalStorage<CallSession>('bobby-call-session', {
+    step: STEPS.WELCOME,
+    ageTier: null,
+    situation: null,
+  });
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
 
   const progress = getUserProgress();
 
   const handleCallBobby = () => {
-    setCurrentStep(STEPS.AGE_SELECTION);
+    setSession((prev) => ({ ...prev, step: STEPS.AGE_SELECTION }));
   };
 
   const handleAgeSelected = (tier: AgeTierConfig) => {
-    setSelectedAgeTier(tier);
-    setCurrentStep(STEPS.SITUATION_SELECTION);
+    setSession((prev) => ({
+      ...prev,
+      ageTier: tier.id,
+      step: STEPS.SITUATION_SELECTION,
+    }));
   };
 
   const handleSituationSelected = (situation: Situation) => {
-    setSelectedSituation(situation);
-    setCurrentStep(STEPS.DIALING);
+    setSession((prev) => ({
+      ...prev,
+      situation: situation.id,
+      step: STEPS.DIALING,
+    }));
   };
 
   const handleCorrectNumber = () => {
-    setCurrentStep(STEPS.CONVERSATION);
+    setSession((prev) => ({ ...prev, step: STEPS.CONVERSATION }));
   };
 
   const handleConversationComplete = (conversation: ConversationMessage[]) => {
     const assessment = assessConversation(conversation, {
-      ageTier: selectedAgeTier?.id,
-      situation: selectedSituation?.id,
+      ageTier: session.ageTier,
+      situation: session.situation,
     });
 
     const perf: PerformanceMetrics = {
@@ -71,19 +80,21 @@ export default function AppPage() {
     };
 
     setPerformance(perf);
-    setCurrentStep(STEPS.COMPLETION);
+    setSession((prev) => ({ ...prev, step: STEPS.COMPLETION }));
   };
 
   const handleContinue = () => {
     // Reset for new scenario
-    setSelectedAgeTier(null);
-    setSelectedSituation(null);
     setPerformance({});
-    setCurrentStep(STEPS.WELCOME);
+    clearSession();
+  };
+
+  const handleViewAchievements = () => {
+    clearSession();
   };
 
   // Welcome Screen
-  if (currentStep === STEPS.WELCOME) {
+  if (session.step === STEPS.WELCOME) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -114,29 +125,29 @@ export default function AppPage() {
   }
 
   // Age Selection
-  if (currentStep === STEPS.AGE_SELECTION) {
+  if (session.step === STEPS.AGE_SELECTION) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
-          <AgeSelector onSelect={handleAgeSelected} />
+          <AgeSelector onSelect={handleAgeSelected} selectedTier={session.ageTier} />
         </main>
       </ErrorBoundary>
     );
   }
 
   // Situation Selection
-  if (currentStep === STEPS.SITUATION_SELECTION) {
+  if (session.step === STEPS.SITUATION_SELECTION) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
-          <SituationSelector onSelect={handleSituationSelected} />
+          <SituationSelector onSelect={handleSituationSelected} selectedSituation={session.situation} />
         </main>
       </ErrorBoundary>
     );
   }
 
   // Number Dialing
-  if (currentStep === STEPS.DIALING) {
+  if (session.step === STEPS.DIALING) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -147,13 +158,13 @@ export default function AppPage() {
   }
 
   // Voice Conversation
-  if (currentStep === STEPS.CONVERSATION) {
+  if (session.step === STEPS.CONVERSATION) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
           <VoiceConversation
-            ageTier={selectedAgeTier?.id}
-            situation={selectedSituation?.id}
+            ageTier={session.ageTier ?? undefined}
+            situation={session.situation ?? undefined}
             onComplete={handleConversationComplete}
           />
         </main>
@@ -162,15 +173,16 @@ export default function AppPage() {
   }
 
   // Completion Screen
-  if (currentStep === STEPS.COMPLETION) {
+  if (session.step === STEPS.COMPLETION) {
     return (
       <ErrorBoundary>
         <main className="app-page" role="main">
           <CompletionScreen
-            service={selectedSituation?.id}
-            ageTier={selectedAgeTier?.id}
+            service={session.situation ?? undefined}
+            ageTier={session.ageTier ?? undefined}
             performance={performance}
             onContinue={handleContinue}
+            onViewAchievements={handleViewAchievements}
           />
         </main>
       </ErrorBoundary>

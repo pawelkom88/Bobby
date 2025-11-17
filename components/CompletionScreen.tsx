@@ -14,12 +14,13 @@ interface CompletionScreenProps {
   ageTier?: AgeTier;
   performance?: PerformanceMetrics;
   onContinue?: () => void;
+  onViewAchievements?: () => void;
 }
 
 /**
  * Completion screen component with confetti, XP, badges, and level 10 special message
  */
-export default function CompletionScreen({ service, ageTier, performance = {}, onContinue }: CompletionScreenProps) {
+export default function CompletionScreen({ service, ageTier, performance = {}, onContinue, onViewAchievements }: CompletionScreenProps) {
   const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(true);
   const [xpEarned, setXPEarned] = useState(0);
@@ -67,6 +68,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
   };
 
   const handleViewAchievements = () => {
+    if (onViewAchievements) {
+      onViewAchievements();
+    }
     router.push('/achievements');
   };
 
