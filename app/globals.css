@@ -1,24 +1,167 @@
 /**
- * Global styles for accessibility features
- * User will add their own styling, but these classes are available for:
- * - Dyslexia-friendly font
+ * Global styles for Bobby - Kids' Emergency Training App
+ * 
+ * Font stack:
+ * - League Gothic: Bold, playful headings (cartoon aesthetic)
+ * - Source Sans 3: Readable body text with full weight range
+ * 
+ * Accessibility features:
+ * - Dyslexia-friendly font option
  * - High contrast mode
  * - Reduced sensory mode
  * - Font size adjustments
  */
 
+/* ============================================================================
+   FONTS - Google Fonts with preconnect for optimal performance
+   ============================================================================ */
+
+/* Preconnect to Google Fonts CDN for faster font loading */
+@import url('https://fonts.googleapis.com');
+@import url('https://fonts.gstatic.com');
+
+/* Import Google Fonts - League Gothic + Source Sans 3 with full weight range */
+@import url('https://fonts.googleapis.com/css2?family=League+Gothic&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - Font families and base styling
+   ============================================================================ */
+
 :root {
+  /* Font families - League Gothic for headings, Source Sans 3 for body */
+  --font-family-heading: 'League Gothic', sans-serif;
+  --font-family-body: 'Source Sans 3', sans-serif;
+  
+  /* Font sizing */
   --font-size-base: 16px;
 }
 
-/* Dyslexia-friendly font class */
-.dyslexia-font {
-  /* User can add OpenDyslexic or similar font here */
+/* ============================================================================
+   GLOBAL FONT APPLICATION
+   ============================================================================ */
+
+html {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
 }
 
-/* High contrast mode */
+body {
+  font-family: var(--font-family-body);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Apply heading font to all heading elements */
+h1, h2, h3, h4, h5, h6,
+[class*="heading"],
+[class*="title"] {
+  font-family: var(--font-family-heading);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+   HEADING UTILITY CLASSES - Source Sans 3 weight variants
+   ============================================================================ */
+
+.font-light {
+  font-weight: 200;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+.font-italic {
+  font-style: italic;
+}
+
+/* ============================================================================
+   HEADING STYLES - League Gothic with variations
+   ============================================================================ */
+
+.heading-league,
+.league-gothic {
+  font-family: var(--font-family-heading);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+}
+
+/* ============================================================================
+   BODY TEXT STYLES - Source Sans 3 with variations
+   ============================================================================ */
+
+.body-text-light,
+.source-sans-3-light {
+  font-family: var(--font-family-body);
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.body-text-regular,
+.source-sans-3 {
+  font-family: var(--font-family-body);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.body-text-semibold,
+.source-sans-3-semibold {
+  font-family: var(--font-family-body);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.body-text-bold,
+.source-sans-3-bold {
+  font-family: var(--font-family-body);
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ============================================================================
+   ACCESSIBILITY - Font and display options
+   ============================================================================ */
+
+/* Dyslexia-friendly font class - uses OpenDyslexic if available, fallback to body font */
+.dyslexia-font {
+  font-family: 'OpenDyslexic', var(--font-family-body), sans-serif;
+}
+
+/* High contrast mode - enhanced text visibility */
 .high-contrast {
-  /* User can add high contrast color scheme here */
+  color: #000;
+  background-color: #fff;
+}
+
+.high-contrast * {
+  color: #000 !important;
+  background-color: #fff !important;
+  border-color: #000 !important;
 }
 
 /* Reduced sensory mode */
