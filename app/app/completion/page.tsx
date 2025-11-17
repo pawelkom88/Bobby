@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import CompletionScreen from '@/components/CompletionScreen';
+import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
 
@@ -41,17 +41,19 @@ export default function CompletionPage() {
   };
 
   return (
-    <ErrorBoundary>
-      <main className="app-page" role="main">
-        <CompletionScreen
-          service={DEFAULT_SITUATION}
-          ageTier={DEFAULT_AGE_TIER}
-          performance={performance}
-          onContinue={handleContinue}
-          onViewAchievements={handleContinue}
-        />
-      </main>
-    </ErrorBoundary>
+    <PageWrapper>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <CompletionScreen
+            service={DEFAULT_SITUATION}
+            ageTier={DEFAULT_AGE_TIER}
+            performance={performance}
+            onContinue={handleContinue}
+            onViewAchievements={handleContinue}
+          />
+        </main>
+      </ErrorBoundary>
+    </PageWrapper>
   );
 }
 

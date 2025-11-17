@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import DialPad from '@/components/DialPad';
+import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function DialPage() {
@@ -16,11 +16,13 @@ export default function DialPage() {
   };
 
   return (
-    <ErrorBoundary>
-      <main className="app-page" role="main">
-        <DialPad onCorrectNumber={handleCorrectNumber} onBack={handleBack} />
-      </main>
-    </ErrorBoundary>
+    <PageWrapper>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <DialPad onCorrectNumber={handleCorrectNumber} onBack={handleBack} />
+        </main>
+      </ErrorBoundary>
+    </PageWrapper>
   );
 }
 

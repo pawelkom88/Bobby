@@ -1,6 +1,7 @@
 'use client';
 
 import VoiceConversation from '@/components/VoiceConversation';
+import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { assessConversation } from '@/lib/assessment';
 import type { ConversationMessage, AgeTier, Service } from '@/types';
@@ -34,17 +35,19 @@ export default function ConversationPage() {
   };
 
   return (
-    <ErrorBoundary>
-      <main className="app-page" role="main">
-        <VoiceConversation
-          ageTier={DEFAULT_AGE_TIER}
-          situation={DEFAULT_SITUATION}
-          onComplete={handleConversationComplete}
-          onBack={handleBack}
-          autoStart={true}
-        />
-      </main>
-    </ErrorBoundary>
+    <PageWrapper>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <VoiceConversation
+            ageTier={DEFAULT_AGE_TIER}
+            situation={DEFAULT_SITUATION}
+            onComplete={handleConversationComplete}
+            onBack={handleBack}
+            autoStart={true}
+          />
+        </main>
+      </ErrorBoundary>
+    </PageWrapper>
   );
 }
 
