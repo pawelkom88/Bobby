@@ -10,7 +10,8 @@ import CompletionScreen from '@/components/CompletionScreen';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import { getUserProgress } from '@/lib/storage';
-import type { AgeTierConfig, Situation, PerformanceMetrics } from '@/types';
+import { assessConversation } from '@/lib/assessment';
+import type { AgeTierConfig, Situation, PerformanceMetrics, ConversationMessage } from '@/types';
 
 type Step = 'welcome' | 'age_selection' | 'situation_selection' | 'dialing' | 'conversation' | 'completion';
 
@@ -33,7 +34,6 @@ export default function AppPage() {
   const [currentStep, setCurrentStep] = useState<Step>(STEPS.WELCOME);
   const [selectedAgeTier, setSelectedAgeTier] = useState<AgeTierConfig | null>(null);
   const [selectedSituation, setSelectedSituation] = useState<Situation | null>(null);
-  const [conversationData, setConversationData] = useState<ConversationMessage[] | null>(null);
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
 
   const progress = getUserProgress();
@@ -57,13 +57,19 @@ export default function AppPage() {
   };
 
   const handleConversationComplete = (conversation: ConversationMessage[]) => {
-    setConversationData(conversation);
-    // Calculate performance metrics
+    const assessment = assessConversation(conversation, {
+      ageTier: selectedAgeTier?.id,
+      situation: selectedSituation?.id,
+    });
+
     const perf: PerformanceMetrics = {
-      completed: true,
-      clearCommunication: conversation.length > 2,
-      stayedCalm: true, // Could be enhanced with actual metrics
+      completed: assessment.passed,
+      assessment,
+      feedbackSummary: assessment.improvements.length
+        ? assessment.improvements
+        : assessment.positives,
     };
+
     setPerformance(perf);
     setCurrentStep(STEPS.COMPLETION);
   };
@@ -72,7 +78,6 @@ export default function AppPage() {
     // Reset for new scenario
     setSelectedAgeTier(null);
     setSelectedSituation(null);
-    setConversationData(null);
     setPerformance({});
     setCurrentStep(STEPS.WELCOME);
   };

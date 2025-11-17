@@ -3,6 +3,7 @@
  */
 
 import type { Badge, PerformanceMetrics } from '@/types';
+import { scoreToXP } from './assessment';
 
 // Level requirements: XP needed to reach each level
 export const LEVEL_REQUIREMENTS: number[] = [
@@ -90,16 +91,16 @@ export function getBadgeForLevel(level: number): Badge | null {
  * Calculate XP earned based on performance
  */
 export function calculateXPEarned(performance: PerformanceMetrics = {}): number {
-  // Base XP
+  if (performance.assessment) {
+    return scoreToXP(performance.assessment.score);
+  }
+
+  // Fallback legacy behaviour if no assessment is present
   let xp = 50;
-  
-  // Add bonuses based on performance
-  // This can be expanded based on conversation quality, response time, etc.
   if (performance.completed) xp += 20;
   if (performance.clearCommunication) xp += 15;
   if (performance.stayedCalm) xp += 15;
-  
-  // Cap at 100 XP
+
   return Math.min(xp, 100);
 }
 

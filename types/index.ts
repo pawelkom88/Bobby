@@ -20,11 +20,19 @@ export interface Situation {
   icon: string;
 }
 
+export interface ConversationMessage {
+  type: 'user' | 'agent';
+  text: string;
+  timestamp: string;
+}
+
 export interface Conversation {
   timestamp: string;
   service: Service;
   ageTier: AgeTier;
   xpEarned: number;
+  score?: number;
+  feedback?: string[];
 }
 
 export interface Badge {
@@ -52,10 +60,30 @@ export interface UserData {
   settings: UserSettings;
 }
 
+export interface AssessmentFeedback {
+  positives: string[];
+  improvements: string[];
+  warnings: string[];
+}
+
+export interface ConversationAssessment {
+  score: number;
+  passed: boolean;
+  positives: string[];
+  improvements: string[];
+  warnings: string[];
+  metrics: {
+    userTurns: number;
+    durationSeconds: number;
+  };
+}
+
 export interface PerformanceMetrics {
   completed?: boolean;
   clearCommunication?: boolean;
   stayedCalm?: boolean;
+  assessment?: ConversationAssessment;
+  feedbackSummary?: string[];
 }
 
 export interface SpeechRecognitionResult {

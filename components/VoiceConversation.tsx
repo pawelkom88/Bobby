@@ -16,13 +16,7 @@ import { getSettings } from '@/lib/storage';
 import { sanitizeText } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 import LoadingSpinner from './LoadingSpinner';
-import type { AgeTier, Service } from '@/types';
-
-interface ConversationMessage {
-  type: 'user' | 'agent';
-  text: string;
-  timestamp: string;
-}
+import type { AgeTier, Service, ConversationMessage } from '@/types';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -212,6 +206,9 @@ export default function VoiceConversation({ ageTier, situation, onComplete }: Vo
     if (onComplete) {
       onComplete(conversation);
     }
+    // Clear transcript from state immediately after notifying parent
+    setConversation([]);
+    setCurrentTranscript('');
   };
 
   if (permissionError) {

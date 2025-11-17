@@ -27,6 +27,11 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
   const [badgeAwarded, setBadgeAwarded] = useState<Badge | null>(null);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isLevel10, setIsLevel10] = useState(false);
+  const assessment = performance.assessment;
+  const feedbackSummary =
+    assessment && assessment.improvements.length > 0
+      ? assessment.improvements
+      : assessment?.positives ?? [];
 
   useEffect(() => {
     // Calculate and award XP
@@ -46,7 +51,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
         new Date().toISOString(),
         service,
         ageTier,
-        xp
+        xp,
+        assessment?.score,
+        feedbackSummary?.slice(0, 3)
       );
     }
   }, [service, ageTier, performance]);
@@ -102,6 +109,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
             )}
             <div className="xp-earned">
               <p>You earned {xpEarned} XP!</p>
+              {assessment && (
+                <p className="assessment-score">Score: {Math.round(assessment.score)} / 100</p>
+              )}
             </div>
           </>
         )}
@@ -113,6 +123,39 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
         {badgeAwarded && (
           <div className="completion-badge">
             <BadgeDisplay showAll={false} />
+          </div>
+        )}
+
+        {assessment && (
+          <div className="assessment-feedback" aria-live="polite">
+            <h3>What you did well</h3>
+            <ul>
+              {assessment.positives.length > 0 ? (
+                assessment.positives.map((item, index) => <li key={`pos-${index}`}>{item}</li>)
+              ) : (
+                <li>Great effort!</li>
+              )}
+            </ul>
+
+            <h3>Next time try</h3>
+            <ul>
+              {assessment.improvements.length > 0 ? (
+                assessment.improvements.map((item, index) => <li key={`imp-${index}`}>{item}</li>)
+              ) : (
+                <li>Keep practicing to stay sharp.</li>
+              )}
+            </ul>
+
+            {assessment.warnings.length > 0 && (
+              <>
+                <h3>Friendly reminders</h3>
+                <ul>
+                  {assessment.warnings.map((item, index) => (
+                    <li key={`warn-${index}`}>{item}</li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         )}
 

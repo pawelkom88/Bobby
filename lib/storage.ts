@@ -75,7 +75,9 @@ export function saveConversation(
   timestamp: string,
   service: Service,
   ageTier: AgeTier,
-  xpEarned: number
+  xpEarned: number,
+  score?: number,
+  feedback?: string[]
 ): void {
   // Validate inputs
   if (!validateTimestamp(timestamp)) {
@@ -96,12 +98,16 @@ export function saveConversation(
   }
 
   const data = getUserData();
-  data.conversations.push({
+  const conversationEntry = {
     timestamp,
     service,
     ageTier,
     xpEarned,
-  });
+    ...(typeof score === 'number' ? { score } : {}),
+    ...(feedback && feedback.length ? { feedback } : {}),
+  };
+
+  data.conversations.push(conversationEntry);
   saveUserData(data);
 }
 
