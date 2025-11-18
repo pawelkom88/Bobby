@@ -5,6 +5,8 @@ import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import Image from 'next/image';
+import CartoonButton from '@/components/CartoonButton';
 
 export default function AppPage() {
   return (
@@ -12,41 +14,12 @@ export default function AppPage() {
       <ErrorBoundary>
         <main className="app-page" role="main">
           <div className="welcome-container">
-            {/* Header */}
-            <div className="welcome-header">
-              <h1 className="welcome-title">WELCOME BACK!</h1>
-            </div>
-
-            {/* Main Card */}
             <div className="welcome-card">
-              {/* Progress Section */}
-              <div className="progress-section">
-                <div className="progress-left">
-                  <p className="progress-label">YOUR PROGRESS</p>
-                  <div className="level-progress">
-                    <LevelProgress showLabel={true} />
-                  </div>
-                </div>
-
-                {/* Bobby Character Placeholder */}
-                <div className="bobby-placeholder">
-                  <div className="bobby-emoji">👤</div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="action-buttons">
-                <Link
-                  href="/app/dial"
-                  className="btn btn-primary"
-                  aria-label="Start training with Bobby"
-                >
-                  <span className="btn-icon">📞</span>
-                  <span className="btn-text">CALL BOBBY</span>
-                </Link>
-              </div>
-
-              {/* Badges Section */}
+              <div>
+                <h1 className="welcome-title">WELCOME</h1>
+                <p className="welcome-subtitle">Hi, I am Bobby, your guide</p></div>
+              <Image src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
+              <CartoonButton asLink href="/app/dial">CALL BOBBY</CartoonButton>
               <div className="badges-section">
                 <h2>YOUR BADGES</h2>
                 <div className="badges-container">

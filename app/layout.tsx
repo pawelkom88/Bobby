@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { SoundProvider } from '@/components/SoundProvider';
-import SoundToggleButton from '@/components/SoundToggleButton';
 
 export const metadata: Metadata = {
   title: 'Bobby - Emergency Training for Kids',
@@ -17,7 +16,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SoundProvider>
-          <SoundToggleButton />
           {children}
         </SoundProvider>
       </body>

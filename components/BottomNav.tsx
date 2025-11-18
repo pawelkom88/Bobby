@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import SoundToggleBottomNav from './SoundToggleBottomNav';
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -72,6 +73,8 @@ export default function BottomNav() {
           <span>{item.label}</span>
         </Link>
       ))}
+
+      <SoundToggleBottomNav />
     </nav>
   );
 }

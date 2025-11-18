@@ -34,14 +34,14 @@ const KEY_SOUNDS = {
 };
 
 const FUNNY_ERROR_MESSAGES = [
-  "Oops! That's not quite right! 😅",
-  "Hmm, try again friend! 🤔",
-  "Nice try! Almost there! 💪",
-  "Whoopsie-daisy! Give it another go! 🎉",
-  "Not this time! You got this! ⭐",
-  "Close, but let's try again! 🚀",
-  "Keep trying, you're doing great! 🌟",
-  "That wasn't it, but I believe in you! 💖",
+  "Oops! That's not quite right!",
+  "Hmm, try again friend!",
+  "Nice try! Almost there!",
+  "Whoopsie-daisy! Give it another go!",
+  "Not this time! You got this!",
+  "Close, but let's try again!",
+  "Keep trying, you're doing great!",
+  "That wasn't it, but I believe in you!",
 ];
 
 export default function CartoonDialPad({
@@ -112,7 +112,6 @@ export default function CartoonDialPad({
 
   return (
     <div className="cartoon-dial-pad">
-      {/* Error Speech Bubble */}
       {hasError && (
         <div className="error-bubble" role="alert" aria-live="polite">
           <div className="bubble-content">{errorMessage}</div>
@@ -120,22 +119,7 @@ export default function CartoonDialPad({
         </div>
       )}
 
-      <div className="dial-pad-header">
-        <div className="dial-pad-title-section">
-          <h2 className="dial-pad-title">WHAT NUMBER?</h2>
-          {onBack && (
-            <button
-              type="button"
-              className="back-button"
-              onClick={onBack}
-              aria-label="Go back to situation selection"
-            >
-              ← Back
-            </button>
-          )}
-        </div>
-        <p className="dial-pad-subtitle">Dial {targetNumber} to start</p>
-      </div>
+      <h2 className="dial-pad-subtitle">Dial {targetNumber} to start</h2>
 
       <div className="phone-container">
         <div className="phone">
@@ -205,7 +189,7 @@ export default function CartoonDialPad({
                   }, 2500);
                   return;
                 }
-                
+
                 if (input.length !== targetNumber.length) {
                   // Show error if incomplete number
                   const errorMsg = `Please dial all ${targetNumber.length} digits! 🔢`;
@@ -217,12 +201,12 @@ export default function CartoonDialPad({
                   }, 2500);
                   return;
                 }
-                
+
                 if (!validateEmergencyNumber(input, targetNumber)) {
                   // Show error if wrong number
                   const randomMessage =
                     FUNNY_ERROR_MESSAGES[
-                      Math.floor(Math.random() * FUNNY_ERROR_MESSAGES.length)
+                    Math.floor(Math.random() * FUNNY_ERROR_MESSAGES.length)
                     ];
                   setErrorMessage(randomMessage);
                   setHasError(true);
@@ -233,7 +217,7 @@ export default function CartoonDialPad({
                   }, 2500);
                   return;
                 }
-                
+
                 // Call is correct - proceed to Bobby
                 if (onCorrectNumber) {
                   onCorrectNumber();
@@ -242,7 +226,10 @@ export default function CartoonDialPad({
               aria-label="Make call to Bobby"
               disabled={input.length === 0}
             >
-              📞 CALL
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{ width: '20px', height: '20px' }}>
+                <path d="M511.2 387l-23.25 100.8c-3.266 14.25-15.79 24.22-30.46 24.22C205.2 512 0 306.8 0 54.5c0-14.66 9.969-27.2 24.22-30.45l100.8-23.25C139.7-2.602 154.7 5.018 160.8 18.92l46.52 108.5c5.438 12.78 1.77 27.67-8.98 36.45L144.5 207.1c33.98 69.22 90.26 125.5 159.5 159.5l44.08-53.8c8.688-10.78 23.69-14.51 36.47-8.975l108.5 46.51C506.1 357.2 514.6 372.4 511.2 387z"></path>
+              </svg>
+              <span>CALL</span>
             </button>
             <button
               type="button"
@@ -254,7 +241,18 @@ export default function CartoonDialPad({
               }}
               aria-label="Clear display"
             >
-              ✕ CLEAR
+              <svg fill="#000000" height="16px" width="16px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 460.775 460.775">
+                <path d="M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55
+	c-4.127,0-8.08,1.639-10.993,4.55l-171.138,171.14L59.25,4.565c-2.913-2.911-6.866-4.55-10.993-4.55
+	c-4.126,0-8.08,1.639-10.992,4.55L4.558,37.284c-6.077,6.075-6.077,15.909,0,21.986l171.138,171.128L4.575,401.505
+	c-6.074,6.077-6.074,15.911,0,21.986l32.709,32.719c2.911,2.911,6.865,4.55,10.992,4.55c4.127,0,8.08-1.639,10.994-4.55
+	l171.117-171.12l171.118,171.12c2.913,2.911,6.866,4.55,10.993,4.55c4.128,0,8.081-1.639,10.992-4.55l32.709-32.719
+	c6.074-6.075,6.074-15.909,0-21.986L285.08,230.397z"/>
+              </svg>
+              <span>
+                CLEAR
+              </span>
             </button>
           </div>
         </div>

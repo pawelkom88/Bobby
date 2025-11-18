@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 interface CartoonButtonProps {
   children: React.ReactNode;
@@ -10,6 +11,8 @@ interface CartoonButtonProps {
   className?: string;
   ariaLabel?: string;
   title?: string;
+  asLink?: boolean;
+  href?: string;
 }
 
 /**
@@ -24,9 +27,16 @@ export default function CartoonButton({
   className = '',
   ariaLabel,
   title,
+  asLink = false,
+  href = '',
 }: CartoonButtonProps) {
   return (
     <div className="btn-container">
+      {asLink ? (
+        <Link href={href} className="cartoon-btn">
+          <span>{children}</span>
+        </Link>
+      ) : (
       <button
         type={type}
         onClick={onClick}
@@ -37,6 +47,7 @@ export default function CartoonButton({
       >
         <span>{children}</span>
       </button>
+    )}
     </div>
   );
 }
