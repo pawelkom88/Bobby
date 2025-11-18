@@ -5,6 +5,7 @@ import { getSettings, updateSettings } from '@/lib/storage';
 import type { UserSettings } from '@/types';
 import AccessibilityToggle from './AccessibilityToggle';
 import CartoonButton from './CartoonButton';
+import { useSound } from './SoundProvider';
 
 interface AccessibilitySectionProps {
   onSettingsChange?: (settings: UserSettings) => void;
@@ -27,6 +28,7 @@ export default function AccessibilitySection({
   });
 
   const [mounted, setMounted] = useState(false);
+  const { soundEnabled, toggleSound } = useSound();
 
   // Load settings from storage on mount
   useEffect(() => {
@@ -51,6 +53,20 @@ export default function AccessibilitySection({
     if (onSettingsChange) {
       onSettingsChange(newSettings);
     }
+  };
+
+  /**
+   * Handle sound toggle with sound effect
+   */
+  const handleSoundToggle = () => {
+    try {
+      const audio = new Audio('/sfx/sound-on-off.mp3');
+      audio.volume = 0.5;
+      void audio.play();
+    } catch {
+      // Audio playback failed silently
+    }
+    toggleSound();
   };
 
   /**
@@ -106,6 +122,16 @@ export default function AccessibilitySection({
       </div>
 
       <div className="accessibility-toggles">
+        {/* UI Sound Toggle */}
+        <AccessibilityToggle
+          id="ui-sound-toggle"
+          label="UI Sound"
+          icon={<span className="accessibility-icon">🔊</span>}
+          checked={soundEnabled}
+          onChange={handleSoundToggle}
+          ariaLabel={soundEnabled ? 'Turn UI sound off' : 'Turn UI sound on'}
+        />
+
         {/* Dyslexia-Friendly Font Toggle */}
         <AccessibilityToggle
           id="dyslexia-font-toggle"
