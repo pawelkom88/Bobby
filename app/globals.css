@@ -32,25 +32,25 @@
   --font-family-body: 'Kavoon', cursive;
   --font-family-heading: 'Kavoon', cursive;
   --font-family-cartoon: 'Kavoon', cursive;
-  
+
   /* Font sizing */
   --font-size-base: 16px;
 
   /* Cartoon Button Colors */
-    --btn-color: #fccb39;
-    --btn-border-color: #eb6934;
-    --btn-text-color: #9a431f;
-    --btn-light-color: #ffda66;
+  --btn-color: #fccb39;
+  --btn-border-color: #eb6934;
+  --btn-text-color: #9a431f;
+  --btn-light-color: #ffda66;
 }
 
 /* ============================================================================
    GLOBAL FONT APPLICATION
    ============================================================================ */
-   * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 
 html {
@@ -65,16 +65,23 @@ body {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(
-    to bottom,
-    #b7e0ff 0%,     /* light sky blue */
-    #c5e7e0 40%,    /* pale aqua/green */
-    #f4f1d9 100%    /* soft beige */
-  );
+  background: linear-gradient(to bottom,
+      #b7e0ff 0%,
+      /* light sky blue */
+      #c5e7e0 40%,
+      /* pale aqua/green */
+      #f4f1d9 100%
+      /* soft beige */
+    );
 }
 
 /* Apply heading font to all heading elements */
-h1, h2, h3, h4, h5, h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
 [class*="heading"],
 [class*="title"] {
   font-family: var(--font-family-heading);
@@ -235,10 +242,14 @@ a,
 }
 
 @keyframes spinner-bounce {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0);
     opacity: 0.5;
   }
+
   40% {
     transform: scale(1);
     opacity: 1;
@@ -397,11 +408,9 @@ a,
   gap: 1rem;
   padding-right: 2.5rem;
   border-radius: 3rem;
-  background: linear-gradient(
-    90deg,
-    color-mix(in hsl, var(--color-orange-950) 60%, black),
-    color-mix(in hsl, var(--color-orange-950) 30%, black)
-  );
+  background: linear-gradient(90deg,
+      color-mix(in hsl, var(--color-orange-950) 60%, black),
+      color-mix(in hsl, var(--color-orange-950) 30%, black));
   color: var(--color-gray-300);
   border: 1px solid color-mix(in hsl, var(--color-yellow-500), black 70%);
 }
@@ -418,11 +427,9 @@ a,
   height: 4.5rem;
   border-radius: 50%;
   /* outer circle */
-  background-image: radial-gradient(
-    circle at center,
-    var(--color-yellow-400) 80%,
-    var(--color-yellow-800) 100%
-  );
+  background-image: radial-gradient(circle at center,
+      var(--color-yellow-400) 80%,
+      var(--color-yellow-800) 100%);
   z-index: 1;
   overflow: hidden;
 }
@@ -464,8 +471,7 @@ a,
   margin-left: calc(var(--spark-size) / 2 * -1);
   color: white;
   transform-origin: center center;
-  animation: spark-animation 5s calc(var(--delay, 0ms) + 700ms) linear both
-    infinite;
+  animation: spark-animation 5s calc(var(--delay, 0ms) + 700ms) linear both infinite;
 
   & svg {
     width: var(--spark-size);
@@ -478,12 +484,14 @@ a,
     left: 10%;
     top: 10%;
   }
+
   &:nth-child(2) {
     --spark-size: 14px;
     --delay: 200ms;
     left: 100%;
     top: 35%;
   }
+
   &:nth-child(3) {
     --spark-size: 10px;
     --delay: 400ms;
@@ -504,9 +512,7 @@ a,
   /* Calculate positions */
   --h-1-pos: calc(var(--h-start) + var(--h-1-size));
   --h-2-pos: calc(var(--h-start) + var(--h-gap) + var(--h-1-size));
-  --h-end: calc(
-    var(--h-start) + var(--h-gap) + var(--h-1-size) + var(--h-2-size)
-  );
+  --h-end: calc(var(--h-start) + var(--h-gap) + var(--h-1-size) + var(--h-2-size));
 
   content: "";
   position: absolute;
@@ -514,17 +520,15 @@ a,
   z-index: -1;
   will-change: transform;
   animation: slide 5s ease-in-out both infinite;
-  background-image: linear-gradient(
-    var(--h-angle),
-    transparent var(--h-start),
-    var(--h-color) var(--h-start),
-    var(--h-color) var(--h-1-pos),
-    transparent var(--h-1-pos),
-    transparent var(--h-2-pos),
-    var(--h-color) var(--h-2-pos),
-    var(--h-color) var(--h-end),
-    transparent var(--h-end)
-  );
+  background-image: linear-gradient(var(--h-angle),
+      transparent var(--h-start),
+      var(--h-color) var(--h-start),
+      var(--h-color) var(--h-1-pos),
+      transparent var(--h-1-pos),
+      transparent var(--h-2-pos),
+      var(--h-color) var(--h-2-pos),
+      var(--h-color) var(--h-end),
+      transparent var(--h-end));
 }
 
 .content {
@@ -552,6 +556,7 @@ a,
   0% {
     transform: translateX(-100%);
   }
+
   50%,
   100% {
     transform: translateX(100%);
@@ -562,12 +567,15 @@ a,
   0% {
     transform: scale(0) rotate(-180deg);
   }
+
   8% {
     transform: scale(1) rotate(0deg);
   }
+
   12% {
     transform: scale(1) rotate(90deg);
   }
+
   16%,
   100% {
     transform: scale(0) rotate(180deg);
@@ -814,9 +822,19 @@ a,
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 .dial-error-message {
@@ -1122,13 +1140,16 @@ a,
     opacity: 0;
     transform: translateX(-120px) translateY(-80px) scale(0.3);
   }
+
   60% {
     opacity: 1;
     transform: translateX(8px) translateY(5px) scale(1.1);
   }
+
   80% {
     transform: translateX(-3px) translateY(0) scale(0.98);
   }
+
   100% {
     transform: translateX(0) translateY(0) scale(1);
   }
@@ -1515,12 +1536,10 @@ a,
 }
 
 .welcome-card {
-  background: linear-gradient(
-    180deg,
-    #c2e6ff 0%,
-    #daf1ff 55%,
-    #ffffff 100%
-  );
+  background: linear-gradient(180deg,
+      #c2e6ff 0%,
+      #daf1ff 55%,
+      #ffffff 100%);
   border-radius: 2rem;
   padding: 2.5rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
@@ -1710,15 +1729,13 @@ a,
   padding: 0.5rem 0.75rem;
   border-radius: 30px;
   position: relative;
-  font-size: 0.65rem;
-  font-weight: 600;
   min-height: 44px;
   gap: 0.5rem;
   background: transparent;
   transition: background 0.4s ease-in-out,
-              color 0.4s ease-in-out,
-              padding 0.4s ease-in-out,
-              box-shadow 0.4s ease-in-out;
+    color 0.4s ease-in-out,
+    padding 0.4s ease-in-out,
+    box-shadow 0.4s ease-in-out;
 }
 
 .bottom-nav-item svg {
@@ -1734,9 +1751,10 @@ a,
   visibility: hidden;
   max-width: 0;
   transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              visibility 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              max-width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              margin 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    visibility 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    max-width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -1774,6 +1792,7 @@ a,
     box-shadow: none;
     padding: 0.5rem 0.75rem;
   }
+
   to {
     background: rgba(6, 182, 212, 0.2);
     box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.3) inset;
@@ -1785,6 +1804,7 @@ a,
   from {
     stroke-width: 2;
   }
+
   to {
     stroke-width: 2.5;
   }
@@ -1797,10 +1817,12 @@ a,
     max-width: 0;
     margin-right: 0;
   }
+
   50% {
     opacity: 1;
     visibility: visible;
   }
+
   100% {
     opacity: 1;
     visibility: visible;
@@ -1813,10 +1835,10 @@ a,
   color: #6b7280;
   transform: scale(1.1);
   transition: background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              transform 0.3s ease-out,
-              padding 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.3s ease-out,
+    padding 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .bottom-nav-item:active:not(.active) {
@@ -1855,7 +1877,7 @@ a,
   --btn-border-color: #eb6934;
   --btn-text-color: #9a431f;
   --btn-light-color: #ffda66;
-  
+
   width: 48px;
   height: 48px;
   border: 4px solid var(--btn-border-color);
@@ -1865,9 +1887,9 @@ a,
   cursor: pointer;
   position: relative;
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
-              background 0.3s ease,
-              border-color 0.3s ease;
+    box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.3s ease,
+    border-color 0.3s ease;
   outline: none;
   padding: 0;
   display: flex;
@@ -1951,10 +1973,13 @@ a,
 }
 
 @keyframes wave {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(-50%) scaleY(0.5);
     opacity: 0.5;
   }
+
   50% {
     transform: translateY(-50%) scaleY(1);
     opacity: 1;
@@ -2003,8 +2028,15 @@ a,
 }
 
 @keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .sound-toggle-bottom.animating .sound-toggle-icon {

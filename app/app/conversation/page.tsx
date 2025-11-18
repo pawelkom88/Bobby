@@ -1,5 +1,6 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import VoiceConversation from '@/components/VoiceConversation';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -35,6 +36,7 @@ export default function ConversationPage() {
   };
 
   return (
+    <ViewTransition>
     <PageWrapper>
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -48,6 +50,7 @@ export default function ConversationPage() {
         </main>
       </ErrorBoundary>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

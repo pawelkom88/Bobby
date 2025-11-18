@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ViewTransition } from 'react';
 import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -41,6 +42,7 @@ export default function CompletionPage() {
   };
 
   return (
+    <ViewTransition>
     <PageWrapper>
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -54,6 +56,7 @@ export default function CompletionPage() {
         </main>
       </ErrorBoundary>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

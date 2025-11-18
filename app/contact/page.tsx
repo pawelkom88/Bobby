@@ -1,9 +1,11 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import Link from 'next/link';
 
 export default function ContactPage() {
   return (
+    <ViewTransition>
     <main className="contact-page" role="main">
       <header className="contact-header">
         <h1 className="contact-title">CONTACT US</h1>
@@ -55,6 +57,7 @@ export default function ContactPage() {
         </Link>
       </nav>
     </main>
+    </ViewTransition>
   );
 }
 

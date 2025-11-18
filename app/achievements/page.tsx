@@ -1,5 +1,6 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
@@ -9,6 +10,7 @@ export default function AchievementsPage() {
   const progress = getUserProgress();
 
   return (
+    <ViewTransition>
     <PageWrapper>
       <main className="achievements-page" role="main">
         <header className="achievements-header">
@@ -51,6 +53,7 @@ export default function AchievementsPage() {
         </div>
       </main>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

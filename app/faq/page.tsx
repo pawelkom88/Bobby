@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ViewTransition } from 'react';
 import Link from 'next/link';
 
 interface FAQItem {
@@ -45,6 +46,7 @@ export default function FAQPage() {
   };
 
   return (
+    <ViewTransition>
     <main className="faq-page" role="main">
       <header className="faq-header">
         <h1 className="faq-title">FREQUENT QUESTIONS</h1>
@@ -99,6 +101,7 @@ export default function FAQPage() {
         </Link>
       </nav>
     </main>
+    </ViewTransition>
   );
 }
 

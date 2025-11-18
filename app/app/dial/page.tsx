@@ -1,5 +1,6 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -16,6 +17,7 @@ export default function DialPage() {
   };
 
   return (
+    <ViewTransition>
     <PageWrapper>
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -23,6 +25,7 @@ export default function DialPage() {
         </main>
       </ErrorBoundary>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import Link from 'next/link';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
@@ -8,6 +9,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function HomePage() {
   return (
+    <ViewTransition>
     <PageWrapper>
       <ErrorBoundary>
         <main className="home-page" role="main">
@@ -46,6 +48,7 @@ export default function HomePage() {
         </main>
       </ErrorBoundary>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

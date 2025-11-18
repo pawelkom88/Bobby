@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ViewTransition } from 'react';
 import AccessibilityControls from '@/components/AccessibilityControls';
 import PageWrapper from '@/components/PageWrapper';
 import { resetProgress } from '@/lib/storage';
@@ -27,6 +28,7 @@ export default function SettingsPage() {
   };
 
   return (
+    <ViewTransition>
     <PageWrapper>
       <main className="settings-page" role="main">
         <header className="settings-header">
@@ -93,6 +95,7 @@ export default function SettingsPage() {
         </div>
       </main>
     </PageWrapper>
+    </ViewTransition>
   );
 }
 

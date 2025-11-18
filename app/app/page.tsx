@@ -7,9 +7,11 @@ import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Image from 'next/image';
 import CartoonButton from '@/components/CartoonButton';
+import { ViewTransition } from 'react';
 
 export default function AppPage() {
   return (
+    <ViewTransition>
     <PageWrapper>
       <ErrorBoundary>
         <main className="app-page" role="main">
@@ -31,5 +33,6 @@ export default function AppPage() {
         </main>
       </ErrorBoundary>
     </PageWrapper>
+    </ViewTransition>
   );
 }
