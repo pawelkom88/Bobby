@@ -20,8 +20,15 @@ export default function PageWrapper({ children }: PageWrapperProps) {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
+      position: 'relative',
     }}>
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      <div style={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: showBottomNav ? '80px' : '0',
+      }}>
         {children}
       </div>
       {showBottomNav && <BottomNav />}

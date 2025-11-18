@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { ViewTransition } from 'react';
-import AccessibilityControls from '@/components/AccessibilityControls';
+import AccessibilitySection from '@/components/AccessibilitySection';
+import CartoonButton from '@/components/CartoonButton';
 import PageWrapper from '@/components/PageWrapper';
 import { resetProgress } from '@/lib/storage';
 import { useRouter } from 'next/navigation';
@@ -37,8 +38,7 @@ export default function SettingsPage() {
 
         <div className="settings-content">
           <section className="settings-section" aria-labelledby="accessibility-heading">
-            <h2 id="accessibility-heading">Accessibility</h2>
-            <AccessibilityControls />
+            <AccessibilitySection />
           </section>
 
           <section className="settings-section" aria-labelledby="progress-heading">
@@ -47,14 +47,12 @@ export default function SettingsPage() {
               {!showResetConfirm ? (
                 <>
                   <p>Reset all progress, badges, and conversation history.</p>
-                  <button
-                    type="button"
-                    className="reset-button"
+                  <CartoonButton
                     onClick={handleResetProgress}
-                    aria-label="Reset progress"
+                    ariaLabel="Reset progress"
                   >
                     Reset Progress
-                  </button>
+                  </CartoonButton>
                 </>
               ) : (
                 <>
@@ -62,22 +60,19 @@ export default function SettingsPage() {
                     Are you sure you want to reset all progress? This cannot be undone.
                   </p>
                   <div className="reset-actions">
-                    <button
-                      type="button"
-                      className="confirm-reset-button"
+                    <CartoonButton
                       onClick={handleResetProgress}
-                      aria-label="Confirm reset progress"
+                      ariaLabel="Confirm reset progress"
+                      className="cartoon-btn-danger"
                     >
                       Yes, Reset Everything
-                    </button>
-                    <button
-                      type="button"
-                      className="cancel-reset-button"
+                    </CartoonButton>
+                    <CartoonButton
                       onClick={handleCancelReset}
-                      aria-label="Cancel reset"
+                      ariaLabel="Cancel reset"
                     >
                       Cancel
-                    </button>
+                    </CartoonButton>
                   </div>
                 </>
               )}
