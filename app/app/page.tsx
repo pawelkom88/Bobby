@@ -13,27 +13,27 @@ import AnimatedImageWrapper from '@/components/AnimatedImageWrapper';
 export default function AppPage() {
   return (
     <ViewTransition>
-    <PageWrapper>
-      <ErrorBoundary>
-        <main className="app-page" role="main">
-          <div className="welcome-container">
-            <div className="welcome-card">
-              <div>
-                <h1 className="welcome-title">WELCOME</h1>
-                <p className="welcome-subtitle">Hi, I am Bobby, your guide</p></div>
-              <AnimatedImageWrapper src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
-              <CartoonButton asLink href="/app/dial">CALL BOBBY</CartoonButton>
-              <div className="badges-section">
-                <h2>YOUR BADGES</h2>
-                <div className="badges-container">
-                  <BadgeDisplay showAll={false} />
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <div className="welcome-container">
+              <div className="welcome-card">
+                <div>
+                  <h1 className="welcome-title">WELCOME</h1>
+                  <p className="welcome-subtitle">Hi, I am Bobby, your guide</p></div>
+                <AnimatedImageWrapper src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
+                <CartoonButton asLink href="/app/dial">CALL BOBBY</CartoonButton>
+                <div className="badges-section">
+                  <h2>YOUR BADGES</h2>
+                  <div className="badges-container">
+                    <BadgeDisplay showAll={false} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </ErrorBoundary>
-    </PageWrapper>
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
     </ViewTransition>
   );
 }

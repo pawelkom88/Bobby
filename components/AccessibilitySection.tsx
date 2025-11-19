@@ -6,6 +6,7 @@ import type { UserSettings } from '@/types';
 import AccessibilityToggle from './AccessibilityToggle';
 import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
+import Image from 'next/image';
 
 interface AccessibilitySectionProps {
   onSettingsChange?: (settings: UserSettings) => void;
@@ -117,10 +118,16 @@ export default function AccessibilitySection({
 
   return (
     <div className="accessibility-section" role="region" aria-label="Accessibility settings">
-      <div className="accessibility-section-header">
-        <h2 className="accessibility-section-title">Accessibility Settings</h2>
-      </div>
 
+
+        <h2 className="accessibility-section-title">Accessibility Settings</h2>
+      <Image
+      className="accessibility-image"
+            src="/bobby-accessibility.png"
+            alt="Bobby Accessibility"
+            width={200}
+            height={200}
+          />
       <div className="accessibility-toggles">
         {/* UI Sound Toggle */}
         <AccessibilityToggle
