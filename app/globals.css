@@ -3599,3 +3599,211 @@ a,
       var(--bg-10-b);
   }
 }
+
+/* ============================================================================
+   BADGE DISPLAY - Grid and tiles
+   ============================================================================ */
+
+.badge-display {
+  width: 100%;
+}
+
+.no-badges-message {
+  margin: 0;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.badge-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(245, 250, 255, 0.9) 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(100, 200, 255, 0.2);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.badge-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.badge-tile.locked:hover {
+  border-color: rgba(100, 200, 255, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 255, 255, 0.95) 100%);
+}
+
+.badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  min-height: 100px;
+  min-width: 100px;
+}
+
+.badge-name {
+  font-weight: 700;
+  color: #333;
+  font-size: 1.1rem;
+  font-family: var(--font-family-body);
+}
+
+.badge-level {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: var(--font-family-body);
+}
+
+.badge-requirement {
+  color: #666;
+  font-weight: 500;
+  font-size: 0.9rem;
+  font-family: var(--font-family-body);
+}
+
+/* ============================================================================
+   ANIMATED PADLOCK - Replaces lock emoji in achievements
+   ============================================================================ */
+
+.padlock-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.padlock-wrapper input {
+  position: fixed;
+  top: -1.5em;
+  left: -1.5em;
+}
+
+.padlock-wrapper input:not(:checked):focus + .padlock,
+.padlock-wrapper input:not(:checked):hover + .padlock {
+  animation: 0.5s swing ease-in-out;
+}
+
+.padlock {
+  font-size: 3px;
+  position: relative;
+  width: 16em;
+  height: 20em;
+  transform-origin: 50% 2em;
+  -webkit-tap-highlight-color: #0000;
+  cursor: pointer;
+}
+
+.padlock:before {
+  background: hsl(0, 0%, 70%);
+  content: "";
+  display: block;
+  top: 5.25em;
+  right: 2.375em;
+  width: 2em;
+  height: 1.5em;
+  z-index: 1;
+}
+
+.padlock:before,
+.padlock__top,
+.padlock__top-a,
+.padlock__top-b,
+.padlock__bottom {
+  position: absolute;
+}
+
+.padlock__top,
+.padlock__top-a {
+  height: 14.5em;
+  top: 0;
+}
+
+.padlock__top {
+  width: 11.25em;
+  right: 2.375em;
+}
+
+.padlock__top-a,
+.padlock__top-b {
+  left: 0;
+  width: 100%;
+}
+
+.padlock__top-a {
+  border-radius: 50% 50% 0 0 / 5em 5em 0 0;
+  box-shadow: 0 0 0 2em hsl(0, 0%, 70%) inset;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 12.25em,
+    2em 12.25em,
+    2em 10.25em,
+    1.25em 10.75em,
+    1.25em 11.5em,
+    2em 11.5em,
+    2em 12.25em,
+    0 12.25em
+  );
+}
+
+.padlock__top-b {
+  box-shadow: -2em 0 0 hsl(0, 0%, 70%) inset;
+  height: 3em;
+  top: 12em;
+}
+
+.padlock__bottom {
+  background: hsl(50, 90%, 55%);
+  box-shadow:
+    0.75em 0 0 hsl(50, 90%, 40%) inset,
+    2em 0 0 hsl(50, 90%, 75%) inset,
+    -0.75em 0 0 hsl(50, 90%, 40%) inset,
+    -3em 0 0 hsl(50, 90%, 75%) inset;
+  border-radius: 0.5em;
+  width: 100%;
+  height: 10.75em;
+  top: 9.25em;
+}
+
+.padlock__sr {
+  clip: rect(1px, 1px, 1px, 1px);
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
+
+/* Animations */
+@keyframes swing {
+  from, to {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}

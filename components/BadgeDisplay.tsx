@@ -68,8 +68,21 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
               aria-label={`${badge.name} badge ${isEarned ? 'earned' : 'locked'}`}
             >
               <div className="badge-icon" aria-hidden="true">
-                {/* Placeholder icon - user will replace */}
-                {isEarned ? '🏆' : '🔒'}
+                {isEarned ? (
+                  <span>🏆</span>
+                ) : (
+                  <div className="padlock-wrapper">
+                    <input id={`lock-${badge.id}`} type="checkbox" name="unlocked" value="1" aria-hidden="true" />
+                    <label htmlFor={`lock-${badge.id}`} className="padlock">
+                      <div className="padlock__sr">Unlock</div>
+                      <div className="padlock__top">
+                        <div className="padlock__top-a"></div>
+                        <div className="padlock__top-b"></div>
+                      </div>
+                      <div className="padlock__bottom"></div>
+                    </label>
+                  </div>
+                )}
               </div>
               <div className="badge-name">{badge.name}</div>
               {isEarned && (
