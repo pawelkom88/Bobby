@@ -27,7 +27,6 @@ export default function PageWrapper({ children }: PageWrapperProps) {
         overflowY: 'auto', 
         overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
-        paddingBottom: showBottomNav ? '80px' : '0',
       }}>
         {children}
       </div>

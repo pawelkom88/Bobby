@@ -123,12 +123,13 @@ export default function CartoonDialPad({
 
       <div className="phone-container">
         <div className="phone">
+          <h2 className="phone-title">Mummy's phone</h2>
           <div className="display" aria-live="polite" aria-atomic="true">
             {displayValue}
           </div>
 
           <div className="keyboard">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map(
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map(
               (num, index) => {
                 const letterMap: Record<string, string> = {
                   '1': '',

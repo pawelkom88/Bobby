@@ -8,15 +8,16 @@ import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { setSelectedService } from '@/lib/storage';
 import type { Service } from '@/types';
+import Image from 'next/image';
 
 export default function ChooseEmergencyPage() {
   const router = useRouter();
   const [selectedService, setSelected] = useState<Service | null>(null);
 
-  const services: Array<{ id: Service; label: string; icon: string; color: string }> = [
-    { id: 'fire', label: 'FIRE', icon: '🔥', color: '#F5A547' },
-    { id: 'ambulance', label: 'AMBULANCE', icon: '🚑', color: '#9C5FD5' },
-    { id: 'police', label: 'POLICE', icon: '🚔', color: '#4DB8B8' },
+  const services: Array<{ id: Service; label: string; imagePath: string; color: string }> = [
+    { id: 'fire', label: 'FIRE', imagePath: '/emergency-type-fire-brigade.png', color: '#F68941' },
+    { id: 'ambulance', label: 'AMBULANCE', imagePath: '/emergency-type-ambulance.png', color: '#A5D967' },
+    { id: 'police', label: 'POLICE', imagePath: '/emergency-type-police.png', color: '#299DED' },
   ];
 
   const handleSelectService = (service: Service) => {
@@ -53,7 +54,7 @@ export default function ChooseEmergencyPage() {
                     aria-label={`Select ${service.label}`}
                   >
                     <div className="emergency-tile-content">
-                      <div className="emergency-tile-icon">{service.icon}</div>
+                      <Image src={service.imagePath} alt={service.label} width={100} height={100} className="emergency-tile-icon" />
                       <div className="emergency-tile-text">
                         <span className="emergency-tile-label">{service.label}</span>
                       </div>
