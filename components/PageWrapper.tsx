@@ -11,12 +11,11 @@ interface PageWrapperProps {
 export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname();
   
-  // Hide bottom nav on root route and /app/dial
-  const showBottomNav = pathname !== '/' && pathname !== '/app/dial';
+  // Hide bottom nav on root route, /app/dial, and /app/conversation
+  const showBottomNav = pathname !== '/' && pathname !== '/app/dial' && pathname !== '/app/conversation';
 
   return (
     <div className="page-wrapper" style={{
-      minHeight: '100vh',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',

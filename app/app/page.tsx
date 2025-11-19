@@ -22,7 +22,7 @@ export default function AppPage() {
                   <h1 className="welcome-title">WELCOME</h1>
                   <p className="welcome-subtitle">Hi, I am Bobby, your guide</p></div>
                 <AnimatedImageWrapper src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
-                <CartoonButton asLink href="/your-age">CALL BOBBY</CartoonButton>
+                <CartoonButton containerClassName="welcome-button" asLink href="/your-age">CALL BOBBY</CartoonButton>
                 <div className="badges-section">
                   <h2>YOUR BADGES</h2>
                   <div className="badges-container">

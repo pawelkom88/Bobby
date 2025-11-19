@@ -123,7 +123,6 @@ export default function CartoonDialPad({
 
       <div className="phone-container">
         <div className="phone">
-          <h2 className="phone-title">Mummy's phone</h2>
           <div className="display" aria-live="polite" aria-atomic="true">
             {displayValue}
           </div>

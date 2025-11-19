@@ -333,7 +333,6 @@ export default function VoiceConversation({
   return (
     <div className="voice-conversation" role="region" aria-label="Voice conversation">
       <div className="conversation-header">
-        <h2 className="conversation-title">CALL WITH BOBBY</h2>
         {onBack && !agentConnected && (
           <button
             type="button"
@@ -345,14 +344,15 @@ export default function VoiceConversation({
           </button>
         )}
       </div>
-      <p className="conversation-subtitle">Stay calm, you're doing great!</p>
+      <h1 className="conversation-subtitle">Connecting ...</h1>
+      <p className="conversation-subtitle-text">Get ready to chat with Bobby!</p>
 
       {!agentConnected && (
         <div className="conversation-start-section">
           {isConnecting ? (
-            <LoadingSpinner message="Connecting to Bobby..." />
+            <LoadingSpinner  />
           ) : autoStart ? (
-            <LoadingSpinner message="Connecting to Bobby..." />
+            <LoadingSpinner  />
           ) : (
             <CartoonButton
               onClick={startConversation}
