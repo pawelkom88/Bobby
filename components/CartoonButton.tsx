@@ -13,6 +13,7 @@ interface CartoonButtonProps {
   title?: string;
   asLink?: boolean;
   href?: string;
+  containerClassName?: string;
 }
 
 /**
@@ -29,11 +30,12 @@ export default function CartoonButton({
   title,
   asLink = false,
   href = '',
+  containerClassName = '',
 }: CartoonButtonProps) {
   return (
-    <div className="btn-container">
+    <div className={`btn-container ${containerClassName}`}>
       {asLink ? (
-        <Link href={href} className="cartoon-btn">
+        <Link href={href} className={`cartoon-btn ${className}`}>
           <span>{children}</span>
         </Link>
       ) : (
