@@ -118,8 +118,6 @@ export default function AccessibilitySection({
 
   return (
     <div className="accessibility-section" role="region" aria-label="Accessibility settings">
-
-
         <h2 className="accessibility-section-title">Accessibility Settings</h2>
       <Image
       className="accessibility-image"

@@ -50,6 +50,7 @@ export default function SettingsPage() {
                     <CartoonButton
                       onClick={handleResetProgress}
                       ariaLabel="Reset progress"
+                      className="cartoon-btn-danger"
                     >
                       Reset Progress
                     </CartoonButton>

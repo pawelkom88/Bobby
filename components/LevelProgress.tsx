@@ -63,29 +63,30 @@ export default function LevelProgress({ showLabel = true }: LevelProgressProps) 
   return (
     <div className="level-progress" role="region" aria-label="Level progress">
       {showLabel && (
+        <div className="level-progress-label">
+          <span>YOUR SCORE</span>
+        </div>
+      )}
+      <div className="level-progress-content">
         <div className="level-progress-header">
           <span className="level-label">LEVEL {level}</span>
-          {level < 10 && (
-            <span className="xp-label" aria-live="polite">
-              {xpToNext} XP to next level
-            </span>
-          )}
+          <span className="progress-percentage">{Math.round(progress)}%</span>
         </div>
-      )}
-      <div className="progress-bar-container" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Level ${level} progress`}>
-        <div
-          className="progress-bar-fill"
-          style={{
-            width: `${progress}%`,
-            transition: 'width 0.3s ease',
-          }}
-        />
+        <div className="progress-bar-container" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Level ${level} progress ${Math.round(progress)}%`}>
+          <div
+            className="progress-bar-fill"
+            style={{
+              width: `${progress}%`,
+              transition: 'width 0.3s ease',
+            }}
+          />
+        </div>
+        {level < 10 && showLabel && (
+          <div className="xp-label" aria-live="polite">
+            {xpToNext} XP to next level
+          </div>
+        )}
       </div>
-      {showLabel && (
-        <div className="xp-info" aria-live="polite">
-          {xp} XP
-        </div>
-      )}
     </div>
   );
 }

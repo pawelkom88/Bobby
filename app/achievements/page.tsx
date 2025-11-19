@@ -11,48 +11,53 @@ export default function AchievementsPage() {
 
   return (
     <ViewTransition>
-    <PageWrapper>
-      <main className="achievements-page" role="main">
-        <header className="achievements-header">
-          <h1 className="achievements-title">MY ACHIEVEMENTS</h1>
-        </header>
+      <PageWrapper>
+        <main className="achievements-page" role="main">
+          <header className="achievements-header">
+            <h1 className="achievements-title">MY ACHIEVEMENTS</h1>
+          </header>
+          <div className="achievements-content">
+            <section className="achievements-section" aria-labelledby="score-heading">
+              <h2 id="score-heading">Your Score</h2>
+              <div className="achievements-card">
+                <LevelProgress showLabel={true} />
+              </div>
+            </section>
 
-        <div className="achievements-progress">
-          <div className="progress-section">
-            <h2>Your Score</h2>
-            <LevelProgress showLabel={true} />
+            <section className="achievements-section" aria-labelledby="badges-heading">
+              <h2 id="badges-heading">Your Badges</h2>
+              <div className="achievements-card">
+                <BadgeDisplay showAll={true} />
+              </div>
+            </section>
+
+            <section className="achievements-section" aria-labelledby="history-heading">
+              <h2 id="history-heading">Training History</h2>
+              <div className="achievements-card">
+                {progress.conversations.length === 0 ? (
+                  <p className="no-history">No training sessions yet. Start your first scenario!</p>
+                ) : (
+                  <ul className="conversation-list" role="list">
+                    {progress.conversations
+                      .slice()
+                      .reverse()
+                      .slice(0, 10)
+                      .map((conv, index) => (
+                        <li key={index} className="conversation-item" role="listitem">
+                          <div className="conversation-service">{conv.service.toUpperCase()}</div>
+                          <div className="conversation-date">
+                            {new Date(conv.timestamp).toLocaleDateString()}
+                          </div>
+                          <div className="conversation-xp">+{conv.xpEarned} XP</div>
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+            </section>
           </div>
-        </div>
-
-        <div className="achievements-badges">
-          <h2>Your Badges</h2>
-          <BadgeDisplay showAll={true} />
-        </div>
-
-        <div className="achievements-history">
-          <h2>Training History</h2>
-          {progress.conversations.length === 0 ? (
-            <p className="no-history">No training sessions yet. Start your first scenario!</p>
-          ) : (
-            <ul className="conversation-list" role="list">
-              {progress.conversations
-                .slice()
-                .reverse()
-                .slice(0, 10)
-                .map((conv, index) => (
-                  <li key={index} className="conversation-item" role="listitem">
-                    <div className="conversation-service">{conv.service.toUpperCase()}</div>
-                    <div className="conversation-date">
-                      {new Date(conv.timestamp).toLocaleDateString()}
-                    </div>
-                    <div className="conversation-xp">+{conv.xpEarned} XP</div>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </div>
-      </main>
-    </PageWrapper>
+        </main>
+      </PageWrapper>
     </ViewTransition>
   );
 }
