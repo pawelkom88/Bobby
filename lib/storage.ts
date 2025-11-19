@@ -8,7 +8,7 @@ import {
   getBadgeForLevel,
 } from './gamification';
 import { validateAgeTier, validateService, validateXP, validateTimestamp } from './validation';
-import type { UserData, UserSettings, Conversation, Service, AgeTier, Badge, LevelUpResult } from '@/types';
+import type { UserData, UserSettings, Conversation, Service, AgeTier, Badge, LevelUpResult, JourneyState } from '@/types';
 
 const STORAGE_KEY = 'bobby-app-data';
 
@@ -269,5 +269,53 @@ export function setUserName(name: string): void {
   const data = getUserData();
   data.userName = name;
   saveUserData(data);
+}
+
+/**
+ * Save selected age tier to journey state
+ */
+export function setSelectedAgeTier(ageTier: AgeTier): void {
+  const data = getUserData();
+  if (!data.journey) {
+    data.journey = {};
+  }
+  data.journey.selectedAgeTier = ageTier;
+  saveUserData(data);
+}
+
+/**
+ * Get selected age tier from journey state
+ */
+export function getSelectedAgeTier(): AgeTier | undefined {
+  const data = getUserData();
+  return data.journey?.selectedAgeTier;
+}
+
+/**
+ * Save selected service to journey state
+ */
+export function setSelectedService(service: Service): void {
+  const data = getUserData();
+  if (!data.journey) {
+    data.journey = {};
+  }
+  data.journey.selectedService = service;
+  saveUserData(data);
+}
+
+/**
+ * Get selected service from journey state
+ */
+export function getSelectedService(): Service | undefined {
+  const data = getUserData();
+  return data.journey?.selectedService;
+}
+
+/**
+ * Get full journey state
+ */
+export function getJourneyState(): JourneyState | undefined {
+  const data = getUserData();
+  return data.journey;
 }
 

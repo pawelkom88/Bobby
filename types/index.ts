@@ -51,6 +51,11 @@ export interface UserSettings {
   dyslexiaFont: boolean;
 }
 
+export interface JourneyState {
+  selectedAgeTier?: AgeTier;
+  selectedService?: Service;
+}
+
 export interface UserData {
   userName: string;
   totalXP: number;
@@ -58,6 +63,7 @@ export interface UserData {
   conversations: Conversation[];
   badges: Badge[];
   settings: UserSettings;
+  journey?: JourneyState;
 }
 
 export interface AssessmentFeedback {
