@@ -29,7 +29,7 @@ export default function YourAgePage() {
       <PageWrapper>
         <main className="age-page" role="main">
           <div className="age-container">
-            <div className="age-card">
+            <div className="age-card accessibility-section">
               <div className="age-header">
                 <h1 className="age-title">WHO IS THIS FOR?</h1>
                 <p className="age-subtitle">Choose the age tier</p>

@@ -35,7 +35,7 @@ export default function ChooseEmergencyPage() {
       <PageWrapper>
         <main className="emergency-page" role="main">
           <div className="emergency-container">
-            <div className="emergency-card">
+            <div className="emergency-card accessibility-section">
               <div className="emergency-header">
                 <h1 className="emergency-title">WHAT'S THE EMERGENCY?</h1>
                 <p className="emergency-subtitle">Choose the emergency type</p>
