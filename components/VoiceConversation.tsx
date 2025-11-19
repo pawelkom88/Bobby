@@ -20,6 +20,7 @@ import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
 import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
+import Image from 'next/image';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -48,7 +49,7 @@ export default function VoiceConversation({
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
-  
+
   const conversationRef = useRef<any>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const stopSpeechRecognitionRef = useRef<(() => void) | null>(null);
@@ -95,7 +96,7 @@ export default function VoiceConversation({
     };
   }, []);
 
-  // Auto-start conversation if autoStart is true and permissions are granted
+  // // Auto-start conversation if autoStart is true and permissions are granted
   useEffect(() => {
     if (autoStart && permissionGranted && !agentConnected) {
       logger.info('Auto-starting conversation');
@@ -179,7 +180,7 @@ export default function VoiceConversation({
             sendTextToAgent(conv, transcript)
               .then((response) => {
                 logger.debug('Agent response received', response);
-                
+
                 // Add agent message to conversation
                 const agentMessage: ConversationMessage = {
                   type: 'agent',
@@ -260,7 +261,7 @@ export default function VoiceConversation({
     setCurrentTranscript('');
   };
 
-  // Keep connecting sound in sync with UI toggle while connecting
+  // // Keep connecting sound in sync with UI toggle while connecting
   useEffect(() => {
     if (!isConnecting) {
       if (stopConnectingSoundRef.current) {
@@ -344,15 +345,17 @@ export default function VoiceConversation({
           </button>
         )}
       </div>
-      <h1 className="conversation-subtitle">Connecting ...</h1>
-      <p className="conversation-subtitle-text">Get ready to chat with Bobby!</p>
-
+      <h1 className="conversation-subtitle">Just a moment ...</h1>
+      <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
+      <br />
+      <Image src="/bobby-connecting.png" alt="Bobby is getting ready to chat" width={200} height={250} />
+      <br />
       {!agentConnected && (
         <div className="conversation-start-section">
           {isConnecting ? (
-            <LoadingSpinner  />
+            <LoadingSpinner />
           ) : autoStart ? (
-            <LoadingSpinner  />
+            <LoadingSpinner />
           ) : (
             <CartoonButton
               onClick={startConversation}

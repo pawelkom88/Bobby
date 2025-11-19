@@ -24,7 +24,7 @@ export default function AppPage() {
                 <AnimatedImageWrapper src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
                 <CartoonButton containerClassName="welcome-button" asLink href="/your-age">CALL BOBBY</CartoonButton>
                 <div className="badges-section">
-                  <h2>YOUR BADGES</h2>
+                  <h2 className="badges-title">YOUR BADGES</h2>
                   <div className="badges-container">
                     <BadgeDisplay showAll={false} />
                   </div>
