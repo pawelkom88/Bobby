@@ -77,9 +77,11 @@ export default function LevelProgress({ showLabel = true }: LevelProgressProps) 
             className="progress-bar-fill"
             style={{
               width: `${progress}%`,
-              transition: 'width 0.3s ease',
             }}
           />
+          <div className="progress-bar-text">
+            {Math.round(progress)}%
+          </div>
         </div>
         {level < 10 && showLabel && (
           <div className="xp-label" aria-live="polite">
