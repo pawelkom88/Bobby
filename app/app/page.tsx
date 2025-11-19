@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Image from 'next/image';
 import CartoonButton from '@/components/CartoonButton';
 import { ViewTransition } from 'react';
+import AnimatedImageWrapper from '@/components/AnimatedImageWrapper';
 
 export default function AppPage() {
   return (
@@ -20,7 +21,7 @@ export default function AppPage() {
               <div>
                 <h1 className="welcome-title">WELCOME</h1>
                 <p className="welcome-subtitle">Hi, I am Bobby, your guide</p></div>
-              <Image src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
+              <AnimatedImageWrapper src="/bobby.png" alt="Bobby" width={300} height={300} className="welcome-image" />
               <CartoonButton asLink href="/app/dial">CALL BOBBY</CartoonButton>
               <div className="badges-section">
                 <h2>YOUR BADGES</h2>
