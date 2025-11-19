@@ -9,6 +9,7 @@ import CartoonButton from '@/components/CartoonButton';
 import { getAllAgeTiers } from '@/lib/ageTiers';
 import { setSelectedAgeTier } from '@/lib/storage';
 import type { AgeTier } from '@/types';
+import Image from 'next/image';
 
 export default function YourAgePage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function YourAgePage() {
   };
 
   const ageTiers = getAllAgeTiers();
-  const tileColors = ['#F5A547', '#9C5FD5', '#4DB8B8']; // Orange, Purple, Teal
+  const tileColors = ['#F58B47', '#9560ED', '#56C3C8']; // Orange, Purple, Teal
 
   return (
     <ViewTransition>
@@ -48,9 +49,9 @@ export default function YourAgePage() {
                   >
                     <div className="age-tile-content">
                       <div className="age-tile-icon">
-                        {tier.id === 1 && '👶'}
-                        {tier.id === 2 && '👧'}
-                        {tier.id === 3 && '👦'}
+                        {tier.id === 1 && <Image src="/age-4-6.png" alt="Baby" width={100} height={100} />}
+                        {tier.id === 2 && <Image src="/age-11-13.png" alt="Teen" width={100} height={100} />}
+                        {tier.id === 3 && <Image src="/age-7-9.png" alt="Child" width={100} height={100} />}
                       </div>
                       <div className="age-tile-text">
                         <span className="age-tile-label">{tier.label.toUpperCase()}</span>
@@ -61,7 +62,7 @@ export default function YourAgePage() {
               </div>
 
               <div className="age-back-button">
-                <CartoonButton asLink href="/app">BACK</CartoonButton>
+                <CartoonButton containerClassName='age-back-button-container' asLink href="/app">BACK</CartoonButton>
               </div>
             </div>
           </div>

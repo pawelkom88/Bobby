@@ -257,6 +257,19 @@ export default function CartoonDialPad({
           </div>
         </div>
       </div>
+
+      {onBack && (
+        <div className="dial-back-button">
+          <button
+            type="button"
+            className="cartoon-btn"
+            onClick={onBack}
+            aria-label="Go back to emergency selection"
+          >
+            <span>BACK</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

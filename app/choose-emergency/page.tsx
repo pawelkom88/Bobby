@@ -22,8 +22,8 @@ export default function ChooseEmergencyPage() {
   const handleSelectService = (service: Service) => {
     setSelected(service);
     setSelectedService(service);
-    // Navigate to next step (conversation)
-    router.push('/app/conversation');
+    // Navigate to dial pad
+    router.push('/app/dial');
   };
 
   const handleBack = () => {
@@ -63,7 +63,7 @@ export default function ChooseEmergencyPage() {
               </div>
 
               <div className="emergency-back-button">
-                <CartoonButton onClick={handleBack}>BACK</CartoonButton>
+                <CartoonButton containerClassName='emergency-back-button-container' onClick={handleBack}>BACK</CartoonButton>
               </div>
             </div>
           </div>
