@@ -13,7 +13,7 @@ export default function DialPage() {
 
   const handleBack = () => {
     // Navigate back to emergency selection
-    window.location.href = '/choose-emergency';
+    window.location.href = '/app/choose-emergency';
   };
 
   return (

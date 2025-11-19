@@ -19,7 +19,7 @@ export default function YourAgePage() {
     setSelectedAge(ageTier);
     setSelectedAgeTier(ageTier);
     // Navigate to next step
-    router.push('/choose-emergency');
+    router.push('/app/choose-emergency');
   };
 
   const ageTiers = getAllAgeTiers();

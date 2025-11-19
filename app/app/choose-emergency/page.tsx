@@ -28,7 +28,7 @@ export default function ChooseEmergencyPage() {
   };
 
   const handleBack = () => {
-    router.push('/your-age');
+    router.push('/app/your-age');
   };
 
   return (

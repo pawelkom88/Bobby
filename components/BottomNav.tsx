@@ -39,7 +39,7 @@ export default function BottomNav() {
 
   const isActive = (route: string) => {
     if (route === '/app') {
-      return pathname === '/app' || pathname.startsWith('/app/') || pathname === '/your-age' || pathname === '/choose-emergency';
+      return pathname === '/app' || pathname.startsWith('/app/');
     }
     return pathname === route;
   };
