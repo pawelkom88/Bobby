@@ -171,6 +171,116 @@ function mapScoreToFeedback(score: number, positives: string[], improvements: st
 }
 
 /**
+ * Assess conversation using Gemini AI
+ * 
+ * Sends the conversation to Gemini for intelligent analysis and feedback
+ */
+export async function assessWithGemini(
+  conversation: ConversationMessage[],
+  { ageTier, situation }: AssessmentOptions = {}
+): Promise<ConversationAssessment> {
+  const tier: AgeTier = ageTier ?? 2;
+  const userMessages = conversation.filter((msg) => msg.type === 'user');
+  const durationSeconds = calculateDurationSeconds(userMessages);
+  const userTurns = userMessages.length;
+
+  try {
+    // Build conversation text for Gemini analysis
+    const conversationText = conversation
+      .map((msg) => `${msg.type === 'user' ? 'Child' : 'Dispatcher'}: ${msg.text}`)
+      .join('\n');
+
+    // Create assessment prompt for Gemini
+    const assessmentPrompt = `Analyze this emergency call training conversation between a child and a dispatcher.
+
+Age Tier: ${tier === 1 ? '4-6' : tier === 2 ? '7-10' : '11-13'}
+Scenario: ${situation || 'unknown'}
+Duration: ${durationSeconds} seconds
+Message Turns: ${userTurns}
+
+CONVERSATION:
+${conversationText}
+
+Provide assessment in JSON format with these exact keys:
+{
+  "score": <number 0-100>,
+  "passed": <boolean>,
+  "positives": [<list of 2-3 positive observations>],
+  "improvements": [<list of 2-3 areas for improvement>],
+  "warnings": [<list of 0-2 concerns if any>]
+}
+
+Consider:
+1. Did the child clearly explain the emergency?
+2. Did they provide location information?
+3. Did they identify who needs help?
+4. Did they describe the person's condition?
+5. Did they stay engaged and calm?
+6. Was the information relevant and on-topic?
+
+Keep feedback age-appropriate and encouraging.`;
+
+    const response = await fetch('/api/gemini-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'user',
+            parts: [{ text: assessmentPrompt }],
+          },
+        ],
+        ageTier: tier,
+        scenario: situation || 'generic',
+        sessionStartTime: Date.now(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get assessment from Gemini');
+    }
+
+    let assessmentText = '';
+    if (response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        assessmentText += decoder.decode(value);
+      }
+    }
+
+    // Parse JSON from response
+    const jsonMatch = assessmentText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Invalid response format from Gemini assessment');
+    }
+
+    const assessment = JSON.parse(jsonMatch[0]);
+
+    return {
+      score: Math.min(100, Math.max(0, assessment.score || 50)),
+      passed: assessment.passed ?? assessment.score >= 60,
+      positives: assessment.positives || [],
+      improvements: assessment.improvements || [],
+      warnings: assessment.warnings || [],
+      metrics: {
+        userTurns,
+        durationSeconds,
+      },
+    };
+  } catch (error) {
+    console.error('Error in Gemini assessment, falling back to rule-based', error);
+    // Fall back to rule-based assessment
+    return assessConversation(conversation, { ageTier, situation });
+  }
+}
+
+/**
  * Assess a conversation transcript without persisting it anywhere.
  */
 export function assessConversation(

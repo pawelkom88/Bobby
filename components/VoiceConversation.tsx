@@ -1,20 +1,24 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Conversation } from '@elevenlabs/client';
 import {
-  startAgentConversation,
-  onAgentResponse,
-  endAgentConversation,
-  checkMicrophonePermission,
-  handleElevenLabsError,
-  getInputFrequencyData,
-  startSpeechToText,
-  sendTextToAgent,
-} from '@/lib/elevenlabs-agent';
+  startGeminiSession,
+  endGeminiSession,
+  sendMessageToGemini,
+  getRemainingSessionTime,
+  getConversationHistory,
+  isSessionValid,
+} from '@/lib/gemini-conversation';
+import {
+  textToSpeech,
+  queueAndPlayAudio,
+  stopAllAudio,
+  isAudioPlaying,
+} from '@/lib/lemonfox-audio';
+import { assessWithGemini } from '@/lib/assessment';
 import { getSettings } from '@/lib/storage';
-import { sanitizeText } from '@/lib/validation';
 import { logger } from '@/lib/logger';
+import { CONFIG } from '@/lib/config';
 import LoadingSpinner from './LoadingSpinner';
 import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
@@ -31,11 +35,11 @@ interface VoiceConversationProps {
 }
 
 /**
- * Voice conversation component with microphone and ElevenLabs integration
+ * Voice conversation component with Gemini AI and LemonFox TTS
  */
 export default function VoiceConversation({
-  ageTier,
-  situation,
+  ageTier = 1,
+  situation = 'fire',
   onComplete,
   onBack,
   autoStart = false,
@@ -44,69 +48,259 @@ export default function VoiceConversation({
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
-  const [agentConnected, setAgentConnected] = useState(false);
+  const [sessionActive, setSessionActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
+  const [remainingTime, setRemainingTime] = useState(CONFIG.SESSION_MAX_DURATION_SECONDS);
+  const [geminiResponse, setGeminiResponse] = useState('');
 
-  const conversationRef = useRef<any>(null);
-  const unsubscribeRef = useRef<(() => void) | null>(null);
   const stopSpeechRecognitionRef = useRef<(() => void) | null>(null);
+  const shouldBeListeningRef = useRef(false);
   const stopConnectingSoundRef = useRef<(() => void) | null>(null);
+  const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const settings = getSettings();
   const { soundEnabled } = useSound();
 
-
-  // Auto-start conversation when component mounts with autoStart flag
+  // Check microphone permission on mount
   useEffect(() => {
-    // Check microphone permission on mount
-    checkMicrophonePermission()
-      .then((granted) => {
-        setPermissionGranted(granted);
-        if (!granted) {
+    if (typeof window !== 'undefined' && navigator.mediaDevices) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(() => {
+          setPermissionGranted(true);
+        })
+        .catch(() => {
           setPermissionError(
             'Microphone access is required for voice chat. Please allow microphone access in your browser settings.'
           );
-        }
-      })
-      .catch((err) => {
-        logger.error('Microphone permission check failed', err);
-        setPermissionError('Could not check microphone access. Please allow it in your browser settings.');
-      });
+        });
+    }
 
     return () => {
       // Cleanup on unmount
       if (stopConnectingSoundRef.current) {
         stopConnectingSoundRef.current();
-        stopConnectingSoundRef.current = null;
-      }
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
       }
       if (stopSpeechRecognitionRef.current) {
         stopSpeechRecognitionRef.current();
       }
-      if (conversationRef.current) {
-        endAgentConversation(conversationRef.current).catch((err) => {
-          logger.error('Error cleaning up conversation', err);
-        });
+      stopAllAudio();
+      if (sessionActive) {
+        endGeminiSession();
       }
     };
-  }, []);
+  }, [sessionActive]);
 
-  // // Auto-start conversation if autoStart is true and permissions are granted
+  // Auto-start conversation if autoStart is true and permissions are granted
   useEffect(() => {
-    if (autoStart && permissionGranted && !agentConnected) {
-      logger.info('Auto-starting conversation');
-      // Small delay to ensure component is mounted
+    if (autoStart && permissionGranted && !sessionActive) {
       const timer = setTimeout(() => {
         void startConversation();
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [autoStart, permissionGranted, agentConnected]);
+  }, [autoStart, permissionGranted, sessionActive]);
+
+  // Update remaining time every second
+  useEffect(() => {
+    if (!sessionActive) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const remaining = getRemainingSessionTime();
+      setRemainingTime(remaining);
+
+      // Auto-end session if time is up
+      if (remaining <= 0) {
+        void endConversation();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionActive]);
+
+  // Start Web Speech API recognition
+  function startSpeechRecognition(): void {
+    // If we shouldn't be listening, don't start
+    if (!shouldBeListeningRef.current) return;
+
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        setError('Speech Recognition not supported in your browser');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false; // Stop after each user input - don't listen while audio plays
+      recognition.interimResults = true;
+      recognition.lang = 'en-GB';
+
+      recognition.onstart = () => {
+        logger.info('Speech recognition started');
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        if (interimTranscript) {
+          setCurrentTranscript(interimTranscript);
+        }
+
+        if (finalTranscript) {
+          const sanitized = finalTranscript.trim();
+          logger.debug('Final transcript', { sanitized });
+          setCurrentTranscript('');
+
+          // Send to Gemini
+          void handleUserInput(sanitized);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        logger.error('Speech recognition error', event.error);
+        
+        // "no-speech" error is common when waiting for user input
+        // Just restart listening instead of showing error
+        if (event.error === 'no-speech') {
+          logger.info('No speech detected, restarting listening...');
+          
+          // Show gentle reminder to user
+          setCurrentTranscript('💭 (Say something to help Bobby...)');
+          
+          // Restart after a brief delay
+          setTimeout(() => {
+            if (isSessionValid() && shouldBeListeningRef.current && !isProcessing) {
+              startSpeechRecognition();
+              setCurrentTranscript(''); // Clear reminder when listening restarts
+            }
+          }, 500);
+        } else {
+          setError(`Speech recognition error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        logger.info('Speech recognition ended');
+        setIsListening(false);
+        
+        // Auto-restart if we should be listening (and not processing/playing)
+        // This handles "silence timeouts" or accidental stops where no final result was produced
+        if (shouldBeListeningRef.current && !isProcessing && !isAudioPlaying()) {
+            logger.info('Auto-restarting speech recognition after silence/end');
+            // Small delay to prevent rapid loops
+            setTimeout(() => {
+                if (shouldBeListeningRef.current && !isProcessing && !isAudioPlaying()) {
+                    startSpeechRecognition();
+                }
+            }, 300);
+        }
+      };
+
+      recognition.start();
+      stopSpeechRecognitionRef.current = () => {
+        recognition.stop();
+      };
+    } catch (err) {
+      logger.error('Error starting speech recognition', err);
+      setError('Failed to start speech recognition');
+    }
+  }
+
+  // Handle user input - send to Gemini
+  async function handleUserInput(userText: string): Promise<void> {
+    if (!userText.trim()) {
+      return;
+    }
+
+    // Stop listening while processing
+    shouldBeListeningRef.current = false;
+    if (stopSpeechRecognitionRef.current) {
+      stopSpeechRecognitionRef.current();
+    }
+
+    try {
+      setIsProcessing(true);
+      setError(null);
+
+      // Add user message to conversation
+      const userMessage: ConversationMessage = {
+        type: 'user',
+        text: userText,
+        timestamp: new Date().toISOString(),
+      };
+      setConversation((prev) => [...prev, userMessage]);
+
+      // Send to Gemini and stream response
+      let geminiText = '';
+      setGeminiResponse('');
+
+      await sendMessageToGemini(
+        userText,
+        (chunk) => {
+          geminiText += chunk;
+          setGeminiResponse(geminiText);
+        },
+        async (fullResponse) => {
+            logger.debug('Gemini response complete', { length: fullResponse.length });
+
+            // Add agent message to conversation FIRST
+            const agentMessage: ConversationMessage = {
+              type: 'agent',
+              text: fullResponse,
+              timestamp: new Date().toISOString(),
+            };
+            setConversation((prev) => [...prev, agentMessage]);
+            setGeminiResponse('');
+
+            // Convert response to audio and play
+            try {
+              const audioBlob = await textToSpeech(fullResponse);
+              await queueAndPlayAudio(audioBlob);
+              // Audio finished - NOW restart listening for user
+              logger.info('Audio finished, restarting speech recognition');
+              shouldBeListeningRef.current = true;
+              startSpeechRecognition();
+            } catch (audioErr) {
+              logger.error('Error playing audio', audioErr);
+              // Restart listening even if audio fails
+              shouldBeListeningRef.current = true;
+              startSpeechRecognition();
+            }
+          },
+        (error) => {
+          logger.error('Gemini error', { error });
+          setError(error);
+          setGeminiResponse('');
+        }
+      );
+
+      setIsProcessing(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error('Error handling user input', { message });
+      setError(message);
+      setIsProcessing(false);
+    }
+  }
 
   const startConversation = async () => {
     if (!permissionGranted) {
@@ -114,114 +308,91 @@ export default function VoiceConversation({
       return;
     }
 
-    setIsConnecting(true);
-    setError(null);
-    // Start connecting sound (UI SFX)
-    if (stopConnectingSoundRef.current) {
-      stopConnectingSoundRef.current();
-      stopConnectingSoundRef.current = null;
-    }
-    stopConnectingSoundRef.current = startConnectingSound(soundEnabled);
+    try {
+      setIsConnecting(true);
+      setError(null);
 
-        try {
-          const agentId = process.env.NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID;
-          if (!agentId) {
-            throw new Error('Agent ID not configured. Set NEXT_PUBLIC_ELEVEN_LABS_AGENT_ID in .env.local');
-          }
+      // Start connecting sound
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+      }
+      stopConnectingSoundRef.current = startConnectingSound(soundEnabled);
 
-      logger.info('Starting ElevenLabs agent conversation', { agentId });
-
-      // Start real-time conversation with ElevenLabs agent
-      const conv = await startAgentConversation(agentId);
-      conversationRef.current = conv;
-
-      // Set up listener for agent responses
-      const unsubscribe = onAgentResponse(conv, (response) => {
-        logger.debug('Agent responded', response);
-
-        // Add agent message to conversation
-        const agentMessage: ConversationMessage = {
-          type: 'agent',
-          text: response.text || 'I am listening...',
-          timestamp: response.timestamp,
-        };
-        setConversation((prev) => [...prev, agentMessage]);
-      });
-
-      unsubscribeRef.current = unsubscribe;
-      setAgentConnected(true);
+      // Initialize Gemini session
+      startGeminiSession({ ageTier, scenario: situation });
+      shouldBeListeningRef.current = true;
+      setSessionActive(true);
       setIsConnecting(false);
-      setIsListening(true);
-      // Stop connecting sound once connected
+      setRemainingTime(CONFIG.SESSION_MAX_DURATION_SECONDS);
+
+      // Stop connecting sound
       if (stopConnectingSoundRef.current) {
         stopConnectingSoundRef.current();
         stopConnectingSoundRef.current = null;
       }
 
-      // Start speech-to-text recognition
-      const stopSpeechRecognition = startSpeechToText(
-        (transcript, isFinal) => {
-          logger.debug('Transcript received', { transcript, isFinal });
+      // Get initial greeting from dispatcher
+      try {
+        let greetingResponse = '';
+        setIsProcessing(true);
 
-          if (isFinal && transcript) {
-            // User finished speaking - send to agent
-            setCurrentTranscript('');
+        await sendMessageToGemini(
+          '', // Empty message to trigger greeting
+          (chunk) => {
+            greetingResponse += chunk;
+            setGeminiResponse(greetingResponse);
+          },
+          async (fullResponse) => {
+            logger.debug('Dispatcher greeting sent', { length: fullResponse.length });
 
-            // Add user message to conversation
-            const userMessage: ConversationMessage = {
-              type: 'user',
-              text: transcript,
+            // Add greeting to conversation FIRST
+            const greetingMessage: ConversationMessage = {
+              type: 'agent',
+              text: fullResponse,
               timestamp: new Date().toISOString(),
             };
-            setConversation((prev) => [...prev, userMessage]);
+            setConversation([greetingMessage]);
+            setGeminiResponse('');
+            setIsProcessing(false);
 
-            // Send to agent
-            setIsLoading(true);
-            sendTextToAgent(conv, transcript)
-              .then((response) => {
-                logger.debug('Agent response received', response);
-
-                // Add agent message to conversation
-                const agentMessage: ConversationMessage = {
-                  type: 'agent',
-                  text: response.text || 'Processing...',
-                  timestamp: response.timestamp,
-                };
-                setConversation((prev) => [...prev, agentMessage]);
-                setIsLoading(false);
-              })
-              .catch((err) => {
-                logger.error('Error sending to agent', err);
-                setError('Failed to process your speech. Please try again.');
-                setIsLoading(false);
-              });
-          } else if (!isFinal) {
-            // Interim transcript - show what user is saying
-            setCurrentTranscript(transcript);
+            // Convert greeting to audio and play
+            try {
+              const audioBlob = await textToSpeech(fullResponse);
+              await queueAndPlayAudio(audioBlob);
+              
+            // Audio has finished playing - NOW start listening for user input
+            logger.info('Greeting audio finished, starting speech recognition');
+            shouldBeListeningRef.current = true;
+            startSpeechRecognition();
+          } catch (audioErr) {
+            logger.error('Error playing greeting audio', audioErr);
+            // Still start listening even if audio fails
+            shouldBeListeningRef.current = true;
+            startSpeechRecognition();
           }
-        },
-        (error) => {
-          logger.error('Speech recognition error', error);
-          setError(error);
-        }
-      );
+          },
+          (error) => {
+            logger.error('Greeting error', { error });
+            setIsProcessing(false);
+            // Start listening anyway
+            startSpeechRecognition();
+          }
+        );
+      } catch (greetingErr) {
+        const message = greetingErr instanceof Error ? greetingErr.message : String(greetingErr);
+        logger.error('Error getting greeting', { message });
+        setIsProcessing(false);
+        // Start listening anyway
+        startSpeechRecognition();
+      }
 
-      stopSpeechRecognitionRef.current = stopSpeechRecognition;
-
-      logger.info('Voice conversation started successfully');
+      logger.info('Voice conversation started with Gemini + LemonFox');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      const errorStack = err instanceof Error ? err.stack : '';
-      console.error('Error starting conversation:', {
-        message: errorMessage,
-        stack: errorStack,
-        error: err,
-      });
-      logger.error('Error starting conversation', { message: errorMessage, stack: errorStack });
-      setError(handleElevenLabsError(err instanceof Error ? err : new Error(errorMessage)));
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error('Error starting conversation', { message });
+      setError(message);
       setIsConnecting(false);
-      setAgentConnected(false);
-      // Stop connecting sound on error
+
       if (stopConnectingSoundRef.current) {
         stopConnectingSoundRef.current();
         stopConnectingSoundRef.current = null;
@@ -229,39 +400,48 @@ export default function VoiceConversation({
     }
   };
 
-  const stopConversation = async () => {
+  const stopConversation = () => {
+    shouldBeListeningRef.current = false;
     try {
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
+      if (stopSpeechRecognitionRef.current) {
+        stopSpeechRecognitionRef.current();
+        stopSpeechRecognitionRef.current = null;
       }
-
-      if (conversationRef.current) {
-        await endAgentConversation(conversationRef.current);
-        conversationRef.current = null;
-      }
-
       setIsListening(false);
-      setAgentConnected(false);
-      logger.info('Voice conversation stopped');
     } catch (err) {
       logger.error('Error stopping conversation', err);
     }
   };
 
-  const endConversation = () => {
-    stopConversation();
-    // Play end-of-conversation UI sound (does not affect agent audio policy)
-    void playEndConversationSound(soundEnabled);
-    if (onComplete) {
-      onComplete(conversation);
+  const endConversation = async () => {
+    try {
+      stopConversation();
+      stopAllAudio();
+
+      // Play end-of-conversation sound
+      void playEndConversationSound(soundEnabled);
+
+      // Get final conversation
+      const finalConversation = getConversationHistory().map((msg) => ({
+        type: msg.role === 'user' ? ('user' as const) : ('agent' as const),
+        text: msg.content,
+        timestamp: new Date().toISOString(),
+      }));
+
+      // End session
+      endGeminiSession();
+      setSessionActive(false);
+
+      // Assessment will be done in parent component
+      if (onComplete) {
+        onComplete(finalConversation);
+      }
+    } catch (err) {
+      logger.error('Error ending conversation', err);
     }
-    // Clear transcript from state immediately after notifying parent
-    setConversation([]);
-    setCurrentTranscript('');
   };
 
-  // // Keep connecting sound in sync with UI toggle while connecting
+  // Handle sound toggle while connecting
   useEffect(() => {
     if (!isConnecting) {
       if (stopConnectingSoundRef.current) {
@@ -270,7 +450,7 @@ export default function VoiceConversation({
       }
       return;
     }
-    // isConnecting
+
     if (soundEnabled) {
       if (!stopConnectingSoundRef.current) {
         stopConnectingSoundRef.current = startConnectingSound(true);
@@ -289,13 +469,12 @@ export default function VoiceConversation({
         <div className="permission-error">
           <h3>Microphone Required</h3>
           <p>{permissionError}</p>
-          <p>This app requires microphone access to function. Please enable it in your browser settings and refresh the page.</p>
         </div>
       </div>
     );
   }
 
-  if (error && !agentConnected) {
+  if (error && !sessionActive) {
     return (
       <div className="voice-conversation" role="alert">
         <div className="connection-error">
@@ -306,24 +485,15 @@ export default function VoiceConversation({
           <p className="error-details">{error}</p>
           <div className="error-action-buttons">
             {onBack && (
-              <CartoonButton
-                onClick={onBack}
-                ariaLabel="Go back to previous step"
-              >
+              <CartoonButton onClick={onBack} ariaLabel="Go back to previous step">
                 ← Go Back
               </CartoonButton>
             )}
             <CartoonButton
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = '/')}
               ariaLabel="Return to home"
             >
               Home
-            </CartoonButton>
-            <CartoonButton
-              onClick={() => window.location.href = '/contact'}
-              ariaLabel="Contact us for support"
-            >
-              Contact Us
             </CartoonButton>
           </div>
         </div>
@@ -334,7 +504,7 @@ export default function VoiceConversation({
   return (
     <div className="voice-conversation" role="region" aria-label="Voice conversation">
       <div className="conversation-header">
-        {onBack && !agentConnected && (
+        {onBack && !sessionActive && (
           <button
             type="button"
             className="back-button"
@@ -344,17 +514,24 @@ export default function VoiceConversation({
             ← Back
           </button>
         )}
+        {sessionActive && (
+          <div className="session-timer" aria-label={`Time remaining: ${remainingTime} seconds`}>
+            <span className={remainingTime < 30 ? 'warning' : ''}>
+              ⏱️ {remainingTime}s
+            </span>
+          </div>
+        )}
       </div>
+
       <h1 className="conversation-subtitle">Just a moment ...</h1>
       <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
       <br />
       <Image src="/bobby-connecting.png" alt="Bobby is getting ready to chat" width={200} height={250} />
       <br />
-      {!agentConnected && (
+
+      {!sessionActive && (
         <div className="conversation-start-section">
           {isConnecting ? (
-            <LoadingSpinner />
-          ) : autoStart ? (
             <LoadingSpinner />
           ) : (
             <CartoonButton
@@ -368,31 +545,37 @@ export default function VoiceConversation({
         </div>
       )}
 
-      {agentConnected && (
+      {sessionActive && (
         <>
           <div className="conversation-status" aria-live="polite">
-            {isLoading ? (
+            {isProcessing ? (
               <LoadingSpinner size="small" message="Bobby is thinking..." />
             ) : isListening ? (
               <span className="listening-indicator">🎤 Listening...</span>
             ) : (
-              <span className="not-listening">Not listening</span>
+              <span className="not-listening">Ready to listen</span>
             )}
           </div>
 
-          <div className="conversation-messages" role="log" aria-live="polite" aria-label="Conversation messages">
+          <div
+            className="conversation-messages"
+            role="log"
+            aria-live="polite"
+            aria-label="Conversation messages"
+          >
             {conversation.map((message, index) => (
-              <div
-                key={index}
-                className={`conversation-message ${message.type}`}
-                role={message.type === 'user' ? 'user message' : 'agent message'}
-              >
+              <div key={index} className={`conversation-message ${message.type}`}>
                 <div className="message-text">{message.text}</div>
               </div>
             ))}
             {currentTranscript && (
               <div className="conversation-message user interim" aria-live="polite">
                 <div className="message-text">{currentTranscript}</div>
+              </div>
+            )}
+            {geminiResponse && (
+              <div className="conversation-message agent streaming">
+                <div className="message-text">{geminiResponse}</div>
               </div>
             )}
           </div>
@@ -411,31 +594,22 @@ export default function VoiceConversation({
 
           <div className="conversation-controls">
             {isListening ? (
-              <CartoonButton
-                onClick={stopConversation}
-                ariaLabel="Stop listening"
-              >
+              <CartoonButton onClick={stopConversation} ariaLabel="Stop listening">
                 Stop Listening
               </CartoonButton>
             ) : (
-              <CartoonButton
-                onClick={startConversation}
-                ariaLabel="Start listening"
-              >
+              <CartoonButton onClick={startSpeechRecognition} ariaLabel="Start listening">
                 Start Listening
               </CartoonButton>
             )}
-            <CartoonButton
-              onClick={endConversation}
-              ariaLabel="End conversation"
-            >
+            <CartoonButton onClick={() => void endConversation()} ariaLabel="End conversation">
               End Call
             </CartoonButton>
           </div>
         </>
       )}
 
-      {error && agentConnected && (
+      {error && sessionActive && (
         <div className="conversation-error" role="alert">
           {error}
         </div>
@@ -443,4 +617,3 @@ export default function VoiceConversation({
     </div>
   );
 }
-
