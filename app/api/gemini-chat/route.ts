@@ -1,26 +1,39 @@
-/**
- * Gemini Chat API Route
- * Server-side streaming endpoint for Gemini API calls
- * 
- * - Stores GEMINI_API_KEY securely
- * - Validates session duration against config limit
- * - Streams Gemini responses using generateContentStream
- * - Implements rate limiting per IP
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { CONFIG } from '@/lib/config';
 
-// In-memory rate limiting: { ip: { count, resetTime } }
-const rateLimitMap = new Map<
-  string,
-  { count: number; resetTime: number }
->();
+// ==================== TYPES ====================
+interface ChatRequest {
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  ageTier: 1 | 2 | 3;
+  scenario: 'fire' | 'ambulance' | 'police';
+  sessionStartTime: number;
+  sessionId?: string; // To track memory per session
+}
 
-/**
- * Get client IP from request
- */
+interface BobbyMemory {
+  childName: string | null;
+  location: string | null;
+  emotionalState: 'CALM' | 'PANICKING' | 'QUIET' | 'UNCERTAIN';
+  safetyStatus: 'SAFE' | 'UNSAFE' | 'UNKNOWN';
+  adultsPresent: boolean | null;
+  infoGathered: string[];
+  callPhase: 'opening' | 'assessment' | 'instruction' | 'reassurance';
+}
+
+interface ResponseStrategy {
+  priority: 'IMMEDIATE_SAFETY' | 'CALM_FIRST' | 'GATHER_INFO' | 'REASSURE';
+  tone: 'urgent_calm' | 'very_gentle' | 'warm_efficient' | 'supportive';
+  maxWords: number;
+  focus: string;
+}
+
+// ==================== IN-MEMORY STORAGE ====================
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const sessionMemory = new Map<string, BobbyMemory>(); // Per-session memory
+
+// ==================== HELPER FUNCTIONS ====================
+
 function getClientIp(request: NextRequest): string {
   return (
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
@@ -30,18 +43,14 @@ function getClientIp(request: NextRequest): string {
   );
 }
 
-/**
- * Check rate limit for IP
- */
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const limit = rateLimitMap.get(ip);
 
   if (!limit || now > limit.resetTime) {
-    // New window or expired
     rateLimitMap.set(ip, {
       count: 1,
-      resetTime: now + 60 * 1000, // 1 minute window
+      resetTime: now + 60 * 1000,
     });
     return true;
   }
@@ -50,52 +59,281 @@ function checkRateLimit(ip: string): boolean {
     limit.count++;
     return true;
   }
-
   return false;
 }
 
-/**
- * Validate session duration
- */
-function isSessionValid(
-  sessionStartTime: number,
-  maxDurationSeconds: number
-): boolean {
-  const now = Date.now();
-  const elapsedSeconds = (now - sessionStartTime) / 1000;
+function isSessionValid(sessionStartTime: number, maxDurationSeconds: number): boolean {
+  const elapsedSeconds = (Date.now() - sessionStartTime) / 1000;
   return elapsedSeconds < maxDurationSeconds;
 }
 
-/**
- * Format age tier for prompt
- */
 function getAgeTierLabel(ageTier: 1 | 2 | 3): string {
-  const mapping: Record<1 | 2 | 3, string> = {
-    1: '5-7',
-    2: '8-10',
-    3: '11-12',
-  };
+  const mapping: Record<1 | 2 | 3, string> = { 1: '5-7', 2: '8-10', 3: '11-12' };
   return mapping[ageTier];
 }
 
-interface ChatRequest {
-  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
-  ageTier: 1 | 2 | 3;
-  scenario: 'fire' | 'ambulance' | 'police';
-  sessionStartTime: number;
+// ==================== PERCEPTION MODULE ====================
+
+function analyzeUserMessage(message: string, memory: BobbyMemory) {
+  const lowerMsg = message.toLowerCase();
+  
+  // Emotion detection
+  const panicWords = ['help', 'scared', 'don\'t know', 'please', '!!!', 'fire', 'can\'t'];
+  const calmWords = ['yes', 'okay', 'here', 'is', 'my'];
+  const quietIndicators = message.length < 5 || message.trim() === '...' || message.trim() === '';
+  
+  const panicCount = panicWords.filter(w => lowerMsg.includes(w)).length;
+  const calmCount = calmWords.filter(w => lowerMsg.includes(w)).length;
+  
+  let emotionalState: BobbyMemory['emotionalState'] = 'UNCERTAIN';
+  if (quietIndicators) emotionalState = 'QUIET';
+  else if (panicCount >= 2) emotionalState = 'PANICKING';
+  else if (panicCount > calmCount) emotionalState = 'PANICKING';
+  else if (calmCount > panicCount) emotionalState = 'CALM';
+  
+  // Extract information
+  const hasName = /my name is (\w+)|i'm (\w+)|i am (\w+)|(\w+)(?=\s*$)/i.exec(message);
+  const hasLocation = /\b(\d+\s+\w+\s+(street|road|avenue|lane|close|way))\b|at home|in the (kitchen|bedroom|living room|bathroom)/i.test(lowerMsg);
+  const mentionsOutside = /outside|out of|left the house|in the garden|on the street/i.test(lowerMsg);
+  const mentionsAdult = /mum|dad|parent|adult|teacher|someone|person/i.test(lowerMsg);
+  
+  // Urgency detection
+  const urgentWords = ['fire', 'burning', 'smoke', 'can\'t breathe', 'blood', 'unconscious'];
+  const urgencyLevel = urgentWords.filter(w => lowerMsg.includes(w)).length >= 2 ? 'CRITICAL' : 'NORMAL';
+  
+  return {
+    emotionalState,
+    urgencyLevel,
+    hasName,
+    hasLocation,
+    mentionsOutside,
+    mentionsAdult,
+    isQuestion: message.includes('?'),
+    isConfirmation: /^(yes|yeah|ok|okay|yep|yup)/i.test(message),
+  };
 }
+
+// ==================== MEMORY MODULE ====================
+
+function initializeMemory(sessionId: string): BobbyMemory {
+  const memory: BobbyMemory = {
+    childName: null,
+    location: null,
+    emotionalState: 'UNCERTAIN',
+    safetyStatus: 'UNKNOWN',
+    adultsPresent: null,
+    infoGathered: [],
+    callPhase: 'opening',
+  };
+  sessionMemory.set(sessionId, memory);
+  return memory;
+}
+
+function updateMemory(
+  sessionId: string,
+  userMessage: string,
+  analysis: ReturnType<typeof analyzeUserMessage>
+): BobbyMemory {
+  let memory = sessionMemory.get(sessionId) || initializeMemory(sessionId);
+  
+  // Update emotional state
+  memory.emotionalState = analysis.emotionalState;
+  
+  // Extract and store name
+  if (analysis.hasName && !memory.childName) {
+    const nameMatch = /my name is (\w+)|i'm (\w+)|i am (\w+)|^(\w+)$/i.exec(userMessage);
+    if (nameMatch) {
+      memory.childName = nameMatch[1] || nameMatch[2] || nameMatch[3] || nameMatch[4];
+      memory.infoGathered.push('name');
+    }
+  }
+  
+  // Track location
+  if (analysis.hasLocation && !memory.location) {
+    memory.location = 'mentioned';
+    memory.infoGathered.push('location');
+  }
+  
+  // Track safety (for fire scenarios)
+  if (analysis.mentionsOutside) {
+    memory.safetyStatus = 'SAFE';
+    memory.infoGathered.push('safety');
+  }
+  
+  // Track adults
+  if (analysis.mentionsAdult && memory.adultsPresent === null) {
+    memory.adultsPresent = true;
+    memory.infoGathered.push('adult_presence');
+  }
+  
+  // Update call phase
+  if (memory.infoGathered.length === 0) {
+    memory.callPhase = 'opening';
+  } else if (memory.infoGathered.length < 3) {
+    memory.callPhase = 'assessment';
+  } else if (memory.safetyStatus === 'UNKNOWN') {
+    memory.callPhase = 'instruction';
+  } else {
+    memory.callPhase = 'reassurance';
+  }
+  
+  sessionMemory.set(sessionId, memory);
+  return memory;
+}
+
+// ==================== REASONING MODULE ====================
+
+function determineStrategy(
+  memory: BobbyMemory,
+  scenario: string,
+  urgency: string
+): ResponseStrategy {
+  // HIGHEST PRIORITY: Safety in fire scenarios
+  if (scenario === 'fire' && memory.safetyStatus !== 'SAFE') {
+    return {
+      priority: 'IMMEDIATE_SAFETY',
+      tone: 'urgent_calm',
+      maxWords: 15,
+      focus: 'get child outside immediately',
+    };
+  }
+  
+  // SECOND PRIORITY: Calm panicking child
+  if (memory.emotionalState === 'PANICKING') {
+    return {
+      priority: 'CALM_FIRST',
+      tone: 'very_gentle',
+      maxWords: 12,
+      focus: 'validate and ground',
+    };
+  }
+  
+  // THIRD PRIORITY: Gather critical info
+  const missingInfo: string[] = [];
+  if (!memory.childName) missingInfo.push('name');
+  if (!memory.location) missingInfo.push('location');
+  if (scenario !== 'fire' && memory.adultsPresent === null) missingInfo.push('adult check');
+  
+  if (missingInfo.length > 0) {
+    return {
+      priority: 'GATHER_INFO',
+      tone: 'warm_efficient',
+      maxWords: 18,
+      focus: missingInfo[0], // One at a time
+    };
+  }
+  
+  // DEFAULT: Reassure and maintain
+  return {
+    priority: 'REASSURE',
+    tone: 'supportive',
+    maxWords: 20,
+    focus: 'keep child calm until help arrives',
+  };
+}
+
+// ==================== PROMPT BUILDER (CONCISE) ====================
+
+function buildPrompt(
+  ageTier: string,
+  scenario: string,
+  memory: BobbyMemory,
+  strategy: ResponseStrategy
+): string {
+  // Age-specific language (condensed)
+  const ageGuide = {
+    '5-7': 'Simple words. "Can you see Mummy\'s tummy moving?" Heavy praise.',
+    '8-10': 'Clear. "Is she breathing normally?" Explain why briefly.',
+    '11-12': 'Mature but warm. "Tell me if breathing seems regular." Give autonomy.',
+  }[ageTier] || '';
+  
+  // Emotional adaptation (condensed)
+  const emotionGuide = {
+    CALM: 'Warm, efficient pace.',
+    PANICKING: 'Slow down. "Hey, hey... it\'s alright. Take a breath." Ground first.',
+    QUIET: 'Extra gentle. Give time. "I know this is scary."',
+    UNCERTAIN: 'Warm and steady.',
+  }[memory.emotionalState];
+  
+  return `You are Bobby, UK 999 dispatcher. Warm, calm, like a caring older sibling.
+Age: ${ageTier}. Emergency: ${scenario}.
+
+RULES:
+1. Stay in character. No meta-talk.
+2. Natural speech: "Right, okay..." "Let me see..." Brief pauses.
+3. 1-2 sentences MAX. ONE question. Word limit: ${strategy.maxWords}.
+4. Write "9 9 9" with spaces (pronounced "nine nine nine").
+
+MEMORY (don't re-ask):
+${memory.childName ? `- Name: ${memory.childName} (use often!)` : '- Name: unknown'}
+${memory.location ? '- Location: known' : '- Location: unknown'}
+${memory.safetyStatus !== 'UNKNOWN' ? `- Safety: ${memory.safetyStatus}` : ''}
+${memory.infoGathered.length > 0 ? `- Gathered: ${memory.infoGathered.join(', ')}` : ''}
+
+CURRENT STRATEGY:
+Priority: ${strategy.priority}
+Tone: ${strategy.tone}
+Focus: ${strategy.focus}
+${emotionGuide}
+
+AGE GUIDE: ${ageGuide}
+
+BRITISH PHRASES: "brilliant", "lovely", "alright", "right then", "well done"
+
+SAFETY:
+- NO graphic details, NO frightening language
+- Fire: Evacuation priority
+- If scary question: "Help is coming fast with doctors who know exactly what to do"
+
+Natural techniques:
+- Echo: "Okay, Mummy fell. You did right to call."
+- Validate: "That's really helpful" (vary, not just "well done")
+- Redirect gently if confused
+
+Remember: Real person, not script. Be present.`;
+}
+
+// ==================== RESPONSE VALIDATION ====================
+
+function validateResponse(response: string, memory: BobbyMemory): string {
+  let fixed = response;
+  
+  // Check word count
+  const wordCount = fixed.split(' ').length;
+  if (wordCount > 30) {
+    // Take first 25 words and add ellipsis
+    fixed = fixed.split(' ').slice(0, 25).join(' ') + '...';
+  }
+  
+  // Ensure using child's name if known
+  if (memory.childName && !fixed.includes(memory.childName)) {
+    // Try to add it naturally
+    fixed = fixed.replace(/\b(okay|alright|right)\b/i, `$1, ${memory.childName},`);
+  }
+  
+  // Check for multiple questions
+  const questionCount = (fixed.match(/\?/g) || []).length;
+  if (questionCount > 1) {
+    // Keep only first question
+    const firstQ = fixed.indexOf('?');
+    if (firstQ !== -1) {
+      fixed = fixed.substring(0, firstQ + 1);
+    }
+  }
+  
+  return fixed.trim();
+}
+
+// ==================== MAIN API HANDLER ====================
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit
+    // Rate limiting
     const clientIp = getClientIp(request);
     if (!checkRateLimit(clientIp)) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
-        {
-          status: 429,
-          headers: { 'Retry-After': '60' }
-        }
+        { status: 429, headers: { 'Retry-After': '60' } }
       );
     }
 
@@ -103,156 +341,73 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.error('GEMINI_API_KEY not configured');
-      return NextResponse.json(
-        { error: 'API key not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
     }
 
     // Parse request
     const body = (await request.json()) as ChatRequest;
-    const { messages, ageTier, scenario, sessionStartTime } = body;
+    const { messages, ageTier, scenario, sessionStartTime, sessionId = 'default' } = body;
 
     if (!messages || !ageTier || !scenario || !sessionStartTime) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Validate session duration
     if (!isSessionValid(sessionStartTime, CONFIG.SESSION_MAX_DURATION_SECONDS)) {
-      return NextResponse.json(
-        { error: 'Session time limit exceeded' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Session time limit exceeded' }, { status: 403 });
     }
 
-    // Initialize Gemini AI client
+    // Initialize AI client
     const ai = new GoogleGenAI({ apiKey });
-
-    // Build system instruction - inject into conversation instead of systemPrompt
     const ageTierLabel = getAgeTierLabel(ageTier);
 
-    // Inject system instructions into the conversation itself to avoid SDK issues
-    // We prepend a system instruction message to the history
-    const systemInstructionText = `You are Bobby, a UK 999 emergency dispatcher with 8 years of experience.
-    You have a warm, calm voice with a slight reassuring tone - like a caring older sibling or trusted teacher.
-    You are helping a child (Age: ${ageTierLabel}) with a ${scenario} emergency.
-    
-    CRITICAL RULES:
-    1. Stay in character as Bobby. NO code, NO meta-talk, NO AI explanations.
-    2. Speak like a real person - use natural pauses, brief "mm-hmm"s, thinking moments ("right, okay..."), and gentle acknowledgments.
-    3. Keep responses conversational (1-2 sentences). Ask ONE question at a time, but don't sound robotic.
-    4. ALWAYS write phone numbers as "9 9 9" (with spaces) so they are pronounced "nine nine nine".
-    5. React naturally to the child's emotional state - if they're panicking, slow down and ground them first before gathering info.
-    
-    CORE PERSONALITY - BOBBY'S VOICE:
-    - Steady and reassuring, never rushed or mechanical
-    - Speaks at a measured pace with natural pauses: "Alright... [pause] ...let's take this step by step"
-    - Uses thinking-out-loud phrases: "Right, okay," "Let me just check," "That's helpful"
-    - Shows genuine warmth through validation, not excessive cheerfulness
-    - Acknowledges emotions directly: "I can hear you're worried, that's completely normal"
-    - Varies validation phrases - not just "well done" - use: "that's really helpful," "perfect," "you're thinking clearly," "good," "exactly right"
-    
-    CONVERSATION FLOW (Adapt naturally, don't follow rigidly):
-    1. **Opening** - Let child explain. Listen actively with brief acknowledgments: "okay," "right," "I'm listening"
-    2. **Introduction** - After they explain: "Okay, you're doing brilliantly calling us. My name's Bobby, and I'm here to help you. What's your name, love?"
-    3. **Information Gathering** - Use their name frequently, weave questions naturally into the conversation
-    4. **Reassurance & Instructions** - Based on what they tell you, adapt your tone and urgency
-    
-    ESSENTIAL INFORMATION TO GATHER (Adapt order based on emergency):
-    1. Child's name (use it often - builds connection)
-    2. Specific location (guide step-by-step, be patient)
-    3. Nature of emergency (let them explain in their words first)
-    4. Condition check (ONLY if relevant - for FIRE: prioritize evacuation, not medical questions)
-    5. Adult presence (Is anyone else there? Don't pressure if they can't talk)
-    
-    AGE-APPROPRIATE LANGUAGE (${ageTierLabel}):
-    ${ageTierLabel === '4-6' ?
-        `- Very simple words, like talking to a young friend
-    - "Can you see Mummy's tummy going up and down?"
-    - "Is there a grown-up you can see?"
-    - Heavy praise: "so brave," "brilliant," "you're a star"
-    - Use concrete, visual language: "Can you see...?" "Can you hear...?"` :
-        ageTierLabel === '7-10' ?
-          `- Clear, conversational, slightly more detailed
-    - "I need you to look and tell me - is she breathing normally?"
-    - "You're doing exactly what you should be doing"
-    - Explain 'why' briefly: "I'm asking because it helps me send the right help"
-    - Balance warmth with respect for their capability` :
-          `- Mature but supportive, like speaking to a young adult
-    - "Can you tell me if their breathing seems regular or if it's difficult?"
-    - "You're handling this really well - stay with me"
-    - Give them a bit more autonomy: "If you can, try to..."
-    - Acknowledge their competence while providing clear guidance`}
-    
-    NATURAL BRITISH SPEECH PATTERNS:
-    - Common phrases: "lovely," "brilliant," "that's perfect," "alright," "right then," "okay love"
-    - Soft connectors: "Right, so..." "Okay, now..." "Let's just..."
-    - Natural fillers when thinking: "Let me see..." "Right, okay..." "Just checking..."
-    - Avoid overusing "love" or "mate" - sprinkle naturally, not every sentence
-    
-    EMOTIONAL ADAPTATION (Key improvement):
-    **If child is calm:** Maintain warm but efficient pace, gather info smoothly
-    **If child is crying/panicking:** 
-      - Slow down immediately
-      - Lower your urgency: "Hey, hey... it's alright. Take a breath with me."
-      - Use grounding first: "Can you tell me one thing you can see right now?"
-      - Wait for them to settle before continuing questions
-    **If child is very quiet/scared:**
-      - Extra gentleness: "I know this is scary. You're being so brave just by calling."
-      - Give them time to answer, don't rush
-    **If child is matter-of-fact:**
-      - Match their tone - stay warm but can be more direct
-      - Still validate: "You're thinking very clearly"
-    
-    CALMING TECHNIQUES (deploy when needed, not by default):
-    - **Breathing:** "Let's take a slow breath together. In through your nose... and out through your mouth."
-    - **Grounding:** "Tell me one thing you can see near you right now." / "What color is the door nearest you?"
-    - **Validation:** "It's okay to feel scared. Calling 9 9 9 was exactly the right thing to do."
-    - **Gentle distraction (if waiting):** "What's your favorite thing to do at school?" "Have you got any pets?"
-    
-    NATURAL CONVERSATIONAL TECHNIQUES:
-    - **Echo and validate:** Child: "Mummy fell down!" Bobby: "Okay, Mummy fell down. Right, you did exactly the right thing calling me."
-    - **Think out loud (briefly):** "Right, okay, so you're in the kitchen... that's helpful."
-    - **Natural transitions:** "Alright, good. Now, I need to ask you..." / "Perfect. Next thing is..."
-    - **Acknowledge before redirecting:** "I hear you. Now, can you tell me..."
-    - **Handle interruptions smoothly:** If child suddenly says something urgent, acknowledge immediately: "Okay, okay - tell me what's happening"
-    
-    SAFETY GUARDRAILS:
-    - NO graphic details
-    - NO dangerous instructions (re-entering fire, moving injured people unless essential)
-    - NO frightening language ("bleeding out," "dying," etc.)
-    - FOR FIRE: Priority is EVACUATION - "The most important thing is that you're safe outside"
-    - If child asks scary questions ("Is Mummy going to die?"), respond: "The ambulance is coming very fast with doctors who know exactly what to do. You're helping by staying with me."
-    
-    ENDING THE CALL (Natural wind-down):
-    After gathering core information (or around 30 seconds before timeout), check on help arrival:
-    
-    "[Name], can you hear any sirens outside or see any blue flashing lights yet?"
-    
-    **IF YES (Help has arrived):**
-    "Oh, that's brilliant! [Name], you have done such an amazing job today. Now, this was practice, yeah? But you were absolutely brilliant. In a real emergency, you'd do exactly this - call 9 9 9. Well done, love. You should feel really proud."
-    
-    **IF NO (Help not arrived yet):**
-    "That's alright, they're on their way and they'll be there very soon. Just stay with me, okay? You're doing everything right. Now, can you tell me..." [continue reassuring, ask simple observation question to keep them engaged]
-    
-    CONTEXT HANDLING:
-    - If child changes topic suddenly or gives confusing info, gently redirect: "Okay, I heard that. Let me just check - you said [repeat key info]. Is that right?"
-    - If child doesn't know an answer: "That's alright, you don't need to know that. Can you tell me..." [ask something they can answer]
-    - If child asks you questions: Answer briefly and warmly, then redirect: "I'm here in our control room sending help to you. Now, can you..."
-    
-    Remember: You're Bobby - a real person who cares, thinks, and reacts naturally. Not a script. Be present with the child.`;
+    // ==================== HANDLE FIRST MESSAGE ====================
+    if (messages.length === 0) {
+      const greetingResponse = "9 9 9, what's your emergency?";
+      
+      const encoder = new TextEncoder();
+      const customReadable = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(greetingResponse));
+          controller.close();
+        },
+      });
 
-    let contents = [
+      return new NextResponse(customReadable, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+        },
+      });
+    }
+
+    // ==================== PROCESS USER MESSAGE ====================
+    const lastUserMessage = messages[messages.length - 1]?.content || '';
+    
+    // Get or initialize memory
+    let memory = sessionMemory.get(sessionId) || initializeMemory(sessionId);
+    
+    // Analyze message
+    const analysis = analyzeUserMessage(lastUserMessage, memory);
+    
+    // Update memory
+    memory = updateMemory(sessionId, lastUserMessage, analysis);
+    
+    // Determine strategy
+    const strategy = determineStrategy(memory, scenario, analysis.urgencyLevel);
+    
+    // Build concise prompt
+    const systemPrompt = buildPrompt(ageTierLabel, scenario, memory, strategy);
+    
+    // ==================== BUILD CONVERSATION ====================
+    const contents = [
       {
         role: 'user',
-        parts: [{ text: systemInstructionText }],
+        parts: [{ text: systemPrompt }],
       },
       {
         role: 'model',
-        parts: [{ text: "Understood. I am Bobby, the UK 999 dispatcher. I will stay in character and follow these guidelines." }],
+        parts: [{ text: "Understood. I'm Bobby." }],
       },
       ...messages.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
@@ -260,51 +415,49 @@ export async function POST(request: NextRequest) {
       }))
     ];
 
-    // If no messages yet, force the specific greeting
-    if (messages.length === 0) {
-      const greetingInstruction = `You are Bobby, a UK 999 emergency dispatcher.
-      
-START YOUR RESPONSE WITH THIS GREETING - EXACTLY AND ONLY THIS:
-"9 9 9, what's your emergency?"
-
-Do not add anything else. Just that phrase.`;
-
-      contents = [
-        {
-          role: 'user',
-          parts: [{ text: greetingInstruction }],
-        }
-      ];
-    }
-
-    // Create streaming response
+    // ==================== GENERATE RESPONSE ====================
     const response = await ai.models.generateContentStream({
       model: CONFIG.GEMINI_MODEL,
       contents,
       generationConfig: {
-        maxOutputTokens: CONFIG.GEMINI_MAX_OUTPUT_TOKENS,
-        temperature: 0.9, 
-        topK: 40,                // Gemini sweet spot for conversational
-    topP: 0.95,              // Allows natural word choice variety
-    candidateCount: 1,
+        maxOutputTokens: strategy.maxWords * 2, // Approximate tokens
+        temperature: 0.85, // Balanced
+        topK: 35,
+        topP: 0.92,
+        candidateCount: 1,
       },
     } as any);
 
-    // Stream response back to client
+    // ==================== STREAM WITH VALIDATION ====================
     const encoder = new TextEncoder();
+    let fullResponse = '';
+    
     const customReadable = new ReadableStream({
       async start(controller) {
         try {
           for await (const chunk of response) {
             const text = chunk.text || '';
+            fullResponse += text;
+            
             if (text) {
               controller.enqueue(encoder.encode(text));
             }
           }
+          
+          // Validate complete response (optional logging)
+          const validated = validateResponse(fullResponse, memory);
+          
+          // Log for improvement tracking
+          console.log('Bobby Response:', {
+            sessionId,
+            strategy: strategy.priority,
+            wordCount: validated.split(' ').length,
+            usedName: memory.childName ? validated.includes(memory.childName) : 'N/A',
+          });
+          
           controller.close();
         } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          console.error('Error streaming Gemini response:', message);
+          console.error('Streaming error:', err);
           controller.error(err);
         }
       },
@@ -316,16 +469,13 @@ Do not add anything else. Just that phrase.`;
         'Cache-Control': 'no-cache',
       },
     });
+    
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? error.stack : '';
-    console.error('Gemini chat API error:', { message, stack, error });
+    console.error('Gemini chat API error:', message);
 
     return NextResponse.json(
-      {
-        error: 'Failed to process chat request',
-        details: message,
-      },
+      { error: 'Failed to process chat request', details: message },
       { status: 500 }
     );
   }
@@ -341,23 +491,3 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-
-
-
-// Configuration A: More consistent Bobby
-// temperature: 0.7,
-// topP: 0.9,
-// topK: 30,
-// Result: More predictable, might feel slightly repetitive
-
-// Configuration B: More natural variation
-// temperature: 0.95,
-// topP: 0.95,
-// topK: 40,
-// Result: More varied responses, more natural, occasional unexpected responses
-
-// Configuration C: Balanced (RECOMMENDED for Bobby)
-// temperature: 0.85,
-// topP: 0.92,
-// topK: 35,
-// Result: Good balance of consistency and natural variation
