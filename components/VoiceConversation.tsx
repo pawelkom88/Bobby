@@ -26,6 +26,7 @@ import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 import Image from 'next/image';
 import VoiceAnimations from './VoiceAnimations';
+import TimerDisplay from './TimerDisplay';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -675,11 +676,7 @@ export default function VoiceConversation({
           </button>
         )}
         {sessionActive && (
-          <div className="session-timer" aria-label={`Time remaining: ${remainingTime} seconds`}>
-            <span className={remainingTime < 30 ? 'warning' : ''}>
-              ⏱️ {remainingTime}s
-            </span>
-          </div>
+          <TimerDisplay remainingSeconds={remainingTime} />
         )}
       </div>
 
@@ -711,24 +708,12 @@ export default function VoiceConversation({
           <div className="conversation-visuals" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
              <h2 className="kavoon" style={{fontSize: '2rem', color: '#333'}}>
                 {visualState === 'speaking' && "Bobby is speaking..."}
-                {visualState === 'listening' && "Bobby is listening..."}
+                {visualState === 'listening' && "Your turn to speak!"}
                 {visualState === 'processing' && "Bobby is thinking..."}
                 {visualState === 'error' && "Something went wrong"}
              </h2>
              
              <VoiceAnimations state={visualState} />
-             
-             {/* Current user transcript (subtitle) */}
-             {currentTranscript && (
-                <div className="live-transcript" style={{
-                    minHeight: '30px',
-                    fontSize: '1.2rem',
-                    color: '#666',
-                    fontStyle: 'italic'
-                }}>
-                    "{currentTranscript}"
-                </div>
-             )}
           </div>
 
           {/* Subtitles (Agent only) */}

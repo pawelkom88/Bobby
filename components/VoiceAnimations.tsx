@@ -20,12 +20,21 @@ export default function VoiceAnimations({ state }: VoiceAnimationProps) {
         </div>
       )}
 
-      {/* User Listening State - Pulse/Ripple */}
+      {/* User Listening State - Animated Microphone */}
       {state === 'listening' && (
         <div className="user-listening-visual">
-          <div className="mic-icon">🎤</div>
-          <div className="pulse-ring"></div>
-          <div className="pulse-ring delay-1"></div>
+          <div className="microphone-container">
+            <div className="microphone-body">
+              <div className="microphone-top"></div>
+              <div className="microphone-middle"></div>
+              <div className="microphone-bottom"></div>
+            </div>
+            <div className="microphone-stand"></div>
+            <div className="microphone-base"></div>
+          </div>
+          <div className="sound-wave wave-1"></div>
+          <div className="sound-wave wave-2"></div>
+          <div className="sound-wave wave-3"></div>
         </div>
       )}
 
