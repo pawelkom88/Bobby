@@ -209,130 +209,16 @@ function mapScoreToFeedback(score: number, positives: string[], improvements: st
 }
 
 /**
- * Assess conversation using Gemini AI
+ * Assess conversation using rule-based heuristics (Deepgram migration)
  * 
- * Sends the conversation to Gemini for intelligent analysis and feedback
+ * Previously used Gemini AI, now falls back to local assessment.
  */
 export async function assessWithGemini(
   conversation: ConversationMessage[],
   { ageTier, situation }: AssessmentOptions = {}
 ): Promise<ConversationAssessment> {
-  const tier: AgeTier = ageTier ?? 2;
-  const userMessages = conversation.filter((msg) => msg.type === 'user');
-  const durationSeconds = calculateDurationSeconds(userMessages);
-  const userTurns = userMessages.length;
-
-  try {
-    // Build conversation text for Gemini analysis
-    const conversationText = conversation
-      .map((msg) => `${msg.type === 'user' ? 'Child' : 'Dispatcher'}: ${msg.text}`)
-      .join('\n');
-
-    // Create assessment prompt for Gemini
-    let conditionCheck = "4. Did they describe the person's condition?";
-    if (situation === 'fire') {
-      conditionCheck = "4. Did they describe the fire (size, smoke) or say if people are safe/evacuated?";
-    } else if (situation === 'police') {
-      conditionCheck = "4. Did they describe the danger (intruder, weapon) or say if they are safe/hiding?";
-    }
-
-    const assessmentPrompt = `Analyze this emergency call training conversation between a child and a dispatcher.
-
-Age Tier: ${tier === 1 ? '4-6' : tier === 2 ? '7-10' : '11-13'}
-Scenario: ${situation || 'unknown'}
-Duration: ${durationSeconds} seconds
-Message Turns: ${userTurns}
-
-CONVERSATION:
-${conversationText}
-
-Provide assessment in JSON format with these exact keys:
-{
-  "score": <number 0-100>,
-  "passed": <boolean>,
-  "positives": [<list of 2-3 positive observations>],
-  "improvements": [<list of 2-3 areas for improvement>],
-  "warnings": [<list of 0-2 concerns if any>]
-}
-
-Consider:
-1. Did the child clearly explain the emergency?
-2. Did they provide location information?
-3. Did they identify who needs help?
-${conditionCheck}
-5. Did they stay engaged and calm?
-6. Was the information relevant and on-topic?
-
-Keep feedback age-appropriate and encouraging.`;
-
-    const response = await fetch('/api/gemini-chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: 'user',
-            parts: [{ text: assessmentPrompt }],
-          },
-        ],
-        ageTier: tier,
-        scenario: situation || 'generic',
-        sessionStartTime: Date.now(),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get assessment from Gemini');
-    }
-
-    let assessmentText = '';
-    if (response.body) {
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        assessmentText += decoder.decode(value);
-      }
-    }
-
-    // Parse JSON from response
-    const jsonMatch = assessmentText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Invalid response format from Gemini assessment');
-    }
-
-    const assessment = JSON.parse(jsonMatch[0]);
-
-    let finalScore = Math.min(100, Math.max(0, assessment.score || 50));
-    const finalWarnings = assessment.warnings || [];
-    const finalImprovements = assessment.improvements || [];
-    
-    // Apply minimum duration threshold (30 seconds)
-    if (durationSeconds < 30) {
-      finalWarnings.push('The conversation was too short. Try to stay on the line longer and share more details.');
-      finalScore = Math.min(finalScore, 20); // Cap score at 20 for too-short calls
-    }
-
-    return {
-      score: finalScore,
-      passed: assessment.passed ?? finalScore >= 60,
-      positives: assessment.positives || [],
-      improvements: finalImprovements,
-      warnings: finalWarnings,
-      metrics: {
-        userTurns,
-        durationSeconds,
-      },
-    };
-  } catch (error) {
-    console.error('Error in Gemini assessment, falling back to rule-based', error);
-    // Fall back to rule-based assessment
-    return assessConversation(conversation, { ageTier, situation });
-  }
+  // Fall back to rule-based assessment directly
+  return assessConversation(conversation, { ageTier, situation });
 }
 
 /**

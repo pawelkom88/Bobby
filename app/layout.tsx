@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { SoundProvider } from '@/components/SoundProvider';
+import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
   title: 'Bobby - Emergency Training for Kids',
@@ -15,9 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SoundProvider>
+        <Providers>
           {children}
-        </SoundProvider>
+        </Providers>
       </body>
     </html>
   );
