@@ -85,7 +85,7 @@ export function getRemainingSessionTime(): number {
 export async function sendMessageToGemini(
   userMessage: string,
   onChunk: (chunk: string) => void,
-  onComplete: (fullResponse: string) => void,
+  onComplete: (fullResponse: string) => void | Promise<void>,
   onError: (error: string) => void
 ): Promise<void> {
   try {
@@ -171,7 +171,10 @@ export async function sendMessageToGemini(
         content: fullResponse,
       });
 
-      onComplete(fullResponse);
+      // Await onComplete if it returns a promise (for audio playback)
+      logger.debug('Calling onComplete callback');
+      await onComplete(fullResponse);
+      logger.debug('onComplete callback finished');
     } catch (streamError) {
       const message =
         streamError instanceof Error ? streamError.message : String(streamError);

@@ -82,10 +82,27 @@ export async function textToSpeech(
  */
 function createAudioElement(blob: Blob): HTMLAudioElement {
   const audioUrl = URL.createObjectURL(blob);
+  logger.debug('Created audio element', { 
+    blobSize: blob.size, 
+    blobType: blob.type,
+    url: audioUrl 
+  });
+  
   const audio = new Audio(audioUrl);
+  audio.preload = 'auto'; // Ensure audio is preloaded
+  
+  // Add detailed event listeners for debugging
+  audio.addEventListener('loadstart', () => logger.debug('Audio loadstart'));
+  audio.addEventListener('loadedmetadata', () => logger.debug('Audio loadedmetadata', { duration: audio.duration }));
+  audio.addEventListener('loadeddata', () => logger.debug('Audio loadeddata'));
+  audio.addEventListener('canplay', () => logger.debug('Audio canplay'));
+  audio.addEventListener('canplaythrough', () => logger.debug('Audio canplaythrough'));
+  
   audio.onended = () => {
+    logger.debug('Audio onended cleanup, revoking URL', { url: audioUrl });
     URL.revokeObjectURL(audioUrl);
   };
+  
   return audio;
 }
 
@@ -93,29 +110,69 @@ function createAudioElement(blob: Blob): HTMLAudioElement {
  * Play audio and return promise that resolves when done
  */
 export async function playAudio(audio: HTMLAudioElement): Promise<void> {
+  logger.debug('playAudio called', { 
+    duration: audio.duration, 
+    readyState: audio.readyState,
+    paused: audio.paused 
+  });
+  
   return new Promise((resolve, reject) => {
     const handleEnded = () => {
+      logger.debug('Audio ended event fired');
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('pause', handlePause);
       isPlaying = false;
+      currentAudio = null;
       resolve();
     };
 
-    const handleError = () => {
+    const handleError = (event: any) => {
+      logger.error('Audio error event fired', { error: event });
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('pause', handlePause);
       isPlaying = false;
+      currentAudio = null;
       reject(new Error('Audio playback error'));
+    };
+
+    const handlePause = () => {
+      logger.debug('Audio paused event fired', { currentTime: audio.currentTime, duration: audio.duration });
     };
 
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
+    audio.addEventListener('pause', handlePause);
+
+    // Log when audio starts playing
+    audio.addEventListener('play', () => {
+      logger.debug('Audio play event fired');
+    }, { once: true });
+
+    audio.addEventListener('playing', () => {
+      logger.debug('Audio playing event fired (actually started)');
+    }, { once: true });
 
     try {
       isPlaying = true;
-      void audio.play().catch(reject);
+      currentAudio = audio;
+      logger.debug('Calling audio.play()');
+      
+      audio.play()
+        .then(() => {
+          logger.debug('audio.play() promise resolved');
+        })
+        .catch((err) => {
+          logger.error('audio.play() promise rejected', { error: err.message });
+          isPlaying = false;
+          currentAudio = null;
+          reject(err);
+        });
     } catch (err) {
+      logger.error('Exception calling audio.play()', { error: err });
       isPlaying = false;
+      currentAudio = null;
       reject(err);
     }
   });
@@ -129,29 +186,42 @@ export async function queueAndPlayAudio(blob: Blob, id?: string): Promise<void> 
     const audio = createAudioElement(blob);
     const audioId = id || `audio-${Date.now()}-${Math.random()}`;
 
-    logger.info('Queueing audio for playback', { audioId, size: blob.size });
+    logger.info('Queueing audio for playback', { 
+      audioId, 
+      size: blob.size,
+      isCurrentlyPlaying: isPlaying,
+      queueLength: audioQueue.length
+    });
 
     // Create promise for this audio
     const promise = playAudio(audio)
       .then(() => {
-        logger.debug('Audio playback completed', { audioId });
+        logger.info('Audio playback completed', { audioId });
+        // Remove from queue after completion
+        audioQueue = audioQueue.filter(item => item.id !== audioId);
       })
       .catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         logger.error('Audio playback error', { audioId, message });
-        // Don't throw, just log and continue to next audio
+        // Remove from queue on error too
+        audioQueue = audioQueue.filter(item => item.id !== audioId);
+        throw error; // Re-throw so caller knows it failed
       });
 
     // Add to queue
     audioQueue.push({ id: audioId, audio, promise });
+    
+    logger.debug('Audio added to queue', { 
+      audioId,
+      queueLength: audioQueue.length,
+      willPlayImmediately: !isPlaying
+    });
 
-    // If nothing is playing, play this immediately
-    if (!isPlaying) {
-      await promise;
-
-      // Remove from queue
-      audioQueue = audioQueue.filter(item => item.id !== audioId);
-    }
+    // Always await the promise to ensure audio plays before returning
+    logger.debug('Awaiting audio playback', { audioId });
+    await promise;
+    logger.debug('Audio playback await completed', { audioId });
+    
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('Error queuing audio', { message });

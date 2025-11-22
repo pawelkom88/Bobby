@@ -67,6 +67,10 @@ export default function VoiceConversation({
   const stopConnectingSoundRef = useRef<(() => void) | null>(null);
   const hasAutoStartedRef = useRef(false);
   const abortLoopCounterRef = useRef(0);
+  const activeRecognitionRef = useRef<any>(null);
+  const lastRecognitionStartRef = useRef<number>(0);
+  const rapidRestartCountRef = useRef<number>(0);
+  const isStartingRecognitionRef = useRef<boolean>(false);
 
   const settings = getSettings();
   const { soundEnabled } = useSound();
@@ -142,7 +146,24 @@ export default function VoiceConversation({
   // Start Web Speech API recognition
   function startSpeechRecognition(): void {
     // If we shouldn't be listening, don't start
-    if (!shouldBeListeningRef.current) return;
+    if (!shouldBeListeningRef.current) {
+      logger.debug('Not starting speech recognition - shouldBeListening is false');
+      return;
+    }
+
+    // Prevent concurrent starts
+    if (isStartingRecognitionRef.current) {
+      logger.debug('Already starting recognition, skipping duplicate call');
+      return;
+    }
+
+    // If already listening, don't start again
+    if (activeRecognitionRef.current) {
+      logger.debug('Recognition already active, skipping start');
+      return;
+    }
+
+    isStartingRecognitionRef.current = true;
 
     try {
       const SpeechRecognition =
@@ -150,21 +171,27 @@ export default function VoiceConversation({
 
       if (!SpeechRecognition) {
         setError('Speech Recognition not supported in your browser');
+        isStartingRecognitionRef.current = false;
         return;
       }
 
       const recognition = new SpeechRecognition();
+      activeRecognitionRef.current = recognition;
+
       recognition.continuous = false; // Stop after each user input - don't listen while audio plays
       recognition.interimResults = true;
       recognition.lang = 'en-GB';
 
       recognition.onstart = () => {
         logger.info('Speech recognition started');
+        lastRecognitionStartRef.current = Date.now();
+        isStartingRecognitionRef.current = false;
         setIsListening(true);
       };
 
       recognition.onresult = (event: any) => {
         abortLoopCounterRef.current = 0; // Reset abort counter on successful result
+        rapidRestartCountRef.current = 0; // Reset rapid restart counter on success
         let interimTranscript = '';
         let finalTranscript = '';
 
@@ -193,17 +220,19 @@ export default function VoiceConversation({
       };
 
       recognition.onerror = (event: any) => {
+        isStartingRecognitionRef.current = false;
+        
         // "no-speech" error is common when waiting for user input
         // Just restart listening instead of showing error
         if (event.error === 'no-speech') {
-          logger.info('No speech detected, restarting listening...');
+          logger.info('No speech detected, will restart after delay');
           
           // Restart after a brief delay if we should still be listening
           setTimeout(() => {
             if (isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
               startSpeechRecognition();
             }
-          }, 300);
+          }, 500);
         } else if (event.error === 'aborted') {
           if (shouldBeListeningRef.current) {
              abortLoopCounterRef.current += 1;
@@ -213,11 +242,22 @@ export default function VoiceConversation({
                     if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                         startSpeechRecognition();
                     }
-                 }, 500);
+                 }, 800);
              } else {
-                 logger.warn('Too many aborts, pausing restart');
+                 logger.warn('Too many aborts, longer backoff');
+                 // Back off longer
+                 setTimeout(() => {
+                    if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                        abortLoopCounterRef.current = 0;
+                        startSpeechRecognition();
+                    }
+                 }, 3000);
              }
           }
+        } else if (event.error === 'audio-capture') {
+          logger.error('Audio capture error - microphone may be in use');
+          setError('Microphone error. Please check if another app is using it.');
+          shouldBeListeningRef.current = false;
         } else {
           logger.error('Speech recognition error', event.error);
           // Don't show error to user for minor glitches, try to recover
@@ -226,36 +266,81 @@ export default function VoiceConversation({
                 if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                     startSpeechRecognition();
                 }
-             }, 1000);
+             }, 1500);
           } else {
              setError(`Speech recognition error: ${event.error}`);
+             shouldBeListeningRef.current = false;
           }
         }
       };
 
       recognition.onend = () => {
-        logger.info('Speech recognition ended');
+        const duration = Date.now() - lastRecognitionStartRef.current;
+        logger.info('Speech recognition ended', { duration: `${duration}ms` });
+        
+        isStartingRecognitionRef.current = false;
         setIsListening(false);
         
+        if (activeRecognitionRef.current === recognition) {
+            activeRecognitionRef.current = null;
+        }
+        
+        // Check for rapid restarts - if session lasted less than 1 second
+        if (duration < 1000) {
+            rapidRestartCountRef.current += 1;
+        } else {
+            rapidRestartCountRef.current = 0;
+        }
+
         // Auto-restart if we should be listening (and not processing/playing)
         // This handles "silence timeouts" or accidental stops where no final result was produced
         if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-            logger.info('Auto-restarting speech recognition after silence/end');
+            
+            let restartDelay = 500; // Increased base delay from 300ms
+            
+            if (rapidRestartCountRef.current > 3) {
+                logger.warn('Rapid restart detected in onend, backing off', { 
+                  count: rapidRestartCountRef.current,
+                  duration: `${duration}ms`
+                });
+                restartDelay = 3000; // Wait 3 seconds
+                
+                if (rapidRestartCountRef.current > 15) {
+                     logger.error('Too many rapid restarts, stopping speech recognition');
+                     setError('Microphone connection unstable. Please reload the page.');
+                     shouldBeListeningRef.current = false;
+                     return;
+                }
+            }
+
+            logger.info('Auto-restarting speech recognition after silence/end', { 
+              restartDelay,
+              rapidRestartCount: rapidRestartCountRef.current
+            });
+            
             setTimeout(() => {
-                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && !activeRecognitionRef.current) {
                     startSpeechRecognition();
                 }
-            }, 300);
+            }, restartDelay);
         }
       };
 
       recognition.start();
       stopSpeechRecognitionRef.current = () => {
-        recognition.stop();
+        try {
+            if (recognition) {
+              recognition.stop();
+            }
+        } catch (e) {
+          logger.debug('Error stopping recognition', e);
+        }
       };
     } catch (err) {
       logger.error('Error starting speech recognition', err);
       setError('Failed to start speech recognition');
+      isStartingRecognitionRef.current = false;
+      activeRecognitionRef.current = null;
     }
   }
 
@@ -308,9 +393,17 @@ export default function VoiceConversation({
 
             // Convert response to audio and play
             try {
+              logger.debug('Starting TTS and audio playback for agent response');
               setIsSpeaking(true);
+              
+              logger.debug('Calling textToSpeech');
               const audioBlob = await textToSpeech(fullResponse);
+              logger.debug('textToSpeech completed', { blobSize: audioBlob.size });
+              
+              logger.debug('Calling queueAndPlayAudio');
               await queueAndPlayAudio(audioBlob);
+              logger.debug('queueAndPlayAudio completed');
+              
               setIsSpeaking(false);
               
               // Audio finished - NOW restart listening for user
@@ -400,9 +493,17 @@ export default function VoiceConversation({
 
             // Convert greeting to audio and play
             try {
+              logger.debug('Starting TTS and audio playback for greeting');
               setIsSpeaking(true);
+              
+              logger.debug('Calling textToSpeech for greeting');
               const audioBlob = await textToSpeech(fullResponse);
+              logger.debug('textToSpeech completed for greeting', { blobSize: audioBlob.size });
+              
+              logger.debug('Calling queueAndPlayAudio for greeting');
               await queueAndPlayAudio(audioBlob);
+              logger.debug('queueAndPlayAudio completed for greeting');
+              
               setIsSpeaking(false);
               
               // Audio has finished playing - NOW start listening for user input
@@ -450,10 +551,20 @@ export default function VoiceConversation({
 
   const stopConversation = () => {
     shouldBeListeningRef.current = false;
+    isStartingRecognitionRef.current = false;
+    
     try {
       if (stopSpeechRecognitionRef.current) {
         stopSpeechRecognitionRef.current();
         stopSpeechRecognitionRef.current = null;
+      }
+      if (activeRecognitionRef.current) {
+        try {
+          activeRecognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
+        activeRecognitionRef.current = null;
       }
       setIsListening(false);
     } catch (err) {
