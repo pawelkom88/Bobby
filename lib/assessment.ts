@@ -134,6 +134,9 @@ const PASS_THRESHOLD_BY_TIER: Record<AgeTier, number> = {
   3: 70,
 };
 
+// Minimum conversation duration in seconds
+const MIN_DURATION_SECONDS = 30;
+
 function normalizeText(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -262,12 +265,22 @@ Keep feedback age-appropriate and encouraging.`;
 
     const assessment = JSON.parse(jsonMatch[0]);
 
+    let finalScore = Math.min(100, Math.max(0, assessment.score || 50));
+    const finalWarnings = assessment.warnings || [];
+    const finalImprovements = assessment.improvements || [];
+    
+    // Apply minimum duration threshold (30 seconds)
+    if (durationSeconds < 30) {
+      finalWarnings.push('The conversation was too short. Try to stay on the line longer and share more details.');
+      finalScore = Math.min(finalScore, 20); // Cap score at 20 for too-short calls
+    }
+
     return {
-      score: Math.min(100, Math.max(0, assessment.score || 50)),
-      passed: assessment.passed ?? assessment.score >= 60,
+      score: finalScore,
+      passed: assessment.passed ?? finalScore >= 60,
       positives: assessment.positives || [],
-      improvements: assessment.improvements || [],
-      warnings: assessment.warnings || [],
+      improvements: finalImprovements,
+      warnings: finalWarnings,
       metrics: {
         userTurns,
         durationSeconds,
@@ -384,6 +397,12 @@ export function assessConversation(
   // Adjust for severe off-topic
   if (irrelevantRatio >= 0.4) {
     score = Math.min(score, 15);
+  }
+
+  // Apply minimum duration threshold (30 seconds)
+  if (durationSeconds < 30) {
+    warnings.push('The conversation was too short. Try to stay on the line longer and share more details.');
+    score = Math.min(score, 20); // Cap score at 20 for too-short calls
   }
 
   mapScoreToFeedback(score, positives, improvements, warnings);

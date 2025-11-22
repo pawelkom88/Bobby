@@ -57,6 +57,7 @@ export default function VoiceConversation({
   
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [sessionActive, setSessionActive] = useState(false);
+  const [conversationEnded, setConversationEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
@@ -77,12 +78,12 @@ export default function VoiceConversation({
   const { soundEnabled } = useSound();
 
   // Derived visual state
-  const visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle' = 
+  const visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle' =
     error ? 'error' :
-    isProcessing ? 'processing' :
-    isSpeaking ? 'speaking' :
-    isListening ? 'listening' :
-    'idle';
+      isProcessing ? 'processing' :
+        isSpeaking ? 'speaking' :
+          isListening ? 'listening' :
+            'idle';
 
   // Check microphone permission on mount
   useEffect(() => {
@@ -222,38 +223,38 @@ export default function VoiceConversation({
 
       recognition.onerror = (event: any) => {
         isStartingRecognitionRef.current = false;
-        
+
         // "no-speech" error is common when waiting for user input
         // Just restart listening instead of showing error
         if (event.error === 'no-speech') {
           logger.info('No speech detected, will restart after delay');
-          
+
           // Restart after a brief delay if we should still be listening
           setTimeout(() => {
-            if (isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+            if (sessionActive && isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
               startSpeechRecognition();
             }
           }, 500);
         } else if (event.error === 'aborted') {
-          if (shouldBeListeningRef.current) {
-             abortLoopCounterRef.current += 1;
-             // Only retry a few times rapidly, otherwise wait
-             if (abortLoopCounterRef.current < 5) {
-                 setTimeout(() => {
-                    if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-                        startSpeechRecognition();
-                    }
-                 }, 800);
-             } else {
-                 logger.warn('Too many aborts, longer backoff');
-                 // Back off longer
-                 setTimeout(() => {
-                    if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-                        abortLoopCounterRef.current = 0;
-                        startSpeechRecognition();
-                    }
-                 }, 3000);
-             }
+          if (shouldBeListeningRef.current && sessionActive) {
+            abortLoopCounterRef.current += 1;
+            // Only retry a few times rapidly, otherwise wait
+            if (abortLoopCounterRef.current < 5) {
+              setTimeout(() => {
+                if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                  startSpeechRecognition();
+                }
+              }, 800);
+            } else {
+              logger.warn('Too many aborts, longer backoff');
+              // Back off longer
+              setTimeout(() => {
+                if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                  abortLoopCounterRef.current = 0;
+                  startSpeechRecognition();
+                }
+              }, 3000);
+            }
           }
         } else if (event.error === 'audio-capture') {
           logger.error('Audio capture error - microphone may be in use');
@@ -263,14 +264,14 @@ export default function VoiceConversation({
           logger.error('Speech recognition error', event.error);
           // Don't show error to user for minor glitches, try to recover
           if (event.error !== 'not-allowed') {
-             setTimeout(() => {
-                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-                    startSpeechRecognition();
-                }
-             }, 1500);
+            setTimeout(() => {
+              if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                startSpeechRecognition();
+              }
+            }, 1500);
           } else {
-             setError(`Speech recognition error: ${event.error}`);
-             shouldBeListeningRef.current = false;
+            setError(`Speech recognition error: ${event.error}`);
+            shouldBeListeningRef.current = false;
           }
         }
       };
@@ -278,61 +279,61 @@ export default function VoiceConversation({
       recognition.onend = () => {
         const duration = Date.now() - lastRecognitionStartRef.current;
         logger.info('Speech recognition ended', { duration: `${duration}ms` });
-        
+
         isStartingRecognitionRef.current = false;
         setIsListening(false);
-        
+
         if (activeRecognitionRef.current === recognition) {
-            activeRecognitionRef.current = null;
+          activeRecognitionRef.current = null;
         }
-        
+
         // Check for rapid restarts - if session lasted less than 1 second
         if (duration < 1000) {
-            rapidRestartCountRef.current += 1;
+          rapidRestartCountRef.current += 1;
         } else {
-            rapidRestartCountRef.current = 0;
+          rapidRestartCountRef.current = 0;
         }
 
         // Auto-restart if we should be listening (and not processing/playing)
         // This handles "silence timeouts" or accidental stops where no final result was produced
-        if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-            
-            let restartDelay = 500; // Increased base delay from 300ms
-            
-            if (rapidRestartCountRef.current > 3) {
-                logger.warn('Rapid restart detected in onend, backing off', { 
-                  count: rapidRestartCountRef.current,
-                  duration: `${duration}ms`
-                });
-                restartDelay = 3000; // Wait 3 seconds
-                
-                if (rapidRestartCountRef.current > 15) {
-                     logger.error('Too many rapid restarts, stopping speech recognition');
-                     setError('Microphone connection unstable. Please reload the page.');
-                     shouldBeListeningRef.current = false;
-                     return;
-                }
-            }
+        if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && sessionActive && isSessionValid()) {
 
-            logger.info('Auto-restarting speech recognition after silence/end', { 
-              restartDelay,
-              rapidRestartCount: rapidRestartCountRef.current
+          let restartDelay = 500; // Increased base delay from 300ms
+
+          if (rapidRestartCountRef.current > 3) {
+            logger.warn('Rapid restart detected in onend, backing off', {
+              count: rapidRestartCountRef.current,
+              duration: `${duration}ms`
             });
-            
-            setTimeout(() => {
-                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && !activeRecognitionRef.current) {
-                    startSpeechRecognition();
-                }
-            }, restartDelay);
+            restartDelay = 3000; // Wait 3 seconds
+
+            if (rapidRestartCountRef.current > 15) {
+              logger.error('Too many rapid restarts, stopping speech recognition');
+              setError('Microphone connection unstable. Please reload the page.');
+              shouldBeListeningRef.current = false;
+              return;
+            }
+          }
+
+          logger.info('Auto-restarting speech recognition after silence/end', {
+            restartDelay,
+            rapidRestartCount: rapidRestartCountRef.current
+          });
+
+          setTimeout(() => {
+            if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && !activeRecognitionRef.current && sessionActive && isSessionValid()) {
+              startSpeechRecognition();
+            }
+          }, restartDelay);
         }
       };
 
       recognition.start();
       stopSpeechRecognitionRef.current = () => {
         try {
-            if (recognition) {
-              recognition.stop();
-            }
+          if (recognition) {
+            recognition.stop();
+          }
         } catch (e) {
           logger.debug('Error stopping recognition', e);
         }
@@ -348,6 +349,12 @@ export default function VoiceConversation({
   // Handle user input - send to Gemini
   async function handleUserInput(userText: string): Promise<void> {
     if (!userText.trim()) {
+      return;
+    }
+
+    // Check if session is still valid (prevents null reference errors)
+    if (!sessionActive || !isSessionValid()) {
+      logger.warn('Cannot handle input - session not active or invalid');
       return;
     }
 
@@ -380,45 +387,45 @@ export default function VoiceConversation({
           setGeminiResponse(geminiText);
         },
         async (fullResponse) => {
-            logger.debug('Gemini response complete', { length: fullResponse.length });
+          logger.debug('Gemini response complete', { length: fullResponse.length });
 
-            // Add agent message to conversation FIRST
-            const agentMessage: ConversationMessage = {
-              type: 'agent',
-              text: fullResponse,
-              timestamp: new Date().toISOString(),
-            };
-            setConversation((prev) => [...prev, agentMessage]);
-            setGeminiResponse('');
-            setIsProcessing(false); // Thinking done, now speaking
+          // Add agent message to conversation FIRST
+          const agentMessage: ConversationMessage = {
+            type: 'agent',
+            text: fullResponse,
+            timestamp: new Date().toISOString(),
+          };
+          setConversation((prev) => [...prev, agentMessage]);
+          setGeminiResponse('');
+          setIsProcessing(false); // Thinking done, now speaking
 
-            // Convert response to audio and play
-            try {
-              logger.debug('Starting TTS and audio playback for agent response');
-              setIsSpeaking(true);
-              
-              logger.debug('Calling textToSpeech');
-              const audioBlob = await textToSpeech(fullResponse);
-              logger.debug('textToSpeech completed', { blobSize: audioBlob.size });
-              
-              logger.debug('Calling queueAndPlayAudio');
-              await queueAndPlayAudio(audioBlob);
-              logger.debug('queueAndPlayAudio completed');
-              
-              setIsSpeaking(false);
-              
-              // Audio finished - NOW restart listening for user
-              logger.info('Audio finished, restarting speech recognition');
-              shouldBeListeningRef.current = true;
-              startSpeechRecognition();
-            } catch (audioErr) {
-              logger.error('Error playing audio', audioErr);
-              setIsSpeaking(false);
-              // Restart listening even if audio fails
-              shouldBeListeningRef.current = true;
-              startSpeechRecognition();
-            }
-          },
+          // Convert response to audio and play
+          try {
+            logger.debug('Starting TTS and audio playback for agent response');
+            setIsSpeaking(true);
+
+            logger.debug('Calling textToSpeech');
+            const audioBlob = await textToSpeech(fullResponse);
+            logger.debug('textToSpeech completed', { blobSize: audioBlob.size });
+
+            logger.debug('Calling queueAndPlayAudio');
+            await queueAndPlayAudio(audioBlob);
+            logger.debug('queueAndPlayAudio completed');
+
+            setIsSpeaking(false);
+
+            // Audio finished - NOW restart listening for user
+            logger.info('Audio finished, restarting speech recognition');
+            shouldBeListeningRef.current = true;
+            startSpeechRecognition();
+          } catch (audioErr) {
+            logger.error('Error playing audio', audioErr);
+            setIsSpeaking(false);
+            // Restart listening even if audio fails
+            shouldBeListeningRef.current = true;
+            startSpeechRecognition();
+          }
+        },
         (error) => {
           logger.error('Gemini error', { error });
           setError(error);
@@ -496,17 +503,17 @@ export default function VoiceConversation({
             try {
               logger.debug('Starting TTS and audio playback for greeting');
               setIsSpeaking(true);
-              
+
               logger.debug('Calling textToSpeech for greeting');
               const audioBlob = await textToSpeech(fullResponse);
               logger.debug('textToSpeech completed for greeting', { blobSize: audioBlob.size });
-              
+
               logger.debug('Calling queueAndPlayAudio for greeting');
               await queueAndPlayAudio(audioBlob);
               logger.debug('queueAndPlayAudio completed for greeting');
-              
+
               setIsSpeaking(false);
-              
+
               // Audio has finished playing - NOW start listening for user input
               logger.info('Greeting audio finished, starting speech recognition');
               shouldBeListeningRef.current = true;
@@ -553,7 +560,7 @@ export default function VoiceConversation({
   const stopConversation = () => {
     shouldBeListeningRef.current = false;
     isStartingRecognitionRef.current = false;
-    
+
     try {
       if (stopSpeechRecognitionRef.current) {
         stopSpeechRecognitionRef.current();
@@ -578,6 +585,7 @@ export default function VoiceConversation({
       stopConversation();
       stopAllAudio();
       setIsSpeaking(false);
+      setConversationEnded(true); // Mark as ended to prevent showing "getting ready" screen
 
       // Play end-of-conversation sound
       void playEndConversationSound(soundEnabled);
@@ -680,7 +688,7 @@ export default function VoiceConversation({
         )}
       </div>
 
-      {!sessionActive ? (
+      {!sessionActive && !conversationEnded ? (
         <>
           <h1 className="conversation-subtitle">Just a moment ...</h1>
           <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
@@ -689,42 +697,38 @@ export default function VoiceConversation({
           <br />
 
           <div className="conversation-start-section">
-            {isConnecting ? (
-              <LoadingSpinner />
-            ) : (
-              <CartoonButton
-                onClick={startConversation}
-                disabled={!permissionGranted || isConnecting}
-                ariaLabel="Start conversation with Bobby"
-              >
-                Start Conversation
-              </CartoonButton>
-            )}
+            {isConnecting &&
+              <LoadingSpinner />}
           </div>
         </>
+      ) : conversationEnded ? (
+        <div className="conversation-ending" style={{ textAlign: 'center', padding: '2rem' }}>
+          <h2>Processing your conversation...</h2>
+          <LoadingSpinner />
+        </div>
       ) : (
         <>
           {/* Main Visual Feedback Area */}
           <div className="conversation-visuals" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
-             <h2 className="kavoon" style={{fontSize: '2rem', color: '#333'}}>
-                {visualState === 'speaking' && "Bobby is speaking..."}
-                {visualState === 'listening' && "Your turn to speak!"}
-                {visualState === 'processing' && "Bobby is thinking..."}
-                {visualState === 'error' && "Something went wrong"}
-             </h2>
-             
-             <VoiceAnimations state={visualState} />
+            <h2 className="kavoon" style={{ fontSize: '2rem', color: '#333' }}>
+              {visualState === 'speaking' && "Bobby is speaking..."}
+              {visualState === 'listening' && "Your turn to speak!"}
+              {visualState === 'processing' && "Bobby is thinking..."}
+              {visualState === 'error' && "Something went wrong"}
+            </h2>
+
+            <VoiceAnimations state={visualState} />
           </div>
 
           {/* Subtitles (Agent only) */}
           {settings.subtitles && conversation.length > 0 && (
             <div className="subtitles" role="region" aria-label="Subtitles" style={{
-                marginTop: 'auto',
-                marginBottom: '2rem',
-                padding: '1rem',
-                background: 'rgba(255,255,255,0.8)',
-                borderRadius: '1rem',
-                maxWidth: '80%'
+              marginTop: 'auto',
+              marginBottom: '2rem',
+              padding: '1rem',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '1rem',
+              maxWidth: '80%'
             }}>
               {conversation
                 .filter((msg) => msg.type === 'agent')
@@ -739,10 +743,10 @@ export default function VoiceConversation({
 
           {/* Controls (Only End Call now) */}
           <div className="conversation-controls" style={{ marginTop: 'auto' }}>
-            <CartoonButton 
-                onClick={() => void endConversation()} 
-                ariaLabel="End conversation"
-                className="cartoon-btn-danger"
+            <CartoonButton
+              onClick={() => void endConversation()}
+              ariaLabel="End conversation"
+              className="cartoon-btn-danger"
             >
               End Call
             </CartoonButton>

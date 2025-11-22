@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ViewTransition } from 'react';
@@ -13,6 +13,16 @@ import Image from 'next/image';
 export default function ChooseEmergencyPage() {
   const router = useRouter();
   const [selectedService, setSelected] = useState<Service | null>(null);
+
+  // Clear session data when in conversation setup flow
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('conversationComplete');
+      sessionStorage.removeItem('lastAssessment');
+      sessionStorage.removeItem('completionId');
+      sessionStorage.removeItem('processedCompletionId');
+    }
+  }, []);
 
   const services: Array<{ id: Service; label: string; imagePath: string; color: string }> = [
     { id: 'fire', label: 'FIRE', imagePath: '/emergency-type-fire-brigade.png', color: '#F68941' },

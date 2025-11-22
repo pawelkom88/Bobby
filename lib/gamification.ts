@@ -36,6 +36,22 @@ export const BADGES = {
     name: 'Emergency Expert',
     levelEarned: 9,
   },
+  // Performance-based badges (score thresholds)
+  SCORE_90: {
+    id: 'excellent-communicator',
+    name: 'Excellent Communicator',
+    description: 'Scored 90+ on a conversation',
+  },
+  SCORE_80: {
+    id: 'great-helper',
+    name: 'Great Helper',
+    description: 'Scored 80+ on a conversation',
+  },
+  SCORE_70: {
+    id: 'good-effort',
+    name: 'Good Effort',
+    description: 'Scored 70+ on a conversation',
+  },
 } as const;
 
 // Badge milestones (levels where badges are awarded)
@@ -102,5 +118,21 @@ export function calculateXPEarned(performance: PerformanceMetrics = {}): number 
   if (performance.stayedCalm) xp += 15;
 
   return Math.min(xp, 100);
+}
+
+/**
+ * Check if a performance-based badge should be awarded based on score
+ */
+export function getBadgeForScore(score: number): Badge | null {
+  if (score >= 90) {
+    return BADGES.SCORE_90;
+  }
+  if (score >= 80) {
+    return BADGES.SCORE_80;
+  }
+  if (score >= 70) {
+    return BADGES.SCORE_70;
+  }
+  return null;
 }
 

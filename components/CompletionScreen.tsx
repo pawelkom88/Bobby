@@ -6,7 +6,7 @@ import Confetti from './Confetti';
 import BadgeDisplay from './BadgeDisplay';
 import LevelProgress from './LevelProgress';
 import CartoonButton from './CartoonButton';
-import { getLevel, addXP, saveConversation } from '@/lib/storage';
+import { getLevel, addXP, saveConversation, awardScoreBadge } from '@/lib/storage';
 import { calculateXPEarned } from '@/lib/gamification';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
 
@@ -23,10 +23,11 @@ interface CompletionScreenProps {
  */
 export default function CompletionScreen({ service, ageTier, performance = {}, onContinue, onViewAchievements }: CompletionScreenProps) {
   const router = useRouter();
-  const [showConfetti, setShowConfetti] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [xpEarned, setXPEarned] = useState(0);
   const [leveledUp, setLeveledUp] = useState(false);
   const [badgeAwarded, setBadgeAwarded] = useState<Badge | null>(null);
+  const [scoreBadgeAwarded, setScoreBadgeAwarded] = useState<Badge | null>(null);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isLevel10, setIsLevel10] = useState(false);
   const assessment = performance.assessment;
@@ -36,31 +37,78 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
       : assessment?.positives ?? [];
 
   useEffect(() => {
-    // Calculate and award XP
-    const oldLevel = getLevel();
-    const xp = calculateXPEarned(performance);
-    setXPEarned(xp);
+    // Check if this completion has already been processed to prevent duplicate XP awards
+    if (typeof window !== 'undefined') {
+      const completionId = sessionStorage.getItem('completionId');
+      const processedId = sessionStorage.getItem('processedCompletionId');
+      
+      // Only award XP if this completion hasn't been processed yet
+      if (completionId && completionId === processedId) {
+        // Already processed, just display existing results
+        console.log('Completion already processed, skipping XP award');
+        const xp = calculateXPEarned(performance);
+        setXPEarned(xp);
+        setCurrentLevel(getLevel());
+        return;
+      }
+      
+      // Calculate and award XP (first time only)
+      const oldLevel = getLevel();
+      const xp = calculateXPEarned(performance);
+      setXPEarned(xp);
 
-    const result = addXP(xp);
-    setLeveledUp(result.leveledUp);
-    setBadgeAwarded(result.badgeAwarded);
-    setCurrentLevel(result.newLevel);
-    setIsLevel10(result.newLevel === 10);
+      // Only show confetti if XP was earned
+      if (xp > 0) {
+        setShowConfetti(true);
+      }
 
-    // Save conversation
-    if (service && ageTier) {
-      saveConversation(
-        new Date().toISOString(),
-        service,
-        ageTier,
-        xp,
-        assessment?.score,
-        feedbackSummary?.slice(0, 3)
-      );
+      const result = addXP(xp);
+      setLeveledUp(result.leveledUp);
+      setBadgeAwarded(result.badgeAwarded);
+      setCurrentLevel(result.newLevel);
+      setIsLevel10(result.newLevel === 10);
+
+      // Award score-based badge if applicable
+      if (assessment?.score) {
+        const scoreBadge = awardScoreBadge(assessment.score);
+        if (scoreBadge) {
+          setScoreBadgeAwarded(scoreBadge);
+        }
+      }
+
+      // Save conversation
+      if (service && ageTier) {
+        saveConversation(
+          new Date().toISOString(),
+          service,
+          ageTier,
+          xp,
+          assessment?.score,
+          feedbackSummary?.slice(0, 3)
+        );
+      }
+      
+      // Mark this completion as processed
+      if (completionId) {
+        sessionStorage.setItem('processedCompletionId', completionId);
+      }
+    } else {
+      // Fallback for SSR or if sessionStorage is not available
+      const xp = calculateXPEarned(performance);
+      setXPEarned(xp);
+      setCurrentLevel(getLevel());
     }
   }, [service, ageTier, performance]);
 
   const handleContinue = () => {
+    // Clear completion data when starting a new conversation
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('lastAssessment');
+      sessionStorage.removeItem('completionId');
+      sessionStorage.removeItem('processedCompletionId');
+      sessionStorage.removeItem('conversationComplete');
+    }
+    
     if (onContinue) {
       onContinue();
     } else {
@@ -77,7 +125,7 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
 
   return (
     <div className="completion-screen" role="region" aria-label="Completion screen">
-      {showConfetti && <Confetti active={showConfetti} duration={3000} />}
+      {showConfetti && xpEarned > 0 && <Confetti active={showConfetti} duration={3000} />}
 
       <div className="completion-content">
         {isLevel10 ? (
@@ -92,6 +140,16 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
             </p>
             <p className="completion-encouragement">
               Remember, you can always practice more to stay sharp. Keep up the amazing work!
+            </p>
+          </>
+        ) : xpEarned === 0 ? (
+          <>
+            <h1 className="completion-title">Practice Session Complete</h1>
+            <p className="completion-message">
+              You tried the {service} emergency scenario.
+            </p>
+            <p className="completion-encouragement">
+              Don't worry! Emergency calls can be tricky. Let's try again and you'll do better!
             </p>
           </>
         ) : (
@@ -112,8 +170,21 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
                 <p>{badgeAwarded.name}</p>
               </div>
             )}
+            {scoreBadgeAwarded && (
+              <div className="badge-awarded-message" role="alert">
+                <h2>Performance Badge! ⭐</h2>
+                <p>{scoreBadgeAwarded.name}</p>
+                {scoreBadgeAwarded.description && (
+                  <p className="badge-description">{scoreBadgeAwarded.description}</p>
+                )}
+              </div>
+            )}
             <div className="xp-earned">
-              <p>You earned {xpEarned} XP!</p>
+              {xpEarned > 0 ? (
+                <p>You earned {xpEarned} XP!</p>
+              ) : (
+                <p className="no-xp-message">No XP earned this time</p>
+              )}
               {assessment && (
                 <p className="assessment-score">Score: {Math.round(assessment.score)} / 100</p>
               )}
@@ -121,11 +192,13 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
           </>
         )}
 
-        <div className="completion-progress">
-          <LevelProgress showLabel={true} />
-        </div>
+        {xpEarned > 0 && (
+          <div className="completion-progress">
+            <LevelProgress showLabel={true} />
+          </div>
+        )}
 
-        {badgeAwarded && (
+        {(badgeAwarded || scoreBadgeAwarded) && (
           <div className="completion-badge">
             <BadgeDisplay showAll={false} />
           </div>

@@ -17,6 +17,9 @@ export default function CompletionPage() {
     // Retrieve assessment from sessionStorage
     if (typeof window !== 'undefined') {
       const assessmentData = sessionStorage.getItem('lastAssessment');
+      const completionId = sessionStorage.getItem('completionId');
+      const processedId = sessionStorage.getItem('processedCompletionId');
+      
       if (assessmentData) {
         try {
           const data = JSON.parse(assessmentData);
@@ -27,8 +30,14 @@ export default function CompletionPage() {
               ? data.assessment.improvements
               : data.assessment.positives,
           });
-          // Clear the data after reading
-          sessionStorage.removeItem('lastAssessment');
+          
+          // Only clear assessment data if this completion has been processed
+          // This allows the data to persist for display on refresh
+          // but prevents duplicate XP awards
+          if (completionId && completionId === processedId) {
+            // Already processed, keep data for display but don't award XP again
+            console.log('Completion already processed, showing existing results');
+          }
         } catch (error) {
           console.error('Error parsing assessment data:', error);
         }

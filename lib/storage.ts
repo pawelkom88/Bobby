@@ -6,6 +6,7 @@ import {
   calculateLevel,
   getXPToNextLevel,
   getBadgeForLevel,
+  getBadgeForScore,
 } from './gamification';
 import { validateAgeTier, validateService, validateXP, validateTimestamp } from './validation';
 import type { UserData, UserSettings, Conversation, Service, AgeTier, Badge, LevelUpResult, JourneyState } from '@/types';
@@ -317,5 +318,34 @@ export function getSelectedService(): Service | undefined {
 export function getJourneyState(): JourneyState | undefined {
   const data = getUserData();
   return data.journey;
+}
+
+/**
+ * Award a performance badge based on conversation score
+ * Returns the badge if it was newly awarded, null if already owned
+ */
+export function awardScoreBadge(score: number): Badge | null {
+  const badge = getBadgeForScore(score);
+  if (!badge) {
+    return null;
+  }
+
+  const data = getUserData();
+  
+  // Check if badge already exists
+  const existingBadge = data.badges.find(b => b.id === badge.id);
+  if (existingBadge) {
+    return null; // Already have this badge
+  }
+
+  // Award the badge
+  const badgeWithTimestamp = {
+    ...badge,
+    timestamp: new Date().toISOString(),
+  };
+  data.badges.push(badgeWithTimestamp);
+  saveUserData(data);
+  
+  return badgeWithTimestamp;
 }
 

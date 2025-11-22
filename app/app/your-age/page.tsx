@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ViewTransition } from 'react';
@@ -14,6 +14,16 @@ import Image from 'next/image';
 export default function YourAgePage() {
   const router = useRouter();
   const [selectedAge, setSelectedAge] = useState<AgeTier | null>(null);
+
+  // Clear session data when starting a new conversation flow
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('conversationComplete');
+      sessionStorage.removeItem('lastAssessment');
+      sessionStorage.removeItem('completionId');
+      sessionStorage.removeItem('processedCompletionId');
+    }
+  }, []);
 
   const handleSelectAge = (ageTier: AgeTier) => {
     setSelectedAge(ageTier);

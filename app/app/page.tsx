@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
@@ -11,6 +12,16 @@ import { ViewTransition } from 'react';
 import AnimatedImageWrapper from '@/components/AnimatedImageWrapper';
 
 export default function AppPage() {
+  // Clear any leftover session data when landing on home page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('conversationComplete');
+      sessionStorage.removeItem('lastAssessment');
+      sessionStorage.removeItem('completionId');
+      sessionStorage.removeItem('processedCompletionId');
+    }
+  }, []);
+
   return (
     <ViewTransition>
       <PageWrapper>
