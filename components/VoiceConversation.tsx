@@ -60,6 +60,8 @@ export default function VoiceConversation({
   const shouldBeListeningRef = useRef(false);
   const stopConnectingSoundRef = useRef<(() => void) | null>(null);
   const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasAutoStartedRef = useRef(false);
+  const abortLoopCounterRef = useRef(0);
 
   const settings = getSettings();
   const { soundEnabled } = useSound();
@@ -96,7 +98,8 @@ export default function VoiceConversation({
 
   // Auto-start conversation if autoStart is true and permissions are granted
   useEffect(() => {
-    if (autoStart && permissionGranted && !sessionActive) {
+    if (autoStart && permissionGranted && !sessionActive && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
       const timer = setTimeout(() => {
         void startConversation();
       }, 300);
@@ -148,6 +151,7 @@ export default function VoiceConversation({
       };
 
       recognition.onresult = (event: any) => {
+        abortLoopCounterRef.current = 0; // Reset abort counter on successful result
         let interimTranscript = '';
         let finalTranscript = '';
 
@@ -193,6 +197,20 @@ export default function VoiceConversation({
               setCurrentTranscript(''); // Clear reminder when listening restarts
             }
           }, 500);
+        } else if (event.error === 'aborted') {
+          // Aborted can happen if we stop it, or if the system stops it.
+          // If we didn't stop it (shouldBeListening is true), it might be a system loop.
+          if (shouldBeListeningRef.current) {
+             abortLoopCounterRef.current += 1;
+             logger.warn(`Speech recognition aborted (count: ${abortLoopCounterRef.current})`);
+             
+             if (abortLoopCounterRef.current > 5) {
+                logger.error('Too many aborts, stopping auto-restart');
+                shouldBeListeningRef.current = false;
+                // Ensure we don't restart in onend by clearing any potentially queued timeouts or just relying on the ref
+                setError('Speech recognition connection unstable. Please reload.');
+             }
+          }
         } else {
           setError(`Speech recognition error: ${event.error}`);
         }
@@ -235,6 +253,19 @@ export default function VoiceConversation({
     shouldBeListeningRef.current = false;
     if (stopSpeechRecognitionRef.current) {
       stopSpeechRecognitionRef.current();
+    }
+
+    // Ensure we don't have multiple instances running or starting too fast
+    if (isListening) {
+        // If already listening, just return or stop and restart? 
+        // For safety, let's stop existing one.
+        try {
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                // Try to find if there's a way to check existing instances? No.
+                // Rely on stopSpeechRecognitionRef
+            }
+        } catch (e) { /* ignore */ }
     }
 
     try {

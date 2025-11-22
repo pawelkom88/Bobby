@@ -110,6 +110,25 @@ h6,
   letter-spacing: 0.05em;
 }
 
+
+.completion-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  margin-top: 3rem;
+}
+.completion-actions button {
+  width: 100%;
+  max-width: 300px;
+  margin-right: 3rem;
+}
+
+.completion-actions button span  {
+  font-size: 1.5rem;
+}
+
 /* ============================================================================
    HEADING UTILITY CLASSES - Kavoon font variants
    ============================================================================ */

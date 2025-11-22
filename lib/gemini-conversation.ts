@@ -123,8 +123,10 @@ export async function sendMessageToGemini(
 
     if (!response.ok) {
       const errorData = await response.json();
+      const errorMessage = errorData.error || `API error: ${response.status}`;
+      const errorDetails = errorData.details || '';
       throw new Error(
-        errorData.error || `API error: ${response.status}`
+        errorDetails ? `${errorMessage} (${errorDetails})` : errorMessage
       );
     }
 
