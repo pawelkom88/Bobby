@@ -110,15 +110,16 @@ function createAudioElement(blob: Blob): HTMLAudioElement {
  * Play audio and return promise that resolves when done
  */
 export async function playAudio(audio: HTMLAudioElement): Promise<void> {
-  logger.debug('playAudio called', { 
+  logger.info('playAudio called', { 
     duration: audio.duration, 
     readyState: audio.readyState,
-    paused: audio.paused 
+    paused: audio.paused,
+    currentTime: audio.currentTime
   });
   
   return new Promise((resolve, reject) => {
     const handleEnded = () => {
-      logger.debug('Audio ended event fired');
+      logger.info('Audio ended event fired - playback complete');
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('pause', handlePause);
@@ -157,17 +158,47 @@ export async function playAudio(audio: HTMLAudioElement): Promise<void> {
     try {
       isPlaying = true;
       currentAudio = audio;
-      logger.debug('Calling audio.play()');
+      logger.info('Calling audio.play() to start playback');
       
       audio.play()
         .then(() => {
-          logger.debug('audio.play() promise resolved');
+          logger.info('audio.play() promise resolved - playback started');
         })
         .catch((err) => {
-          logger.error('audio.play() promise rejected', { error: err.message });
-          isPlaying = false;
-          currentAudio = null;
-          reject(err);
+          const errorMessage = err.message || String(err);
+          logger.error('audio.play() promise rejected', { 
+            error: errorMessage,
+            errorName: err.name,
+            errorCode: err.code 
+          });
+          
+          // Check if this is an autoplay/permissions error
+          // These errors should not break the conversation flow
+          if (errorMessage.includes('NotAllowedError') || 
+              errorMessage.includes('not allowed') || 
+              errorMessage.includes('user agent') ||
+              errorMessage.includes('play()') ||
+              errorMessage.includes('permission')) {
+            logger.warn('Audio playback blocked - likely autoplay policy. Continuing without audio.', {
+              errorType: 'autoplay_policy'
+            });
+            
+            // Clean up listeners
+            audio.removeEventListener('ended', handleEnded);
+            audio.removeEventListener('error', handleError);
+            audio.removeEventListener('pause', handlePause);
+            isPlaying = false;
+            currentAudio = null;
+            
+            // Resolve instead of reject - allow conversation to continue silently
+            resolve();
+          } else {
+            // For other errors, reject so caller knows something went wrong
+            logger.error('Non-autoplay audio error, rejecting', { errorMessage });
+            isPlaying = false;
+            currentAudio = null;
+            reject(err);
+          }
         });
     } catch (err) {
       logger.error('Exception calling audio.play()', { error: err });

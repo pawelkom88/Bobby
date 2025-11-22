@@ -49,6 +49,7 @@ export default function VoiceConversation({
 }: VoiceConversationProps) {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [audioMuted, setAudioMuted] = useState(false);
   
   // State Machine
   const [isListening, setIsListening] = useState(false);
@@ -73,6 +74,7 @@ export default function VoiceConversation({
   const lastRecognitionStartRef = useRef<number>(0);
   const rapidRestartCountRef = useRef<number>(0);
   const isStartingRecognitionRef = useRef<boolean>(false);
+  const sessionActiveRef = useRef<boolean>(false); // Track session state for callbacks
 
   const settings = getSettings();
   const { soundEnabled } = useSound();
@@ -109,11 +111,11 @@ export default function VoiceConversation({
         stopSpeechRecognitionRef.current();
       }
       stopAllAudio();
-      if (sessionActive) {
+      if (sessionActiveRef.current) {
         endGeminiSession();
       }
     };
-  }, [sessionActive]);
+  }, []);
 
   // Auto-start conversation if autoStart is true and permissions are granted
   useEffect(() => {
@@ -128,25 +130,34 @@ export default function VoiceConversation({
 
   // Update remaining time every second
   useEffect(() => {
-    if (!sessionActive) {
-      return;
-    }
-
     const interval = setInterval(() => {
+      if (!sessionActiveRef.current) {
+        return;
+      }
+      
       const remaining = getRemainingSessionTime();
       setRemainingTime(remaining);
 
       // Auto-end session if time is up
-      if (remaining <= 0) {
+      if (remaining <= 0 && sessionActiveRef.current) {
         void endConversation();
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sessionActive]);
+  }, []);
 
   // Start Web Speech API recognition
   function startSpeechRecognition(): void {
+    logger.debug('startSpeechRecognition called', {
+      shouldBeListening: shouldBeListeningRef.current,
+      isStarting: isStartingRecognitionRef.current,
+      hasActiveRecognition: !!activeRecognitionRef.current,
+      isProcessing,
+      isSpeaking,
+      sessionActive
+    });
+    
     // If we shouldn't be listening, don't start
     if (!shouldBeListeningRef.current) {
       logger.debug('Not starting speech recognition - shouldBeListening is false');
@@ -165,6 +176,7 @@ export default function VoiceConversation({
       return;
     }
 
+    logger.info('Initializing speech recognition');
     isStartingRecognitionRef.current = true;
 
     try {
@@ -192,6 +204,11 @@ export default function VoiceConversation({
       };
 
       recognition.onresult = (event: any) => {
+        logger.debug('Speech recognition onresult fired', { 
+          resultIndex: event.resultIndex, 
+          resultsLength: event.results.length 
+        });
+        
         abortLoopCounterRef.current = 0; // Reset abort counter on successful result
         rapidRestartCountRef.current = 0; // Reset rapid restart counter on success
         let interimTranscript = '';
@@ -199,8 +216,17 @@ export default function VoiceConversation({
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
+          const isFinal = event.results[i].isFinal;
+          const confidence = event.results[i][0].confidence;
 
-          if (event.results[i].isFinal) {
+          logger.debug('Speech result', { 
+            index: i, 
+            isFinal, 
+            confidence,
+            transcript: transcript.substring(0, 50) // First 50 chars
+          });
+
+          if (isFinal) {
             finalTranscript += transcript + ' ';
           } else {
             interimTranscript += transcript;
@@ -208,16 +234,25 @@ export default function VoiceConversation({
         }
 
         if (interimTranscript) {
+          logger.debug('Interim transcript update', { 
+            length: interimTranscript.length,
+            preview: interimTranscript.substring(0, 50)
+          });
           setCurrentTranscript(interimTranscript);
         }
 
         if (finalTranscript) {
           const sanitized = finalTranscript.trim();
-          logger.debug('Final transcript', { sanitized });
+          logger.info('Final transcript received', { 
+            length: sanitized.length,
+            text: sanitized 
+          });
           setCurrentTranscript('');
 
           // Send to Gemini
           void handleUserInput(sanitized);
+        } else {
+          logger.debug('No final transcript in this result event');
         }
       };
 
@@ -225,23 +260,23 @@ export default function VoiceConversation({
         isStartingRecognitionRef.current = false;
 
         // "no-speech" error is common when waiting for user input
-        // Just restart listening instead of showing error
-        if (event.error === 'no-speech') {
-          logger.info('No speech detected, will restart after delay');
+          // Just restart listening instead of showing error
+          if (event.error === 'no-speech') {
+            logger.info('No speech detected, will restart after delay');
 
-          // Restart after a brief delay if we should still be listening
-          setTimeout(() => {
-            if (sessionActive && isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
-              startSpeechRecognition();
-            }
-          }, 500);
-        } else if (event.error === 'aborted') {
-          if (shouldBeListeningRef.current && sessionActive) {
+            // Restart after a brief delay if we should still be listening
+            setTimeout(() => {
+              if (sessionActiveRef.current && isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                startSpeechRecognition();
+              }
+            }, 500);
+          } else if (event.error === 'aborted') {
+            if (shouldBeListeningRef.current && sessionActiveRef.current) {
             abortLoopCounterRef.current += 1;
             // Only retry a few times rapidly, otherwise wait
             if (abortLoopCounterRef.current < 5) {
               setTimeout(() => {
-                if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                if (sessionActiveRef.current && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                   startSpeechRecognition();
                 }
               }, 800);
@@ -249,7 +284,7 @@ export default function VoiceConversation({
               logger.warn('Too many aborts, longer backoff');
               // Back off longer
               setTimeout(() => {
-                if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                if (sessionActiveRef.current && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                   abortLoopCounterRef.current = 0;
                   startSpeechRecognition();
                 }
@@ -265,7 +300,7 @@ export default function VoiceConversation({
           // Don't show error to user for minor glitches, try to recover
           if (event.error !== 'not-allowed') {
             setTimeout(() => {
-              if (sessionActive && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+              if (sessionActiveRef.current && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                 startSpeechRecognition();
               }
             }, 1500);
@@ -278,7 +313,13 @@ export default function VoiceConversation({
 
       recognition.onend = () => {
         const duration = Date.now() - lastRecognitionStartRef.current;
-        logger.info('Speech recognition ended', { duration: `${duration}ms` });
+        logger.info('Speech recognition ended', { 
+          duration: `${duration}ms`,
+          shouldBeListening: shouldBeListeningRef.current,
+          isProcessing,
+          isSpeaking,
+          sessionActive
+        });
 
         isStartingRecognitionRef.current = false;
         setIsListening(false);
@@ -296,7 +337,7 @@ export default function VoiceConversation({
 
         // Auto-restart if we should be listening (and not processing/playing)
         // This handles "silence timeouts" or accidental stops where no final result was produced
-        if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && sessionActive && isSessionValid()) {
+        if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && sessionActiveRef.current && isSessionValid()) {
 
           let restartDelay = 500; // Increased base delay from 300ms
 
@@ -317,14 +358,32 @@ export default function VoiceConversation({
 
           logger.info('Auto-restarting speech recognition after silence/end', {
             restartDelay,
-            rapidRestartCount: rapidRestartCountRef.current
+            rapidRestartCount: rapidRestartCountRef.current,
+            reason: 'No final transcript received'
           });
 
           setTimeout(() => {
-            if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && !activeRecognitionRef.current && sessionActive && isSessionValid()) {
+            if (shouldBeListeningRef.current && !isProcessing && !isSpeaking && !activeRecognitionRef.current && sessionActiveRef.current && isSessionValid()) {
+              logger.debug('Executing delayed restart of speech recognition');
               startSpeechRecognition();
+            } else {
+              logger.debug('Skipped delayed restart', {
+                shouldBeListening: shouldBeListeningRef.current,
+                isProcessing,
+                isSpeaking,
+                hasActiveRecognition: !!activeRecognitionRef.current,
+                sessionActive: sessionActiveRef.current
+              });
             }
           }, restartDelay);
+        } else {
+          logger.debug('Not auto-restarting speech recognition', {
+            shouldBeListening: shouldBeListeningRef.current,
+            isProcessing,
+            isSpeaking,
+            sessionActive: sessionActiveRef.current,
+            isValid: isSessionValid()
+          });
         }
       };
 
@@ -348,17 +407,31 @@ export default function VoiceConversation({
 
   // Handle user input - send to Gemini
   async function handleUserInput(userText: string): Promise<void> {
+    logger.info('handleUserInput called', { 
+      textLength: userText.length,
+      text: userText,
+      sessionActive,
+      sessionActiveRef: sessionActiveRef.current,
+      isValid: isSessionValid()
+    });
+    
     if (!userText.trim()) {
+      logger.warn('Empty user text, skipping');
       return;
     }
 
     // Check if session is still valid (prevents null reference errors)
-    if (!sessionActive || !isSessionValid()) {
-      logger.warn('Cannot handle input - session not active or invalid');
+    // Use ref to get current value, not stale closure value
+    if (!sessionActiveRef.current || !isSessionValid()) {
+      logger.warn('Cannot handle input - session not active or invalid', {
+        sessionActiveRef: sessionActiveRef.current,
+        isValid: isSessionValid()
+      });
       return;
     }
 
     // Stop listening while processing
+    logger.debug('Stopping speech recognition to process user input');
     shouldBeListeningRef.current = false;
     if (stopSpeechRecognitionRef.current) {
       stopSpeechRecognitionRef.current();
@@ -367,6 +440,8 @@ export default function VoiceConversation({
     try {
       setIsProcessing(true);
       setError(null);
+      
+      logger.info('Starting to process user input with Gemini');
 
       // Add user message to conversation
       const userMessage: ConversationMessage = {
@@ -380,14 +455,20 @@ export default function VoiceConversation({
       let geminiText = '';
       setGeminiResponse('');
 
+      logger.info('Calling sendMessageToGemini', { userTextLength: userText.length });
+
       await sendMessageToGemini(
         userText,
         (chunk) => {
           geminiText += chunk;
           setGeminiResponse(geminiText);
+          logger.debug('Gemini chunk received', { chunkLength: chunk.length, totalLength: geminiText.length });
         },
         async (fullResponse) => {
-          logger.debug('Gemini response complete', { length: fullResponse.length });
+          logger.info('Gemini response complete', { 
+            length: fullResponse.length,
+            text: fullResponse.substring(0, 100) + (fullResponse.length > 100 ? '...' : '')
+          });
 
           // Add agent message to conversation FIRST
           const agentMessage: ConversationMessage = {
@@ -400,28 +481,47 @@ export default function VoiceConversation({
           setIsProcessing(false); // Thinking done, now speaking
 
           // Convert response to audio and play
+          setIsSpeaking(true);
+          
           try {
-            logger.debug('Starting TTS and audio playback for agent response');
-            setIsSpeaking(true);
+            logger.info('Starting TTS and audio playback for agent response', {
+              responseLength: fullResponse.length
+            });
 
-            logger.debug('Calling textToSpeech');
+            logger.info('Calling textToSpeech API');
             const audioBlob = await textToSpeech(fullResponse);
-            logger.debug('textToSpeech completed', { blobSize: audioBlob.size });
+            logger.info('textToSpeech API completed successfully', { 
+              blobSize: audioBlob.size,
+              blobType: audioBlob.type 
+            });
 
-            logger.debug('Calling queueAndPlayAudio');
+            logger.info('Calling queueAndPlayAudio to play response');
             await queueAndPlayAudio(audioBlob);
-            logger.debug('queueAndPlayAudio completed');
+            logger.info('queueAndPlayAudio completed - audio played successfully');
 
-            setIsSpeaking(false);
-
-            // Audio finished - NOW restart listening for user
-            logger.info('Audio finished, restarting speech recognition');
-            shouldBeListeningRef.current = true;
-            startSpeechRecognition();
+            // Audio played successfully
+            setAudioMuted(false);
           } catch (audioErr) {
-            logger.error('Error playing audio', audioErr);
+            logger.error('Error in TTS or audio playback', { 
+              error: audioErr,
+              message: audioErr instanceof Error ? audioErr.message : String(audioErr)
+            });
+            
+            // Notify user that audio is muted but conversation continues
+            setAudioMuted(true);
+            
+            // Wait a bit to simulate audio duration so user can read the subtitle
+            logger.info('Waiting 2 seconds for user to read subtitle');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          } finally {
             setIsSpeaking(false);
-            // Restart listening even if audio fails
+            
+            // Always restart listening after response (audio or text-only)
+            logger.info('Response complete, preparing to restart speech recognition', {
+              shouldBeListening: shouldBeListeningRef.current,
+              sessionActive,
+              isValid: isSessionValid()
+            });
             shouldBeListeningRef.current = true;
             startSpeechRecognition();
           }
@@ -466,6 +566,7 @@ export default function VoiceConversation({
       // Initialize Gemini session
       startGeminiSession({ ageTier, scenario: situation });
       setSessionActive(true);
+      sessionActiveRef.current = true; // Update ref immediately for callbacks
       setIsConnecting(false);
       setRemainingTime(CONFIG.SESSION_MAX_DURATION_SECONDS);
 
@@ -500,9 +601,10 @@ export default function VoiceConversation({
             setIsProcessing(false);
 
             // Convert greeting to audio and play
+            setIsSpeaking(true);
+            
             try {
               logger.debug('Starting TTS and audio playback for greeting');
-              setIsSpeaking(true);
 
               logger.debug('Calling textToSpeech for greeting');
               const audioBlob = await textToSpeech(fullResponse);
@@ -510,18 +612,23 @@ export default function VoiceConversation({
 
               logger.debug('Calling queueAndPlayAudio for greeting');
               await queueAndPlayAudio(audioBlob);
-              logger.debug('queueAndPlayAudio completed for greeting');
+              logger.debug('queueAndPlayAudio completed for greeting - audio played successfully');
 
-              setIsSpeaking(false);
-
-              // Audio has finished playing - NOW start listening for user input
-              logger.info('Greeting audio finished, starting speech recognition');
-              shouldBeListeningRef.current = true;
-              startSpeechRecognition();
+              // Audio played successfully
+              setAudioMuted(false);
             } catch (audioErr) {
               logger.error('Error playing greeting audio', audioErr);
+              
+              // Notify user that audio is muted but conversation continues
+              setAudioMuted(true);
+              
+              // Wait a bit to simulate audio duration so user can read the subtitle
+              await new Promise(resolve => setTimeout(resolve, 2000));
+            } finally {
               setIsSpeaking(false);
-              // Still start listening even if audio fails
+              
+              // Always start listening after greeting (audio or text-only)
+              logger.info('Greeting complete, starting speech recognition');
               shouldBeListeningRef.current = true;
               startSpeechRecognition();
             }
@@ -600,6 +707,7 @@ export default function VoiceConversation({
       // End session
       endGeminiSession();
       setSessionActive(false);
+      sessionActiveRef.current = false; // Update ref immediately
 
       // Assessment will be done in parent component
       if (onComplete) {
@@ -708,10 +816,27 @@ export default function VoiceConversation({
         </div>
       ) : (
         <>
+          {/* Audio muted notification */}
+          {audioMuted && (
+            <div style={{
+              padding: '0.75rem 1rem',
+              background: '#fff3cd',
+              border: '2px solid #ffc107',
+              borderRadius: '0.75rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+              animation: 'slideDown 0.3s ease-out'
+            }}>
+              <p style={{ margin: 0, color: '#856404', fontSize: '0.95rem', fontWeight: '600' }}>
+                🔇 Audio is muted by your browser - Reading Bobby's responses below
+              </p>
+            </div>
+          )}
+
           {/* Main Visual Feedback Area */}
           <div className="conversation-visuals" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
             <h2 className="kavoon" style={{ fontSize: '2rem', color: '#333' }}>
-              {visualState === 'speaking' && "Bobby is speaking..."}
+              {visualState === 'speaking' && (audioMuted ? "Bobby is responding..." : "Bobby is speaking...")}
               {visualState === 'listening' && "Your turn to speak!"}
               {visualState === 'processing' && "Bobby is thinking..."}
               {visualState === 'error' && "Something went wrong"}
@@ -720,21 +845,29 @@ export default function VoiceConversation({
             <VoiceAnimations state={visualState} />
           </div>
 
-          {/* Subtitles (Agent only) */}
-          {settings.subtitles && conversation.length > 0 && (
+          {/* Subtitles (Agent only) - Always show if audio is muted or if subtitles enabled */}
+          {(settings.subtitles || audioMuted) && conversation.length > 0 && (
             <div className="subtitles" role="region" aria-label="Subtitles" style={{
               marginTop: 'auto',
               marginBottom: '2rem',
-              padding: '1rem',
-              background: 'rgba(255,255,255,0.8)',
+              padding: '1.25rem',
+              background: audioMuted ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255,255,255,0.8)',
+              border: audioMuted ? '2px solid #ffc107' : 'none',
               borderRadius: '1rem',
-              maxWidth: '80%'
+              maxWidth: '85%',
+              boxShadow: audioMuted ? '0 4px 12px rgba(0,0,0,0.15)' : 'none'
             }}>
               {conversation
                 .filter((msg) => msg.type === 'agent')
                 .slice(-1) // Show only last message
                 .map((msg, index) => (
-                  <p key={index} className="subtitle-text" style={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                  <p key={index} className="subtitle-text" style={{ 
+                    fontSize: audioMuted ? '1.3rem' : '1.2rem', 
+                    textAlign: 'center',
+                    lineHeight: '1.5',
+                    margin: 0,
+                    color: '#333'
+                  }}>
                     {msg.text}
                   </p>
                 ))}
