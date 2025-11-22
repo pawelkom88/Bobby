@@ -108,6 +108,41 @@ const CONDITION_KEYWORDS = [
   'drowning',
 ];
 
+const FIRE_CONDITION_KEYWORDS = [
+  'trapped',
+  'stuck',
+  'inside',
+  'outside',
+  'out',
+  'safe',
+  'burning',
+  'smoke',
+  'flames',
+  'huge',
+  'big',
+  'small',
+  'spreading',
+  'smell',
+];
+
+const POLICE_CONDITION_KEYWORDS = [
+  'hiding',
+  'hid',
+  'safe',
+  'locked',
+  'door',
+  'window',
+  'scared',
+  'run',
+  'running',
+  'away',
+  'weapon',
+  'gun',
+  'knife',
+  'break',
+  'breaking',
+];
+
 const IRRELEVANT_KEYWORDS = [
   'pizza',
   'order food',
@@ -194,6 +229,13 @@ export async function assessWithGemini(
       .join('\n');
 
     // Create assessment prompt for Gemini
+    let conditionCheck = "4. Did they describe the person's condition?";
+    if (situation === 'fire') {
+      conditionCheck = "4. Did they describe the fire (size, smoke) or say if people are safe/evacuated?";
+    } else if (situation === 'police') {
+      conditionCheck = "4. Did they describe the danger (intruder, weapon) or say if they are safe/hiding?";
+    }
+
     const assessmentPrompt = `Analyze this emergency call training conversation between a child and a dispatcher.
 
 Age Tier: ${tier === 1 ? '4-6' : tier === 2 ? '7-10' : '11-13'}
@@ -217,7 +259,7 @@ Consider:
 1. Did the child clearly explain the emergency?
 2. Did they provide location information?
 3. Did they identify who needs help?
-4. Did they describe the person's condition?
+${conditionCheck}
 5. Did they stay engaged and calm?
 6. Was the information relevant and on-topic?
 
@@ -357,11 +399,29 @@ export function assessConversation(
   }
 
   // Condition / status
-  const conditionMatch = containsAny(joined, CONDITION_KEYWORDS);
-  if (conditionMatch) {
-    positives.push('You explained how the person is doing.');
+  let conditionMatch = false;
+  if (scenario === 'fire') {
+    conditionMatch = containsAny(joined, [...CONDITION_KEYWORDS, ...FIRE_CONDITION_KEYWORDS]);
+    if (conditionMatch) {
+      positives.push('You shared details about the fire and safety.');
+    } else {
+      improvements.push('Tell Bobby if everyone is safe or out of the building.');
+    }
+  } else if (scenario === 'police') {
+    conditionMatch = containsAny(joined, [...CONDITION_KEYWORDS, ...POLICE_CONDITION_KEYWORDS]);
+    if (conditionMatch) {
+      positives.push('You shared important safety details.');
+    } else {
+      improvements.push('Tell Bobby if you are safe or hiding.');
+    }
   } else {
-    improvements.push('Share if they are hurt, breathing, or awake.');
+    // Medical / Default
+    conditionMatch = containsAny(joined, CONDITION_KEYWORDS);
+    if (conditionMatch) {
+      positives.push('You explained how the person is doing.');
+    } else {
+      improvements.push('Share if they are hurt, breathing, or awake.');
+    }
   }
 
   // Cooperation (turns & duration)
