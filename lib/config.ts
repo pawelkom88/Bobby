@@ -12,9 +12,9 @@ export const CONFIG = {
   GEMINI_MODEL: 'gemini-2.5-flash', // Model to use
 
   // LemonFox TTS Configuration
-  LEMONFOX_DEFAULT_VOICE: 'emma', // British female voice
+  LEMONFOX_DEFAULT_VOICE: 'george', // British male voice
   LEMONFOX_RESPONSE_FORMAT: 'mp3',
-  LEMONFOX_SPEED: 1.0, // Range: 0.5 - 4.0
+  LEMONFOX_SPEED: 1.2, // Range: 0.5 - 4.0
   LEMONFOX_LANGUAGE: 'en-gb', // British English
 
   // Rate Limiting

@@ -25,6 +25,7 @@ import { useSound } from './SoundProvider';
 import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 import Image from 'next/image';
+import VoiceAnimations from './VoiceAnimations';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -36,6 +37,7 @@ interface VoiceConversationProps {
 
 /**
  * Voice conversation component with Gemini AI and LemonFox TTS
+ * Refactored for Hands-Free Mode with Visual Feedback
  */
 export default function VoiceConversation({
   ageTier = 1,
@@ -46,12 +48,16 @@ export default function VoiceConversation({
 }: VoiceConversationProps) {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  
+  // State Machine
   const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false); // AI Speaking
+  
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [sessionActive, setSessionActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [remainingTime, setRemainingTime] = useState(CONFIG.SESSION_MAX_DURATION_SECONDS);
   const [geminiResponse, setGeminiResponse] = useState('');
@@ -59,12 +65,19 @@ export default function VoiceConversation({
   const stopSpeechRecognitionRef = useRef<(() => void) | null>(null);
   const shouldBeListeningRef = useRef(false);
   const stopConnectingSoundRef = useRef<(() => void) | null>(null);
-  const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasAutoStartedRef = useRef(false);
   const abortLoopCounterRef = useRef(0);
 
   const settings = getSettings();
   const { soundEnabled } = useSound();
+
+  // Derived visual state
+  const visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle' = 
+    error ? 'error' :
+    isProcessing ? 'processing' :
+    isSpeaking ? 'speaking' :
+    isListening ? 'listening' :
+    'idle';
 
   // Check microphone permission on mount
   useEffect(() => {
@@ -180,39 +193,43 @@ export default function VoiceConversation({
       };
 
       recognition.onerror = (event: any) => {
-        logger.error('Speech recognition error', event.error);
-        
         // "no-speech" error is common when waiting for user input
         // Just restart listening instead of showing error
         if (event.error === 'no-speech') {
           logger.info('No speech detected, restarting listening...');
           
-          // Show gentle reminder to user
-          setCurrentTranscript('💭 (Say something to help Bobby...)');
-          
-          // Restart after a brief delay
+          // Restart after a brief delay if we should still be listening
           setTimeout(() => {
-            if (isSessionValid() && shouldBeListeningRef.current && !isProcessing) {
+            if (isSessionValid() && shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
               startSpeechRecognition();
-              setCurrentTranscript(''); // Clear reminder when listening restarts
             }
-          }, 500);
+          }, 300);
         } else if (event.error === 'aborted') {
-          // Aborted can happen if we stop it, or if the system stops it.
-          // If we didn't stop it (shouldBeListening is true), it might be a system loop.
           if (shouldBeListeningRef.current) {
              abortLoopCounterRef.current += 1;
-             logger.warn(`Speech recognition aborted (count: ${abortLoopCounterRef.current})`);
-             
-             if (abortLoopCounterRef.current > 5) {
-                logger.error('Too many aborts, stopping auto-restart');
-                shouldBeListeningRef.current = false;
-                // Ensure we don't restart in onend by clearing any potentially queued timeouts or just relying on the ref
-                setError('Speech recognition connection unstable. Please reload.');
+             // Only retry a few times rapidly, otherwise wait
+             if (abortLoopCounterRef.current < 5) {
+                 setTimeout(() => {
+                    if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                        startSpeechRecognition();
+                    }
+                 }, 500);
+             } else {
+                 logger.warn('Too many aborts, pausing restart');
              }
           }
         } else {
-          setError(`Speech recognition error: ${event.error}`);
+          logger.error('Speech recognition error', event.error);
+          // Don't show error to user for minor glitches, try to recover
+          if (event.error !== 'not-allowed') {
+             setTimeout(() => {
+                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
+                    startSpeechRecognition();
+                }
+             }, 1000);
+          } else {
+             setError(`Speech recognition error: ${event.error}`);
+          }
         }
       };
 
@@ -222,11 +239,10 @@ export default function VoiceConversation({
         
         // Auto-restart if we should be listening (and not processing/playing)
         // This handles "silence timeouts" or accidental stops where no final result was produced
-        if (shouldBeListeningRef.current && !isProcessing && !isAudioPlaying()) {
+        if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
             logger.info('Auto-restarting speech recognition after silence/end');
-            // Small delay to prevent rapid loops
             setTimeout(() => {
-                if (shouldBeListeningRef.current && !isProcessing && !isAudioPlaying()) {
+                if (shouldBeListeningRef.current && !isProcessing && !isSpeaking) {
                     startSpeechRecognition();
                 }
             }, 300);
@@ -253,19 +269,6 @@ export default function VoiceConversation({
     shouldBeListeningRef.current = false;
     if (stopSpeechRecognitionRef.current) {
       stopSpeechRecognitionRef.current();
-    }
-
-    // Ensure we don't have multiple instances running or starting too fast
-    if (isListening) {
-        // If already listening, just return or stop and restart? 
-        // For safety, let's stop existing one.
-        try {
-            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                // Try to find if there's a way to check existing instances? No.
-                // Rely on stopSpeechRecognitionRef
-            }
-        } catch (e) { /* ignore */ }
     }
 
     try {
@@ -301,17 +304,22 @@ export default function VoiceConversation({
             };
             setConversation((prev) => [...prev, agentMessage]);
             setGeminiResponse('');
+            setIsProcessing(false); // Thinking done, now speaking
 
             // Convert response to audio and play
             try {
+              setIsSpeaking(true);
               const audioBlob = await textToSpeech(fullResponse);
               await queueAndPlayAudio(audioBlob);
+              setIsSpeaking(false);
+              
               // Audio finished - NOW restart listening for user
               logger.info('Audio finished, restarting speech recognition');
               shouldBeListeningRef.current = true;
               startSpeechRecognition();
             } catch (audioErr) {
               logger.error('Error playing audio', audioErr);
+              setIsSpeaking(false);
               // Restart listening even if audio fails
               shouldBeListeningRef.current = true;
               startSpeechRecognition();
@@ -321,15 +329,20 @@ export default function VoiceConversation({
           logger.error('Gemini error', { error });
           setError(error);
           setGeminiResponse('');
+          setIsProcessing(false);
+          // Try to recover listening
+          shouldBeListeningRef.current = true;
+          startSpeechRecognition();
         }
       );
-
-      setIsProcessing(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       logger.error('Error handling user input', { message });
       setError(message);
       setIsProcessing(false);
+      // Try to recover
+      shouldBeListeningRef.current = true;
+      startSpeechRecognition();
     }
   }
 
@@ -351,7 +364,6 @@ export default function VoiceConversation({
 
       // Initialize Gemini session
       startGeminiSession({ ageTier, scenario: situation });
-      shouldBeListeningRef.current = true;
       setSessionActive(true);
       setIsConnecting(false);
       setRemainingTime(CONFIG.SESSION_MAX_DURATION_SECONDS);
@@ -365,7 +377,7 @@ export default function VoiceConversation({
       // Get initial greeting from dispatcher
       try {
         let greetingResponse = '';
-        setIsProcessing(true);
+        setIsProcessing(true); // Showing thinking initially
 
         await sendMessageToGemini(
           '', // Empty message to trigger greeting
@@ -388,24 +400,28 @@ export default function VoiceConversation({
 
             // Convert greeting to audio and play
             try {
+              setIsSpeaking(true);
               const audioBlob = await textToSpeech(fullResponse);
               await queueAndPlayAudio(audioBlob);
+              setIsSpeaking(false);
               
-            // Audio has finished playing - NOW start listening for user input
-            logger.info('Greeting audio finished, starting speech recognition');
-            shouldBeListeningRef.current = true;
-            startSpeechRecognition();
-          } catch (audioErr) {
-            logger.error('Error playing greeting audio', audioErr);
-            // Still start listening even if audio fails
-            shouldBeListeningRef.current = true;
-            startSpeechRecognition();
-          }
+              // Audio has finished playing - NOW start listening for user input
+              logger.info('Greeting audio finished, starting speech recognition');
+              shouldBeListeningRef.current = true;
+              startSpeechRecognition();
+            } catch (audioErr) {
+              logger.error('Error playing greeting audio', audioErr);
+              setIsSpeaking(false);
+              // Still start listening even if audio fails
+              shouldBeListeningRef.current = true;
+              startSpeechRecognition();
+            }
           },
           (error) => {
             logger.error('Greeting error', { error });
             setIsProcessing(false);
             // Start listening anyway
+            shouldBeListeningRef.current = true;
             startSpeechRecognition();
           }
         );
@@ -414,6 +430,7 @@ export default function VoiceConversation({
         logger.error('Error getting greeting', { message });
         setIsProcessing(false);
         // Start listening anyway
+        shouldBeListeningRef.current = true;
         startSpeechRecognition();
       }
 
@@ -448,6 +465,7 @@ export default function VoiceConversation({
     try {
       stopConversation();
       stopAllAudio();
+      setIsSpeaking(false);
 
       // Play end-of-conversation sound
       void playEndConversationSound(soundEnabled);
@@ -554,86 +572,82 @@ export default function VoiceConversation({
         )}
       </div>
 
-      <h1 className="conversation-subtitle">Just a moment ...</h1>
-      <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
-      <br />
-      <Image src="/bobby-connecting.png" alt="Bobby is getting ready to chat" width={200} height={250} />
-      <br />
-
-      {!sessionActive && (
-        <div className="conversation-start-section">
-          {isConnecting ? (
-            <LoadingSpinner />
-          ) : (
-            <CartoonButton
-              onClick={startConversation}
-              disabled={!permissionGranted || isConnecting}
-              ariaLabel="Start conversation with Bobby"
-            >
-              Start Conversation
-            </CartoonButton>
-          )}
-        </div>
-      )}
-
-      {sessionActive && (
+      {!sessionActive ? (
         <>
-          <div className="conversation-status" aria-live="polite">
-            {isProcessing ? (
-              <LoadingSpinner size="small" message="Bobby is thinking..." />
-            ) : isListening ? (
-              <span className="listening-indicator">🎤 Listening...</span>
+          <h1 className="conversation-subtitle">Just a moment ...</h1>
+          <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
+          <br />
+          <Image src="/bobby-connecting.png" alt="Bobby is getting ready to chat" width={200} height={250} />
+          <br />
+
+          <div className="conversation-start-section">
+            {isConnecting ? (
+              <LoadingSpinner />
             ) : (
-              <span className="not-listening">Ready to listen</span>
+              <CartoonButton
+                onClick={startConversation}
+                disabled={!permissionGranted || isConnecting}
+                ariaLabel="Start conversation with Bobby"
+              >
+                Start Conversation
+              </CartoonButton>
             )}
           </div>
-
-          <div
-            className="conversation-messages"
-            role="log"
-            aria-live="polite"
-            aria-label="Conversation messages"
-          >
-            {conversation.map((message, index) => (
-              <div key={index} className={`conversation-message ${message.type}`}>
-                <div className="message-text">{message.text}</div>
-              </div>
-            ))}
-            {currentTranscript && (
-              <div className="conversation-message user interim" aria-live="polite">
-                <div className="message-text">{currentTranscript}</div>
-              </div>
-            )}
-            {geminiResponse && (
-              <div className="conversation-message agent streaming">
-                <div className="message-text">{geminiResponse}</div>
-              </div>
-            )}
+        </>
+      ) : (
+        <>
+          {/* Main Visual Feedback Area */}
+          <div className="conversation-visuals" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+             <h2 className="kavoon" style={{fontSize: '2rem', color: '#333'}}>
+                {visualState === 'speaking' && "Bobby is speaking..."}
+                {visualState === 'listening' && "Bobby is listening..."}
+                {visualState === 'processing' && "Bobby is thinking..."}
+                {visualState === 'error' && "Something went wrong"}
+             </h2>
+             
+             <VoiceAnimations state={visualState} />
+             
+             {/* Current user transcript (subtitle) */}
+             {currentTranscript && (
+                <div className="live-transcript" style={{
+                    minHeight: '30px',
+                    fontSize: '1.2rem',
+                    color: '#666',
+                    fontStyle: 'italic'
+                }}>
+                    "{currentTranscript}"
+                </div>
+             )}
           </div>
 
+          {/* Subtitles (Agent only) */}
           {settings.subtitles && conversation.length > 0 && (
-            <div className="subtitles" role="region" aria-label="Subtitles">
+            <div className="subtitles" role="region" aria-label="Subtitles" style={{
+                marginTop: 'auto',
+                marginBottom: '2rem',
+                padding: '1rem',
+                background: 'rgba(255,255,255,0.8)',
+                borderRadius: '1rem',
+                maxWidth: '80%'
+            }}>
               {conversation
                 .filter((msg) => msg.type === 'agent')
+                .slice(-1) // Show only last message
                 .map((msg, index) => (
-                  <p key={index} className="subtitle-text">
+                  <p key={index} className="subtitle-text" style={{ fontSize: '1.2rem', textAlign: 'center' }}>
                     {msg.text}
                   </p>
                 ))}
             </div>
           )}
 
-          <div className="conversation-controls">
-            {isListening ? (
-              <CartoonButton onClick={stopConversation} ariaLabel="Stop listening">
-                Stop Listening
-              </CartoonButton>
-            ) : (
-              <CartoonButton onClick={startSpeechRecognition} ariaLabel="Start listening">
-                Start Listening
-              </CartoonButton>
-            )}
-            <CartoonButton onClick={() => void endConversation()} ariaLabel="End conversation">
+          {/* Controls (Only End Call now) */}
+          <div className="conversation-controls" style={{ marginTop: 'auto' }}>
+            <CartoonButton 
+                onClick={() => void endConversation()} 
+                ariaLabel="End conversation"
+                className="cartoon-btn-danger"
+            >
               End Call
             </CartoonButton>
           </div>
