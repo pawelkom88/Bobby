@@ -5,9 +5,10 @@ import { ViewTransition } from 'react';
 import VoiceConversation from '@/components/VoiceConversation';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { assessWithGemini } from '@/lib/assessment';
-import { logger } from '@/lib/logger';
-import type { ConversationMessage, AgeTier, Service } from '@/types';
+import { getSelectedService, getSelectedAgeTier } from '@/lib/storage';
+import {AgeTier, ConversationMessage, Service} from "@/types";
+import {assessWithGemini} from "@/lib/assessment";
+import {logger} from "@/lib/logger";
 
 // Default values for ageTier and situation
 const DEFAULT_AGE_TIER: AgeTier = 1;
@@ -15,6 +16,10 @@ const DEFAULT_SITUATION: Service = 'fire';
 
 export default function ConversationPage() {
   const [isComplete, setIsComplete] = useState(false);
+
+  // Get selected values from storage
+  const selectedAgeTier = getSelectedAgeTier() ?? DEFAULT_AGE_TIER;
+  const selectedSituation = getSelectedService() ?? DEFAULT_SITUATION;
 
   // Check if user is trying to return to a completed conversation
   useEffect(() => {
@@ -53,8 +58,8 @@ export default function ConversationPage() {
     try {
       // Assess the conversation using Gemini
       const assessment = await assessWithGemini(conversation, {
-        ageTier: DEFAULT_AGE_TIER,
-        situation: DEFAULT_SITUATION,
+        ageTier: selectedAgeTier,
+        situation: selectedSituation,
       });
 
       // Store assessment in sessionStorage for the completion page
@@ -92,8 +97,8 @@ export default function ConversationPage() {
       <ErrorBoundary>
         <main className="app-page" role="main">
           <VoiceConversation
-            ageTier={DEFAULT_AGE_TIER}
-            situation={DEFAULT_SITUATION}
+            ageTier={selectedAgeTier}
+            situation={selectedSituation}
             onComplete={handleConversationComplete}
             onBack={handleBack}
             autoStart={true}

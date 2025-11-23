@@ -18,7 +18,7 @@ import { useDeepgram } from '@/context/DeepgramContextProvider';
 import { useMicrophone } from '@/context/MicrophoneContextProvider';
 import { sendMicToSocket, sendSocketMessage, DeepgramAgentConfig } from '@/utils/deepgramUtils';
 import { createAudioBuffer, playAudioBuffer } from '@/utils/audioUtils';
-import { generateSystemPrompt } from '@/lib/prompts';
+import { getAmbulancePrompt, getFirePrompt, getPolicePrompt } from '@/lib/prompts';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -50,7 +50,7 @@ export default function VoiceConversation({
   const [conversationEnded, setConversationEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(CONFIG.SESSION_MAX_DURATION_SECONDS);
+  const [remainingTime, setRemainingTime] = useState(CONFIG.MAX_CONVERSATION_TIME_MINUTES * 60);
 
   // Deepgram & Microphone Hooks
   const { socket, socketState, connectToDeepgram, disconnectFromDeepgram } = useDeepgram();
@@ -217,6 +217,21 @@ export default function VoiceConversation({
                 timestamp: new Date().toISOString(),
               };
               setConversation(prev => [...prev, newMsg]);
+              
+              // Check if agent is ending the conversation (farewell phrases)
+              if (msg.role === 'assistant') {
+                const farewellPhrases = ['bye', 'take care', 'stay safe', 'bye for now', 'see you later', 'goodbye'];
+                const isFarewell = farewellPhrases.some(phrase => 
+                  msg.content.toLowerCase().includes(phrase.toLowerCase())
+                );
+                
+                if (isFarewell) {
+                  // End conversation after agent finishes speaking
+                  setTimeout(() => {
+                    endConversation();
+                  }, 3000); // 3 second delay to allow farewell message to be spoken
+                }
+              }
               break;
             
             case 'EndOfThought':
@@ -284,8 +299,30 @@ export default function VoiceConversation({
 
           // Send Configuration
           console.log('VoiceConversation: Generating system prompt...');
-          const instructions = generateSystemPrompt(ageTier, situation);
+          const ageTierLabel = CONFIG.AGE_TIER_TO_PROMPT[ageTier];
+          
+          // Build conversation history context
+          const conversationContext = conversation.length > 0 
+            ? conversation.map(msg => ({
+                type: "History" as const,
+                role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
+                content: msg.text
+              }))
+            : [];
+          
+          const instructions = situation === 'ambulance' 
+            ? getAmbulancePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES)
+            : situation === 'fire'
+            ? getFirePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES)
+            : getPolicePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES);
           console.log('VoiceConversation: System prompt generated, length:', instructions.length);
+          
+          // Dynamic greeting based on scenario
+          const greeting = situation === 'ambulance' 
+            ? "Ambulance service. Is the patient breathing?"
+            : situation === 'fire'
+            ? "Fire and Rescue. What is the problem?"
+            : "Police emergency.";
           
           const config: DeepgramAgentConfig = {
               type: "Settings",
@@ -302,6 +339,9 @@ export default function VoiceConversation({
               },
               agent: {
                   language: "en",
+                  context: {
+                      messages: conversationContext
+                  },
                   listen: {
                       provider: {
                           type: "deepgram",
@@ -318,9 +358,10 @@ export default function VoiceConversation({
                   speak: {
                       provider: {
                           type: "deepgram",
-                          model: "aura-2-draco-en"
+                          model: "aura-helios-en"
                       }
-                  }
+                  },
+                  greeting: greeting
               }
           };
 

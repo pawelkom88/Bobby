@@ -60,19 +60,38 @@ export interface DeepgramAgentConfig {
     };
   };
   agent: {
+    language: string;
+    context?: {
+      messages: Array<{
+        type: string;
+        role: 'user' | 'assistant';
+        content: string;
+      }>;
+    };
     listen: {
-      model: string;
+      provider: {
+        type: string;
+        model: string;
+      };
     };
     think: {
       provider: {
         type: string;
+        model: string;
+        temperature?: number;
       };
-      model: string;
-      instructions: string;
+      prompt: string;
+      context_length?: {
+        max?: number;
+      };
     };
     speak: {
-      model: string;
+      provider: {
+        type: string;
+        model: string;
+      };
     };
+    greeting?: string;
   };
 }
 

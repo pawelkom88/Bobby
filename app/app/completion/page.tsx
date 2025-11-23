@@ -6,12 +6,17 @@ import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
+import { getSelectedService, getSelectedAgeTier } from '@/lib/storage';
 
 const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
 export default function CompletionPage() {
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
+
+  // Get selected values from storage
+  const selectedAgeTier = getSelectedAgeTier() ?? DEFAULT_AGE_TIER;
+  const selectedSituation = getSelectedService() ?? DEFAULT_SITUATION;
 
   useEffect(() => {
     // Retrieve assessment from sessionStorage
@@ -56,8 +61,8 @@ export default function CompletionPage() {
       <ErrorBoundary>
         <main className="app-page" role="main">
           <CompletionScreen
-            service={DEFAULT_SITUATION}
-            ageTier={DEFAULT_AGE_TIER}
+            service={selectedSituation}
+            ageTier={selectedAgeTier}
             performance={performance}
             onContinue={handleContinue}
             onViewAchievements={handleContinue}

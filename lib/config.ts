@@ -20,9 +20,9 @@ export const CONFIG = {
 
   // Age Tier to Prompt Mapping
   AGE_TIER_TO_PROMPT: {
-    1: '5-7',
-    2: '8-10',
-    3: '11-12',
+    1: '5–7 years old',
+    2: '8–10 years old',
+    3: '11–12 years old',
   } as const,
 };
 
