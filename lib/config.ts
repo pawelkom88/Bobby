@@ -6,6 +6,9 @@ export const CONFIG = {
   // Session Duration
   SESSION_MAX_DURATION_SECONDS: 180, // 3 minutes
 
+  // Conversation Duration for Emergency Scenarios
+  MAX_CONVERSATION_TIME_MINUTES: 5,
+
   // Deepgram Configuration
   DEEPGRAM_API_ENDPOINT: '/api/authenticate',
   
@@ -17,9 +20,9 @@ export const CONFIG = {
 
   // Age Tier to Prompt Mapping
   AGE_TIER_TO_PROMPT: {
-    1: '4-6',
-    2: '7-10',
-    3: '11-13',
+    1: '5-7',
+    2: '8-10',
+    3: '11-12',
   } as const,
 };
 

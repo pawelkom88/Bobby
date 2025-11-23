@@ -31,10 +31,10 @@ export const AGE_TIERS = {
 /**
  * Get age tier by ID
  */
-export function getAgeTier(tierId: AgeTier): AgeTierConfig {
-  const tiers = Object.values(AGE_TIERS);
-  return tiers.find(tier => tier.id === tierId) || AGE_TIERS.TIER_1;
-}
+// export function getAgeTier(tierId: AgeTier): AgeTierConfig {
+//   const tiers = Object.values(AGE_TIERS);
+//   return tiers.find(tier => tier.id === tierId) || AGE_TIERS.TIER_1;
+// }
 
 /**
  * Get all age tiers
@@ -46,70 +46,70 @@ export function getAllAgeTiers(): AgeTierConfig[] {
 /**
  * Get language complexity settings for a tier
  */
-export function getLanguageSettings(tierId: AgeTier) {
-  const tier = getAgeTier(tierId);
-  
-  switch (tier.id) {
-    case 1:
-      return {
-        useSimpleWords: true,
-        shortSentences: true,
-        usePictograms: true,
-        repetition: true,
-        encouragementFrequency: 'high' as const,
-      };
-    case 2:
-      return {
-        useSimpleWords: true,
-        shortSentences: false,
-        usePictograms: true,
-        repetition: false,
-        encouragementFrequency: 'medium' as const,
-      };
-    case 3:
-      return {
-        useSimpleWords: false,
-        shortSentences: false,
-        usePictograms: false,
-        repetition: false,
-        encouragementFrequency: 'low' as const,
-        introduce111: true,
-      };
-    default:
-      return getLanguageSettings(1);
-  }
-}
+// export function getLanguageSettings(tierId: AgeTier) {
+//   const tier = getAgeTier(tierId);
+//
+//   switch (tier.id) {
+//     case 1:
+//       return {
+//         useSimpleWords: true,
+//         shortSentences: true,
+//         usePictograms: true,
+//         repetition: true,
+//         encouragementFrequency: 'high' as const,
+//       };
+//     case 2:
+//       return {
+//         useSimpleWords: true,
+//         shortSentences: false,
+//         usePictograms: true,
+//         repetition: false,
+//         encouragementFrequency: 'medium' as const,
+//       };
+//     case 3:
+//       return {
+//         useSimpleWords: false,
+//         shortSentences: false,
+//         usePictograms: false,
+//         repetition: false,
+//         encouragementFrequency: 'low' as const,
+//         introduce111: true,
+//       };
+//     default:
+//       return getLanguageSettings(1);
+//   }
+// }
 
 /**
  * Get scenario variations for a tier
  */
-export function getScenarioSettings(tierId: AgeTier) {
-  const tier = getAgeTier(tierId);
-  
-  switch (tier.id) {
-    case 1:
-      return {
-        duration: 'short' as const,
-        complexity: 'low' as const,
-        visualAids: true,
-        stepByStep: true,
-      };
-    case 2:
-      return {
-        duration: 'medium' as const,
-        complexity: 'medium' as const,
-        visualAids: true,
-        stepByStep: false,
-      };
-    case 3:
-      return {
-        duration: 'long' as const,
-        complexity: 'high' as const,
-        visualAids: false,
-        stepByStep: false,
-      };
-    default:
-      return getScenarioSettings(1);
-  }
-}
+// export function getScenarioSettings(tierId: AgeTier) {
+//   const tier = getAgeTier(tierId);
+//
+//   switch (tier.id) {
+//     case 1:
+//       return {
+//         duration: 'short' as const,
+//         complexity: 'low' as const,
+//         visualAids: true,
+//         stepByStep: true,
+//       };
+//     case 2:
+//       return {
+//         duration: 'medium' as const,
+//         complexity: 'medium' as const,
+//         visualAids: true,
+//         stepByStep: false,
+//       };
+//     case 3:
+//       return {
+//         duration: 'long' as const,
+//         complexity: 'high' as const,
+//         visualAids: false,
+//         stepByStep: false,
+//       };
+//     default:
+//       return getScenarioSettings(1);
+//   }
+// }
 
