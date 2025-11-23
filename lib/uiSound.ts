@@ -16,7 +16,8 @@ function getAudioContext(): AudioContext | null {
   }
   try {
     if (!sharedAudioContext) {
-      const Ctor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
+      const Ctor = (window.AudioContext ||
+        (window as any).webkitAudioContext) as typeof AudioContext | undefined;
       if (!Ctor) {
         return null;
       }
@@ -130,18 +131,25 @@ export function startConnectingSound(enabled: boolean): () => void {
     }
     const url = candidates[idx++];
     // Quick type-based skip if clearly unsupported
-    const type = url.endsWith('.aac') ? 'audio/aac' : url.endsWith('.mp3') ? 'audio/mpeg' : '';
+    const type = url.endsWith('.aac')
+      ? 'audio/aac'
+      : url.endsWith('.mp3')
+        ? 'audio/mpeg'
+        : '';
     if (type && audio.canPlayType && !audio.canPlayType(type)) {
       tryNext();
       return;
     }
     audio.src = url;
     // Start playing; may fail due to permissions or unsupported codec
-    audio.play().then(() => {
-      connectingAudioEl = audio;
-    }).catch(() => {
-      tryNext();
-    });
+    audio
+      .play()
+      .then(() => {
+        connectingAudioEl = audio;
+      })
+      .catch(() => {
+        tryNext();
+      });
   };
 
   // Web Audio loop fallback
@@ -160,15 +168,15 @@ export function startConnectingSound(enabled: boolean): () => void {
         const now = ac.currentTime;
         const osc = ac.createOscillator();
         const gain = ac.createGain();
-  
+
         osc.type = 'sine';
         osc.frequency.setValueAtTime(650, now);
         osc.frequency.exponentialRampToValueAtTime(520, now + 0.12);
-  
+
         gain.gain.setValueAtTime(0.0001, now);
         gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-  
+
         osc.connect(gain);
         gain.connect(ac.destination);
         osc.start(now);
@@ -210,7 +218,9 @@ export function startConnectingSound(enabled: boolean): () => void {
  * If NEXT_PUBLIC_UI_SOUND_END_URL is provided, it will be used.
  * Otherwise, fall back to a short descending blip.
  */
-export async function playEndConversationSound(enabled: boolean): Promise<void> {
+export async function playEndConversationSound(
+  enabled: boolean
+): Promise<void> {
   if (!enabled || typeof window === 'undefined') {
     return;
   }
@@ -268,5 +278,3 @@ export async function playEndConversationSound(enabled: boolean): Promise<void> 
     // ignore
   }
 }
-
-

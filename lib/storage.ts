@@ -8,8 +8,23 @@ import {
   getBadgeForLevel,
   getBadgeForScore,
 } from './gamification';
-import { validateAgeTier, validateService, validateXP, validateTimestamp } from './validation';
-import type { UserData, UserSettings, Conversation, Service, AgeTier, Badge, LevelUpResult, JourneyState } from '@/types';
+import {
+  validateAgeTier,
+  validateService,
+  validateXP,
+  validateTimestamp,
+} from './validation';
+import type {
+  UserData,
+  UserSettings,
+  Conversation,
+  Service,
+  AgeTier,
+  Badge,
+  LevelUpResult,
+  JourneyState,
+} from '@/types';
+import {logger} from "@/lib/logger";
 
 const STORAGE_KEY = 'bobby-app-data';
 
@@ -41,7 +56,7 @@ export function getUserData(): UserData {
   if (typeof window === 'undefined') {
     return getDefaultData();
   }
-  
+
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
@@ -49,7 +64,7 @@ export function getUserData(): UserData {
     }
     return JSON.parse(data) as UserData;
   } catch (error) {
-    console.error('Error reading from localStorage:', error);
+    logger.error('Error reading from localStorage:', error);
     return getDefaultData();
   }
 }
@@ -61,11 +76,11 @@ function saveUserData(data: UserData): void {
   if (typeof window === 'undefined') {
     return;
   }
-  
+
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
-    console.error('Error saving to localStorage:', error);
+    logger.error('Error saving to localStorage:', error);
   }
 }
 
@@ -82,19 +97,19 @@ export function saveConversation(
 ): void {
   // Validate inputs
   if (!validateTimestamp(timestamp)) {
-    console.error('Invalid timestamp:', timestamp);
+    logger.error('Invalid timestamp:', timestamp);
     return;
   }
   if (!validateService(service)) {
-    console.error('Invalid service:', service);
+    logger.error('Invalid service:', service);
     return;
   }
   if (!validateAgeTier(ageTier)) {
-    console.error('Invalid age tier:', ageTier);
+    logger.error('Invalid age tier:', ageTier);
     return;
   }
   if (!validateXP(xpEarned)) {
-    console.error('Invalid XP amount:', xpEarned);
+    logger.error('Invalid XP amount:', xpEarned);
     return;
   }
 
@@ -118,7 +133,7 @@ export function saveConversation(
 export function addXP(amount: number): LevelUpResult {
   // Validate XP amount
   if (!validateXP(amount)) {
-    console.error('Invalid XP amount:', amount);
+    logger.error('Invalid XP amount:', amount);
     return {
       newLevel: getLevel(),
       leveledUp: false,
@@ -133,7 +148,7 @@ export function addXP(amount: number): LevelUpResult {
   data.level = calculateLevel(data.totalXP);
   const newLevel = data.level;
   const leveledUp = newLevel > oldLevel;
-  
+
   let badgeAwarded: Badge | null = null;
   if (leveledUp) {
     const badge = getBadgeForLevel(newLevel);
@@ -149,9 +164,9 @@ export function addXP(amount: number): LevelUpResult {
       }
     }
   }
-  
+
   saveUserData(data);
-  
+
   return {
     newLevel,
     leveledUp,
@@ -232,14 +247,14 @@ export function resetProgress(): void {
   if (typeof window === 'undefined') {
     return;
   }
-  
+
   try {
     const data = getDefaultData();
     // Preserve settings if desired, or reset everything
     // For now, reset everything
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
-    console.error('Error resetting progress:', error);
+    logger.error('Error resetting progress:', error);
   }
 }
 
@@ -331,7 +346,7 @@ export function awardScoreBadge(score: number): Badge | null {
   }
 
   const data = getUserData();
-  
+
   // Check if badge already exists
   const existingBadge = data.badges.find(b => b.id === badge.id);
   if (existingBadge) {
@@ -345,7 +360,6 @@ export function awardScoreBadge(score: number): Badge | null {
   };
   data.badges.push(badgeWithTimestamp);
   saveUserData(data);
-  
+
   return badgeWithTimestamp;
 }
-

@@ -31,7 +31,7 @@ export default function SoundToggleBottomNav() {
 
     setTimeout(() => {
       toggleSound();
-      
+
       setTimeout(() => {
         setIsAnimating(false);
       }, 400);
@@ -58,4 +58,3 @@ export default function SoundToggleBottomNav() {
     </button>
   );
 }
-

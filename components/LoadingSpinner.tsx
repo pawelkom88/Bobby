@@ -1,5 +1,3 @@
 export default function LoadingSpinner() {
-  return (
-    <div className="rainbow-marker-loader"></div>
-  );
+  return <div className="rainbow-marker-loader"></div>;
 }

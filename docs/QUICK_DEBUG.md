@@ -80,8 +80,8 @@ fetch('/api/get-signed-url', {
   headers: { 'Content-Type': 'application/json', 'Origin': 'http://localhost:3000' }
 })
   .then(r => r.json())
-  .then(d => console.log(d))
-  .catch(e => console.error(e))
+  .then(d => logger.log(d))
+  .catch(e => logger.error(e))
 ```
 
 **Expected response**: `{ signed_url: "wss://..." }`

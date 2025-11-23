@@ -19,13 +19,16 @@ function formatTime(seconds: number): string {
 /**
  * Minimized timer that expands on hover/click to show remaining time
  */
-export default function TimerDisplay({ remainingSeconds, onExpire }: TimerDisplayProps) {
+export default function TimerDisplay({
+  remainingSeconds,
+  onExpire,
+}: TimerDisplayProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const formattedTime = formatTime(remainingSeconds);
 
   return (
-    <div 
+    <div
       className="timer-container"
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
@@ -33,7 +36,7 @@ export default function TimerDisplay({ remainingSeconds, onExpire }: TimerDispla
       role="button"
       tabIndex={0}
       aria-label={`Time remaining: ${formattedTime}`}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           setIsExpanded(!isExpanded);
@@ -41,9 +44,7 @@ export default function TimerDisplay({ remainingSeconds, onExpire }: TimerDispla
       }}
     >
       {/* Clock Icon - Always Visible */}
-      <div className="timer-icon">
-        ⏱️
-      </div>
+      <div className="timer-icon">⏱️</div>
 
       {/* Expanded Time Display - Shows on Hover/Click */}
       {isExpanded && (
@@ -54,4 +55,3 @@ export default function TimerDisplay({ remainingSeconds, onExpire }: TimerDispla
     </div>
   );
 }
-

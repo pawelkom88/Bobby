@@ -1,6 +1,7 @@
 /**
  * Retry utility for handling transient failures
  */
+import {logger} from "@/lib/logger";
 
 export interface RetryOptions {
   maxRetries?: number;
@@ -33,9 +34,10 @@ export async function retry<T>(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt < config.maxRetries) {
-        const delayMs = config.delayMs * Math.pow(config.backoffMultiplier, attempt);
+        const delayMs =
+          config.delayMs * Math.pow(config.backoffMultiplier, attempt);
         config.onRetry?.(attempt + 1, lastError);
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        await new Promise(resolve => setTimeout(resolve, delayMs));
       }
     }
   }
@@ -54,8 +56,7 @@ export async function retryWithFallback<T>(
   try {
     return await retry(fn, options);
   } catch (error) {
-    console.error('Retry failed, using fallback:', error);
+    logger.error('Retry failed, using fallback:', error);
     return fallbackValue;
   }
 }
-

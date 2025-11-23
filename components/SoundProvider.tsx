@@ -12,14 +12,19 @@ type SoundContextValue = {
 const SoundContext = createContext<SoundContextValue | undefined>(undefined);
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const [soundEnabled, setSoundEnabled] = useLocalStorage<boolean>('bobby-sound-enabled', true);
+  const [soundEnabled, setSoundEnabled] = useLocalStorage<boolean>(
+    'bobby-sound-enabled',
+    true
+  );
 
   const toggleSound = () => {
-    setSoundEnabled((prev) => !prev);
+    setSoundEnabled(prev => !prev);
   };
 
   return (
-    <SoundContext.Provider value={{ soundEnabled, setSoundEnabled, toggleSound }}>
+    <SoundContext.Provider
+      value={{ soundEnabled, setSoundEnabled, toggleSound }}
+    >
       {children}
     </SoundContext.Provider>
   );
@@ -32,5 +37,3 @@ export function useSound() {
   }
   return ctx;
 }
-
-

@@ -50,4 +50,3 @@ export function useAsync<T>(
 
   return { ...state, execute };
 }
-

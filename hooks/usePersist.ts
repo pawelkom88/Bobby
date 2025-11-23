@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useCallback } from 'react';
+import {logger} from "@/lib/logger";
 
 /**
  * Persist state to localStorage
@@ -20,12 +21,12 @@ export function usePersist<T>(
       const serializedValue = options?.serialize
         ? options.serialize(value)
         : JSON.stringify(value);
-      
+
       if (typeof window !== 'undefined') {
         localStorage.setItem(key, serializedValue);
       }
     } catch (error) {
-      console.error(`Error persisting "${key}" to localStorage:`, error);
+      logger.error(`Error persisting "${key}" to localStorage:`, error);
     }
   }, [key, value, options]);
 }
@@ -53,8 +54,7 @@ export function useRetrievePersist<T>(
 
     return options?.deserialize ? options.deserialize(item) : JSON.parse(item);
   } catch (error) {
-    console.error(`Error retrieving "${key}" from localStorage:`, error);
+    logger.error(`Error retrieving "${key}" from localStorage:`, error);
     return defaultValue;
   }
 }
-

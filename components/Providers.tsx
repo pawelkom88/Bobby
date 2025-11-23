@@ -8,11 +8,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SoundProvider>
       <DeepgramContextProvider>
-        <MicrophoneContextProvider>
-          {children}
-        </MicrophoneContextProvider>
+        <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
       </DeepgramContextProvider>
     </SoundProvider>
   );
 }
-

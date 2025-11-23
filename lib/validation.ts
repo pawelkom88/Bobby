@@ -49,7 +49,9 @@ export function sanitizeText(text: string): string {
 /**
  * Validate emergency number input
  */
-export function validateEmergencyNumber(input: string, targetNumber: string = '999'): boolean {
+export function validateEmergencyNumber(
+  input: string,
+  targetNumber: string = '999'
+): boolean {
   return input === targetNumber;
 }
-

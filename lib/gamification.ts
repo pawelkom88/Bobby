@@ -7,11 +7,11 @@ import { scoreToXP } from './assessment';
 
 // Level requirements: XP needed to reach each level
 export const LEVEL_REQUIREMENTS: number[] = [
-  0,    // Level 1
-  100,  // Level 2
-  250,  // Level 3 (Badge 1)
-  450,  // Level 4
-  700,  // Level 5
+  0, // Level 1
+  100, // Level 2
+  250, // Level 3 (Badge 1)
+  450, // Level 4
+  700, // Level 5
   1000, // Level 6 (Badge 2)
   1350, // Level 7
   1750, // Level 8
@@ -106,7 +106,9 @@ export function getBadgeForLevel(level: number): Badge | null {
 /**
  * Calculate XP earned based on performance
  */
-export function calculateXPEarned(performance: PerformanceMetrics = {}): number {
+export function calculateXPEarned(
+  performance: PerformanceMetrics = {}
+): number {
   if (performance.assessment) {
     return scoreToXP(performance.assessment.score);
   }
@@ -135,4 +137,3 @@ export function getBadgeForScore(score: number): Badge | null {
   }
   return null;
 }
-

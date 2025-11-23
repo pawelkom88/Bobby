@@ -14,7 +14,11 @@ interface AgeSelectorProps {
 /**
  * Age selector component with three tier buttons
  */
-export default function AgeSelector({ onSelect, selectedTier = null, onBack }: AgeSelectorProps) {
+export default function AgeSelector({
+  onSelect,
+  selectedTier = null,
+  onBack,
+}: AgeSelectorProps) {
   const [selected, setSelected] = useState<AgeTier | null>(selectedTier);
   const ageTiers = getAllAgeTiers();
 
@@ -26,22 +30,23 @@ export default function AgeSelector({ onSelect, selectedTier = null, onBack }: A
   };
 
   return (
-    <div className="age-selector" role="radiogroup" aria-label="Select age tier">
+    <div
+      className="age-selector"
+      role="radiogroup"
+      aria-label="Select age tier"
+    >
       <div className="selector-header">
         <h2 className="age-selector-title">WHO IS THIS FOR?</h2>
         {onBack && (
-          <CartoonButton
-            onClick={onBack}
-            ariaLabel="Go back to welcome screen"
-          >
+          <CartoonButton onClick={onBack} ariaLabel="Go back to welcome screen">
             ← Back
           </CartoonButton>
         )}
       </div>
       <p className="age-selector-subtitle">Choose the age tier</p>
-      
+
       <div className="age-tier-buttons">
-        {ageTiers.map((tier) => (
+        {ageTiers.map(tier => (
           <CartoonButton
             key={tier.id}
             onClick={() => handleSelect(tier)}
@@ -54,4 +59,3 @@ export default function AgeSelector({ onSelect, selectedTier = null, onBack }: A
     </div>
   );
 }
-

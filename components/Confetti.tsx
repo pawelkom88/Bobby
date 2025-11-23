@@ -11,7 +11,10 @@ interface ConfettiProps {
  * Pure CSS confetti animation component
  * Triggers on mount and animates confetti particles
  */
-export default function Confetti({ active = true, duration = 3000 }: ConfettiProps) {
+export default function Confetti({
+  active = true,
+  duration = 3000,
+}: ConfettiProps) {
   const [isActive, setIsActive] = useState(active);
 
   useEffect(() => {
@@ -34,9 +37,15 @@ export default function Confetti({ active = true, duration = 3000 }: ConfettiPro
     left: Math.random() * 100,
     delay: Math.random() * 0.5,
     duration: 2 + Math.random() * 2,
-    color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][
-      Math.floor(Math.random() * 7)
-    ],
+    color: [
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#FFA07A',
+      '#98D8C8',
+      '#F7DC6F',
+      '#BB8FCE',
+    ][Math.floor(Math.random() * 7)],
   }));
 
   return (
@@ -55,7 +64,7 @@ export default function Confetti({ active = true, duration = 3000 }: ConfettiPro
         overflow: 'hidden',
       }}
     >
-      {particles.map((particle) => (
+      {particles.map(particle => (
         <div
           key={particle.id}
           className="confetti-particle"
@@ -86,4 +95,3 @@ export default function Confetti({ active = true, duration = 3000 }: ConfettiPro
     </div>
   );
 }
-

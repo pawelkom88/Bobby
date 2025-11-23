@@ -3,6 +3,7 @@
  */
 
 import type { SpeechRecognitionResult } from '@/types';
+import {logger} from "@/lib/logger";
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -72,12 +73,9 @@ export function isSpeechRecognitionAvailable(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
-  
+
   const win = window as WindowWithSpeechRecognition;
-  return (
-    'webkitSpeechRecognition' in win ||
-    'SpeechRecognition' in win
-  );
+  return 'webkitSpeechRecognition' in win || 'SpeechRecognition' in win;
 }
 
 /**
@@ -87,14 +85,14 @@ export async function requestMicrophonePermission(): Promise<boolean> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices) {
     return false;
   }
-  
+
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     // Stop the stream immediately - we just needed permission
     stream.getTracks().forEach(track => track.stop());
     return true;
   } catch (error) {
-    console.error('Microphone permission denied:', error);
+    logger.error('Microphone permission denied:', error);
     return false;
   }
 }
@@ -102,27 +100,29 @@ export async function requestMicrophonePermission(): Promise<boolean> {
 /**
  * Create a speech recognition instance
  */
-export function createSpeechRecognition(options: SpeechRecognitionOptions = {}): SpeechRecognition | null {
+export function createSpeechRecognition(
+  options: SpeechRecognitionOptions = {}
+): SpeechRecognition | null {
   if (!isSpeechRecognitionAvailable()) {
     return null;
   }
-  
+
   const win = window as WindowWithSpeechRecognition;
   const SpeechRecognition =
     win.SpeechRecognition || win.webkitSpeechRecognition;
-  
+
   if (!SpeechRecognition) {
     return null;
   }
-  
+
   const recognition = new SpeechRecognition();
-  
+
   // Default options
   recognition.continuous = options.continuous ?? true;
   recognition.interimResults = options.interimResults ?? true;
   recognition.lang = options.lang || 'en-GB';
   recognition.maxAlternatives = options.maxAlternatives || 1;
-  
+
   return recognition;
 }
 
@@ -134,22 +134,17 @@ export function startSpeechRecognition(
   callbacks: SpeechRecognitionCallbacks = {}
 ): () => void {
   if (!recognition) {
-    console.error('Speech recognition not available');
+    logger.error('Speech recognition not available');
     return () => {};
   }
-  
-  const {
-    onResult,
-    onError,
-    onStart,
-    onEnd,
-  } = callbacks;
-  
+
+  const { onResult, onError, onStart, onEnd } = callbacks;
+
   // Handle results
   recognition.onresult = (event: SpeechRecognitionEvent) => {
     let finalTranscript = '';
     let interimTranscript = '';
-    
+
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
@@ -158,7 +153,7 @@ export function startSpeechRecognition(
         interimTranscript += transcript;
       }
     }
-    
+
     if (onResult) {
       onResult({
         final: finalTranscript.trim(),
@@ -166,45 +161,45 @@ export function startSpeechRecognition(
       });
     }
   };
-  
+
   // Handle errors
   recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-    console.error('Speech recognition error:', event.error);
+    logger.error('Speech recognition error:', event.error);
     if (onError) {
       onError(event.error);
     }
   };
-  
+
   // Handle start
   recognition.onstart = () => {
     if (onStart) {
       onStart();
     }
   };
-  
+
   // Handle end
   recognition.onend = () => {
     if (onEnd) {
       onEnd();
     }
   };
-  
+
   // Start recognition
   try {
     recognition.start();
   } catch (error) {
-    console.error('Error starting speech recognition:', error);
+    logger.error('Error starting speech recognition:', error);
     if (onError) {
       onError(error as Error);
     }
   }
-  
+
   // Return stop function
   return () => {
     try {
       recognition.stop();
     } catch (error) {
-      console.error('Error stopping speech recognition:', error);
+      logger.error('Error stopping speech recognition:', error);
     }
   };
 }
@@ -212,15 +207,16 @@ export function startSpeechRecognition(
 /**
  * Stop speech recognition
  */
-export function stopSpeechRecognition(recognition: SpeechRecognition | null): void {
+export function stopSpeechRecognition(
+  recognition: SpeechRecognition | null
+): void {
   if (!recognition) {
     return;
   }
-  
+
   try {
     recognition.stop();
   } catch (error) {
-    console.error('Error stopping speech recognition:', error);
+    logger.error('Error stopping speech recognition:', error);
   }
 }
-

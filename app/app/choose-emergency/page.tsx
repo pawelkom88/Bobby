@@ -1,18 +1,43 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Image from 'next/image';
 import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { setSelectedService } from '@/lib/storage';
-import type { Service } from '@/types';
-import Image from 'next/image';
+import { ROUTES } from '@/lib/routes';
+import {Service} from "@/types";
+
+const services: Array<{
+  id: Service;
+  label: string;
+  imagePath: string;
+  color: string;
+}> = [
+  {
+    id: 'fire',
+    label: 'FIRE',
+    imagePath: '/emergency-type-fire-brigade.png',
+    color: '#F68941',
+  },
+  {
+    id: 'ambulance',
+    label: 'AMBULANCE',
+    imagePath: '/emergency-type-ambulance.png',
+    color: '#A5D967',
+  },
+  {
+    id: 'police',
+    label: 'POLICE',
+    imagePath: '/emergency-type-police.png',
+    color: '#299DED',
+  },
+];
 
 export default function ChooseEmergencyPage() {
   const router = useRouter();
-  const [selectedService, setSelected] = useState<Service | null>(null);
 
   // Clear session data when in conversation setup flow
   useEffect(() => {
@@ -24,21 +49,14 @@ export default function ChooseEmergencyPage() {
     }
   }, []);
 
-  const services: Array<{ id: Service; label: string; imagePath: string; color: string }> = [
-    { id: 'fire', label: 'FIRE', imagePath: '/emergency-type-fire-brigade.png', color: '#F68941' },
-    { id: 'ambulance', label: 'AMBULANCE', imagePath: '/emergency-type-ambulance.png', color: '#A5D967' },
-    { id: 'police', label: 'POLICE', imagePath: '/emergency-type-police.png', color: '#299DED' },
-  ];
-
   const handleSelectService = (service: Service) => {
-    setSelected(service);
     setSelectedService(service);
     // Navigate to dial pad
-    router.push('/app/dial');
+    router.push(ROUTES.DIAL);
   };
 
   const handleBack = () => {
-    router.push('/app/your-age');
+    router.push(ROUTES.YOUR_AGE);
   };
 
   return (
@@ -53,7 +71,7 @@ export default function ChooseEmergencyPage() {
               </div>
 
               <div className="emergency-tiles-container">
-                {services.map((service) => (
+                {services.map(service => (
                   <button
                     key={service.id}
                     onClick={() => handleSelectService(service.id)}
@@ -64,9 +82,17 @@ export default function ChooseEmergencyPage() {
                     aria-label={`Select ${service.label}`}
                   >
                     <div className="emergency-tile-content">
-                      <Image src={service.imagePath} alt={service.label} width={100} height={100} className="emergency-tile-icon" />
+                      <Image
+                        src={service.imagePath}
+                        alt={service.label}
+                        width={100}
+                        height={100}
+                        className="emergency-tile-icon"
+                      />
                       <div className="emergency-tile-text">
-                        <span className="emergency-tile-label">{service.label}</span>
+                        <span className="emergency-tile-label">
+                          {service.label}
+                        </span>
                       </div>
                     </div>
                   </button>
@@ -74,7 +100,12 @@ export default function ChooseEmergencyPage() {
               </div>
 
               <div className="emergency-back-button">
-                <CartoonButton containerClassName='emergency-back-button-container' onClick={handleBack}>BACK</CartoonButton>
+                <CartoonButton
+                  containerClassName="emergency-back-button-container"
+                  onClick={handleBack}
+                >
+                  BACK
+                </CartoonButton>
               </div>
             </div>
           </div>
@@ -83,4 +114,3 @@ export default function ChooseEmergencyPage() {
     </ViewTransition>
   );
 }
-

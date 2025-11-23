@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
@@ -10,10 +9,10 @@ import { getAllAgeTiers } from '@/lib/ageTiers';
 import { setSelectedAgeTier } from '@/lib/storage';
 import type { AgeTier } from '@/types';
 import Image from 'next/image';
+import { ROUTES } from '@/lib/routes';
 
 export default function YourAgePage() {
   const router = useRouter();
-  const [selectedAge, setSelectedAge] = useState<AgeTier | null>(null);
 
   // Clear session data when starting a new conversation flow
   useEffect(() => {
@@ -26,10 +25,9 @@ export default function YourAgePage() {
   }, []);
 
   const handleSelectAge = (ageTier: AgeTier) => {
-    setSelectedAge(ageTier);
     setSelectedAgeTier(ageTier);
     // Navigate to next step
-    router.push('/app/choose-emergency');
+    router.push(ROUTES.CHOOSE_EMERGENCY);
   };
 
   const ageTiers = getAllAgeTiers();
@@ -59,12 +57,35 @@ export default function YourAgePage() {
                   >
                     <div className="age-tile-content">
                       <div className="age-tile-icon">
-                        {tier.id === 1 && <Image src="/age-4-6.png" alt="Baby" width={100} height={100} />}
-                        {tier.id === 2 && <Image src="/age-11-13.png" alt="Teen" width={100} height={100} />}
-                        {tier.id === 3 && <Image src="/age-7-9.png" alt="Child" width={100} height={100} />}
+                        {tier.id === 1 && (
+                          <Image
+                            src="/age-4-6.png"
+                            alt="Baby"
+                            width={100}
+                            height={100}
+                          />
+                        )}
+                        {tier.id === 2 && (
+                          <Image
+                            src="/age-11-13.png"
+                            alt="Teen"
+                            width={100}
+                            height={100}
+                          />
+                        )}
+                        {tier.id === 3 && (
+                          <Image
+                            src="/age-7-9.png"
+                            alt="Child"
+                            width={100}
+                            height={100}
+                          />
+                        )}
                       </div>
                       <div className="age-tile-text">
-                        <span className="age-tile-label">{tier.label.toUpperCase()}</span>
+                        <span className="age-tile-label">
+                          {tier.label.toUpperCase()}
+                        </span>
                       </div>
                     </div>
                   </button>
@@ -72,7 +93,13 @@ export default function YourAgePage() {
               </div>
 
               <div className="age-back-button">
-                <CartoonButton containerClassName='age-back-button-container' asLink href="/app">BACK</CartoonButton>
+                <CartoonButton
+                  containerClassName="age-back-button-container"
+                  asLink
+                  href={ROUTES.APP}
+                >
+                  BACK
+                </CartoonButton>
               </div>
             </div>
           </div>
@@ -81,4 +108,3 @@ export default function YourAgePage() {
     </ViewTransition>
   );
 }
-

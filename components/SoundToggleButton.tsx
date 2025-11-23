@@ -20,14 +20,16 @@ export default function SoundToggleButton() {
       const audio = new Audio('/sfx/sound-on-off.mp3');
       audio.volume = 0.5;
       void audio.play();
-    } catch {
-
-    }
+    } catch {}
     toggleSound();
   };
 
   return (
-    <div className="sound-toggle-container" role="region" aria-label="Sound controls">
+    <div
+      className="sound-toggle-container"
+      role="region"
+      aria-label="Sound controls"
+    >
       <button
         type="button"
         className="sound-toggle-button"
@@ -41,5 +43,3 @@ export default function SoundToggleButton() {
     </div>
   );
 }
-
-

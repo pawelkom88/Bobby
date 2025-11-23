@@ -6,9 +6,16 @@ import Confetti from './Confetti';
 import BadgeDisplay from './BadgeDisplay';
 import LevelProgress from './LevelProgress';
 import CartoonButton from './CartoonButton';
-import { getLevel, addXP, saveConversation, awardScoreBadge } from '@/lib/storage';
+import {
+  getLevel,
+  addXP,
+  saveConversation,
+  awardScoreBadge,
+} from '@/lib/storage';
 import { calculateXPEarned } from '@/lib/gamification';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
+import { ROUTES } from '@/lib/routes';
+import {logger} from "@/lib/logger";
 
 interface CompletionScreenProps {
   service?: Service;
@@ -21,37 +28,45 @@ interface CompletionScreenProps {
 /**
  * Completion screen component with confetti, XP, badges, and level 10 special message
  */
-export default function CompletionScreen({ service, ageTier, performance = {}, onContinue, onViewAchievements }: CompletionScreenProps) {
+export default function CompletionScreen({
+  service,
+  ageTier,
+  performance = {},
+  onContinue,
+  onViewAchievements,
+}: CompletionScreenProps) {
   const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(false);
   const [xpEarned, setXPEarned] = useState(0);
   const [leveledUp, setLeveledUp] = useState(false);
   const [badgeAwarded, setBadgeAwarded] = useState<Badge | null>(null);
-  const [scoreBadgeAwarded, setScoreBadgeAwarded] = useState<Badge | null>(null);
+  const [scoreBadgeAwarded, setScoreBadgeAwarded] = useState<Badge | null>(
+    null
+  );
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isLevel10, setIsLevel10] = useState(false);
   const assessment = performance.assessment;
   const feedbackSummary =
     assessment && assessment.improvements.length > 0
       ? assessment.improvements
-      : assessment?.positives ?? [];
+      : (assessment?.positives ?? []);
 
   useEffect(() => {
     // Check if this completion has already been processed to prevent duplicate XP awards
     if (typeof window !== 'undefined') {
       const completionId = sessionStorage.getItem('completionId');
       const processedId = sessionStorage.getItem('processedCompletionId');
-      
+
       // Only award XP if this completion hasn't been processed yet
       if (completionId && completionId === processedId) {
         // Already processed, just display existing results
-        console.log('Completion already processed, skipping XP award');
+        logger.log('Completion already processed, skipping XP award');
         const xp = calculateXPEarned(performance);
         setXPEarned(xp);
         setCurrentLevel(getLevel());
         return;
       }
-      
+
       // Calculate and award XP (first time only)
       const oldLevel = getLevel();
       const xp = calculateXPEarned(performance);
@@ -87,7 +102,7 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
           feedbackSummary?.slice(0, 3)
         );
       }
-      
+
       // Mark this completion as processed
       if (completionId) {
         sessionStorage.setItem('processedCompletionId', completionId);
@@ -108,11 +123,11 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
       sessionStorage.removeItem('processedCompletionId');
       sessionStorage.removeItem('conversationComplete');
     }
-    
+
     if (onContinue) {
       onContinue();
     } else {
-      router.push('/app');
+      router.push(ROUTES.APP);
     }
   };
 
@@ -120,12 +135,18 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
     if (onViewAchievements) {
       onViewAchievements();
     }
-    router.push('/achievements');
+    router.push(ROUTES.ACHIEVEMENTS);
   };
 
   return (
-    <div className="completion-screen" role="region" aria-label="Completion screen">
-      {showConfetti && xpEarned > 0 && <Confetti active={showConfetti} duration={3000} />}
+    <div
+      className="completion-screen"
+      role="region"
+      aria-label="Completion screen"
+    >
+      {showConfetti && xpEarned > 0 && (
+        <Confetti active={showConfetti} duration={3000} />
+      )}
 
       <div className="completion-content">
         {isLevel10 ? (
@@ -135,11 +156,12 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
               Congratulations! You've mastered emergency calls!
             </p>
             <p className="completion-encouragement">
-              You've learned how to stay calm, communicate clearly, and get help when you need it.
-              You're now prepared and confident. Great job!
+              You've learned how to stay calm, communicate clearly, and get help
+              when you need it. You're now prepared and confident. Great job!
             </p>
             <p className="completion-encouragement">
-              Remember, you can always practice more to stay sharp. Keep up the amazing work!
+              Remember, you can always practice more to stay sharp. Keep up the
+              amazing work!
             </p>
           </>
         ) : xpEarned === 0 ? (
@@ -149,7 +171,8 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
               You tried the {service} emergency scenario.
             </p>
             <p className="completion-encouragement">
-              Don't worry! Emergency calls can be tricky. Let's try again and you'll do better!
+              Don't worry! Emergency calls can be tricky. Let's try again and
+              you'll do better!
             </p>
           </>
         ) : (
@@ -175,7 +198,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
                 <h2>Performance Badge! ⭐</h2>
                 <p>{scoreBadgeAwarded.name}</p>
                 {scoreBadgeAwarded.description && (
-                  <p className="badge-description">{scoreBadgeAwarded.description}</p>
+                  <p className="badge-description">
+                    {scoreBadgeAwarded.description}
+                  </p>
                 )}
               </div>
             )}
@@ -186,7 +211,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
                 <p className="no-xp-message">No XP earned this time</p>
               )}
               {assessment && (
-                <p className="assessment-score">Score: {Math.round(assessment.score)} / 100</p>
+                <p className="assessment-score">
+                  Score: {Math.round(assessment.score)} / 100
+                </p>
               )}
             </div>
           </>
@@ -209,7 +236,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
             <h3>What you did well</h3>
             <ul>
               {assessment.positives.length > 0 ? (
-                assessment.positives.map((item, index) => <li key={`pos-${index}`}>{item}</li>)
+                assessment.positives.map((item, index) => (
+                  <li key={`pos-${index}`}>{item}</li>
+                ))
               ) : (
                 <li>Great effort!</li>
               )}
@@ -218,7 +247,9 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
             <h3>Next time try</h3>
             <ul>
               {assessment.improvements.length > 0 ? (
-                assessment.improvements.map((item, index) => <li key={`imp-${index}`}>{item}</li>)
+                assessment.improvements.map((item, index) => (
+                  <li key={`imp-${index}`}>{item}</li>
+                ))
               ) : (
                 <li>Keep practicing to stay sharp.</li>
               )}
@@ -255,4 +286,3 @@ export default function CompletionScreen({ service, ageTier, performance = {}, o
     </div>
   );
 }
-

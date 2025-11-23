@@ -48,10 +48,7 @@ export default function VoiceAnimations({ state }: VoiceAnimationProps) {
       )}
 
       {/* Error/Idle States could be simpler or empty */}
-      {state === 'error' && (
-         <div className="error-visual">⚠️</div>
-      )}
+      {state === 'error' && <div className="error-visual">⚠️</div>}
     </div>
   );
 }
-

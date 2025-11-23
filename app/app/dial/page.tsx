@@ -5,6 +5,7 @@ import { ViewTransition } from 'react';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ROUTES } from '@/lib/routes';
 
 export default function DialPage() {
   // Clear session data before starting conversation
@@ -19,24 +20,26 @@ export default function DialPage() {
 
   const handleCorrectNumber = () => {
     // Navigate to conversation page
-    window.location.href = '/app/conversation';
+    window.location.href = ROUTES.CONVERSATION;
   };
 
   const handleBack = () => {
     // Navigate back to emergency selection
-    window.location.href = '/app/choose-emergency';
+    window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
 
   return (
     <ViewTransition>
-    <PageWrapper>
-      <ErrorBoundary>
-        <main className="app-page" role="main">
-          <DialPad onCorrectNumber={handleCorrectNumber} onBack={handleBack} />
-        </main>
-      </ErrorBoundary>
-    </PageWrapper>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <DialPad
+              onCorrectNumber={handleCorrectNumber}
+              onBack={handleBack}
+            />
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
     </ViewTransition>
   );
 }
-

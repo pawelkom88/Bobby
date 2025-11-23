@@ -38,7 +38,8 @@ export interface Conversation {
 export interface Badge {
   id: string;
   name: string;
-  levelEarned: number;
+  levelEarned?: number;
+  description?: string;
   timestamp?: string;
 }
 
@@ -115,4 +116,3 @@ export interface AgentResponse {
   text: string;
   timestamp: string;
 }
-

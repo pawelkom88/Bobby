@@ -39,18 +39,17 @@ export default function CartoonButton({
           <span>{children}</span>
         </Link>
       ) : (
-      <button
-        type={type}
-        onClick={onClick}
-        disabled={disabled}
-        className={`cartoon-btn ${className}`}
-        aria-label={ariaLabel}
-        title={title}
-      >
-        <span>{children}</span>
-      </button>
-    )}
+        <button
+          type={type}
+          onClick={onClick}
+          disabled={disabled}
+          className={`cartoon-btn ${className}`}
+          aria-label={ariaLabel}
+          title={title}
+        >
+          <span>{children}</span>
+        </button>
+      )}
     </div>
   );
 }
-

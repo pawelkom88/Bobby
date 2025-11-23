@@ -2,7 +2,7 @@
  * Logger utility for debugging and monitoring
  */
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'log';
 
 export interface LogEntry {
   timestamp: string;
@@ -35,6 +35,11 @@ class Logger {
   info(message: string, data?: any): void {
     console.info(this.formatMessage('info', message, data));
     this.addLog('info', message, data);
+  }
+
+  log(message: string, data?: any): void {
+    console.log(this.formatMessage('log', message, data));
+    this.addLog('log', message, data);
   }
 
   warn(message: string, data?: any): void {
@@ -77,4 +82,3 @@ class Logger {
 }
 
 export const logger = new Logger();
-

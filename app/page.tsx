@@ -1,9 +1,6 @@
 'use client';
 
 import { ViewTransition } from 'react';
-import Link from 'next/link';
-import LevelProgress from '@/components/LevelProgress';
-import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -23,4 +20,3 @@ export default function HomePage() {
     </ViewTransition>
   );
 }
-

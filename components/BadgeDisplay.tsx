@@ -21,17 +21,17 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
     };
 
     updateBadges();
-    
+
     // Listen for storage changes
     const handleStorageChange = () => {
       updateBadges();
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Check periodically for same-tab updates
     const interval = setInterval(updateBadges, 1000);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
@@ -41,7 +41,11 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
   // All possible badges (for showing locked ones if showAll is true)
   const allBadges: Badge[] = [
     { id: 'first-steps-hero', name: 'First Steps Hero', levelEarned: 3 },
-    { id: 'confident-communicator', name: 'Confident Communicator', levelEarned: 6 },
+    {
+      id: 'confident-communicator',
+      name: 'Confident Communicator',
+      levelEarned: 6,
+    },
     { id: 'emergency-expert', name: 'Emergency Expert', levelEarned: 9 },
   ];
 
@@ -50,7 +54,9 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
   if (displayedBadges.length === 0 && !showAll) {
     return (
       <div className="badge-display" role="region" aria-label="Badges">
-        <p className="no-badges-message">No badges earned yet. Keep practicing!</p>
+        <p className="no-badges-message">
+          No badges earned yet. Keep practicing!
+        </p>
       </div>
     );
   }
@@ -58,8 +64,8 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
   return (
     <div className="badge-display" role="region" aria-label="Badges">
       <div className="badge-grid">
-        {displayedBadges.map((badge) => {
-          const isEarned = badges.some((b) => b.id === badge.id);
+        {displayedBadges.map(badge => {
+          const isEarned = badges.some(b => b.id === badge.id);
           return (
             <div
               key={badge.id}
@@ -72,7 +78,13 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
                   <span>🏆</span>
                 ) : (
                   <div className="padlock-wrapper">
-                    <input id={`lock-${badge.id}`} type="checkbox" name="unlocked" value="1" aria-hidden="true" />
+                    <input
+                      id={`lock-${badge.id}`}
+                      type="checkbox"
+                      name="unlocked"
+                      value="1"
+                      aria-hidden="true"
+                    />
                     <label htmlFor={`lock-${badge.id}`} className="padlock">
                       <div className="padlock__sr">Unlock</div>
                       <div className="padlock__top">
@@ -89,7 +101,9 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
                 <div className="badge-level">Level {badge.levelEarned}</div>
               )}
               {!isEarned && showAll && (
-                <div className="badge-requirement">Reach Level {badge.levelEarned}</div>
+                <div className="badge-requirement">
+                  Reach Level {badge.levelEarned}
+                </div>
               )}
             </div>
           );
@@ -98,4 +112,3 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
     </div>
   );
 }
-

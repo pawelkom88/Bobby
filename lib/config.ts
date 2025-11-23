@@ -11,7 +11,7 @@ export const CONFIG = {
 
   // Deepgram Configuration
   DEEPGRAM_API_ENDPOINT: '/api/authenticate',
-  
+
   // Agent Models
   AGENT_LISTEN_MODEL: 'nova-3',
   AGENT_THINK_PROVIDER: 'open_ai',
@@ -25,12 +25,3 @@ export const CONFIG = {
     3: '11–12 years old',
   } as const,
 };
-
-export type AgeTierForPrompt = keyof typeof CONFIG.AGE_TIER_TO_PROMPT;
-
-/**
- * Get age tier label
- */
-export function getAgeTierLabel(tierId: 1 | 2 | 3): string {
-  return CONFIG.AGE_TIER_TO_PROMPT[tierId];
-}

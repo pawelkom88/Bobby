@@ -8,7 +8,7 @@ import PageWrapper from '@/components/PageWrapper';
 import { resetProgress } from '@/lib/storage';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ROUTES } from '@/lib/routes';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function SettingsPage() {
       resetProgress();
       setShowResetConfirm(false);
       // Redirect to home after reset
-      router.push('/');
+      router.push(ROUTES.HOME);
     } else {
       setShowResetConfirm(true);
     }
@@ -37,11 +37,17 @@ export default function SettingsPage() {
             <h1 className="settings-title">SETTINGS</h1>
           </header>
           <div className="settings-content">
-            <section className="settings-section" aria-labelledby="accessibility-heading">
+            <section
+              className="settings-section"
+              aria-labelledby="accessibility-heading"
+            >
               <AccessibilitySection />
             </section>
 
-            <section className="settings-section" aria-labelledby="progress-heading">
+            <section
+              className="settings-section"
+              aria-labelledby="progress-heading"
+            >
               <h2 id="progress-heading">Progress</h2>
               <div className="reset-progress-section">
                 {!showResetConfirm ? (
@@ -58,7 +64,8 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <p className="reset-warning" role="alert">
-                      Are you sure you want to reset all progress? This cannot be undone.
+                      Are you sure you want to reset all progress? This cannot
+                      be undone.
                     </p>
                     <div className="reset-actions">
                       <CartoonButton
@@ -80,11 +87,14 @@ export default function SettingsPage() {
               </div>
             </section>
 
-            <section className="settings-section" aria-labelledby="about-heading">
+            <section
+              className="settings-section"
+              aria-labelledby="about-heading"
+            >
               <h2 id="about-heading">About</h2>
               <p>Bobby - Emergency Training for Kids</p>
               <p>Version 1.0.0</p>
-              <Link href="/contact" className="contact-link">
+              <Link href={ROUTES.CONTACT} className="contact-link">
                 Contact Support
               </Link>
             </section>
@@ -94,4 +104,3 @@ export default function SettingsPage() {
     </ViewTransition>
   );
 }
-

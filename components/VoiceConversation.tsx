@@ -12,13 +12,19 @@ import type { AgeTier, Service, ConversationMessage } from '@/types';
 import Image from 'next/image';
 import VoiceAnimations from './VoiceAnimations';
 import TimerDisplay from './TimerDisplay';
-
-// Deepgram & Audio imports
 import { useDeepgram } from '@/context/DeepgramContextProvider';
 import { useMicrophone } from '@/context/MicrophoneContextProvider';
-import { sendMicToSocket, sendSocketMessage, DeepgramAgentConfig } from '@/utils/deepgramUtils';
+import {
+  sendMicToSocket,
+  sendSocketMessage,
+  DeepgramAgentConfig,
+} from '@/utils/deepgramUtils';
 import { createAudioBuffer, playAudioBuffer } from '@/utils/audioUtils';
-import { getAmbulancePrompt, getFirePrompt, getPolicePrompt } from '@/lib/prompts';
+import {
+  getAmbulancePrompt,
+  getFirePrompt,
+  getPolicePrompt,
+} from '@/lib/prompts';
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -28,9 +34,6 @@ interface VoiceConversationProps {
   autoStart?: boolean;
 }
 
-/**
- * Voice conversation component with Deepgram Voice Agent API
- */
 export default function VoiceConversation({
   ageTier = 1,
   situation = 'fire',
@@ -38,23 +41,30 @@ export default function VoiceConversation({
   onBack,
   autoStart = false,
 }: VoiceConversationProps) {
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-  
-  // State Machine
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Thinking
   const [isSpeaking, setIsSpeaking] = useState(false); // Agent Speaking
-  
+
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [sessionActive, setSessionActive] = useState(false);
   const [conversationEnded, setConversationEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(CONFIG.MAX_CONVERSATION_TIME_MINUTES * 60);
+  const [remainingTime, setRemainingTime] = useState(
+    CONFIG.MAX_CONVERSATION_TIME_MINUTES * 60
+  );
 
   // Deepgram & Microphone Hooks
-  const { socket, socketState, connectToDeepgram, disconnectFromDeepgram } = useDeepgram();
-  const { setupMicrophone, startMicrophone, microphone, microphoneState, microphoneError, processor } = useMicrophone();
+  const { socket, socketState, connectToDeepgram, disconnectFromDeepgram } =
+    useDeepgram();
+  const {
+    setupMicrophone,
+    startMicrophone,
+    microphone,
+    microphoneState,
+    microphoneError,
+    processor,
+  } = useMicrophone();
 
   // Refs
   const stopConnectingSoundRef = useRef<(() => void) | null>(null);
@@ -67,17 +77,104 @@ export default function VoiceConversation({
   const { soundEnabled } = useSound();
 
   // Derived visual state
-  const visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle' =
-    error || microphoneError ? 'error' :
-      isProcessing ? 'processing' :
-        isSpeaking ? 'speaking' :
-          isListening ? 'listening' :
-            'idle';
+  const visualState:
+    | 'listening'
+    | 'processing'
+    | 'speaking'
+    | 'error'
+    | 'idle' =
+    error || microphoneError
+      ? 'error'
+      : isProcessing
+        ? 'processing'
+        : isSpeaking
+          ? 'speaking'
+          : isListening
+            ? 'listening'
+            : 'idle';
+
+  // Silence detection
+  const silenceThreshold = useRef(0.01); // Audio level threshold for silence
+  const silenceDuration = useRef(5000); // 5 seconds
+  const lastAudioTime = useRef(Date.now());
+  const silenceCheckInterval = useRef<NodeJS.Timeout | null>(null);
+  const silenceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Monitor audio levels
+  const checkAudioLevels = useCallback(
+    (audioData: Float32Array) => {
+      const maxLevel = Math.max(...audioData.map(Math.abs));
+      if (maxLevel > silenceThreshold.current) {
+        // Only reset timer if agent is not speaking (i.e., this is user speech)
+        if (!isSpeaking) {
+          lastAudioTime.current = Date.now();
+          logger.log(
+            'VoiceConversation: User audio detected, resetting silence timer'
+          );
+
+          // Clear any pending silence timeout
+          if (silenceTimeout.current) {
+            clearTimeout(silenceTimeout.current);
+            silenceTimeout.current = null;
+          }
+        } else {
+          logger.log(
+            'VoiceConversation: Agent audio detected, not resetting silence timer'
+          );
+        }
+      }
+    },
+    [isSpeaking]
+  );
+
+  // Start silence monitoring
+  const startSilenceMonitoring = useCallback(() => {
+    logger.log('VoiceConversation: Starting silence monitoring');
+    silenceCheckInterval.current = setInterval(() => {
+      const now = Date.now();
+      const timeSinceLastAudio = now - lastAudioTime.current;
+
+      if (
+        timeSinceLastAudio >= silenceDuration.current &&
+        !silenceTimeout.current
+      ) {
+        logger.log(
+          `VoiceConversation: Silence detected (${timeSinceLastAudio}ms), injecting trigger`
+        );
+        // Send special message to trigger silence response
+        if (socket && socketState === 1) {
+          const silenceMessage = {
+            type: 'InjectUserMessage',
+            content: 'USER_IS_SILENT_TRIGGER',
+          };
+          sendSocketMessage(socket, silenceMessage);
+          logger.log('VoiceConversation: Injected silence trigger message');
+
+          // Reset last audio time to prevent repeated triggers
+          lastAudioTime.current = now;
+        }
+      }
+    }, 1000); // Check every second
+  }, [socket, socketState]);
+
+  // Stop silence monitoring
+  const stopSilenceMonitoring = useCallback(() => {
+    logger.log('VoiceConversation: Stopping silence monitoring');
+    if (silenceCheckInterval.current) {
+      clearInterval(silenceCheckInterval.current);
+      silenceCheckInterval.current = null;
+    }
+    if (silenceTimeout.current) {
+      clearTimeout(silenceTimeout.current);
+      silenceTimeout.current = null;
+    }
+  }, []);
 
   // Initialize playback AudioContext
   useEffect(() => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+      audioContextRef.current = new (window.AudioContext ||
+        (window as any).webkitAudioContext)({
         sampleRate: 24000, // Deepgram standard output
         latencyHint: 'interactive',
       });
@@ -94,42 +191,34 @@ export default function VoiceConversation({
   useEffect(() => {
     setupMicrophone();
     return () => {
-        // Cleanup audio sources
-        scheduledAudioSources.current.forEach(source => {
-            try { source.stop(); } catch(e) {}
-        });
+      // Cleanup audio sources
+      scheduledAudioSources.current.forEach(source => {
+        try {
+          source.stop();
+        } catch (e) {}
+      });
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Check permissions based on microphone state
-  useEffect(() => {
-      if (microphoneState === null) {
-          // Setting up or failed
-      } else if (microphoneState === 0) {
-          // Setting up
-      } 
-      // If failed, microphoneState might remain null or we can add error state to context
-      if (microphoneError) {
-        setPermissionError(microphoneError);
-      }
-  }, [microphoneState, microphoneError]);
-
-
   // Auto-start conversation
   useEffect(() => {
-    if (autoStart && microphoneState === 1 && !sessionActive && !hasAutoStartedRef.current) {
+    if (
+      autoStart &&
+      !sessionActive &&
+      !hasAutoStartedRef.current
+    ) {
       hasAutoStartedRef.current = true;
       const timer = setTimeout(() => {
         startConversation();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [autoStart, microphoneState, sessionActive]);
+  }, [autoStart, sessionActive]);
 
   // Update remaining time
   useEffect(() => {
     if (!sessionActive) return;
-    
+
     const interval = setInterval(() => {
       setRemainingTime(prev => {
         if (prev <= 1) {
@@ -143,26 +232,73 @@ export default function VoiceConversation({
     return () => clearInterval(interval);
   }, [sessionActive]);
 
+  // Monitor microphone data for audio levels
+  useEffect(() => {
+    if (microphone && socket && socketState === 1 && processor) {
+      const originalOnaudioprocess = processor.onaudioprocess;
+
+      processor.onaudioprocess = event => {
+        // Get audio data for silence detection
+        const inputBuffer = event.inputBuffer;
+        const channelData = inputBuffer.getChannelData(0);
+        checkAudioLevels(channelData);
+
+        // Call original handler
+        if (originalOnaudioprocess) {
+          originalOnaudioprocess.call(processor, event);
+        }
+      };
+    }
+
+    return () => {
+      if (processor) {
+        processor.onaudioprocess = sendMicToSocket(socket!);
+      }
+    };
+  }, [microphone, socket, socketState, processor, checkAudioLevels]);
+
+  // Start/stop silence monitoring with conversation
+  useEffect(() => {
+    if (sessionActive && isListening) {
+      startSilenceMonitoring();
+    } else {
+      stopSilenceMonitoring();
+    }
+
+    return () => stopSilenceMonitoring();
+  }, [
+    sessionActive,
+    isListening,
+    startSilenceMonitoring,
+    stopSilenceMonitoring,
+  ]);
+
   // Handle Deepgram Messages (Audio & Events)
   useEffect(() => {
     if (!socket) return;
 
     const onMessage = async (event: MessageEvent) => {
-      console.log('VoiceConversation: onMessage received, data type:', typeof event.data, 'length:', event.data.length);
+      logger.log(
+        `VoiceConversation: onMessage received, data type: ${typeof event.data}, length: ${event.data.length}`
+      );
       if (event.data instanceof ArrayBuffer) {
-        console.log('VoiceConversation: Received audio data, processing...');
+        logger.log('VoiceConversation: Received audio data, processing...');
         // Audio Data
         if (audioContextRef.current) {
           const buffer = createAudioBuffer(audioContextRef.current, event.data);
           if (buffer) {
-            const source = playAudioBuffer(audioContextRef.current, buffer, startTimeRef);
+            const source = playAudioBuffer(
+              audioContextRef.current,
+              buffer,
+              startTimeRef
+            );
             scheduledAudioSources.current.push(source);
             source.onended = () => {
-                const index = scheduledAudioSources.current.indexOf(source);
-                if (index > -1) scheduledAudioSources.current.splice(index, 1);
-                
-                // Only set not speaking if queue is empty (approximate)
-                // Better to rely on AgentAudioDone or explicit events if available
+              const index = scheduledAudioSources.current.indexOf(source);
+              if (index > -1) scheduledAudioSources.current.splice(index, 1);
+
+              // Only set not speaking if queue is empty (approximate)
+              // Better to rely on AgentAudioDone or explicit events if available
             };
             setIsSpeaking(true);
             setIsProcessing(false);
@@ -170,11 +306,11 @@ export default function VoiceConversation({
           }
         }
       } else {
-        console.log('VoiceConversation: Received JSON message, parsing...');
+        logger.log('VoiceConversation: Received JSON message, parsing...');
         // JSON Message
         try {
           const msg = JSON.parse(event.data);
-          console.log('VoiceConversation: Parsed message:', msg);
+          logger.log('VoiceConversation: Parsed message:', msg);
 
           logger.debug('Deepgram Message:', msg);
 
@@ -183,14 +319,16 @@ export default function VoiceConversation({
               setIsListening(false);
               setIsProcessing(true); // User speaking, agent thinking/listening
               setIsSpeaking(false);
-              
+
               // Clear queued audio if user interrupts
               scheduledAudioSources.current.forEach(source => {
-                  try { source.stop(); } catch(e) {}
+                try {
+                  source.stop();
+                } catch (e) {}
               });
               scheduledAudioSources.current = [];
               if (audioContextRef.current) {
-                  startTimeRef.current = audioContextRef.current.currentTime;
+                startTimeRef.current = audioContextRef.current.currentTime;
               }
               break;
 
@@ -201,15 +339,25 @@ export default function VoiceConversation({
               break;
 
             case 'AgentAudioDone':
-               // Agent finished sending audio. 
-               // Playback might continue for a bit.
-               // We can set state to listening after a short delay or rely on silence?
-               // Deepgram usually handles state well.
-               setIsSpeaking(false);
-               setIsListening(true);
-               break;
+              // Agent finished sending audio.
+              // Playback might continue for a bit.
+              // We can set state to listening after a short delay or rely on silence?
+              // Deepgram usually handles state well.
+              setIsSpeaking(false);
+              setIsListening(true);
+              break;
 
             case 'ConversationText':
+              // Handle special silence trigger
+              if (msg.content === 'USER_IS_SILENT_TRIGGER') {
+                // Don't add to conversation history, but trigger agent response
+                // The agent will respond based on the prompt instructions
+                logger.log(
+                  'VoiceConversation: Silence trigger detected, agent should respond'
+                );
+                break;
+              }
+
               // Add to conversation history
               const newMsg: ConversationMessage = {
                 type: msg.role === 'user' ? 'user' : 'agent',
@@ -217,14 +365,21 @@ export default function VoiceConversation({
                 timestamp: new Date().toISOString(),
               };
               setConversation(prev => [...prev, newMsg]);
-              
+
               // Check if agent is ending the conversation (farewell phrases)
               if (msg.role === 'assistant') {
-                const farewellPhrases = ['bye', 'take care', 'stay safe', 'bye for now', 'see you later', 'goodbye'];
-                const isFarewell = farewellPhrases.some(phrase => 
+                const farewellPhrases = [
+                  'bye',
+                  'take care',
+                  'stay safe',
+                  'bye for now',
+                  'see you later',
+                  'goodbye',
+                ];
+                const isFarewell = farewellPhrases.some(phrase =>
                   msg.content.toLowerCase().includes(phrase.toLowerCase())
                 );
-                
+
                 if (isFarewell) {
                   // End conversation after agent finishes speaking
                   setTimeout(() => {
@@ -235,26 +390,44 @@ export default function VoiceConversation({
 
               // Check if user is using farewell keywords
               if (msg.role === 'user') {
-                const farewellPhrases = ['bye', 'take care', 'stay safe', 'bye for now', 'see you later', 'goodbye'];
-                const isUserFarewell = farewellPhrases.some(phrase => 
+                const farewellPhrases = [
+                  'bye',
+                  'take care',
+                  'stay safe',
+                  'bye for now',
+                  'see you later',
+                  'goodbye',
+                ];
+                const isUserFarewell = farewellPhrases.some(phrase =>
                   msg.content.toLowerCase().includes(phrase.toLowerCase())
                 );
-                
+
                 if (isUserFarewell) {
-                  console.log('%c🚨 USER USED FAREWELL KEYWORD 🚨', 'color: red; font-size: 24px; font-weight: bold; background: yellow; padding: 10px;');
+                  logger.log(
+                    '%c🚨 USER USED FAREWELL KEYWORD 🚨',
+                    'color: red; font-size: 24px; font-weight: bold; background: yellow; padding: 10px;'
+                  );
                 }
               }
               break;
-            
+
             case 'EndOfThought':
-               // Agent finished thinking
-               break;
+              // Agent finished thinking
+              break;
+
+            case 'InjectionRefused':
+              logger.log(
+                'VoiceConversation: Silence injection refused - agent was speaking or user was talking'
+              );
+              // Reset the last audio time to try again later
+              lastAudioTime.current = Date.now();
+              break;
 
             default:
               break;
           }
         } catch (e) {
-          console.error("Error parsing Deepgram message", e);
+          logger.error('Error parsing Deepgram message', e);
         }
       }
     };
@@ -269,7 +442,7 @@ export default function VoiceConversation({
       processor.onaudioprocess = sendMicToSocket(socket);
     }
     return () => {
-        if (processor) processor.onaudioprocess = null;
+      if (processor) processor.onaudioprocess = null;
     };
   }, [microphone, socket, socketState, processor]);
 
@@ -283,7 +456,6 @@ export default function VoiceConversation({
 
       // Connect to Deepgram
       await connectToDeepgram();
-
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       logger.error('Error starting conversation', { message });
@@ -298,123 +470,154 @@ export default function VoiceConversation({
 
   // When socket opens, send configuration
   useEffect(() => {
-    console.log('VoiceConversation: socketState changed to', socketState, 'isConnecting:', isConnecting);
-      if (socketState === 1 && isConnecting) {
-          console.log('VoiceConversation: Socket connected, sending configuration');
-          // Connected
-          setIsConnecting(false);
-          setSessionActive(true);
-          if (stopConnectingSoundRef.current) {
-            stopConnectingSoundRef.current();
-            stopConnectingSoundRef.current = null;
-          }
+    logger.log(
+      `VoiceConversation: socketState changed to ${socketState}, isConnecting: ${isConnecting}`
+    );
+    if (socketState === 1 && isConnecting) {
+      logger.log('VoiceConversation: Socket connected, sending configuration');
+      // Connected
+      setIsConnecting(false);
+      setSessionActive(true);
+      if (stopConnectingSoundRef.current) {
+        stopConnectingSoundRef.current();
+        stopConnectingSoundRef.current = null;
+      }
 
-          // Send Configuration
-          console.log('VoiceConversation: Generating system prompt...');
-          const ageTierLabel = CONFIG.AGE_TIER_TO_PROMPT[ageTier];
-          
-          // Build conversation history context
-          const conversationContext = conversation.length > 0 
-            ? conversation.map(msg => ({
-                type: "History" as const,
-                role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
-                content: msg.text
-              }))
-            : [];
-          
-          const instructions = situation === 'ambulance' 
-            ? getAmbulancePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES)
-            : situation === 'fire'
+      // Send Configuration
+      logger.log('VoiceConversation: Generating system prompt...');
+      const ageTierLabel = CONFIG.AGE_TIER_TO_PROMPT[ageTier];
+
+      // Build conversation history context
+      const conversationContext =
+        conversation.length > 0
+          ? conversation.map(msg => ({
+              type: 'History' as const,
+              role:
+                msg.type === 'user'
+                  ? ('user' as const)
+                  : ('assistant' as const),
+              content: msg.text,
+            }))
+          : [];
+
+      const instructions =
+        situation === 'ambulance'
+          ? getAmbulancePrompt(
+              ageTierLabel,
+              CONFIG.MAX_CONVERSATION_TIME_MINUTES
+            )
+          : situation === 'fire'
             ? getFirePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES)
-            : getPolicePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES);
-          console.log('VoiceConversation: System prompt generated, length:', instructions.length);
-          
-          // Dynamic greeting based on scenario
-          const greeting = situation === 'ambulance' 
-            ? "Hi, I'm Bobby from Ambulance Service. Is the patient breathing?"
-            : situation === 'fire'
+            : getPolicePrompt(
+                ageTierLabel,
+                CONFIG.MAX_CONVERSATION_TIME_MINUTES
+              );
+      logger.log(
+        'VoiceConversation: System prompt generated, length:',
+        instructions.length
+      );
+
+      // Dynamic greeting based on scenario
+      const greeting =
+        situation === 'ambulance'
+          ? "Hi, I'm Bobby from Ambulance Service. Is the patient breathing?"
+          : situation === 'fire'
             ? "Hi, I'm Bobby from Fire and Rescue. What is the problem?"
             : "Hi, I'm Bobby from Police. What's wrong?";
-          
-          const config: DeepgramAgentConfig = {
-              type: "Settings",
-              audio: {
-                  input: {
-                      encoding: "linear16",
-                      sample_rate: 16000,
-                  },
-                  output: {
-                      encoding: "linear16",
-                      sample_rate: 24000,
-                      container: "none",
-                  }
+
+      const config: DeepgramAgentConfig = {
+        type: 'Settings',
+        audio: {
+          input: {
+            encoding: 'linear16',
+            sample_rate: 16000,
+          },
+          output: {
+            encoding: 'linear16',
+            sample_rate: 24000,
+            container: 'none',
+          },
+        },
+        agent: {
+          language: 'en',
+          context: {
+            messages: conversationContext,
+          },
+          listen: {
+            provider: {
+              type: 'deepgram',
+              model: 'nova-3',
+            },
+          },
+          think: {
+            provider: {
+              type: 'open_ai',
+              model: 'gpt-4.1-mini',
+              temperature: 0.4,
+              // model: "gpt-4o-mini",
+            },
+            prompt: instructions,
+          },
+          // type: "UpdateSpeak",
+          speak: {
+            provider: {
+              type: 'cartesia',
+              model_id: 'sonic-2',
+              voice: {
+                mode: 'id',
+                id: '726d5ae5-055f-4c3d-8355-d9677de68937',
               },
-              agent: {
-                  language: "en",
-                  context: {
-                      messages: conversationContext
-                  },
-                  listen: {
-                      provider: {
-                          type: "deepgram",
-                          model: "nova-3",
-                      }
-                  },
-                  think: {
-                      provider: {
-                          type: "open_ai",
-                          model: "gpt-4.1-mini",
-                          temperature: 0.4
-                          // model: "gpt-4o-mini",
-                      },
-                      prompt: instructions,
-                  },
-                  // type: "UpdateSpeak",
-                  speak: {
-                      provider: {
-                          type: "deepgram",
-                          model: "aura-helios-en"
-                      }
-                  },
-                  greeting: greeting
-              }
-          };
+            },
+          },
+          greeting: greeting,
+        },
+      };
 
-          console.log('VoiceConversation: Config created:', JSON.stringify(config, null, 2));
+      logger.log(
+        'VoiceConversation: Config created:',
+        JSON.stringify(config, null, 2)
+      );
 
-          if (socket) {
-            console.log('VoiceConversation: Sending Settings message to socket');
-            sendSocketMessage(socket, config);
-            
-            console.log('VoiceConversation: Starting microphone');
-            startMicrophone();
-            setIsListening(true);
-          } else {
-            console.error('VoiceConversation: Socket is null when trying to send config');
-          }
-      } else if (socketState === 2) {
-          console.log('VoiceConversation: Socket error state detected');
-          // Error
-          if (isConnecting) {
-            setIsConnecting(false);
-            setError("Connection to voice server failed.");
-            if (stopConnectingSoundRef.current) {
-                stopConnectingSoundRef.current();
-                stopConnectingSoundRef.current = null;
-            }
-          }
+      if (socket) {
+        logger.log('VoiceConversation: Sending Settings message to socket');
+        sendSocketMessage(socket, config);
+
+        logger.log('VoiceConversation: Starting microphone');
+        startMicrophone();
+        setIsListening(true);
+      } else {
+        logger.error(
+          'VoiceConversation: Socket is null when trying to send config'
+        );
       }
+    } else if (socketState === 2) {
+      logger.log('VoiceConversation: Socket error state detected');
+      // Error
+      if (isConnecting) {
+        setIsConnecting(false);
+        setError('Connection to voice server failed.');
+        if (stopConnectingSoundRef.current) {
+          stopConnectingSoundRef.current();
+          stopConnectingSoundRef.current = null;
+        }
+      }
+    }
   }, [socketState, isConnecting, socket, ageTier, situation, startMicrophone]);
 
   const endConversation = async () => {
     try {
-      console.log('%c🎉 CONVERSATION ENDED 🎉', 'color: green; font-size: 24px; font-weight: bold; background: lightgreen; padding: 10px;');
-      
+      logger.log(
+        '%c🎉 CONVERSATION ENDED 🎉',
+        'color: green; font-size: 24px; font-weight: bold; background: lightgreen; padding: 10px;'
+      );
+
       disconnectFromDeepgram();
-      
+
       // Stop audio
       scheduledAudioSources.current.forEach(source => {
-        try { source.stop(); } catch(e) {}
+        try {
+          source.stop();
+        } catch (e) {}
       });
       scheduledAudioSources.current = [];
 
@@ -434,7 +637,8 @@ export default function VoiceConversation({
     }
   };
 
-  if (error && !sessionActive) {
+  // Component: ConnectionError
+  function ConnectionError() {
     return (
       <div className="voice-conversation" role="alert">
         <div className="connection-error">
@@ -445,7 +649,10 @@ export default function VoiceConversation({
           <p className="error-details">{error}</p>
           <div className="error-action-buttons">
             {onBack && (
-              <CartoonButton onClick={onBack} ariaLabel="Go back to previous step">
+              <CartoonButton
+                onClick={onBack}
+                ariaLabel="Go back to previous step"
+              >
                 ← Go Back
               </CartoonButton>
             )}
@@ -461,8 +668,9 @@ export default function VoiceConversation({
     );
   }
 
-  return (
-    <div className="voice-conversation" role="region" aria-label="Voice conversation">
+  // Component: ConversationHeader
+  function ConversationHeader() {
+    return (
       <div className="conversation-header">
         {onBack && !sessionActive && (
           <button
@@ -474,87 +682,146 @@ export default function VoiceConversation({
             ← Back
           </button>
         )}
-        {sessionActive && (
-          <TimerDisplay remainingSeconds={remainingTime} />
-        )}
+        {sessionActive && <TimerDisplay remainingSeconds={remainingTime} />}
       </div>
+    );
+  }
 
-      {!sessionActive && !conversationEnded ? (
-        <>
-          <h1 className="conversation-subtitle">Just a moment ...</h1>
-          <p className="conversation-subtitle-text">Bobby is getting ready to chat!</p>
-          <br />
-          <Image src="/bobby-connecting.png" alt="Bobby is getting ready to chat" width={200} height={250} />
-          <br />
-          
-          <div className="conversation-start-section">
-            {isConnecting && <LoadingSpinner />}
-          </div>
-        </>
-      ) : conversationEnded ? (
-        <div className="conversation-ending" style={{ textAlign: 'center', padding: '2rem' }}>
-          <h2>Processing your conversation...</h2>
-          <LoadingSpinner />
+  // Component: PreConversationView
+  function PreConversationView() {
+    return (
+      <>
+        <h1 className="conversation-subtitle">Just a moment ...</h1>
+        <p className="conversation-subtitle-text">
+          Bobby is getting ready to chat!
+        </p>
+        <br />
+        <Image
+          src="/bobby-connecting.png"
+          alt="Bobby is getting ready to chat"
+          width={200}
+          height={250}
+        />
+        <br />
+
+        <div className="conversation-start-section">
+          {isConnecting && <LoadingSpinner />}
         </div>
-      ) : (
-        <>
-          {/* Visual Feedback */}
-          <div className="conversation-visuals" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
-            <h2 className="kavoon" style={{ fontSize: '2rem', color: '#333' }}>
-              {visualState === 'speaking' && "Bobby is speaking..."}
-              {visualState === 'listening' && "Your turn to speak!"}
-              {visualState === 'processing' && "Bobby is thinking..."}
-              {visualState === 'error' && "Something went wrong"}
-            </h2>
+      </>
+    );
+  }
 
-            <VoiceAnimations state={visualState} />
-          </div>
+  // Component: ConversationEndingView
+  function ConversationEndingView() {
+    return (
+      <div
+        className="conversation-ending"
+        style={{ textAlign: 'center', padding: '2rem' }}
+      >
+        <h2>Processing your conversation...</h2>
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-          {/* Subtitles (Agent only) */}
-          {(settings.subtitles) && conversation.length > 0 && (
-            <div className="subtitles" role="region" aria-label="Subtitles" style={{
+  // Component: ActiveConversationView
+  function ActiveConversationView() {
+    return (
+      <>
+        {/* Visual Feedback */}
+        <div
+          className="conversation-visuals"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '2rem',
+          }}
+        >
+          <h2 className="kavoon" style={{ fontSize: '2rem', color: '#333' }}>
+            {visualState === 'speaking' && 'Bobby is speaking...'}
+            {visualState === 'listening' && 'Your turn to speak!'}
+            {visualState === 'processing' && 'Bobby is thinking...'}
+            {visualState === 'error' && 'Something went wrong'}
+          </h2>
+
+          <VoiceAnimations state={visualState} />
+        </div>
+
+        {/* Subtitles (Agent only) */}
+        {settings.subtitles && conversation.length > 0 && (
+          <div
+            className="subtitles"
+            role="region"
+            aria-label="Subtitles"
+            style={{
               marginTop: 'auto',
               marginBottom: '2rem',
               padding: '1.25rem',
               background: 'rgba(255,255,255,0.8)',
               borderRadius: '1rem',
               maxWidth: '85%',
-            }}>
-              {conversation
-                .filter((msg) => msg.type === 'agent')
-                .slice(-1)
-                .map((msg, index) => (
-                  <p key={index} className="subtitle-text" style={{ 
-                    fontSize: '1.2rem', 
+            }}
+          >
+            {conversation
+              .filter(msg => msg.type === 'agent')
+              .slice(-1)
+              .map((msg, index) => (
+                <p
+                  key={index}
+                  className="subtitle-text"
+                  style={{
+                    fontSize: '1.2rem',
                     textAlign: 'center',
                     lineHeight: '1.5',
                     margin: 0,
-                    color: '#333'
-                  }}>
-                    {msg.text}
-                  </p>
-                ))}
-            </div>
-          )}
-
-          {/* Controls */}
-          <div className="conversation-controls" style={{ marginTop: 'auto' }}>
-            <CartoonButton
-              onClick={() => void endConversation()}
-              ariaLabel="End conversation"
-              className="cartoon-btn-danger"
-            >
-              End Call
-            </CartoonButton>
+                    color: '#333',
+                  }}
+                >
+                  {msg.text}
+                </p>
+              ))}
           </div>
-        </>
-      )}
+        )}
 
-      {error && sessionActive && (
-        <div className="conversation-error" role="alert">
-          {error}
+        {/* Controls */}
+        <div className="conversation-controls" style={{ marginTop: 'auto' }}>
+          <CartoonButton
+            onClick={() => void endConversation()}
+            ariaLabel="End conversation"
+            className="cartoon-btn-danger"
+          >
+            End Call
+          </CartoonButton>
         </div>
-      )}
+      </>
+    );
+  }
+
+  // Component: SessionError
+  function SessionError() {
+    return (
+      <div className="conversation-error" role="alert">
+        {error}
+      </div>
+    );
+  }
+
+  if (error && !sessionActive) {
+    return <ConnectionError />;
+  }
+
+  return (
+    <div
+      className="voice-conversation"
+      role="region"
+      aria-label="Voice conversation"
+    >
+      <ConversationHeader />
+      {conversationEnded && <ConversationEndingView />}
+      {!conversationEnded && sessionActive && <ActiveConversationView />}
+      {!conversationEnded && !sessionActive && <PreConversationView />}
+      {error && sessionActive && <SessionError />}
     </div>
   );
 }

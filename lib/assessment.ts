@@ -1,16 +1,4 @@
-/**
- * Transcript assessment utilities
- * Rule-based heuristic that keeps all processing client-side
- * and never persists the raw transcript.
- */
-
 import type { AgeTier, Service, ConversationMessage } from '@/types';
-
-export interface AssessmentFeedback {
-  positives: string[];
-  improvements: string[];
-  warnings: string[];
-}
 
 export interface ConversationAssessment {
   score: number;
@@ -30,14 +18,66 @@ type AssessmentOptions = {
 };
 
 const EMERGENCY_KEYWORDS: Record<Service, string[]> = {
-  fire: ['fire', 'smoke', 'burn', 'burning', 'flames', 'hot', 'kitchen', 'house on fire', 'blaze', 'combustion'],
-  ambulance: [
-    'ambulance', 'hurt', 'injured', 'bleeding', 'not breathing', 'passed out', 'sick', 'medical',
-    'pain', 'hurt', 'accident', 'twisted', 'broken', 'fracture', 'sprain', 'wound', 'emergency',
-    'help', 'ill', 'illness', 'injury', 'injure', 'emergency', 'problem', 'issue',
-    'fell', 'fall', 'cut', 'bruise', 'emergency', 'please', 'need help', 'urgent'
+  fire: [
+    'fire',
+    'smoke',
+    'burn',
+    'burning',
+    'flames',
+    'hot',
+    'kitchen',
+    'house on fire',
+    'blaze',
+    'combustion',
   ],
-  police: ['police', 'intruder', 'break in', 'stole', 'stealing', 'kidnap', 'danger', 'fight', 'crime', 'help', 'emergency'],
+  ambulance: [
+    'ambulance',
+    'hurt',
+    'injured',
+    'bleeding',
+    'not breathing',
+    'passed out',
+    'sick',
+    'medical',
+    'pain',
+    'hurt',
+    'accident',
+    'twisted',
+    'broken',
+    'fracture',
+    'sprain',
+    'wound',
+    'emergency',
+    'help',
+    'ill',
+    'illness',
+    'injury',
+    'injure',
+    'emergency',
+    'problem',
+    'issue',
+    'fell',
+    'fall',
+    'cut',
+    'bruise',
+    'emergency',
+    'please',
+    'need help',
+    'urgent',
+  ],
+  police: [
+    'police',
+    'intruder',
+    'break in',
+    'stole',
+    'stealing',
+    'kidnap',
+    'danger',
+    'fight',
+    'crime',
+    'help',
+    'emergency',
+  ],
 };
 
 const LOCATION_KEYWORDS = [
@@ -173,21 +213,27 @@ const PASS_THRESHOLD_BY_TIER: Record<AgeTier, number> = {
 const MIN_DURATION_SECONDS = 30;
 
 function normalizeText(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function containsAny(text: string, keywords: string[]): boolean {
-  return keywords.some((keyword) => text.includes(keyword));
+  return keywords.some(keyword => text.includes(keyword));
 }
 
 function detectAddressLike(text: string): boolean {
-  return /\b\d{1,4}\s+(street|st|road|rd|avenue|ave|drive|dr|lane|ln|court|ct)\b/.test(text);
+  return /\b\d{1,4}\s+(street|st|road|rd|avenue|ave|drive|dr|lane|ln|court|ct)\b/.test(
+    text
+  );
 }
 
 function calculateDurationSeconds(messages: ConversationMessage[]): number {
   const timestamps = messages
-    .map((msg) => Date.parse(msg.timestamp))
-    .filter((value) => !Number.isNaN(value));
+    .map(msg => Date.parse(msg.timestamp))
+    .filter(value => !Number.isNaN(value));
   if (timestamps.length < 2) {
     return 0;
   }
@@ -196,7 +242,12 @@ function calculateDurationSeconds(messages: ConversationMessage[]): number {
   return Math.max(0, Math.round((max - min) / 1000));
 }
 
-function mapScoreToFeedback(score: number, positives: string[], improvements: string[], warnings: string[]) {
+function mapScoreToFeedback(
+  score: number,
+  positives: string[],
+  improvements: string[],
+  warnings: string[]
+) {
   if (score >= 85 && positives.length === 0) {
     positives.push('You shared everything Bobby needed!');
   }
@@ -210,7 +261,7 @@ function mapScoreToFeedback(score: number, positives: string[], improvements: st
 
 /**
  * Assess conversation using rule-based heuristics (Deepgram migration)
- * 
+ *
  * Previously used Gemini AI, now falls back to local assessment.
  */
 export async function assessWithGemini(
@@ -230,7 +281,7 @@ export function assessConversation(
 ): ConversationAssessment {
   const tier: AgeTier = ageTier ?? 2;
   const scenario: Service | null = situation ?? null;
-  const userMessages = conversation.filter((msg) => msg.type === 'user');
+  const userMessages = conversation.filter(msg => msg.type === 'user');
   const durationSeconds = calculateDurationSeconds(userMessages);
   const userTurns = userMessages.length;
 
@@ -254,11 +305,13 @@ export function assessConversation(
     };
   }
 
-  const normalizedMessages = userMessages.map((msg) => normalizeText(msg.text));
+  const normalizedMessages = userMessages.map(msg => normalizeText(msg.text));
   const joined = normalizedMessages.join(' ');
 
   // Emergency type clarity
-  const emergencyKeywords = scenario ? EMERGENCY_KEYWORDS[scenario] : Object.values(EMERGENCY_KEYWORDS).flat();
+  const emergencyKeywords = scenario
+    ? EMERGENCY_KEYWORDS[scenario]
+    : Object.values(EMERGENCY_KEYWORDS).flat();
   const emergencyMatch = containsAny(joined, emergencyKeywords);
   if (emergencyMatch) {
     positives.push('You told Bobby what kind of emergency it is.');
@@ -268,7 +321,7 @@ export function assessConversation(
 
   // Location details
   const locationMatch = normalizedMessages.some(
-    (text) => containsAny(text, LOCATION_KEYWORDS) || detectAddressLike(text)
+    text => containsAny(text, LOCATION_KEYWORDS) || detectAddressLike(text)
   );
   if (locationMatch) {
     positives.push('You shared where the emergency is happening.');
@@ -287,14 +340,22 @@ export function assessConversation(
   // Condition / status
   let conditionMatch = false;
   if (scenario === 'fire') {
-    conditionMatch = containsAny(joined, [...CONDITION_KEYWORDS, ...FIRE_CONDITION_KEYWORDS]);
+    conditionMatch = containsAny(joined, [
+      ...CONDITION_KEYWORDS,
+      ...FIRE_CONDITION_KEYWORDS,
+    ]);
     if (conditionMatch) {
       positives.push('You shared details about the fire and safety.');
     } else {
-      improvements.push('Tell Bobby if everyone is safe or out of the building.');
+      improvements.push(
+        'Tell Bobby if everyone is safe or out of the building.'
+      );
     }
   } else if (scenario === 'police') {
-    conditionMatch = containsAny(joined, [...CONDITION_KEYWORDS, ...POLICE_CONDITION_KEYWORDS]);
+    conditionMatch = containsAny(joined, [
+      ...CONDITION_KEYWORDS,
+      ...POLICE_CONDITION_KEYWORDS,
+    ]);
     if (conditionMatch) {
       positives.push('You shared important safety details.');
     } else {
@@ -321,10 +382,14 @@ export function assessConversation(
   }
 
   // Relevance
-  const irrelevantCount = normalizedMessages.filter((text) => containsAny(text, IRRELEVANT_KEYWORDS)).length;
+  const irrelevantCount = normalizedMessages.filter(text =>
+    containsAny(text, IRRELEVANT_KEYWORDS)
+  ).length;
   const irrelevantRatio = irrelevantCount / userTurns;
   if (irrelevantRatio >= 0.4) {
-    warnings.push('That sounded off-topic. Emergency calls are for real help only.');
+    warnings.push(
+      'That sounded off-topic. Emergency calls are for real help only.'
+    );
   }
 
   // Weighted score
@@ -347,7 +412,9 @@ export function assessConversation(
 
   // Apply minimum duration threshold (30 seconds)
   if (durationSeconds < 30) {
-    warnings.push('The conversation was too short. Try to stay on the line longer and share more details.');
+    warnings.push(
+      'The conversation was too short. Try to stay on the line longer and share more details.'
+    );
     score = Math.min(score, 20); // Cap score at 20 for too-short calls
   }
 
@@ -379,4 +446,3 @@ export function scoreToXP(score: number): number {
   if (score >= 15) return 10;
   return 0;
 }
-

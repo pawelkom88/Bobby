@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import BottomNav from './BottomNav';
+import { ROUTES } from '@/lib/routes';
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -10,27 +11,34 @@ interface PageWrapperProps {
 
 export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname();
-  
+
   // Hide bottom nav on root route, /app/dial, and /app/conversation
-  const showBottomNav = pathname !== '/' && pathname !== '/app/dial' && pathname !== '/app/conversation';
+  const showBottomNav =
+    pathname !== ROUTES.HOME &&
+    pathname !== ROUTES.DIAL &&
+    pathname !== ROUTES.CONVERSATION;
 
   return (
-    <div className="page-wrapper" style={{
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-    }}>
-      <div style={{ 
-        flex: 1, 
-        overflowY: 'auto', 
-        overflowX: 'hidden',
-        WebkitOverflowScrolling: 'touch',
-      }}>
+    <div
+      className="page-wrapper"
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         {children}
       </div>
       {showBottomNav && <BottomNav />}
     </div>
   );
 }
-

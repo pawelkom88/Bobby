@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+build
+*.log
+.env*
+.git
+.vscode
+.idea
+public
+*.md

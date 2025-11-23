@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useState, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from 'react';
+import {logger} from "@/lib/logger";
 
 interface MicrophoneContextType {
   microphone: MediaStreamAudioSourceNode | null;
@@ -12,14 +20,25 @@ interface MicrophoneContextType {
   processor: ScriptProcessorNode | undefined;
 }
 
-const MicrophoneContext = createContext<MicrophoneContextType | undefined>(undefined);
+const MicrophoneContext = createContext<MicrophoneContextType | undefined>(
+  undefined
+);
 
-export const MicrophoneContextProvider = ({ children }: { children: ReactNode }) => {
+export const MicrophoneContextProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [microphoneState, setMicrophoneState] = useState<number | null>(null);
-  const [microphone, setMicrophone] = useState<MediaStreamAudioSourceNode | null>(null);
+  const [microphone, setMicrophone] =
+    useState<MediaStreamAudioSourceNode | null>(null);
   const [microphoneError, setMicrophoneError] = useState<string | null>(null);
-  const [microphoneAudioContext, setMicrophoneAudioContext] = useState<AudioContext | undefined>(undefined);
-  const [processor, setProcessor] = useState<ScriptProcessorNode | undefined>(undefined);
+  const [microphoneAudioContext, setMicrophoneAudioContext] = useState<
+    AudioContext | undefined
+  >(undefined);
+  const [processor, setProcessor] = useState<ScriptProcessorNode | undefined>(
+    undefined
+  );
 
   const setupMicrophone = async () => {
     setMicrophoneState(0); // Setting up
@@ -36,7 +55,8 @@ export const MicrophoneContextProvider = ({ children }: { children: ReactNode })
         },
       });
 
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
       const micSource = audioContext.createMediaStreamSource(stream);
       const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
 
@@ -45,7 +65,7 @@ export const MicrophoneContextProvider = ({ children }: { children: ReactNode })
       setProcessor(scriptProcessor);
       setMicrophoneState(1); // Ready
     } catch (err) {
-      console.error("Error setting up microphone:", err);
+      logger.error('Error setting up microphone:', err);
       setMicrophoneState(null);
       setMicrophoneError(err instanceof Error ? err.message : String(err));
     }
@@ -94,8 +114,9 @@ export const MicrophoneContextProvider = ({ children }: { children: ReactNode })
 export function useMicrophone() {
   const context = useContext(MicrophoneContext);
   if (context === undefined) {
-    throw new Error("useMicrophone must be used within a MicrophoneContextProvider");
+    throw new Error(
+      'useMicrophone must be used within a MicrophoneContextProvider'
+    );
   }
   return context;
 }
-

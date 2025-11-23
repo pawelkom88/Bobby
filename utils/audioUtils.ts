@@ -1,9 +1,15 @@
 // Audio processing utilities for Deepgram Voice Agent
 
-export function createAudioBuffer(audioContext: AudioContext, data: ArrayBuffer, sampleRate = 24000) {
+import {logger} from "@/lib/logger";
+
+export function createAudioBuffer(
+  audioContext: AudioContext,
+  data: ArrayBuffer,
+  sampleRate = 24000
+) {
   const audioDataView = new Int16Array(data);
   if (audioDataView.length === 0) {
-    console.error("Received audio data is empty.");
+    logger.error('Received audio data is empty.');
     return;
   }
 
@@ -22,12 +28,12 @@ export function createAudioBuffer(audioContext: AudioContext, data: ArrayBuffer,
 export function playAudioBuffer(
   audioContext: AudioContext,
   buffer: AudioBuffer,
-  startTimeRef: React.MutableRefObject<number>,
+  startTimeRef: React.RefObject<number>,
   analyser?: AnalyserNode
 ) {
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
-  
+
   if (analyser) {
     source.connect(analyser);
     analyser.connect(audioContext.destination);
@@ -36,7 +42,7 @@ export function playAudioBuffer(
   }
 
   const currentTime = audioContext.currentTime;
-  
+
   // Ensure we schedule slightly in the future if we fell behind
   if (startTimeRef.current < currentTime) {
     startTimeRef.current = currentTime;
@@ -48,7 +54,11 @@ export function playAudioBuffer(
   return source;
 }
 
-export function downsample(buffer: Float32Array, fromSampleRate: number, toSampleRate: number) {
+export function downsample(
+  buffer: Float32Array,
+  fromSampleRate: number,
+  toSampleRate: number
+) {
   if (fromSampleRate === toSampleRate) {
     return buffer;
   }
@@ -78,6 +88,5 @@ export function convertFloat32ToInt16(buffer: Float32Array) {
   while (l--) {
     buf[l] = Math.min(1, buffer[l]) * 0x7fff;
   }
-  return buf.buffer;
+  return buf;
 }
-
