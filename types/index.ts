@@ -41,6 +41,7 @@ export interface Badge {
   levelEarned?: number;
   description?: string;
   timestamp?: string;
+  image?: string;
 }
 
 export interface UserSettings {

@@ -13,9 +13,10 @@ import {
   awardScoreBadge,
 } from '@/lib/storage';
 import { calculateXPEarned } from '@/lib/gamification';
+import { playFanfareSound } from '@/lib/uiSound';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
+import { logger } from '@/lib/logger';
 import { ROUTES } from '@/lib/routes';
-import {logger} from "@/lib/logger";
 
 interface CompletionScreenProps {
   service?: Service;
@@ -75,6 +76,10 @@ export default function CompletionScreen({
       // Only show confetti if XP was earned
       if (xp > 0) {
         setShowConfetti(true);
+        // Play fanfare sound for successful completion
+        playFanfareSound(true).catch(() => {
+          // Ignore audio errors silently
+        });
       }
 
       const result = addXP(xp);

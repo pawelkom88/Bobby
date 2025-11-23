@@ -278,3 +278,61 @@ export async function playEndConversationSound(
     // ignore
   }
 }
+
+/**
+ * Play a one-shot "fanfare" sound for successful completion.
+ * Uses the fanfare.mp3 file from public/sfx directory.
+ */
+export async function playFanfareSound(enabled: boolean): Promise<void> {
+  if (!enabled || typeof window === 'undefined') {
+    return;
+  }
+
+  // Try to play fanfare.mp3 from sfx directory
+  const candidates = ['/sfx/fanfare.mp3', '/fanfare.mp3'];
+
+  for (const url of candidates) {
+    try {
+      const audio = new Audio(url);
+      audio.volume = 0.5; // Quiet as requested
+      await audio.play();
+      return;
+    } catch {
+      // Try next candidate
+    }
+  }
+
+  // Fallback to Web Audio triumphant sound
+  const ac = getAudioContext();
+  if (!ac) return;
+
+  try {
+    if (ac.state === 'suspended') {
+      await ac.resume();
+    }
+    const now = ac.currentTime;
+
+    // Create a short triumphant chord progression
+    const notes = [523.25, 659.25, 783.99]; // C, E, G (C major chord)
+
+    notes.forEach((freq, index) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + index * 0.1);
+
+      gain.gain.setValueAtTime(0.0001, now + index * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.1 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.1 + 0.4);
+
+      osc.connect(gain);
+      gain.connect(ac.destination);
+
+      osc.start(now + index * 0.1);
+      osc.stop(now + index * 0.1 + 0.5);
+    });
+  } catch {
+    // Ignore audio errors
+  }
+}

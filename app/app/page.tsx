@@ -48,7 +48,7 @@ export default function AppPage() {
                 <div className="badges-section">
                   <h2 className="badges-title">YOUR BADGES</h2>
                   <div className="badges-container">
-                    <BadgeDisplay showAll={false} />
+                    <BadgeDisplay showAll={true} />
                   </div>
                 </div>
               </div>

@@ -26,6 +26,7 @@
   --font-family-heading: var(--font-super-kindly);
   --font-family-cartoon: var(--font-super-kindly);
   --font-family-accessibility: var(--font-atkinson-hyperlegible);
+  --font-family-amity-jack: 'Amity Jack', sans-serif;
 
   /* Font sizing */
   --font-size-base: 16px;
@@ -35,6 +36,18 @@
   --btn-border-color: #eb6934;
   --btn-text-color: #9a431f;
   --btn-light-color: #ffda66;
+}
+
+/* ============================================================================
+   FONT FACE DEFINITIONS
+   ============================================================================ */
+
+@font-face {
+  font-family: 'Amity Jack';
+  src: url('/amityjack.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* ============================================================================
@@ -3837,8 +3850,8 @@ a,
 .badge-name {
   font-weight: 700;
   color: #333;
-  font-size: 1.1rem;
-  font-family: var(--font-family-body);
+  font-size: 1.8rem;
+  font-family: var(--font-family-amity-jack);
 }
 
 .badge-level {

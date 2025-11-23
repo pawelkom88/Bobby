@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { getBadges } from '@/lib/storage';
+import { BADGES } from '@/lib/gamification';
 import type { Badge } from '@/types';
 
 interface BadgeDisplayProps {
@@ -40,13 +42,11 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
 
   // All possible badges (for showing locked ones if showAll is true)
   const allBadges: Badge[] = [
-    { id: 'first-steps-hero', name: 'First Steps Hero', levelEarned: 3 },
-    {
-      id: 'confident-communicator',
-      name: 'Confident Communicator',
-      levelEarned: 6,
-    },
-    { id: 'emergency-expert', name: 'Emergency Expert', levelEarned: 9 },
+    BADGES.FIRST_CALL_HERO,
+    BADGES.BRAVE_HELPER,
+    BADGES.CALM_COMMUNICATOR,
+    BADGES.LISTENING_MASTER,
+    BADGES.SCENARIO_EXPLORER,
   ];
 
   const displayedBadges = showAll ? allBadges : badges;
@@ -74,36 +74,18 @@ export default function BadgeDisplay({ showAll = false }: BadgeDisplayProps) {
               aria-label={`${badge.name} badge ${isEarned ? 'earned' : 'locked'}`}
             >
               <div className="badge-icon" aria-hidden="true">
-                {isEarned ? (
-                  <span>🏆</span>
-                ) : (
-                  <div className="padlock-wrapper">
-                    <input
-                      id={`lock-${badge.id}`}
-                      type="checkbox"
-                      name="unlocked"
-                      value="1"
-                      aria-hidden="true"
-                    />
-                    <label htmlFor={`lock-${badge.id}`} className="padlock">
-                      <div className="padlock__sr">Unlock</div>
-                      <div className="padlock__top">
-                        <div className="padlock__top-a"></div>
-                        <div className="padlock__top-b"></div>
-                      </div>
-                      <div className="padlock__bottom"></div>
-                    </label>
-                  </div>
-                )}
+                <Image
+                  src={badge.image!}
+                  alt={`${badge.name} badge ${isEarned ? 'earned' : 'locked'}`}
+                  className={`badge-image ${isEarned ? 'earned' : 'locked'}`}
+                  width={300}
+                  height={300}
+                  loading="lazy"
+                />
               </div>
               <div className="badge-name">{badge.name}</div>
-              {isEarned && (
-                <div className="badge-level">Level {badge.levelEarned}</div>
-              )}
-              {!isEarned && showAll && (
-                <div className="badge-requirement">
-                  Reach Level {badge.levelEarned}
-                </div>
+              {isEarned && badge.description && (
+                <div className="badge-description">{badge.description}</div>
               )}
             </div>
           );

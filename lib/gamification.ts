@@ -19,38 +19,42 @@ export const LEVEL_REQUIREMENTS: number[] = [
   2700, // Level 10 (Max level)
 ];
 
-// Badge definitions
+// Badge definitions - ordered by acquisition difficulty/progress
 export const BADGES = {
-  LEVEL_3: {
-    id: 'first-steps-hero',
-    name: 'First Steps Hero',
-    levelEarned: 3,
+  // 1. First Call Hero - Completing first emergency call
+  FIRST_CALL_HERO: {
+    id: 'first-call-hero',
+    name: 'First Call Hero',
+    image: '/first-call-hero.png',
+    description: 'Completed your first emergency call!',
   },
-  LEVEL_6: {
-    id: 'confident-communicator',
-    name: 'Confident Communicator',
-    levelEarned: 6,
+  // 2. Brave Helper - Showing courage in emergency situations
+  BRAVE_HELPER: {
+    id: 'brave-helper',
+    name: 'Brave Helper',
+    image: '/brave-helper.png',
+    description: 'Helped in a scary emergency situation',
   },
-  LEVEL_9: {
-    id: 'emergency-expert',
-    name: 'Emergency Expert',
-    levelEarned: 9,
+  // 3. Calm Communicator - Communicating clearly under pressure
+  CALM_COMMUNICATOR: {
+    id: 'calm-communicator',
+    name: 'Calm Communicator',
+    image: '/callm-communicator.png', // Note: filename has typo in public dir
+    description: 'Stayed calm and communicated clearly',
   },
-  // Performance-based badges (score thresholds)
-  SCORE_90: {
-    id: 'excellent-communicator',
-    name: 'Excellent Communicator',
-    description: 'Scored 90+ on a conversation',
+  // 4. Listening Master - Good listening and response skills
+  LISTENING_MASTER: {
+    id: 'listening_master',
+    name: 'Listening Master',
+    image: '/listening_master.png',
+    description: 'Listened carefully and responded well',
   },
-  SCORE_80: {
-    id: 'great-helper',
-    name: 'Great Helper',
-    description: 'Scored 80+ on a conversation',
-  },
-  SCORE_70: {
-    id: 'good-effort',
-    name: 'Good Effort',
-    description: 'Scored 70+ on a conversation',
+  // 5. Scenario Explorer - Tried different types of emergencies
+  SCENARIO_EXPLORER: {
+    id: 'scenario_explorer',
+    name: 'Scenario Explorer',
+    image: '/scenario_explorer.png',
+    description: 'Practiced different emergency scenarios',
   },
 } as const;
 
@@ -96,9 +100,55 @@ export function getXPToNextLevel(totalXP: number): number {
  */
 export function getBadgeForLevel(level: number): Badge | null {
   if (BADGE_MILESTONES.includes(level)) {
-    if (level === 3) return BADGES.LEVEL_3;
-    if (level === 6) return BADGES.LEVEL_6;
-    if (level === 9) return BADGES.LEVEL_9;
+    if (level === 3) return BADGES.FIRST_CALL_HERO;
+    if (level === 6) return BADGES.BRAVE_HELPER;
+    if (level === 9) return BADGES.CALM_COMMUNICATOR;
+  }
+  return null;
+}
+
+/**
+ * Get badge for first conversation completion
+ */
+export function getBadgeForFirstCall(): Badge {
+  return BADGES.FIRST_CALL_HERO;
+}
+
+/**
+ * Get badge based on scenario type (bravery in dangerous situations)
+ */
+export function getBadgeForScenario(scenario: string): Badge | null {
+  if (scenario === 'police') {
+    return BADGES.BRAVE_HELPER;
+  }
+  if (scenario === 'fire') {
+    return BADGES.BRAVE_HELPER;
+  }
+  return null;
+}
+
+/**
+ * Check if a performance-based badge should be awarded based on score
+ */
+export function getBadgeForScore(score: number): Badge | null {
+  if (score >= 90) {
+    return BADGES.CALM_COMMUNICATOR;
+  }
+  if (score >= 80) {
+    return BADGES.LISTENING_MASTER;
+  }
+  if (score >= 70) {
+    return BADGES.BRAVE_HELPER;
+  }
+  return null;
+}
+
+/**
+ * Check if scenario explorer badge should be awarded
+ */
+export function getBadgeForScenariosExplored(scenariosCount: number): Badge | null {
+  if (scenariosCount >= 3) { // Tried all 3 emergency types
+    return BADGES.SCENARIO_EXPLORER;
   }
   return null;
 }
@@ -120,20 +170,4 @@ export function calculateXPEarned(
   if (performance.stayedCalm) xp += 15;
 
   return Math.min(xp, 100);
-}
-
-/**
- * Check if a performance-based badge should be awarded based on score
- */
-export function getBadgeForScore(score: number): Badge | null {
-  if (score >= 90) {
-    return BADGES.SCORE_90;
-  }
-  if (score >= 80) {
-    return BADGES.SCORE_80;
-  }
-  if (score >= 70) {
-    return BADGES.SCORE_70;
-  }
-  return null;
 }
