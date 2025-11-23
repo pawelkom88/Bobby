@@ -18,7 +18,7 @@ const atkinsonHyperlegible = Atkinson_Hyperlegible({
 });
 
 const superKindly = localFont({
-  src: '../public/SuperKindly.ttf',
+  src: '../public/amityjack.ttf',
   variable: '--font-super-kindly',
   display: 'swap',
 });

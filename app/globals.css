@@ -4252,3 +4252,221 @@ a,
   font-size: 3rem;
   animation: shake 0.5s;
 }
+
+/* ============================================================================
+   LANDING PAGE
+   ============================================================================ */
+
+.landing-container {
+    min-height: 100vh;
+    background: linear-gradient(
+            to bottom,
+            #b7e0ff 0%,
+            #c5e7e0 40%,
+            #f4f1d9 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.landing-wrapper {
+    width: 100%;
+    max-width: 920px;
+    background: #EDF6FB;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.landing-nav {
+    background: white;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 32px 32px 0 0;
+}
+
+.landing-nav-placeholder {
+    width: 380px;
+    height: 30px;
+    background: #d1d5db;
+    border-radius: 4px;
+}
+
+.landing-nav-button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+}
+
+.landing-nav-button:hover {
+    background: #2563eb;
+}
+
+.landing-main {
+    padding: 80px 40px 120px;
+}
+
+.landing-content {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.landing-text-section {
+    flex: 1;
+}
+
+.landing-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.landing-subtitle {
+    font-size: 20px;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.landing-cta-button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 18px 36px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+}
+
+.landing-cta-button:hover {
+    background: #2563eb;
+}
+
+.landing-phone-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.landing-image-placeholder {
+    width: 250px;
+    height: 200px;
+    background: #d1d5db;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.landing-footer {
+    background: white;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0 0 32px 32px;
+}
+
+.landing-footer-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.landing-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.landing-footer-link {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.landing-footer-link:hover {
+    color: #334155;
+}
+
+.landing-twitter-icon {
+    width: 48px;
+    height: 48px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+}
+
+.landing-twitter-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.landing-twitter-icon:hover {
+    background: #2563eb;
+}
+
+@media (max-width: 768px) {
+    .landing-nav {
+        padding: 16px 24px;
+    }
+
+    .landing-nav-placeholder {
+        width: 200px;
+        height: 24px;
+    }
+
+    .landing-nav-button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+
+    .landing-main {
+        padding: 40px 24px 60px;
+    }
+
+    .landing-content {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .landing-title {
+        font-size: 36px;
+    }
+
+    .landing-subtitle {
+        font-size: 18px;
+    }
+
+    .landing-image-placeholder {
+        width: 100%;
+        height: 180px;
+    }
+
+    .landing-footer {
+        padding: 20px 24px;
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+}
