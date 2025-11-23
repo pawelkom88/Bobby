@@ -232,6 +232,18 @@ export default function VoiceConversation({
                   }, 3000); // 3 second delay to allow farewell message to be spoken
                 }
               }
+
+              // Check if user is using farewell keywords
+              if (msg.role === 'user') {
+                const farewellPhrases = ['bye', 'take care', 'stay safe', 'bye for now', 'see you later', 'goodbye'];
+                const isUserFarewell = farewellPhrases.some(phrase => 
+                  msg.content.toLowerCase().includes(phrase.toLowerCase())
+                );
+                
+                if (isUserFarewell) {
+                  console.log('%c🚨 USER USED FAREWELL KEYWORD 🚨', 'color: red; font-size: 24px; font-weight: bold; background: yellow; padding: 10px;');
+                }
+              }
               break;
             
             case 'EndOfThought':
@@ -351,10 +363,13 @@ export default function VoiceConversation({
                   think: {
                       provider: {
                           type: "open_ai",
-                          model: "gpt-4o-mini",
+                          model: "gpt-4.1-mini",
+                          temperature: 0.4
+                          // model: "gpt-4o-mini",
                       },
                       prompt: instructions,
                   },
+                  // type: "UpdateSpeak",
                   speak: {
                       provider: {
                           type: "deepgram",
@@ -393,6 +408,8 @@ export default function VoiceConversation({
 
   const endConversation = async () => {
     try {
+      console.log('%c🎉 CONVERSATION ENDED 🎉', 'color: green; font-size: 24px; font-weight: bold; background: lightgreen; padding: 10px;');
+      
       disconnectFromDeepgram();
       
       // Stop audio

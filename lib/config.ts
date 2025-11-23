@@ -13,7 +13,7 @@ export const CONFIG = {
   DEEPGRAM_API_ENDPOINT: '/api/authenticate',
   
   // Agent Models
-  AGENT_LISTEN_MODEL: 'nova-2',
+  AGENT_LISTEN_MODEL: 'nova-3',
   AGENT_THINK_PROVIDER: 'open_ai',
   AGENT_THINK_MODEL: 'gpt-4o-mini',
   AGENT_SPEAK_MODEL: 'aura-asteria-en',
