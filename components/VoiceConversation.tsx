@@ -148,7 +148,9 @@ export default function VoiceConversation({
     if (!socket) return;
 
     const onMessage = async (event: MessageEvent) => {
+      console.log('VoiceConversation: onMessage received, data type:', typeof event.data, 'length:', event.data.length);
       if (event.data instanceof ArrayBuffer) {
+        console.log('VoiceConversation: Received audio data, processing...');
         // Audio Data
         if (audioContextRef.current) {
           const buffer = createAudioBuffer(audioContextRef.current, event.data);
@@ -168,9 +170,12 @@ export default function VoiceConversation({
           }
         }
       } else {
+        console.log('VoiceConversation: Received JSON message, parsing...');
         // JSON Message
         try {
           const msg = JSON.parse(event.data);
+          console.log('VoiceConversation: Parsed message:', msg);
+
           logger.debug('Deepgram Message:', msg);
 
           switch (msg.type) {
@@ -266,7 +271,9 @@ export default function VoiceConversation({
 
   // When socket opens, send configuration
   useEffect(() => {
+    console.log('VoiceConversation: socketState changed to', socketState, 'isConnecting:', isConnecting);
       if (socketState === 1 && isConnecting) {
+          console.log('VoiceConversation: Socket connected, sending configuration');
           // Connected
           setIsConnecting(false);
           setSessionActive(true);
@@ -276,7 +283,9 @@ export default function VoiceConversation({
           }
 
           // Send Configuration
+          console.log('VoiceConversation: Generating system prompt...');
           const instructions = generateSystemPrompt(ageTier, situation);
+          console.log('VoiceConversation: System prompt generated, length:', instructions.length);
           
           const config: DeepgramAgentConfig = {
               type: "Settings",
@@ -292,30 +301,43 @@ export default function VoiceConversation({
                   }
               },
               agent: {
+                  language: "en",
                   listen: {
-                      model: "nova-2",
+                      provider: {
+                          type: "deepgram",
+                          model: "nova-3",
+                      }
                   },
                   think: {
                       provider: {
                           type: "open_ai",
+                          model: "gpt-4o-mini",
                       },
-                      model: "gpt-4o-mini",
-                      instructions: instructions,
+                      prompt: instructions,
                   },
                   speak: {
-                      model: "aura-asteria-en",
+                      provider: {
+                          type: "deepgram",
+                          model: "aura-2-draco-en"
+                      }
                   }
               }
           };
 
+          console.log('VoiceConversation: Config created:', JSON.stringify(config, null, 2));
+
           if (socket) {
+            console.log('VoiceConversation: Sending Settings message to socket');
             sendSocketMessage(socket, config);
             
-            // Start microphone
+            console.log('VoiceConversation: Starting microphone');
             startMicrophone();
             setIsListening(true);
+          } else {
+            console.error('VoiceConversation: Socket is null when trying to send config');
           }
       } else if (socketState === 2) {
+          console.log('VoiceConversation: Socket error state detected');
           // Error
           if (isConnecting) {
             setIsConnecting(false);

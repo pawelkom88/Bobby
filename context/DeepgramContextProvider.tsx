@@ -18,51 +18,77 @@ export const DeepgramContextProvider = ({ children }: { children: ReactNode }) =
   const keepAliveInterval = useRef<NodeJS.Timeout | null>(null);
 
   const connectToDeepgram = async () => {
-    if (socket && socket.readyState === WebSocket.OPEN) return;
+    console.log('DeepgramContext: connectToDeepgram called');
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      console.log('DeepgramContext: Socket already open, returning');
+      return;
+    }
 
     setSocketState(0); // Connecting
+    console.log('DeepgramContext: Setting socket state to connecting (0)');
 
     try {
+      console.log('DeepgramContext: Fetching auth token...');
       const token = await getAuthToken();
+      console.log('DeepgramContext: Auth token received:', token ? 'SUCCESS' : 'FAILED');
       if (!token) {
-        console.error("Failed to get auth token");
+        console.error("DeepgramContext: Failed to get auth token");
         setSocketState(2); // Error
         return;
       }
 
+      console.log('DeepgramContext: Creating WebSocket connection...');
       const ws = new WebSocket("wss://agent.deepgram.com/v1/agent/converse", [
         "bearer",
         token,
       ]);
+      console.log('DeepgramContext: WebSocket created, setting up event listeners');
 
       ws.binaryType = "arraybuffer";
 
       ws.onopen = () => {
-        console.log("Deepgram WebSocket connected");
+        console.log("DeepgramContext: WebSocket onopen triggered - connected successfully");
         setSocketState(1); // Connected
         
         // Start keep-alive
+        console.log('DeepgramContext: Starting keep-alive interval (5000ms)');
         keepAliveInterval.current = setInterval(sendKeepAliveMessage(ws), 5000);
       };
 
       ws.onerror = (error) => {
-        console.error("Deepgram WebSocket error:", error);
+        console.error("DeepgramContext: WebSocket onerror:", error);
         setSocketState(2); // Error
       };
 
       ws.onclose = () => {
-        console.log("Deepgram WebSocket closed");
+        console.log("DeepgramContext: WebSocket onclose triggered");
         setSocketState(3); // Closed
         if (keepAliveInterval.current) {
+          console.log('DeepgramContext: Clearing keep-alive interval');
           clearInterval(keepAliveInterval.current);
           keepAliveInterval.current = null;
         }
         setSocket(null);
       };
 
+      ws.onmessage = (event) => {
+        console.log('DeepgramContext: Received message:', event.data);
+        try {
+          if (typeof event.data === 'string') {
+            const parsed = JSON.parse(event.data);
+            console.log('DeepgramContext: Parsed message:', parsed);
+          } else {
+            console.log('DeepgramContext: Binary message received');
+          }
+        } catch (e) {
+          console.error('DeepgramContext: Failed to parse message:', e);
+        }
+      };
+
+      console.log('DeepgramContext: Setting socket state');
       setSocket(ws);
     } catch (error) {
-      console.error("Error connecting to Deepgram:", error);
+      console.error("DeepgramContext: Error in connectToDeepgram:", error);
       setSocketState(2); // Error
     }
   };
