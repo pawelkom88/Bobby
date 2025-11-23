@@ -319,10 +319,10 @@ export default function VoiceConversation({
           
           // Dynamic greeting based on scenario
           const greeting = situation === 'ambulance' 
-            ? "Ambulance service. Is the patient breathing?"
+            ? "Hi, I'm Bobby from Ambulance Service. Is the patient breathing?"
             : situation === 'fire'
-            ? "Fire and Rescue. What is the problem?"
-            : "Police emergency.";
+            ? "Hi, I'm Bobby from Fire and Rescue. What is the problem?"
+            : "Hi, I'm Bobby from Police. What's wrong?";
           
           const config: DeepgramAgentConfig = {
               type: "Settings",
