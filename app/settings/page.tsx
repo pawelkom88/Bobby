@@ -6,20 +6,18 @@ import AccessibilitySection from '@/components/AccessibilitySection';
 import CartoonButton from '@/components/CartoonButton';
 import PageWrapper from '@/components/PageWrapper';
 import { resetProgress } from '@/lib/storage';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 
 export default function SettingsPage() {
-  const router = useRouter();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetConfirmed, setResetConfirmed] = useState(false);
 
   const handleResetProgress = () => {
     if (showResetConfirm) {
       resetProgress();
       setShowResetConfirm(false);
-      // Redirect to home after reset
-      router.push(ROUTES.HOME);
+      setResetConfirmed(true);
     } else {
       setShowResetConfirm(true);
     }
@@ -51,7 +49,7 @@ export default function SettingsPage() {
               <h2 id="progress-heading">Progress</h2>
               <div className="reset-progress-section">
                 {!showResetConfirm ? (
-                  <>
+                  <div>
                     <p>Reset all progress, badges, and conversation history.</p>
                     <CartoonButton
                       onClick={handleResetProgress}
@@ -60,7 +58,12 @@ export default function SettingsPage() {
                     >
                       Reset Progress
                     </CartoonButton>
-                  </>
+                    {resetConfirmed && (
+                      <p className="reset-confirmation" role="alert">
+                        Progress reset successfully.
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <>
                     <p className="reset-warning" role="alert">

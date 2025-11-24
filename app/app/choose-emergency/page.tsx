@@ -8,7 +8,7 @@ import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { setSelectedService } from '@/lib/storage';
 import { ROUTES } from '@/lib/routes';
-import {Service} from "@/types";
+import { Service } from '@/types';
 
 const services: Array<{
   id: Service;
@@ -85,7 +85,7 @@ export default function ChooseEmergencyPage() {
                       <Image
                         src={service.imagePath}
                         alt={service.label}
-                        width={100}
+                        width={120}
                         height={100}
                         className="emergency-tile-icon"
                       />

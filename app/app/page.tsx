@@ -31,6 +31,7 @@ export default function AppPage() {
                   <h1 className="welcome-title">WELCOME</h1>
                   <p className="welcome-subtitle">Hi, I am Bobby, your guide</p>
                 </div>
+
                 <AnimatedImageWrapper
                   src="/bobby.png"
                   alt="Bobby"
@@ -38,6 +39,7 @@ export default function AppPage() {
                   height={300}
                   className="welcome-image"
                 />
+
                 <CartoonButton
                   containerClassName="welcome-button"
                   asLink
@@ -45,11 +47,11 @@ export default function AppPage() {
                 >
                   CALL BOBBY
                 </CartoonButton>
-                <div className="badges-section">
-                  <h2 className="badges-title">YOUR BADGES</h2>
-                  <div className="badges-container">
-                    <BadgeDisplay showAll={true} />
-                  </div>
+              </div>
+              <div className="badges-section">
+                <h2 className="badges-title">YOUR BADGES</h2>
+                <div className="badges-container">
+                  <BadgeDisplay showAll={true} />
                 </div>
               </div>
             </div>
