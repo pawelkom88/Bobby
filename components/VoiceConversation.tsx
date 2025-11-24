@@ -202,11 +202,7 @@ export default function VoiceConversation({
 
   // Auto-start conversation
   useEffect(() => {
-    if (
-      autoStart &&
-      !sessionActive &&
-      !hasAutoStartedRef.current
-    ) {
+    if (autoStart && !sessionActive && !hasAutoStartedRef.current) {
       hasAutoStartedRef.current = true;
       const timer = setTimeout(() => {
         startConversation();
@@ -672,16 +668,6 @@ export default function VoiceConversation({
   function ConversationHeader() {
     return (
       <div className="conversation-header">
-        {onBack && !sessionActive && (
-          <button
-            type="button"
-            className="back-button"
-            onClick={onBack}
-            aria-label="Go back to dial pad"
-          >
-            ← Back
-          </button>
-        )}
         {sessionActive && <TimerDisplay remainingSeconds={remainingTime} />}
       </div>
     );
@@ -702,11 +688,6 @@ export default function VoiceConversation({
           width={200}
           height={250}
         />
-        <br />
-
-        <div className="conversation-start-section">
-          {isConnecting && <LoadingSpinner />}
-        </div>
       </>
     );
   }
