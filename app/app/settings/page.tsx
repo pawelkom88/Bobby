@@ -5,6 +5,7 @@ import { ViewTransition } from 'react';
 import AccessibilitySection from '@/components/AccessibilitySection';
 import CartoonButton from '@/components/CartoonButton';
 import PageWrapper from '@/components/PageWrapper';
+import LogoutButton from '@/components/LogoutButton';
 import { resetProgress } from '@/lib/storage';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
@@ -87,6 +88,19 @@ export default function SettingsPage() {
                     </div>
                   </>
                 )}
+              </div>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="account-heading"
+            >
+              <h2 id="account-heading">Account</h2>
+              <div className="account-section">
+                <p>Manage your account settings</p>
+                <LogoutButton className="cartoon-btn cartoon-btn-secondary">
+                  Sign Out
+                </LogoutButton>
               </div>
             </section>
 

@@ -50,7 +50,7 @@ function getSilencePhrases(
 ): string[] {
   const phrases = {
     '5–7 years old': [
-      'Are you still there love?',
+      'Are you still there?',
       "It's okay, I'm right here with you.",
       'Can you tell me what happened?',
       "I'm waiting for you to talk to me.",
@@ -228,7 +228,7 @@ You represent the **${serviceName}**. Sound like you:
 
 ### TIMING & TURN‑TAKING
 - Ask one question, then wait. Let the child finish speaking.
-- Silence ladder: after ~5 seconds of silence → use ONE of these reassuring phrases to keep the child engaged and feeling safe (choose just one): ${silencePhrases.map(p => `"${p}"`).join(' / ')}; after two nudges → try yes/no; third → ask for nearby adult.
+- Silence ladder: after ~8 seconds of silence ( it is crucial to follow this rule ) → use ONE of these reassuring phrases to keep the child engaged and feeling safe (choose just one): ${silencePhrases.map(p => `"${p}"`).join(' / ')}; after two nudges → try yes/no; third → ask for nearby adult.
 - Interruption: if the child starts talking while you speak, stop and listen.
 - Turn eagerness guidance: Patient for addresses/phones/postcodes; Normal by default; Eager for short reassurance.
 
@@ -248,7 +248,7 @@ Track: stage (opening, triage, location, safety, reassurance, arrival, closing),
 - Whispering (police): You whisper too. "I’ll ask yes or no. Are you in a locked room?"
 - Noisy line: "I heard 'kitchen'. Is that right?"
 - Address confirm: "So it's one two three Maple Road, S E 1 0 A A. Did I get that right?"
-- Silence trigger: If you receive "USER_IS_SILENT_TRIGGER", respond immediately with ONE of these age-appropriate silence phrases (choose just one): "Are you still there love?", "It's okay, I'm right here with you.", "Can you tell me what happened?", "I'm waiting for you to talk to me.", "Don't worry, take your time.", "I'm here to help you.", "Are you okay?", "Tell me when you're ready." This indicates the user has been silent for 5+ seconds and needs reassurance.
+- Silence trigger: If you receive "USER_IS_SILENT_TRIGGER", respond immediately with ONE of these age-appropriate silence phrases (choose just one): "Are you still there?", "It's okay, I'm right here with you.", "Can you tell me what happened?", "I'm waiting for you to talk to me.", "Don't worry, take your time.", "I'm here to help you.", "Are you okay?", "Tell me when you're ready." This indicates the user has been silent for 5+ seconds and needs reassurance.
 `;
 }
 

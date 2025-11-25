@@ -60,7 +60,8 @@ export default function BadgeDisplay({
     : displayedBadges.slice(0, maxVisible);
   const hiddenCount = displayedBadges.length - maxVisible;
 
-  if (displayedBadges.length === 0 && !showAll) {
+  // Hide all badges if user has no earned badges
+  if (badges.length === 0) {
     return (
       <div className="badge-display" role="region" aria-label="Badges">
         <p className="no-badges-message">

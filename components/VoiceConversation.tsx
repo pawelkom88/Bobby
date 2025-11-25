@@ -32,6 +32,7 @@ interface VoiceConversationProps {
   onComplete?: (conversation: ConversationMessage[]) => void;
   onBack?: () => void;
   autoStart?: boolean;
+  disableConnection?: boolean;
 }
 
 export default function VoiceConversation({
@@ -40,6 +41,7 @@ export default function VoiceConversation({
   onComplete,
   onBack,
   autoStart = false,
+  disableConnection = true,
 }: VoiceConversationProps) {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Thinking
@@ -94,8 +96,8 @@ export default function VoiceConversation({
             : 'idle';
 
   // Silence detection
-  const silenceThreshold = useRef(0.01); // Audio level threshold for silence
-  const silenceDuration = useRef(5000); // 5 seconds
+  const silenceThreshold = useRef(0.05); // Audio level threshold for silence (reduce false positives)
+  const silenceDuration = useRef(8000); // 8 seconds
   const lastAudioTime = useRef(Date.now());
   const silenceCheckInterval = useRef<NodeJS.Timeout | null>(null);
   const silenceTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -130,6 +132,8 @@ export default function VoiceConversation({
   // Start silence monitoring
   const startSilenceMonitoring = useCallback(() => {
     logger.log('VoiceConversation: Starting silence monitoring');
+    // Reset the silence timer whenever we (re)start monitoring so the child gets a full window to respond
+    lastAudioTime.current = Date.now();
     silenceCheckInterval.current = setInterval(() => {
       const now = Date.now();
       const timeSinceLastAudio = now - lastAudioTime.current;
@@ -202,14 +206,19 @@ export default function VoiceConversation({
 
   // Auto-start conversation
   useEffect(() => {
-    if (autoStart && !sessionActive && !hasAutoStartedRef.current) {
+    if (
+      autoStart &&
+      microphoneState === 1 &&
+      !sessionActive &&
+      !hasAutoStartedRef.current
+    ) {
       hasAutoStartedRef.current = true;
       const timer = setTimeout(() => {
         startConversation();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [autoStart, sessionActive]);
+  }, [autoStart, microphoneState, sessionActive]);
 
   // Update remaining time
   useEffect(() => {
@@ -312,6 +321,9 @@ export default function VoiceConversation({
 
           switch (msg.type) {
             case 'UserStartedSpeaking':
+              // Reset silence timer on confirmed user speech start
+              lastAudioTime.current = Date.now();
+
               setIsListening(false);
               setIsProcessing(true); // User speaking, agent thinking/listening
               setIsSpeaking(false);
@@ -341,6 +353,8 @@ export default function VoiceConversation({
               // Deepgram usually handles state well.
               setIsSpeaking(false);
               setIsListening(true);
+              // Give the child a fresh silence window after the agent stops speaking
+              lastAudioTime.current = Date.now();
               break;
 
             case 'ConversationText':
@@ -361,6 +375,11 @@ export default function VoiceConversation({
                 timestamp: new Date().toISOString(),
               };
               setConversation(prev => [...prev, newMsg]);
+
+              // User just sent a message -> reset silence timer
+              if (msg.role === 'user') {
+                lastAudioTime.current = Date.now();
+              }
 
               // Check if agent is ending the conversation (farewell phrases)
               if (msg.role === 'assistant') {
@@ -450,8 +469,22 @@ export default function VoiceConversation({
       // Start connecting sound
       stopConnectingSoundRef.current = startConnectingSound(soundEnabled);
 
-      // Connect to Deepgram
-      await connectToDeepgram();
+      if (!disableConnection) {
+        // Connect to Deepgram
+        await connectToDeepgram();
+      } else {
+        // Skip connection for development/styling
+        logger.log('VoiceConversation: Connection disabled for development');
+        setTimeout(() => {
+          setIsConnecting(false);
+          setSessionActive(true);
+          setIsListening(true);
+          if (stopConnectingSoundRef.current) {
+            stopConnectingSoundRef.current();
+            stopConnectingSoundRef.current = null;
+          }
+        }, 2000); // Simulate connection time
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       logger.error('Error starting conversation', { message });
@@ -685,6 +718,7 @@ export default function VoiceConversation({
         <Image
           src="/bobby-connecting.png"
           alt="Bobby is getting ready to chat"
+          className="floating-bobby"
           width={200}
           height={250}
         />
@@ -719,7 +753,7 @@ export default function VoiceConversation({
             gap: '2rem',
           }}
         >
-          <h2 className="kavoon" style={{ fontSize: '2rem', color: '#333' }}>
+          <h2 style={{ fontSize: '2rem', color: '#333' }}>
             {visualState === 'speaking' && 'Bobby is speaking...'}
             {visualState === 'listening' && 'Your turn to speak!'}
             {visualState === 'processing' && 'Bobby is thinking...'}
@@ -798,7 +832,7 @@ export default function VoiceConversation({
       role="region"
       aria-label="Voice conversation"
     >
-      <ConversationHeader />
+      {/*<ConversationHeader />*/}
       {conversationEnded && <ConversationEndingView />}
       {!conversationEnded && sessionActive && <ActiveConversationView />}
       {!conversationEnded && !sessionActive && <PreConversationView />}

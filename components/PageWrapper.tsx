@@ -12,7 +12,6 @@ interface PageWrapperProps {
 export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname();
 
-  // Hide bottom nav on root route, /app/dial, and /app/conversation
   const showBottomNav =
     pathname !== ROUTES.HOME &&
     pathname !== ROUTES.DIAL &&

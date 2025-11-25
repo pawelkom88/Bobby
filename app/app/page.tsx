@@ -33,10 +33,10 @@ export default function AppPage() {
                 </div>
 
                 <AnimatedImageWrapper
-                  src="/bobby.png"
+                  src="/bobby-hero.png"
                   alt="Bobby"
-                  width={300}
-                  height={300}
+                  width={275}
+                  height={275}
                   className="welcome-image"
                 />
 
@@ -47,12 +47,6 @@ export default function AppPage() {
                 >
                   CALL BOBBY
                 </CartoonButton>
-              </div>
-              <div className="badges-section">
-                <h2 className="badges-title">YOUR BADGES</h2>
-                <div className="badges-container">
-                  <BadgeDisplay showAll={true} />
-                </div>
               </div>
             </div>
           </main>

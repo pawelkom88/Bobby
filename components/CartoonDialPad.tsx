@@ -126,14 +126,12 @@ export default function CartoonDialPad({
 
       <div>
         {/* Heading */}
-        <h1 className="dial-heading">
-          Dial {targetNumber}
-        </h1>
+        <h1 className="dial-heading">Dial {targetNumber}</h1>
 
         {/* Number display */}
-        <div 
+        <div
           className={`dial-display ${!input ? 'empty' : ''}`}
-          aria-live="polite" 
+          aria-live="polite"
           aria-atomic="true"
         >
           {input || '___'}
@@ -225,15 +223,7 @@ export default function CartoonDialPad({
       </div>
 
       {onBack && (
-        <div
-          className="dial-back-button"
-          style={{
-            position: 'absolute',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-          }}
-        >
+        <div className="dial-back-button">
           <button
             type="button"
             className="cartoon-btn"

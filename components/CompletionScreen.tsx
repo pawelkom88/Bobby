@@ -55,18 +55,51 @@ export default function CompletionScreen({
   useEffect(() => {
     // Check if this completion has already been processed to prevent duplicate XP awards
     if (typeof window !== 'undefined') {
+      const assessmentData = sessionStorage.getItem('lastAssessment');
       const completionId = sessionStorage.getItem('completionId');
       const processedId = sessionStorage.getItem('processedCompletionId');
 
-      // Only award XP if this completion hasn't been processed yet
-      if (completionId && completionId === processedId) {
-        // Already processed, just display existing results
-        logger.log('Completion already processed, skipping XP award');
+      // Additional safeguard: check if this completionId was already processed in localStorage
+      const processedCompletions = JSON.parse(
+        localStorage.getItem('processedCompletions') || '[]'
+      );
+      const alreadyProcessed = processedCompletions.includes(completionId);
+
+      // If we have assessment data but no completionId, this is a page refresh - skip XP award
+      if (assessmentData && !completionId) {
+        logger.log('Page refresh detected, skipping XP award', {
+          assessmentData: !!assessmentData,
+          completionId,
+        });
         const xp = calculateXPEarned(performance);
         setXPEarned(xp);
         setCurrentLevel(getLevel());
         return;
       }
+
+      // Only award XP if we have a valid completionId that hasn't been processed
+      if (!completionId || alreadyProcessed || completionId === processedId) {
+        // Already processed, missing completionId, or no valid completion, just display existing results
+        logger.log(
+          'Completion already processed or invalid, skipping XP award',
+          {
+            completionId,
+            processedId,
+            alreadyProcessed,
+            hasCompletionId: !!completionId,
+          }
+        );
+        const xp = calculateXPEarned(performance);
+        setXPEarned(xp);
+        setCurrentLevel(getLevel());
+        return;
+      }
+
+      logger.log('Awarding XP for new completion', {
+        completionId,
+        processedId,
+        alreadyProcessed,
+      });
 
       // Calculate and award XP (first time only)
       const oldLevel = getLevel();
@@ -111,6 +144,18 @@ export default function CompletionScreen({
       // Mark this completion as processed
       if (completionId) {
         sessionStorage.setItem('processedCompletionId', completionId);
+
+        // Additional safeguard: persist in localStorage to survive refreshes
+        const processedCompletions = JSON.parse(
+          localStorage.getItem('processedCompletions') || '[]'
+        );
+        if (!processedCompletions.includes(completionId)) {
+          processedCompletions.push(completionId);
+          localStorage.setItem(
+            'processedCompletions',
+            JSON.stringify(processedCompletions)
+          );
+        }
       }
     } else {
       // Fallback for SSR or if sessionStorage is not available
@@ -118,7 +163,7 @@ export default function CompletionScreen({
       setXPEarned(xp);
       setCurrentLevel(getLevel());
     }
-  }, [service, ageTier, performance]);
+  }, [service, ageTier]);
 
   const handleContinue = () => {
     // Clear completion data when starting a new conversation
@@ -129,23 +174,16 @@ export default function CompletionScreen({
       sessionStorage.removeItem('conversationComplete');
     }
 
-    if (onContinue) {
-      onContinue();
-    } else {
-      router.push(ROUTES.APP);
-    }
+    router.push(ROUTES.YOUR_AGE);
   };
 
   const handleViewAchievements = () => {
-    if (onViewAchievements) {
-      onViewAchievements();
-    }
     router.push(ROUTES.ACHIEVEMENTS);
   };
 
   return (
     <div
-      className="completion-screen"
+      className="completion-content-wrapper"
       role="region"
       aria-label="Completion screen"
     >
@@ -153,140 +191,159 @@ export default function CompletionScreen({
         <Confetti active={showConfetti} duration={3000} />
       )}
 
+      <header className="completion-header">
+        <h1 className="completion-title">
+          {isLevel10
+            ? '🎉 Training Complete! 🎉'
+            : xpEarned === 0
+              ? 'Practice Session Complete'
+              : 'Well Done! 🎉'}
+        </h1>
+      </header>
+
       <div className="completion-content">
-        {isLevel10 ? (
-          <>
-            <h1 className="completion-title">🎉 Training Complete! 🎉</h1>
-            <p className="completion-message">
-              Congratulations! You've mastered emergency calls!
-            </p>
-            <p className="completion-encouragement">
-              You've learned how to stay calm, communicate clearly, and get help
-              when you need it. You're now prepared and confident. Great job!
-            </p>
-            <p className="completion-encouragement">
-              Remember, you can always practice more to stay sharp. Keep up the
-              amazing work!
-            </p>
-          </>
-        ) : xpEarned === 0 ? (
-          <>
-            <h1 className="completion-title">Practice Session Complete</h1>
-            <p className="completion-message">
-              You tried the {service} emergency scenario.
-            </p>
-            <p className="completion-encouragement">
-              Don't worry! Emergency calls can be tricky. Let's try again and
-              you'll do better!
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="completion-title">Well Done! 🎉</h1>
-            <p className="completion-message">
-              You completed the {service} emergency scenario!
-            </p>
-            {leveledUp && (
-              <div className="level-up-message" role="alert">
-                <h2>Level Up! 🚀</h2>
-                <p>You reached Level {currentLevel}!</p>
-              </div>
-            )}
-            {badgeAwarded && (
-              <div className="badge-awarded-message" role="alert">
-                <h2>New Badge Earned! 🏆</h2>
-                <p>{badgeAwarded.name}</p>
-              </div>
-            )}
-            {scoreBadgeAwarded && (
-              <div className="badge-awarded-message" role="alert">
-                <h2>Performance Badge! ⭐</h2>
-                <p>{scoreBadgeAwarded.name}</p>
-                {scoreBadgeAwarded.description && (
-                  <p className="badge-description">
-                    {scoreBadgeAwarded.description}
-                  </p>
-                )}
-              </div>
-            )}
-            <div className="xp-earned">
-              {xpEarned > 0 ? (
-                <p>You earned {xpEarned} XP!</p>
-              ) : (
-                <p className="no-xp-message">No XP earned this time</p>
-              )}
-              {assessment && (
-                <p className="assessment-score">
-                  Score: {Math.round(assessment.score)} / 100
+        <section
+          className="completion-section"
+          aria-labelledby="message-heading"
+        >
+          <div className="completion-card">
+            {isLevel10 ? (
+              <div className="completion-message">
+                <p>Congratulations! You've mastered emergency calls!</p>
+                <p>
+                  You've learned how to stay calm, communicate clearly, and get
+                  help when you need it. You're now prepared and confident.
+                  Great job!
                 </p>
-              )}
-            </div>
-          </>
-        )}
+                <p>
+                  Remember, you can always practice more to stay sharp. Keep up
+                  the amazing work!
+                </p>
+              </div>
+            ) : xpEarned === 0 ? (
+              <div className="completion-message">
+                <p>You tried the {service} emergency scenario.</p>
+                <p>
+                  Don't worry! Emergency calls can be tricky. Let's try again
+                  and you'll do better!
+                </p>
+              </div>
+            ) : (
+              <div className="completion-message">
+                <p>You completed the {service} emergency scenario!</p>
+                {leveledUp && (
+                  <div className="level-up-message" role="alert">
+                    <h2>Level Up! 🚀</h2>
+                    <p>You reached Level {currentLevel}!</p>
+                  </div>
+                )}
+                {badgeAwarded && (
+                  <div className="badge-awarded-message" role="alert">
+                    <h2>New Badge Earned! 🏆</h2>
+                    <p>{badgeAwarded.name}</p>
+                  </div>
+                )}
+                {scoreBadgeAwarded && (
+                  <div className="badge-awarded-message" role="alert">
+                    <h2>Performance Badge! ⭐</h2>
+                    <p>{scoreBadgeAwarded.name}</p>
+                    {scoreBadgeAwarded.description && (
+                      <p className="badge-description">
+                        {scoreBadgeAwarded.description}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="xp-earned">
+                  {xpEarned > 0 ? (
+                    <p>You earned {xpEarned} XP!</p>
+                  ) : (
+                    <p className="no-xp-message">No XP earned this time</p>
+                  )}
+                  {assessment && (
+                    <p className="assessment-score">
+                      Score: {Math.round(assessment.score)} / 100
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
 
         {xpEarned > 0 && (
-          <div className="completion-progress">
-            <LevelProgress showLabel={true} />
-          </div>
+          <section
+            className="completion-section"
+            aria-labelledby="progress-heading"
+          >
+            <h2 id="progress-heading">Your Progress</h2>
+            <div className="completion-card">
+              <LevelProgress showLabel={true} />
+            </div>
+          </section>
         )}
 
         {(badgeAwarded || scoreBadgeAwarded) && (
-          <div className="completion-badge">
-            <BadgeDisplay showAll={false} />
-          </div>
+          <section
+            className="completion-section"
+            aria-labelledby="badges-heading"
+          >
+            <h2 id="badges-heading">Your Badges</h2>
+            <div className="completion-card">
+              <BadgeDisplay showAll={false} />
+            </div>
+          </section>
         )}
 
         {assessment && (
-          <div className="assessment-feedback" aria-live="polite">
-            <h3>What you did well</h3>
-            <ul>
-              {assessment.positives.length > 0 ? (
-                assessment.positives.map((item, index) => (
-                  <li key={`pos-${index}`}>{item}</li>
-                ))
-              ) : (
-                <li>Great effort!</li>
-              )}
-            </ul>
-
-            <h3>Next time try</h3>
-            <ul>
-              {assessment.improvements.length > 0 ? (
-                assessment.improvements.map((item, index) => (
-                  <li key={`imp-${index}`}>{item}</li>
-                ))
-              ) : (
-                <li>Keep practicing to stay sharp.</li>
-              )}
-            </ul>
-
-            {assessment.warnings.length > 0 && (
-              <>
-                <h3>Friendly reminders</h3>
+          <section
+            className="completion-section"
+            aria-labelledby="feedback-heading"
+          >
+            <h2 id="feedback-heading">Feedback</h2>
+            <div
+              className="completion-card assessment-feedback"
+              aria-live="polite"
+            >
+              <div>
+                <h3>What you did well</h3>
                 <ul>
-                  {assessment.warnings.map((item, index) => (
-                    <li key={`warn-${index}`}>{item}</li>
-                  ))}
+                  {assessment.positives.length > 0 ? (
+                    assessment.positives.map((item, index) => (
+                      <li key={`pos-${index}`}>{item}</li>
+                    ))
+                  ) : (
+                    <li>Great effort!</li>
+                  )}
                 </ul>
-              </>
-            )}
-          </div>
-        )}
+              </div>
 
-        <div className="completion-actions">
-          <CartoonButton
-            onClick={handleContinue}
-            ariaLabel="Continue to next scenario"
-          >
-            Try Another Scenario
-          </CartoonButton>
-          <CartoonButton
-            onClick={handleViewAchievements}
-            ariaLabel="View achievements"
-          >
-            View Achievements
-          </CartoonButton>
-        </div>
+              <div>
+                <h3>Next time try</h3>
+                <ul>
+                  {assessment.improvements.length > 0 ? (
+                    assessment.improvements.map((item, index) => (
+                      <li key={`imp-${index}`}>{item}</li>
+                    ))
+                  ) : (
+                    <li>Keep practicing to stay sharp.</li>
+                  )}
+                </ul>
+              </div>
+
+              {assessment.warnings.length > 0 && (
+                <div>
+                  <h3>Friendly reminders</h3>
+                  <ul>
+                    {assessment.warnings.map((item, index) => (
+                      <li key={`warn-${index}`}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

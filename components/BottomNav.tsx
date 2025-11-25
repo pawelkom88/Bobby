@@ -53,9 +53,6 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   const isActive = (route: string) => {
-    if (route === '/app') {
-      return pathname === '/app' || pathname.startsWith('/app/');
-    }
     return pathname === route;
   };
 
