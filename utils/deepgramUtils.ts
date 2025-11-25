@@ -117,6 +117,7 @@ export interface DeepgramAgentConfig {
           mode: string;
           id: string;
         };
+        speed?: number;
       };
     };
     greeting?: string;

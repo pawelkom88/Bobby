@@ -98,9 +98,7 @@ export default function SettingsPage() {
               <h2 id="account-heading">Account</h2>
               <div className="account-section">
                 <p>Manage your account settings</p>
-                <LogoutButton className="cartoon-btn cartoon-btn-secondary">
-                  Sign Out
-                </LogoutButton>
+                <LogoutButton className="cartoon-btn">Sign Out</LogoutButton>
               </div>
             </section>
 

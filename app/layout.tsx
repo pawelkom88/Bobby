@@ -25,6 +25,7 @@ const superKindly = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com'),
   title: 'Bobby - Emergency Training for Kids',
   description: 'Help children practice emergency calls in a safe, fun way',
   alternates: {

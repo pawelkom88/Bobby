@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import Image from 'next/image';
+import { AuthButton } from '@/components/AuthButton';
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signUp, loading: authLoading } = useAuth();
@@ -82,22 +84,32 @@ export default function SignUpPage() {
       if (error instanceof FirebaseError) {
         switch (error.code) {
           case 'auth/email-already-in-use':
-            setErrors({ general: 'This email is already registered. Please log in instead.' });
+            setErrors({
+              general:
+                'This email is already registered. Please log in instead.',
+            });
             break;
           case 'auth/invalid-email':
             setErrors({ email: 'Invalid email address.' });
             break;
           case 'auth/operation-not-allowed':
-            setErrors({ general: 'Email/password accounts are not enabled. Please contact support.' });
+            setErrors({
+              general:
+                'Email/password accounts are not enabled. Please contact support.',
+            });
             break;
           case 'auth/weak-password':
-            setErrors({ password: 'Password is too weak. Please use a stronger password.' });
+            setErrors({
+              password: 'Password is too weak. Please use a stronger password.',
+            });
             break;
           default:
             setErrors({ general: 'Sign up failed. Please try again.' });
         }
       } else {
-        setErrors({ general: 'An unexpected error occurred. Please try again.' });
+        setErrors({
+          general: 'An unexpected error occurred. Please try again.',
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -107,21 +119,23 @@ export default function SignUpPage() {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     if (errors.email) {
-      setErrors((prev) => ({ ...prev, email: undefined }));
+      setErrors(prev => ({ ...prev, email: undefined }));
     }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     if (errors.password) {
-      setErrors((prev) => ({ ...prev, password: undefined }));
+      setErrors(prev => ({ ...prev, password: undefined }));
     }
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setConfirmPassword(e.target.value);
     if (errors.confirmPassword) {
-      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+      setErrors(prev => ({ ...prev, confirmPassword: undefined }));
     }
   };
 
@@ -130,36 +144,30 @@ export default function SignUpPage() {
       {/* Decorative sparkles */}
       <div className="login-sparkle" aria-hidden="true" />
 
-      <div className="login-container" role="main" aria-labelledby="signup-title">
+      <div
+        className="login-container"
+        role="main"
+        aria-labelledby="signup-title"
+      >
         {/* Character Placeholder */}
-        <div className="login-character" aria-hidden="true">
-          {/* Headphones */}
-          <div className="login-headphones">
-            <div className="login-headphone-left" />
-            <div className="login-headphone-right" />
-          </div>
-
-          {/* Face */}
-          <div className="login-face">
-            {/* Eyes */}
-            <div className="login-eyes">
-              <div className="login-eye login-eye-left" />
-              <div className="login-eye login-eye-right" />
-            </div>
-            {/* Mouth */}
-            <div className="login-mouth" />
-          </div>
-
-          {/* Shadow */}
-          <div className="login-character-shadow" />
-        </div>
+        <Image
+          src="/login-bobby.png"
+          alt="Bobby Logo"
+          width={200}
+          height={200}
+          className="login-character"
+        />
 
         {/* Welcome Text */}
-        <h1 id="signup-title" className="login-title">
+        <h1 id="login-title" className="login-title">
           Join Bobby!
         </h1>
 
-        <form onSubmit={handleSubmit} noValidate aria-describedby="signup-description">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          aria-describedby="signup-description"
+        >
           <p id="signup-description" className="sr-only">
             Create your Bobby account by entering your email and password.
           </p>
@@ -209,7 +217,11 @@ export default function SignUpPage() {
               />
             </div>
             {errors.email && (
-              <div id="email-error" className="login-error-message" role="alert">
+              <div
+                id="email-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.email}
               </div>
             )}
@@ -228,7 +240,14 @@ export default function SignUpPage() {
                 className="login-input-icon"
                 aria-hidden="true"
               >
-                <rect x="5" y="11" width="14" height="10" rx="2" fill="#A0A0B0" />
+                <rect
+                  x="5"
+                  y="11"
+                  width="14"
+                  height="10"
+                  rx="2"
+                  fill="#A0A0B0"
+                />
                 <path
                   d="M8 11V7a4 4 0 018 0v4"
                   stroke="#A0A0B0"
@@ -248,12 +267,18 @@ export default function SignUpPage() {
                 className="login-input"
                 required
                 aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? 'password-error' : undefined}
+                aria-describedby={
+                  errors.password ? 'password-error' : undefined
+                }
                 autoComplete="new-password"
               />
             </div>
             {errors.password && (
-              <div id="password-error" className="login-error-message" role="alert">
+              <div
+                id="password-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.password}
               </div>
             )}
@@ -272,7 +297,14 @@ export default function SignUpPage() {
                 className="login-input-icon"
                 aria-hidden="true"
               >
-                <rect x="5" y="11" width="14" height="10" rx="2" fill="#A0A0B0" />
+                <rect
+                  x="5"
+                  y="11"
+                  width="14"
+                  height="10"
+                  rx="2"
+                  fill="#A0A0B0"
+                />
                 <path
                   d="M8 11V7a4 4 0 018 0v4"
                   stroke="#A0A0B0"
@@ -292,33 +324,38 @@ export default function SignUpPage() {
                 className="login-input"
                 required
                 aria-invalid={!!errors.confirmPassword}
-                aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+                aria-describedby={
+                  errors.confirmPassword ? 'confirm-password-error' : undefined
+                }
                 autoComplete="new-password"
               />
             </div>
             {errors.confirmPassword && (
-              <div id="confirm-password-error" className="login-error-message" role="alert">
+              <div
+                id="confirm-password-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.confirmPassword}
               </div>
             )}
           </div>
 
           {/* Sign Up Button */}
-          <button
+          <AuthButton
             type="submit"
-            className="login-button"
             disabled={isSubmitting}
             aria-describedby="signup-description"
           >
             {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}
-          </button>
+          </AuthButton>
         </form>
 
         {/* Already have account */}
         <div className="login-signup">
-          Already have an account?{' '}
+          Already part of the team?{' '}
           <Link href={ROUTES.LOGIN} className="login-signup-link">
-            Log In
+            Jump back in!
           </Link>
         </div>
       </div>
@@ -326,3 +363,10 @@ export default function SignUpPage() {
   );
 }
 
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignUpForm />
+    </Suspense>
+  );
+}

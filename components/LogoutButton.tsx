@@ -35,7 +35,7 @@ export default function LogoutButton({ className, children }: LogoutButtonProps)
       className={className}
       aria-label="Sign out"
     >
-      {children || (isLoggingOut ? 'Signing out...' : 'Sign Out')}
+      <span>{children || (isLoggingOut ? 'Signing out...' : 'Sign Out')}</span>
     </button>
   );
 }

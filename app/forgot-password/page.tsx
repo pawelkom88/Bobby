@@ -5,11 +5,15 @@ import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import Image from 'next/image';
+import { AuthButton } from '@/components/AuthButton';
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; general?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; general?: string }>(
+    {}
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
@@ -52,13 +56,19 @@ export default function ForgotPasswordPage() {
             setErrors({ email: 'Invalid email address.' });
             break;
           case 'auth/too-many-requests':
-            setErrors({ general: 'Too many requests. Please try again later.' });
+            setErrors({
+              general: 'Too many requests. Please try again later.',
+            });
             break;
           default:
-            setErrors({ general: 'Failed to send reset email. Please try again.' });
+            setErrors({
+              general: 'Failed to send reset email. Please try again.',
+            });
         }
       } else {
-        setErrors({ general: 'An unexpected error occurred. Please try again.' });
+        setErrors({
+          general: 'An unexpected error occurred. Please try again.',
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -68,7 +78,7 @@ export default function ForgotPasswordPage() {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     if (errors.email) {
-      setErrors((prev) => ({ ...prev, email: undefined }));
+      setErrors(prev => ({ ...prev, email: undefined }));
     }
   };
 
@@ -77,32 +87,42 @@ export default function ForgotPasswordPage() {
       <div className="login-page">
         <div className="login-sparkle" aria-hidden="true" />
 
-        <div className="login-container" role="main" aria-labelledby="success-title">
+        <div
+          className="login-container"
+          role="main"
+          aria-labelledby="success-title"
+        >
           {/* Character Placeholder */}
-          <div className="login-character" aria-hidden="true">
-            <div className="login-headphones">
-              <div className="login-headphone-left" />
-              <div className="login-headphone-right" />
-            </div>
-            <div className="login-face">
-              <div className="login-eyes">
-                <div className="login-eye login-eye-left" />
-                <div className="login-eye login-eye-right" />
-              </div>
-              <div className="login-mouth" />
-            </div>
-            <div className="login-character-shadow" />
-          </div>
+          <Image
+            src="/login-bobby.png"
+            alt="Bobby Logo"
+            width={200}
+            height={200}
+            className="login-character"
+          />
 
           <h1 id="success-title" className="login-title">
             Check Your Email!
           </h1>
 
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <p style={{ fontSize: '18px', color: '#4A4A5E', marginBottom: '20px' }}>
+            <p
+              style={{
+                fontSize: '18px',
+                color: '#4A4A5E',
+                marginBottom: '20px',
+              }}
+            >
               We've sent a password reset link to:
             </p>
-            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#2C3E50', marginBottom: '30px' }}>
+            <p
+              style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                color: '#2C3E50',
+                marginBottom: '30px',
+              }}
+            >
               {email}
             </p>
             <p style={{ fontSize: '16px', color: '#7F8C8D' }}>
@@ -112,7 +132,15 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
 
-          <Link href={ROUTES.LOGIN} className="login-button" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>
+          <Link
+            href={ROUTES.LOGIN}
+            className="login-button"
+            style={{
+              textDecoration: 'none',
+              display: 'block',
+              textAlign: 'center',
+            }}
+          >
             BACK TO LOGIN
           </Link>
 
@@ -124,7 +152,12 @@ export default function ForgotPasswordPage() {
                 setEmail('');
               }}
               className="login-signup-link"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
             >
               Try Again
             </button>
@@ -139,40 +172,42 @@ export default function ForgotPasswordPage() {
       {/* Decorative sparkles */}
       <div className="login-sparkle" aria-hidden="true" />
 
-      <div className="login-container" role="main" aria-labelledby="forgot-password-title">
+      <div
+        className="login-container"
+        role="main"
+        aria-labelledby="forgot-password-title"
+      >
         {/* Character Placeholder */}
-        <div className="login-character" aria-hidden="true">
-          {/* Headphones */}
-          <div className="login-headphones">
-            <div className="login-headphone-left" />
-            <div className="login-headphone-right" />
-          </div>
-
-          {/* Face */}
-          <div className="login-face">
-            {/* Eyes */}
-            <div className="login-eyes">
-              <div className="login-eye login-eye-left" />
-              <div className="login-eye login-eye-right" />
-            </div>
-            {/* Mouth */}
-            <div className="login-mouth" />
-          </div>
-
-          {/* Shadow */}
-          <div className="login-character-shadow" />
-        </div>
+        <Image
+          src="/login-bobby.png"
+          alt="Bobby Logo"
+          width={200}
+          height={200}
+          className="login-character"
+        />
 
         {/* Welcome Text */}
         <h1 id="forgot-password-title" className="login-title">
           Reset Password
         </h1>
 
-        <p style={{ textAlign: 'center', color: '#7F8C8D', marginBottom: '30px', fontSize: '16px' }}>
-          Enter your email address and we'll send you a link to reset your password.
+        <p
+          style={{
+            textAlign: 'center',
+            color: '#7F8C8D',
+            marginBottom: '30px',
+            fontSize: '16px',
+          }}
+        >
+          Enter your email address and we'll send you a link to reset your
+          password.
         </p>
 
-        <form onSubmit={handleSubmit} noValidate aria-describedby="forgot-password-description">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          aria-describedby="forgot-password-description"
+        >
           <p id="forgot-password-description" className="sr-only">
             Enter your email address to receive a password reset link.
           </p>
@@ -222,32 +257,34 @@ export default function ForgotPasswordPage() {
               />
             </div>
             {errors.email && (
-              <div id="email-error" className="login-error-message" role="alert">
+              <div
+                id="email-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.email}
               </div>
             )}
           </div>
 
           {/* Submit Button */}
-          <button
+          <AuthButton
             type="submit"
-            className="login-button"
             disabled={isSubmitting}
             aria-describedby="forgot-password-description"
           >
             {isSubmitting ? 'SENDING...' : 'SEND RESET LINK'}
-          </button>
+          </AuthButton>
         </form>
 
         {/* Back to Login */}
         <div className="login-signup">
-          Remember your password?{' '}
+          Password back in your head?{' '}
           <Link href={ROUTES.LOGIN} className="login-signup-link">
-            Log In
+            Let's go!
           </Link>
         </div>
       </div>
     </div>
   );
 }
-

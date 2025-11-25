@@ -1,19 +1,25 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import Image from 'next/image';
+import { AuthButton } from '@/components/AuthButton';
 
-export default function BobbyLogin() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signIn, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{email?: string; password?: string; general?: string}>({});
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    general?: string;
+  }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get redirect URL from query params
@@ -27,7 +33,7 @@ export default function BobbyLogin() {
   }, [user, authLoading, router, redirectUrl]);
 
   const validateForm = () => {
-    const newErrors: {email?: string; password?: string} = {};
+    const newErrors: { email?: string; password?: string } = {};
 
     if (!email.trim()) {
       newErrors.email = 'Email is required';
@@ -68,10 +74,14 @@ export default function BobbyLogin() {
           case 'auth/invalid-credential':
           case 'auth/user-not-found':
           case 'auth/wrong-password':
-            setErrors({ general: 'Invalid email or password. Please try again.' });
+            setErrors({
+              general: 'Invalid email or password. Please try again.',
+            });
             break;
           case 'auth/too-many-requests':
-            setErrors({ general: 'Too many failed attempts. Please try again later.' });
+            setErrors({
+              general: 'Too many failed attempts. Please try again later.',
+            });
             break;
           case 'auth/user-disabled':
             setErrors({ general: 'This account has been disabled.' });
@@ -80,7 +90,9 @@ export default function BobbyLogin() {
             setErrors({ general: 'Login failed. Please try again.' });
         }
       } else {
-        setErrors({ general: 'An unexpected error occurred. Please try again.' });
+        setErrors({
+          general: 'An unexpected error occurred. Please try again.',
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -108,48 +120,51 @@ export default function BobbyLogin() {
       {/* Decorative sparkles */}
       <div className="login-sparkle" aria-hidden="true" />
 
-      <div className="login-container" role="main" aria-labelledby="login-title">
+      <div
+        className="login-container"
+        role="main"
+        aria-labelledby="login-title"
+      >
         {/* Character Placeholder */}
-        <div className="login-character" aria-hidden="true">
-          {/* Headphones */}
-          <div className="login-headphones">
-            <div className="login-headphone-left" />
-            <div className="login-headphone-right" />
-          </div>
-
-          {/* Face */}
-          <div className="login-face">
-            {/* Eyes */}
-            <div className="login-eyes">
-              <div className="login-eye login-eye-left" />
-              <div className="login-eye login-eye-right" />
-            </div>
-            {/* Mouth */}
-            <div className="login-mouth" />
-          </div>
-
-          {/* Shadow */}
-          <div className="login-character-shadow" />
-        </div>
+        <Image
+          src="/login-bobby.png"
+          alt="Bobby Logo"
+          width={200}
+          height={200}
+          className="login-character"
+        />
 
         {/* Welcome Text */}
-        <h1 id="login-title" className="login-title">Welcome Back to Bobby!</h1>
+        <h1 id="login-title" className="login-title">
+          Welcome Back to Bobby!
+        </h1>
 
-        <form onSubmit={handleSubmit} noValidate aria-describedby="login-description">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          aria-describedby="login-description"
+        >
           <p id="login-description" className="sr-only">
-            Please enter your email and password to log in to your Bobby account.
+            Please enter your email and password to log in to your Bobby
+            account.
           </p>
 
           {/* General Error Message */}
           {errors.general && (
-            <div className="login-error-message" role="alert" style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <div
+              className="login-error-message"
+              role="alert"
+              style={{ marginBottom: '20px', textAlign: 'center' }}
+            >
               {errors.general}
             </div>
           )}
 
           {/* Email Input */}
           <div className="login-input-group">
-            <div className={`login-input-container ${errors.email ? 'login-input-error' : ''}`}>
+            <div
+              className={`login-input-container ${errors.email ? 'login-input-error' : ''}`}
+            >
               <svg
                 width="24"
                 height="24"
@@ -173,13 +188,17 @@ export default function BobbyLogin() {
                 className="login-input"
                 required
                 aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
+                aria-describedby={errors.email ? 'email-error' : undefined}
                 autoComplete="email"
                 autoFocus
               />
             </div>
             {errors.email && (
-              <div id="email-error" className="login-error-message" role="alert">
+              <div
+                id="email-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.email}
               </div>
             )}
@@ -187,7 +206,9 @@ export default function BobbyLogin() {
 
           {/* Password Input */}
           <div className="login-password-group">
-            <div className={`login-input-container ${errors.password ? 'login-input-error' : ''}`}>
+            <div
+              className={`login-input-container ${errors.password ? 'login-input-error' : ''}`}
+            >
               <svg
                 width="24"
                 height="24"
@@ -196,7 +217,14 @@ export default function BobbyLogin() {
                 className="login-input-icon"
                 aria-hidden="true"
               >
-                <rect x="5" y="11" width="14" height="10" rx="2" fill="#A0A0B0" />
+                <rect
+                  x="5"
+                  y="11"
+                  width="14"
+                  height="10"
+                  rx="2"
+                  fill="#A0A0B0"
+                />
                 <path
                   d="M8 11V7a4 4 0 018 0v4"
                   stroke="#A0A0B0"
@@ -216,43 +244,56 @@ export default function BobbyLogin() {
                 className="login-input"
                 required
                 aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
+                aria-describedby={
+                  errors.password ? 'password-error' : undefined
+                }
                 autoComplete="current-password"
               />
             </div>
             {errors.password && (
-              <div id="password-error" className="login-error-message" role="alert">
+              <div
+                id="password-error"
+                className="login-error-message"
+                role="alert"
+              >
                 {errors.password}
               </div>
             )}
           </div>
 
           {/* Login Button */}
-          <button
+          <AuthButton
             type="submit"
-            className="login-button"
             disabled={isSubmitting}
             aria-describedby="login-description"
           >
             {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
-          </button>
+          </AuthButton>
         </form>
 
         {/* Forgot Password */}
         <div className="login-forgot-password">
           <Link href={ROUTES.FORGOT_PASSWORD} className="login-forgot-link">
-            Forgot Password?
+            Password playing hide and seek? 🔍
           </Link>
         </div>
 
         {/* Sign Up */}
         <div className="login-signup">
-          New here?{' '}
+          First time caller?{' '}
           <Link href={ROUTES.SIGNUP} className="login-signup-link">
-            Sign Up
+            Sign up to join the fun!
           </Link>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BobbyLogin() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

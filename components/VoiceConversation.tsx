@@ -596,6 +596,7 @@ export default function VoiceConversation({
                 mode: 'id',
                 id: '726d5ae5-055f-4c3d-8355-d9677de68937',
               },
+              speed: settings.slowedSpeech ? 0.7 : 1.0,
             },
           },
           greeting: greeting,
