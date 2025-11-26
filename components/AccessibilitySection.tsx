@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getSettings, updateSettings } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import type { UserSettings } from '@/types';
 import AccessibilityToggle from './AccessibilityToggle';
 import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
 import Image from 'next/image';
-import {logger} from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 interface AccessibilitySectionProps {
   onSettingsChange?: (settings: UserSettings) => void;
@@ -20,30 +20,21 @@ interface AccessibilitySectionProps {
 export default function AccessibilitySection({
   onSettingsChange,
 }: AccessibilitySectionProps) {
-  const [settings, setSettings] = useState<UserSettings>({
-    subtitles: true,
-    slowedSpeech: false,
-    reducedSensory: false,
-    fontSize: 'medium',
-    colorMode: 'default',
-    dyslexiaFont: false,
-  });
-
+  const { userData, updateSettings } = useUserData();
+  const settings = userData.settings;
   const [mounted, setMounted] = useState(false);
   const { soundEnabled, toggleSound } = useSound();
 
-  // Load settings from storage on mount
+  // Apply settings to document on mount and when settings change
   useEffect(() => {
-    const currentSettings = getSettings();
-    setSettings(currentSettings);
-    applySettingsToDocument(currentSettings);
+    applySettingsToDocument(settings);
     setMounted(true);
-  }, []);
+  }, [settings]);
 
   /**
    * Handle individual setting changes
    */
-  const handleSettingChange = (
+  const handleSettingChange = async (
     key: keyof UserSettings,
     value: boolean | string
   ) => {
@@ -51,12 +42,16 @@ export default function AccessibilitySection({
       ...settings,
       [key]: value,
     } as UserSettings;
-    setSettings(newSettings);
-    updateSettings(newSettings);
-    applySettingsToDocument(newSettings);
 
-    if (onSettingsChange) {
-      onSettingsChange(newSettings);
+    try {
+      await updateSettings(newSettings);
+      applySettingsToDocument(newSettings);
+
+      if (onSettingsChange) {
+        onSettingsChange(newSettings);
+      }
+    } catch (error) {
+      logger.error('Error updating settings:', error);
     }
   };
 
@@ -121,11 +116,7 @@ export default function AccessibilitySection({
   }
 
   return (
-    <div
-      className="accessibility-section"
-      role="region"
-      aria-label="Accessibility settings"
-    >
+    <div role="region" aria-label="Accessibility settings">
       <h2 className="accessibility-section-title">Accessibility Settings</h2>
       <Image
         className="accessibility-image"
@@ -139,7 +130,22 @@ export default function AccessibilitySection({
         <AccessibilityToggle
           id="ui-sound-toggle"
           label="UI Sound"
-          icon={<span className="accessibility-icon">🔊</span>}
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 64 64"
+              width="32"
+              height="32"
+              role="img"
+              aria-label="Musical note"
+            >
+              <g fill="#000000" fillRule="evenodd">
+                <ellipse cx="18" cy="46" rx="11" ry="9" />
+                <rect x="25" y="10" width="4" height="36" rx="1" />
+                <path d="M29 12c7 2.6 12 6.8 12 14.5 0 6.3-3.6 10.6-3.6 10.6a2 2 0 1 1-3.2-2.2S37.4 37 37.4 30.5C37.4 24 32 20 29 18z" />
+              </g>
+            </svg>
+          }
           checked={soundEnabled}
           onChange={handleSoundToggle}
           ariaLabel={soundEnabled ? 'Turn UI sound off' : 'Turn UI sound on'}
@@ -149,7 +155,28 @@ export default function AccessibilitySection({
         <AccessibilityToggle
           id="dyslexia-font-toggle"
           label="Dyslexia-Friendly Font"
-          icon={<span className="accessibility-icon">A</span>}
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 120"
+              width="18"
+              height="24"
+            >
+              <text
+                x="50"
+                y="90"
+                font-family="Arial"
+                font-size="100"
+                font-weight="bold"
+                fill="none"
+                stroke="black"
+                stroke-width="4"
+                text-anchor="middle"
+              >
+                A
+              </text>
+            </svg>
+          }
           checked={settings.dyslexiaFont}
           onChange={checked => handleSettingChange('dyslexiaFont', checked)}
           ariaLabel="Use dyslexia-friendly font for better readability"
@@ -159,7 +186,34 @@ export default function AccessibilitySection({
         <AccessibilityToggle
           id="slowed-speech-toggle"
           label="Slowed Speech Mode"
-          icon={<span className="accessibility-icon">🎤</span>}
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 120 100"
+              width="24"
+              height="32"
+              fill="#BAE1F5"
+              stroke="black"
+              strokeWidth="6"
+              strokeLinejoin="round"
+            >
+              <path
+                d="M20 20
+           H100
+           a10 10 0 0 1 10 10
+           V60
+           a10 10 0 0 1 -10 10
+           H50
+           L30 85
+           V70
+           H20
+           a10 10 0 0 1 -10 -10
+           V30
+           a10 10 0 0 1 10 -10
+           Z"
+              />
+            </svg>
+          }
           checked={settings.slowedSpeech}
           onChange={checked => handleSettingChange('slowedSpeech', checked)}
           ariaLabel="Slow down speech for better understanding"
@@ -169,7 +223,22 @@ export default function AccessibilitySection({
         <AccessibilityToggle
           id="reduced-sensory-toggle"
           label="Reduced Sensory Mode"
-          icon={<span className="accessibility-icon">✨</span>}
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 120 70"
+              width="32"
+              height="24"
+              fill="none"
+              stroke="black"
+              strokeWidth="6"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            >
+              <path d="M10 35 Q60 -5 110 35 Q60 75 10 35 Z" />
+              <circle fill="black" cx="60" cy="35" r="15" />
+            </svg>
+          }
           checked={settings.reducedSensory}
           onChange={checked => handleSettingChange('reducedSensory', checked)}
           ariaLabel="Reduce animations and visual effects"

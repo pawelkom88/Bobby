@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { getBadges } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import { BADGES } from '@/lib/gamification';
 import type { Badge } from '@/types';
 
@@ -18,32 +18,9 @@ export default function BadgeDisplay({
   showAll = false,
   maxVisible = 1,
 }: BadgeDisplayProps) {
-  const [badges, setBadges] = useState<Badge[]>([]);
+  const { userData } = useUserData();
+  const badges = userData.badges;
   const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    const updateBadges = () => {
-      const earnedBadges = getBadges();
-      setBadges(earnedBadges);
-    };
-
-    updateBadges();
-
-    // Listen for storage changes
-    const handleStorageChange = () => {
-      updateBadges();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Check periodically for same-tab updates
-    const interval = setInterval(updateBadges, 1000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
-  }, []);
 
   // All possible badges (for showing locked ones if showAll is true)
   const allBadges: Badge[] = [
@@ -94,9 +71,6 @@ export default function BadgeDisplay({
                 />
               </div>
               <div className="badge-name">{badge.name}</div>
-              {isEarned && badge.description && (
-                <div className="badge-description">{badge.description}</div>
-              )}
             </div>
           );
         })}

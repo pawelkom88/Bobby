@@ -1,5 +1,5 @@
 import { convertFloat32ToInt16, downsample } from './audioUtils';
-import {logger} from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 export const getAuthToken = async () => {
   try {
@@ -113,6 +113,7 @@ export interface DeepgramAgentConfig {
       provider: {
         type: string;
         model_id: string;
+        voice_id: string;
         voice: {
           mode: string;
           id: string;

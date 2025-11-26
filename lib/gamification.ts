@@ -59,7 +59,8 @@ export const BADGES = {
 } as const;
 
 // Badge milestones (levels where badges are awarded)
-export const BADGE_MILESTONES: number[] = [3, 6, 9];
+// Note: First Call Hero is awarded on first conversation, not by level
+export const BADGE_MILESTONES: number[] = [6, 9];
 
 /**
  * Calculate level from total XP
@@ -97,12 +98,12 @@ export function getXPToNextLevel(totalXP: number): number {
 
 /**
  * Check if a badge should be awarded for reaching a level
+ * Note: First Call Hero is awarded on first conversation, not by level
  */
 export function getBadgeForLevel(level: number): Badge | null {
   if (BADGE_MILESTONES.includes(level)) {
-    if (level === 3) return BADGES.FIRST_CALL_HERO;
     if (level === 6) return BADGES.BRAVE_HELPER;
-    if (level === 9) return BADGES.CALM_COMMUNICATOR;
+    if (level === 9) return BADGES.SCENARIO_EXPLORER;
   }
   return null;
 }
@@ -159,15 +160,24 @@ export function getBadgeForScenariosExplored(scenariosCount: number): Badge | nu
 export function calculateXPEarned(
   performance: PerformanceMetrics = {}
 ): number {
+  // DEBUG: Log what we're working with
+  console.log('🔍 calculateXPEarned called with:', performance);
+  console.log('🔍 Has assessment?', !!performance.assessment);
+  console.log('🔍 Assessment:', performance.assessment);
+
   if (performance.assessment) {
-    return scoreToXP(performance.assessment.score);
+    const xp = scoreToXP(performance.assessment.score);
+    console.log('🔍 Using assessment score:', performance.assessment.score, '-> XP:', xp);
+    return xp;
   }
 
   // Fallback legacy behaviour if no assessment is present
+  console.log('🔍 No assessment found, using fallback XP calculation');
   let xp = 50;
   if (performance.completed) xp += 20;
   if (performance.clearCommunication) xp += 15;
   if (performance.stayedCalm) xp += 15;
 
+  console.log('🔍 Fallback XP:', xp);
   return Math.min(xp, 100);
 }

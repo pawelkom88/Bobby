@@ -30,7 +30,7 @@ export default function AccessibilityToggle({
   return (
     <div className="accessibility-toggle-item">
       <div className="accessibility-toggle-content">
-        <div className="accessibility-toggle-icon">{icon}</div>
+        {icon}
         <label className="accessibility-toggle-label" htmlFor={id}>
           {label}
         </label>

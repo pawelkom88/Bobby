@@ -6,9 +6,10 @@ import Image from 'next/image';
 import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
-import { setSelectedService } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import { ROUTES } from '@/lib/routes';
 import { Service } from '@/types';
+import { logger } from '@/lib/logger';
 
 const services: Array<{
   id: Service;
@@ -38,6 +39,7 @@ const services: Array<{
 
 export default function ChooseEmergencyPage() {
   const router = useRouter();
+  const { setSelectedService } = useUserData();
 
   // Clear session data when in conversation setup flow
   useEffect(() => {
@@ -49,10 +51,14 @@ export default function ChooseEmergencyPage() {
     }
   }, []);
 
-  const handleSelectService = (service: Service) => {
-    setSelectedService(service);
-    // Navigate to dial pad
-    router.push(ROUTES.DIAL);
+  const handleSelectService = async (service: Service) => {
+    try {
+      await setSelectedService(service);
+      // Navigate to dial pad
+      router.push(ROUTES.DIAL);
+    } catch (error) {
+      logger.error('Error setting service:', error);
+    }
   };
 
   const handleBack = () => {

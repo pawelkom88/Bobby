@@ -6,7 +6,7 @@ import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
-import { getSelectedService, getSelectedAgeTier } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
 import { ROUTES } from '@/lib/routes';
 
@@ -14,17 +14,19 @@ const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
 export default function CompletionPage() {
+  const { getJourneyState } = useUserData();
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
   const [selectedAgeTier, setSelectedAgeTier] = useState<AgeTier>(DEFAULT_AGE_TIER);
   const [selectedSituation, setSelectedSituation] = useState<Service>(DEFAULT_SITUATION);
 
   useEffect(() => {
-    // Get selected values from storage on client-side only
-    const ageTier = getSelectedAgeTier() ?? DEFAULT_AGE_TIER;
-    const situation = getSelectedService() ?? DEFAULT_SITUATION;
+    // Get selected values from journey state
+    const journeyState = getJourneyState();
+    const ageTier = journeyState?.selectedAgeTier ?? DEFAULT_AGE_TIER;
+    const situation = journeyState?.selectedService ?? DEFAULT_SITUATION;
     setSelectedAgeTier(ageTier);
     setSelectedSituation(situation);
-  }, []);
+  }, [getJourneyState]);
 
   useEffect(() => {
     // Retrieve assessment from sessionStorage
@@ -33,9 +35,18 @@ export default function CompletionPage() {
       const completionId = sessionStorage.getItem('completionId');
       const processedId = sessionStorage.getItem('processedCompletionId');
 
+      console.log('🔍 ===== COMPLETION PAGE LOAD =====');
+      console.log('🔍 assessmentData from sessionStorage:', assessmentData);
+      console.log('🔍 completionId:', completionId);
+      console.log('🔍 processedId:', processedId);
+
       if (assessmentData) {
         try {
           const data = JSON.parse(assessmentData);
+          console.log('🔍 Parsed assessment data:', data);
+          console.log('🔍 Assessment object:', data.assessment);
+          console.log('🔍 Assessment score:', data.assessment?.score);
+
           setPerformance({
             completed: data.passed,
             assessment: data.assessment,
@@ -43,6 +54,8 @@ export default function CompletionPage() {
               ? data.assessment.improvements
               : data.assessment.positives,
           });
+
+          console.log('🔍 Performance state set with assessment:', data.assessment);
 
           // Only clear assessment data if this completion has been processed
           // This allows the data to persist for display on refresh
@@ -55,7 +68,10 @@ export default function CompletionPage() {
           }
         } catch (error) {
           logger.error('Error parsing assessment data:', error);
+          console.error('🔍 ❌ Error parsing assessment:', error);
         }
+      } else {
+        console.log('🔍 ⚠️ No assessment data found in sessionStorage');
       }
     }
   }, []);

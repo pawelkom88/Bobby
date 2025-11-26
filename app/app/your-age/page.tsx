@@ -6,13 +6,15 @@ import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { getAllAgeTiers } from '@/lib/ageTiers';
-import { setSelectedAgeTier } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import type { AgeTier } from '@/types';
 import Image from 'next/image';
 import { ROUTES } from '@/lib/routes';
+import { logger } from '@/lib/logger';
 
 export default function YourAgePage() {
   const router = useRouter();
+  const { setSelectedAgeTier } = useUserData();
 
   // Clear session data when starting a new conversation flow
   useEffect(() => {
@@ -24,10 +26,14 @@ export default function YourAgePage() {
     }
   }, []);
 
-  const handleSelectAge = (ageTier: AgeTier) => {
-    setSelectedAgeTier(ageTier);
-    // Navigate to next step
-    router.push(ROUTES.CHOOSE_EMERGENCY);
+  const handleSelectAge = async (ageTier: AgeTier) => {
+    try {
+      await setSelectedAgeTier(ageTier);
+      // Navigate to next step
+      router.push(ROUTES.CHOOSE_EMERGENCY);
+    } catch (error) {
+      logger.error('Error setting age tier:', error);
+    }
   };
 
   const ageTiers = getAllAgeTiers();

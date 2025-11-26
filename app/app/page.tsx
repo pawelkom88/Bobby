@@ -28,8 +28,10 @@ export default function AppPage() {
             <div className="welcome-container">
               <div className="welcome-card">
                 <div>
-                  <h1 className="welcome-title">WELCOME</h1>
-                  <p className="welcome-subtitle">Hi, I am Bobby, your guide</p>
+                  <h1 className="welcome-title">Hello, Hero!</h1>
+                  <p className="welcome-subtitle">
+                    I'm Bobby. Let's learn to save the day!
+                  </p>
                 </div>
 
                 <AnimatedImageWrapper

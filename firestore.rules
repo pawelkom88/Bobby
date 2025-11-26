@@ -13,27 +13,18 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
-    // User profiles - users can only read/write their own data
+    // User data - users can only read/write their own data
+    // This stores all user-specific data including:
+    // - userName, totalXP, level
+    // - conversations array
+    // - badges array
+    // - settings object
+    // - journey state (optional)
     match /users/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
-    }
-
-    // User progress and conversations - users can only access their own data
-    match /userProgress/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
-    }
-
-    // Conversations - users can only access their own conversations
-    match /conversations/{conversationId} {
-      allow read, write: if isAuthenticated() &&
-                           resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() &&
-                      request.resource.data.userId == request.auth.uid;
-    }
-
-    // Achievements and badges - users can only access their own
-    match /achievements/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId);
+      allow delete: if false; // Prevent accidental deletion
     }
 
     // Default deny all other access

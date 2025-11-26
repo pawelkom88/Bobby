@@ -2,27 +2,6 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { Providers } from '@/components/Providers';
-import { Nunito, Atkinson_Hyperlegible } from 'next/font/google';
-import localFont from 'next/font/local';
-
-const nunito = Nunito({
-  subsets: ['latin'],
-  variable: '--font-family-body',
-  display: 'swap',
-});
-
-const atkinsonHyperlegible = Atkinson_Hyperlegible({
-  weight: ['400', '700'],
-  subsets: ['latin'],
-  variable: '--font-atkinson-hyperlegible',
-  display: 'swap',
-});
-
-const superKindly = localFont({
-  src: '../public/amityjack.ttf',
-  variable: '--font-super-kindly',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com'),
@@ -58,11 +37,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${nunito.variable} ${atkinsonHyperlegible.variable} ${superKindly.variable}`}
-    >
+    <html lang="en">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito&display=swap"
+          rel="stylesheet"
+        />
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -89,7 +71,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={nunito.className}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

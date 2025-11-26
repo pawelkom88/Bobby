@@ -4,9 +4,10 @@ import { ViewTransition } from 'react';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
-import { getUserProgress } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 
 export default function AchievementsPage() {
+  const { getUserProgress } = useUserData();
   const progress = getUserProgress();
 
   return (
@@ -33,7 +34,7 @@ export default function AchievementsPage() {
             >
               <h2 id="badges-heading">Your Badges</h2>
               <div className="achievements-card">
-                <BadgeDisplay showAll={true} />
+                <BadgeDisplay showAll={false} />
               </div>
             </section>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getSettings } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
 import { CONFIG } from '@/lib/config';
 import LoadingSpinner from './LoadingSpinner';
@@ -41,13 +41,40 @@ export default function VoiceConversation({
   onComplete,
   onBack,
   autoStart = false,
-  disableConnection = true,
+  disableConnection = false,
 }: VoiceConversationProps) {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Thinking
   const [isSpeaking, setIsSpeaking] = useState(false); // Agent Speaking
 
-  const [conversation, setConversation] = useState<ConversationMessage[]>([]);
+  const [conversation, setConversation] = useState<ConversationMessage[]>(
+    () => {
+      // Clear old debug data on component mount
+      if (typeof window !== 'undefined') {
+        try {
+          const timestamp = localStorage.getItem(
+            'debug_conversation_timestamp'
+          );
+          if (timestamp) {
+            const age = Date.now() - parseInt(timestamp);
+            if (age > 60000) {
+              // 1 minute
+              localStorage.removeItem('debug_conversation');
+              localStorage.removeItem('debug_conversation_timestamp');
+              logger.log('🔍 Cleared old debug conversation data (>1 min old)');
+            }
+          }
+          // Always clear on new conversation start
+          localStorage.removeItem('debug_conversation');
+          localStorage.removeItem('debug_conversation_timestamp');
+          logger.log('🔍 Starting fresh conversation - cleared debug data');
+        } catch (e) {
+          logger.error('Failed to clear debug conversation data:', e);
+        }
+      }
+      return [];
+    }
+  );
   const [sessionActive, setSessionActive] = useState(false);
   const [conversationEnded, setConversationEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +102,7 @@ export default function VoiceConversation({
   const startTimeRef = useRef<number>(0);
   const scheduledAudioSources = useRef<AudioBufferSourceNode[]>([]);
 
+  const { getSettings } = useUserData();
   const settings = getSettings();
   const { soundEnabled } = useSound();
 
@@ -319,6 +347,18 @@ export default function VoiceConversation({
 
           logger.debug('Deepgram Message:', msg);
 
+          // DEBUG: Log ALL messages with key details
+          console.log(
+            '%c🔍 📨 DEEPGRAM MESSAGE 📨🔍',
+            'color: white; font-size: 20px; font-weight: bold; background: red; padding: 10px; border: 3px solid yellow;',
+            {
+              type: msg.type,
+              role: msg.role,
+              content: msg.content?.substring(0, 100),
+              hasContent: !!msg.content,
+            }
+          );
+
           switch (msg.type) {
             case 'UserStartedSpeaking':
               // Reset silence timer on confirmed user speech start
@@ -368,13 +408,51 @@ export default function VoiceConversation({
                 break;
               }
 
+              // DEBUG: Log message details
+              logger.log('🔍 ConversationText received:', {
+                role: msg.role,
+                content: msg.content,
+                contentLength: msg.content?.length,
+              });
+
               // Add to conversation history
               const newMsg: ConversationMessage = {
                 type: msg.role === 'user' ? 'user' : 'agent',
                 text: msg.content,
                 timestamp: new Date().toISOString(),
               };
-              setConversation(prev => [...prev, newMsg]);
+              logger.log('🔍 Adding message to conversation:', newMsg);
+              setConversation(prev => {
+                const updated = [...prev, newMsg];
+                logger.log(
+                  '🔍 Conversation now has',
+                  updated.length,
+                  'messages'
+                );
+                logger.log(
+                  '🔍 User messages:',
+                  updated.filter(m => m.type === 'user').length
+                );
+
+                // Store in localStorage for debugging
+                try {
+                  localStorage.setItem(
+                    'debug_conversation',
+                    JSON.stringify(updated)
+                  );
+                  localStorage.setItem(
+                    'debug_conversation_timestamp',
+                    Date.now().toString()
+                  );
+                } catch (e) {
+                  logger.error(
+                    'Failed to store conversation in localStorage:',
+                    e
+                  );
+                }
+
+                return updated;
+              });
 
               // User just sent a message -> reset silence timer
               if (msg.role === 'user') {
@@ -590,13 +668,16 @@ export default function VoiceConversation({
           // type: "UpdateSpeak",
           speak: {
             provider: {
-              type: 'cartesia',
-              model_id: 'sonic-2',
-              voice: {
-                mode: 'id',
-                id: '726d5ae5-055f-4c3d-8355-d9677de68937',
-              },
-              speed: settings.slowedSpeech ? 0.7 : 1.0,
+              type: 'eleven_labs',
+              // type: 'cartesia',
+              model_id: 'eleven_multilingual_v2',
+              voice_id: 'lUTamkMw7gOzZbFIwmq4',
+              // model_id: 'sonic-2',
+              // voice: {
+              //   mode: 'id',
+              //   id: '726d5ae5-055f-4c3d-8355-d9677de68937',
+              // },
+              // speed: settings.slowedSpeech ? 0.7 : 1.0,
             },
           },
           greeting: greeting,
@@ -641,6 +722,43 @@ export default function VoiceConversation({
         'color: green; font-size: 24px; font-weight: bold; background: lightgreen; padding: 10px;'
       );
 
+      // DEBUG: Check localStorage for conversation
+      const storedConversation = localStorage.getItem('debug_conversation');
+      logger.log('🔍 Stored conversation in localStorage:', storedConversation);
+
+      // DEBUG: Log conversation state before ending
+      logger.log(
+        '🔍 ENDING CONVERSATION - Total messages:',
+        conversation.length
+      );
+      logger.log(
+        '🔍 User messages:',
+        conversation.filter(m => m.type === 'user').length
+      );
+      logger.log(
+        '🔍 Agent messages:',
+        conversation.filter(m => m.type === 'agent').length
+      );
+      logger.log('🔍 Full conversation:', conversation);
+
+      // CRITICAL FIX: If conversation state is empty but localStorage has data, use localStorage
+      let finalConversation = conversation;
+      if (conversation.length === 0 && storedConversation) {
+        try {
+          const parsed = JSON.parse(storedConversation);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.log(
+              '🔍 ⚠️ USING LOCALSTORAGE CONVERSATION (state was empty):',
+              parsed.length,
+              'messages'
+            );
+            finalConversation = parsed;
+          }
+        } catch (e) {
+          logger.error('Failed to parse stored conversation:', e);
+        }
+      }
+
       disconnectFromDeepgram();
 
       // Stop audio
@@ -660,7 +778,11 @@ export default function VoiceConversation({
 
       // Complete
       if (onComplete) {
-        onComplete(conversation);
+        logger.log(
+          '🔍 Calling onComplete with conversation:',
+          finalConversation
+        );
+        onComplete(finalConversation);
       }
     } catch (err) {
       logger.error('Error ending conversation', err);

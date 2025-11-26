@@ -5,7 +5,7 @@ import { ViewTransition } from 'react';
 import VoiceConversation from '@/components/VoiceConversation';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { getSelectedService, getSelectedAgeTier } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
 import { logger } from '@/lib/logger';
@@ -17,10 +17,12 @@ const DEFAULT_SITUATION: Service = 'fire';
 
 export default function ConversationPage() {
   const [isComplete, setIsComplete] = useState(false);
+  const { getJourneyState } = useUserData();
 
-  // Get selected values from storage
-  const selectedAgeTier = getSelectedAgeTier() ?? DEFAULT_AGE_TIER;
-  const selectedSituation = getSelectedService() ?? DEFAULT_SITUATION;
+  // Get selected values from journey state
+  const journeyState = getJourneyState();
+  const selectedAgeTier = journeyState?.selectedAgeTier ?? DEFAULT_AGE_TIER;
+  const selectedSituation = journeyState?.selectedService ?? DEFAULT_SITUATION;
 
   // Check if user is trying to return to a completed conversation
   useEffect(() => {
@@ -61,11 +63,24 @@ export default function ConversationPage() {
     conversation: ConversationMessage[]
   ) => {
     try {
+      // DEBUG: Log conversation details
+      logger.log('🔍 CONVERSATION COMPLETE - Full conversation:', conversation);
+      logger.log('🔍 Total messages:', conversation.length);
+      logger.log('🔍 User messages:', conversation.filter(m => m.type === 'user').length);
+      logger.log('🔍 Agent messages:', conversation.filter(m => m.type === 'agent').length);
+      logger.log('🔍 User message texts:', conversation.filter(m => m.type === 'user').map(m => m.text));
+
       // Assess the conversation using Gemini
       const assessment = await assessWithGemini(conversation, {
         ageTier: selectedAgeTier,
         situation: selectedSituation,
       });
+
+      // DEBUG: Log assessment results
+      logger.log('🔍 ASSESSMENT RESULTS:', assessment);
+      logger.log('🔍 Score:', assessment.score);
+      logger.log('🔍 User turns:', assessment.metrics.userTurns);
+      logger.log('🔍 Duration:', assessment.metrics.durationSeconds);
 
       // Store assessment in sessionStorage for the completion page
       // Generate unique completion ID to prevent duplicate XP awards

@@ -22,12 +22,6 @@
 
 :root {
   /* Font families - now managed by next/font */
-  --font-family-body: var(--font-family-amity-jack);
-  --font-family-heading: var(--font-super-kindly);
-  --font-family-cartoon: var(--font-super-kindly);
-  --font-family-accessibility: var(--font-atkinson-hyperlegible);
-  --font-family-amity-jack: 'Amity Jack', sans-serif;
-
   /* Font sizing */
   --font-size-base: 16px;
 
@@ -39,15 +33,13 @@
 }
 
 /* ============================================================================
-   FONT FACE DEFINITIONS
+   CHEWY FONT CLASS
    ============================================================================ */
 
-@font-face {
-  font-family: 'Amity Jack';
-  src: url('/amityjack.ttf') format('truetype');
-  font-weight: normal;
+.chewy-regular {
+  font-family: "Chewy", system-ui;
+  font-weight: 400;
   font-style: normal;
-  font-display: swap;
 }
 
 /* ============================================================================
@@ -184,12 +176,12 @@
 }
 
 html {
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   font-size: var(--font-size-base);
 }
 
 body {
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -212,7 +204,7 @@ h5,
 h6,
 [class*='heading'],
 [class*='title'] {
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
@@ -260,7 +252,7 @@ h6,
 
 .heading-cartoon,
 .kavoon {
-  font-family: var(--font-family-cartoon);
+  font-family: "Chewy", system-ui;
   font-weight: 700;
 }
 
@@ -269,13 +261,13 @@ h6,
    ============================================================================ */
 
 .body-text-regular {
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
 .body-text-bold {
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   font-weight: bold;
   font-style: normal;
 }
@@ -284,10 +276,10 @@ h6,
    ACCESSIBILITY - Font and display options
    ============================================================================ */
 
-/* Dyslexia-friendly font class - uses Atkinson Hyperlegible across entire app */
+/* Dyslexia-friendly font class - uses Nunito across entire app */
 .dyslexia-font {
   font-family:
-    var(--font-family-accessibility),
+    "Nunito",
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -297,7 +289,7 @@ h6,
 
 .dyslexia-font * {
   font-family:
-    var(--font-family-accessibility),
+    "Nunito",
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -305,7 +297,7 @@ h6,
     sans-serif !important;
 }
 
-/* Headings stay with Kavoon even in dyslexia mode (can be adjusted if needed) */
+/* Headings stay with Nunito even in dyslexia mode */
 .dyslexia-font h1,
 .dyslexia-font h2,
 .dyslexia-font h3,
@@ -313,7 +305,7 @@ h6,
 .dyslexia-font h5,
 .dyslexia-font h6 {
   font-family:
-    var(--font-family-accessibility),
+    "Nunito",
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -1168,7 +1160,7 @@ a,
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   min-height: 60px;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .number-button:not(:disabled):hover {
@@ -1316,7 +1308,7 @@ a,
   transition: all 0.1s;
   user-select: none;
   border: none;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .key:active {
@@ -1376,7 +1368,7 @@ a,
   box-shadow:
     0 6px 0 rgba(0, 0, 0, 0.2),
     0 8px 15px rgba(0, 0, 0, 0.3);
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .action-btn:active {
@@ -1457,7 +1449,7 @@ a,
   font-weight: 700;
   text-align: center;
   line-height: 1.5;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   position: relative;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1544,39 +1536,31 @@ a,
 .question {
   font-size: 2rem;
   color: var(--btn-text-color);
-  font-family: var(--font-family-cartoon);
+  font-family: "Chewy", system-ui;
 }
 
 .btn-container {
   display: inline-flex;
   align-items: center;
-  width: 100%;
-  transform-style: preserve-3d;
-  perspective: 250px;
 }
 
 .cartoon-btn {
-  --rotate-angle: 15deg;
   --direction: -1;
   border: 0.25rem solid var(--btn-border-color);
   padding: 0.5rem 2rem;
   border-radius: 0.5rem;
-  transform: rotateY(calc(var(--rotate-angle) * var(--direction)));
-  transform-style: preserve-3d;
   box-shadow: calc(var(--direction) * 0.1rem) 0.5rem 0rem 0.05rem
     var(--btn-text-color);
   background-color: var(--btn-color);
   text-decoration: none;
   color: var(--btn-text-color);
-  font-family: 'SuperKindly', sans-serif;
+  font-family: "Chewy", system-ui;
   outline: 0;
   position: relative;
   overflow: hidden;
   transition: all ease 0.15s;
   top: 0;
   cursor: pointer;
-  min-height: 60px;
-  min-width: 260px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1661,7 +1645,7 @@ a,
   font-size: 1.3rem;
   font-weight: 600;
   color: #333;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   margin: 0.6rem 0;
 }
 
@@ -1676,7 +1660,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1770,7 +1754,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1812,7 +1796,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1879,7 +1863,7 @@ a,
   margin: 1rem 0;
   text-transform: uppercase;
 
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .welcome-subtitle {
@@ -1887,7 +1871,7 @@ a,
   text-align: center;
   color: black;
   margin: 0;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .welcome-image {
@@ -2028,7 +2012,7 @@ a,
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   border: none;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   min-height: 60px;
 }
 
@@ -2387,7 +2371,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .achievements-content {
@@ -2409,7 +2393,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2444,7 +2428,6 @@ a,
   gap: 1rem;
   align-items: center;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.6);
   border-radius: 1rem;
   border: 1px solid rgba(255, 200, 100, 0.15);
 }
@@ -2452,20 +2435,20 @@ a,
 .conversation-service {
   font-weight: 600;
   color: #ff6b35;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .conversation-date {
-  font-size: 0.9rem;
+    font-size: 1.2rem;
   text-align: center;
 }
 
 .conversation-xp {
   color: #10b981;
   font-weight: 700;
-  font-size: 0.95rem;
+    font-size: 1.2rem;
   text-align: right;
 }
 
@@ -2490,7 +2473,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   text-transform: uppercase;
   text-align: center;
   letter-spacing: 0.05em;
@@ -2537,7 +2520,7 @@ a,
 .accessibility-toggle-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 5px;
   flex: 1;
 }
 
@@ -2563,7 +2546,7 @@ a,
   color: #333;
   cursor: pointer;
   transition: color 0.2s ease;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   user-select: none;
 }
 
@@ -2683,7 +2666,7 @@ a,
   font-size: 0.95rem;
   font-weight: 600;
   color: #333;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -2697,7 +2680,7 @@ a,
   background: linear-gradient(135deg, var(--btn-light-color), var(--btn-color));
   color: var(--btn-text-color);
   font-weight: 600;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -2730,10 +2713,8 @@ a,
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
   margin-bottom: 1rem;
   width: 100%;
-  margin-left: -1rem;
 }
 
 .reset-actions .btn-container {
@@ -2788,7 +2769,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .settings-content {
@@ -2889,7 +2870,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .completion-content {
@@ -2910,7 +2891,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2956,7 +2937,7 @@ a,
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
   color: #92400e;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .level-up-message p,
@@ -3015,7 +2996,7 @@ a,
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
 }
 
 .assessment-feedback ul {
@@ -3026,9 +3007,8 @@ a,
 
 .assessment-feedback li {
   margin-bottom: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.5;
-  color: #333;
 }
 
 .completion-actions {
@@ -3164,13 +3144,6 @@ a,
     font-size: 1rem;
   }
 
-  .assessment-feedback h3 {
-    font-size: 1.1rem;
-  }
-
-  .assessment-feedback li {
-    font-size: 0.9rem;
-  }
 }
 
 /* ============================================================================
@@ -3229,6 +3202,7 @@ a,
   color: #ffffff;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   pointer-events: none;
+  z-index: 10;
 }
 
 /* ============================================================================
@@ -3570,7 +3544,7 @@ a,
 
 .age-title,
 .emergency-title {
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   font-size: 2.2rem;
   font-weight: bold;
   color: #333;
@@ -3580,7 +3554,7 @@ a,
 
 .age-subtitle,
 .emergency-subtitle {
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   font-size: 1.3rem;
   color: black;
   font-weight: 500;
@@ -3603,7 +3577,7 @@ a,
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
   min-height: 100px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -3643,7 +3617,7 @@ a,
 
 .age-tile-label,
 .emergency-tile-label {
-  font-family: var(--font-family-heading);
+  font-family: "Chewy", system-ui;
   font-size: 1.6rem;
   font-weight: bold;
   color: white;
@@ -3656,12 +3630,6 @@ a,
   display: flex;
   justify-content: center;
   margin: 10px 0;
-}
-
-.age-back-button-container,
-.emergency-back-button-container {
-  justify-content: center;
-  margin-left: -2rem;
 }
 
 /* ============================================================================
@@ -4153,20 +4121,20 @@ a,
   font-weight: 700;
   color: #333;
   font-size: 1.8rem;
-  font-family: var(--font-family-amity-jack);
+  font-family: "Nunito", sans-serif;
 }
 
 .badge-level {
   color: #10b981;
   font-weight: 600;
   font-size: 0.95rem;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 .badge-requirement {
   font-weight: 500;
   font-size: 0.9rem;
-  font-family: var(--font-family-body);
+  font-family: "Nunito", sans-serif;
 }
 
 /* ============================================================================

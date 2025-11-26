@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getLevel, getXP, getXPToNextLevelValue } from '@/lib/storage';
+import { useUserData } from '@/context/UserDataContext';
 
 interface LevelProgressProps {
   showLabel?: boolean;
@@ -13,56 +13,34 @@ interface LevelProgressProps {
 export default function LevelProgress({
   showLabel = true,
 }: LevelProgressProps) {
-  const [level, setLevel] = useState(1);
-  const [xp, setXP] = useState(0);
-  const [xpToNext, setXPToNext] = useState(0);
+  const { userData } = useUserData();
   const [progress, setProgress] = useState(0);
 
+  const level = userData.level;
+  const xp = userData.totalXP;
+
   useEffect(() => {
-    // Update progress on mount and when storage changes
-    const updateProgress = () => {
-      const currentLevel = getLevel();
-      const currentXP = getXP();
-      const xpNeeded = getXPToNextLevelValue();
+    // Calculate progress percentage
+    if (level >= 10) {
+      setProgress(100);
+    } else {
+      // Get XP range for current level
+      const levelRanges = [
+        0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
+      ];
+      const currentLevelStart = levelRanges[level - 1] || 0;
+      const currentLevelEnd = levelRanges[level] || 2700;
+      const levelRange = currentLevelEnd - currentLevelStart;
+      const xpInLevel = xp - currentLevelStart;
+      const percentage = levelRange > 0 ? (xpInLevel / levelRange) * 100 : 0;
+      setProgress(Math.min(100, Math.max(0, percentage)));
+    }
+  }, [level, xp]);
 
-      setLevel(currentLevel);
-      setXP(currentXP);
-      setXPToNext(xpNeeded);
-
-      // Calculate progress percentage
-      if (currentLevel >= 10) {
-        setProgress(100);
-      } else {
-        // Get XP range for current level
-        const levelRanges = [
-          0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
-        ];
-        const currentLevelStart = levelRanges[currentLevel - 1] || 0;
-        const currentLevelEnd = levelRanges[currentLevel] || 2700;
-        const levelRange = currentLevelEnd - currentLevelStart;
-        const xpInLevel = currentXP - currentLevelStart;
-        const percentage = levelRange > 0 ? (xpInLevel / levelRange) * 100 : 0;
-        setProgress(Math.min(100, Math.max(0, percentage)));
-      }
-    };
-
-    updateProgress();
-
-    // Listen for storage changes
-    const handleStorageChange = () => {
-      updateProgress();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Also check periodically (in case of same-tab updates)
-    const interval = setInterval(updateProgress, 1000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
-  }, []);
+  // Calculate XP to next level
+  const levelRanges = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+  const currentLevelEnd = levelRanges[level] || 2700;
+  const xpToNext = Math.max(0, currentLevelEnd - xp);
 
   return (
     <div className="level-progress" role="region" aria-label="Level progress">
