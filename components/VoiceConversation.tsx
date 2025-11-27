@@ -11,7 +11,7 @@ import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 import Image from 'next/image';
 import VoiceAnimations from './VoiceAnimations';
-import TimerDisplay from './TimerDisplay';
+import CartoonTimer from './CartoonTimer';
 import { useDeepgram } from '@/context/DeepgramContextProvider';
 import { useMicrophone } from '@/context/MicrophoneContextProvider';
 import {
@@ -25,6 +25,97 @@ import {
   getFirePrompt,
   getPolicePrompt,
 } from '@/lib/prompts';
+
+interface ActiveConversationViewProps {
+  visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle';
+  settings: { subtitles: boolean };
+  conversation: ConversationMessage[];
+  sessionActive: boolean;
+  remainingTime: number;
+  endConversation: () => void;
+}
+
+// Component: ActiveConversationView
+function ActiveConversationView({
+  visualState,
+  settings,
+  conversation,
+  sessionActive,
+  remainingTime,
+  endConversation,
+}: ActiveConversationViewProps) {
+  return (
+    <>
+      {/* Visual Feedback */}
+      <div
+        className="conversation-visuals"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '2rem',
+        }}
+      >
+        <h2 style={{ fontSize: '2rem', color: '#333' }}>
+          {visualState === 'speaking' && 'Bobby is speaking...'}
+          {visualState === 'listening' && 'Your turn to speak!'}
+          {visualState === 'processing' && 'Bobby is thinking...'}
+          {visualState === 'error' && 'Something went wrong'}
+        </h2>
+
+        <VoiceAnimations state={visualState} />
+      </div>
+
+      {/* Subtitles (Agent only) */}
+      {settings.subtitles && conversation.length > 0 && (
+        <div
+          className="subtitles"
+          role="region"
+          aria-label="Subtitles"
+          style={{
+            marginTop: 'auto',
+            marginBottom: '2rem',
+            padding: '1.25rem',
+            background: 'rgba(255,255,255,0.8)',
+            borderRadius: '1rem',
+            maxWidth: '85%',
+          }}
+        >
+          {conversation
+            .filter(msg => msg.type === 'agent')
+            .slice(-1)
+            .map((msg, index) => (
+              <p
+                key={index}
+                className="subtitle-text"
+                style={{
+                  fontSize: '1.2rem',
+                  textAlign: 'center',
+                  lineHeight: '1.5',
+                  margin: 0,
+                  color: '#333',
+                }}
+              >
+                {msg.text}
+              </p>
+            ))}
+        </div>
+      )}
+
+      {/* Timer and Controls */}
+      <div className="conversation-controls" style={{ marginTop: 'auto' }}>
+        {sessionActive && <CartoonTimer remainingSeconds={remainingTime} />}
+        <CartoonButton
+          onClick={() => void endConversation()}
+          ariaLabel="End conversation"
+          className="cartoon-btn-danger"
+        >
+          End Call
+        </CartoonButton>
+      </div>
+    </>
+  );
+}
 
 interface VoiceConversationProps {
   ageTier?: AgeTier;
@@ -41,7 +132,7 @@ export default function VoiceConversation({
   onComplete,
   onBack,
   autoStart = false,
-  disableConnection = false,
+  disableConnection = true,
 }: VoiceConversationProps) {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Thinking
@@ -348,15 +439,9 @@ export default function VoiceConversation({
           logger.debug('Deepgram Message:', msg);
 
           // DEBUG: Log ALL messages with key details
-          console.log(
+          logger.log(
             '%c🔍 📨 DEEPGRAM MESSAGE 📨🔍',
-            'color: white; font-size: 20px; font-weight: bold; background: red; padding: 10px; border: 3px solid yellow;',
-            {
-              type: msg.type,
-              role: msg.role,
-              content: msg.content?.substring(0, 100),
-              hasContent: !!msg.content,
-            }
+            'color: white; font-size: 20px; font-weight: bold; background: red; padding: 10px; border: 3px solid yellow;'
           );
 
           switch (msg.type) {
@@ -424,11 +509,7 @@ export default function VoiceConversation({
               logger.log('🔍 Adding message to conversation:', newMsg);
               setConversation(prev => {
                 const updated = [...prev, newMsg];
-                logger.log(
-                  '🔍 Conversation now has',
-                  updated.length,
-                  'messages'
-                );
+                logger.log('🔍 Conversation now has', updated.length);
                 logger.log(
                   '🔍 User messages:',
                   updated.filter(m => m.type === 'user').length
@@ -672,6 +753,10 @@ export default function VoiceConversation({
               // type: 'cartesia',
               model_id: 'eleven_multilingual_v2',
               voice_id: 'lUTamkMw7gOzZbFIwmq4',
+              voice: {
+                mode: 'id',
+                id: 'lUTamkMw7gOzZbFIwmq4',
+              },
               // model_id: 'sonic-2',
               // voice: {
               //   mode: 'id',
@@ -715,7 +800,7 @@ export default function VoiceConversation({
     }
   }, [socketState, isConnecting, socket, ageTier, situation, startMicrophone]);
 
-  const endConversation = async () => {
+  const endConversation = useCallback(async () => {
     try {
       logger.log(
         '%c🎉 CONVERSATION ENDED 🎉',
@@ -747,10 +832,9 @@ export default function VoiceConversation({
         try {
           const parsed = JSON.parse(storedConversation);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            console.log(
+            logger.log(
               '🔍 ⚠️ USING LOCALSTORAGE CONVERSATION (state was empty):',
-              parsed.length,
-              'messages'
+              parsed.length
             );
             finalConversation = parsed;
           }
@@ -787,7 +871,15 @@ export default function VoiceConversation({
     } catch (err) {
       logger.error('Error ending conversation', err);
     }
-  };
+  }, [
+    conversation,
+    disconnectFromDeepgram,
+    soundEnabled,
+    onComplete,
+    setIsSpeaking,
+    setIsListening,
+    setConversationEnded,
+  ]);
 
   // Component: ConnectionError
   function ConnectionError() {
@@ -820,35 +912,6 @@ export default function VoiceConversation({
     );
   }
 
-  // Component: ConversationHeader
-  function ConversationHeader() {
-    return (
-      <div className="conversation-header">
-        {sessionActive && <TimerDisplay remainingSeconds={remainingTime} />}
-      </div>
-    );
-  }
-
-  // Component: PreConversationView
-  function PreConversationView() {
-    return (
-      <>
-        <h1 className="conversation-subtitle">Just a moment ...</h1>
-        <p className="conversation-subtitle-text">
-          Bobby is getting ready to chat!
-        </p>
-        <br />
-        <Image
-          src="/bobby-connecting.png"
-          alt="Bobby is getting ready to chat"
-          className="floating-bobby"
-          width={200}
-          height={250}
-        />
-      </>
-    );
-  }
-
   // Component: ConversationEndingView
   function ConversationEndingView() {
     return (
@@ -856,91 +919,31 @@ export default function VoiceConversation({
         className="conversation-ending"
         style={{ textAlign: 'center', padding: '2rem' }}
       >
-        <h2>Processing your conversation...</h2>
-        <LoadingSpinner />
+        <LoadingSpinner text="" heading="Processing your conversation..." />
       </div>
-    );
-  }
-
-  // Component: ActiveConversationView
-  function ActiveConversationView() {
-    return (
-      <>
-        {/* Visual Feedback */}
-        <div
-          className="conversation-visuals"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '2rem',
-          }}
-        >
-          <h2 style={{ fontSize: '2rem', color: '#333' }}>
-            {visualState === 'speaking' && 'Bobby is speaking...'}
-            {visualState === 'listening' && 'Your turn to speak!'}
-            {visualState === 'processing' && 'Bobby is thinking...'}
-            {visualState === 'error' && 'Something went wrong'}
-          </h2>
-
-          <VoiceAnimations state={visualState} />
-        </div>
-
-        {/* Subtitles (Agent only) */}
-        {settings.subtitles && conversation.length > 0 && (
-          <div
-            className="subtitles"
-            role="region"
-            aria-label="Subtitles"
-            style={{
-              marginTop: 'auto',
-              marginBottom: '2rem',
-              padding: '1.25rem',
-              background: 'rgba(255,255,255,0.8)',
-              borderRadius: '1rem',
-              maxWidth: '85%',
-            }}
-          >
-            {conversation
-              .filter(msg => msg.type === 'agent')
-              .slice(-1)
-              .map((msg, index) => (
-                <p
-                  key={index}
-                  className="subtitle-text"
-                  style={{
-                    fontSize: '1.2rem',
-                    textAlign: 'center',
-                    lineHeight: '1.5',
-                    margin: 0,
-                    color: '#333',
-                  }}
-                >
-                  {msg.text}
-                </p>
-              ))}
-          </div>
-        )}
-
-        {/* Controls */}
-        <div className="conversation-controls" style={{ marginTop: 'auto' }}>
-          <CartoonButton
-            onClick={() => void endConversation()}
-            ariaLabel="End conversation"
-            className="cartoon-btn-danger"
-          >
-            End Call
-          </CartoonButton>
-        </div>
-      </>
     );
   }
 
   // Component: SessionError
   function SessionError() {
     return (
-      <div className="conversation-error" role="alert">
-        {error}
+      <div
+        className="session-error"
+        role="alert"
+        style={{ textAlign: 'center', padding: '2rem' }}
+      >
+        <h3>Session Error</h3>
+        <p>Something went wrong during the conversation.</p>
+        <p className="error-details">{error}</p>
+        <div className="error-action-buttons" style={{ marginTop: '1rem' }}>
+          <CartoonButton
+            onClick={() => void endConversation()}
+            ariaLabel="End conversation"
+            className="cartoon-btn-danger"
+          >
+            End Conversation
+          </CartoonButton>
+        </div>
       </div>
     );
   }
@@ -957,8 +960,17 @@ export default function VoiceConversation({
     >
       {/*<ConversationHeader />*/}
       {conversationEnded && <ConversationEndingView />}
-      {!conversationEnded && sessionActive && <ActiveConversationView />}
-      {!conversationEnded && !sessionActive && <PreConversationView />}
+      {!conversationEnded && sessionActive && (
+        <ActiveConversationView
+          visualState={visualState}
+          settings={settings}
+          conversation={conversation}
+          sessionActive={sessionActive}
+          remainingTime={remainingTime}
+          endConversation={endConversation}
+        />
+      )}
+      {!conversationEnded && !sessionActive && <LoadingSpinner />}
       {error && sessionActive && <SessionError />}
     </div>
   );

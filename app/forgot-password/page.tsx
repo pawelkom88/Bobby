@@ -7,6 +7,7 @@ import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
+import { logger } from '@/lib/logger';
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useAuth();
@@ -44,7 +45,7 @@ export default function ForgotPasswordPage() {
       await resetPassword(email);
       setEmailSent(true);
     } catch (error) {
-      console.error('Password reset error:', error);
+      logger.error('Password reset error:', error);
 
       // Handle Firebase Auth errors
       if (error instanceof FirebaseError) {
@@ -191,14 +192,7 @@ export default function ForgotPasswordPage() {
           Reset Password
         </h1>
 
-        <p
-          style={{
-            textAlign: 'center',
-            color: '#7F8C8D',
-            marginBottom: '30px',
-            fontSize: '16px',
-          }}
-        >
+        <p className="login-description">
           Enter your email address and we'll send you a link to reset your
           password.
         </p>
@@ -268,18 +262,18 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Submit Button */}
-          <AuthButton
-            type="submit"
-            disabled={isSubmitting}
-            aria-describedby="forgot-password-description"
-          >
-            {isSubmitting ? 'SENDING...' : 'SEND RESET LINK'}
-          </AuthButton>
+          {/*<AuthButton*/}
+          {/*  type="submit"*/}
+          {/*  disabled={isSubmitting}*/}
+          {/*  aria-describedby="forgot-password-description"*/}
+          {/*>*/}
+          {/*  {isSubmitting ? 'SENDING...' : 'SEND RESET LINK'}*/}
+          {/*</AuthButton>*/}
         </form>
 
         {/* Back to Login */}
         <div className="login-signup">
-          Password back in your head?{' '}
+          Password back in your head? <br />
           <Link href={ROUTES.LOGIN} className="login-signup-link">
             Let's go!
           </Link>

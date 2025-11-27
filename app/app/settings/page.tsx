@@ -55,21 +55,21 @@ export default function SettingsPage() {
             >
               <h2 id="progress-heading">Progress</h2>
               {!showResetConfirm ? (
-                <>
+                <div className="progress-section">
                   <p>Reset all progress, badges, and conversation history.</p>
                   <CartoonButton
                     onClick={handleResetProgress}
                     ariaLabel="Reset progress"
                     className="cartoon-btn-danger"
                   >
-                    Reset Progress
+                    💣 Reset Progress
                   </CartoonButton>
                   {resetConfirmed && (
                     <p className="reset-confirmation" role="alert">
                       Progress reset successfully.
                     </p>
                   )}
-                </>
+                </div>
               ) : (
                 <>
                   <p className="reset-warning" role="alert">
@@ -100,10 +100,8 @@ export default function SettingsPage() {
               aria-labelledby="account-heading"
             >
               <h2 id="account-heading">Account</h2>
-              <div className="account-section">
-                <p>Manage your account settings</p>
-                <br />
-                <LogoutButton className="cartoon-btn">Sign Out</LogoutButton>
+              <div className="progress-section">
+                <LogoutButton className="cartoon-btn">← Sign Out</LogoutButton>
               </div>
             </section>
 

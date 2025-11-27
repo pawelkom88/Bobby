@@ -8,6 +8,7 @@ import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
+import { logger } from '@/lib/logger';
 
 function SignUpForm() {
   const router = useRouter();
@@ -78,7 +79,7 @@ function SignUpForm() {
       // Redirect to the intended page or default to /app
       router.push(redirectUrl);
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.error('Sign up error:', error);
 
       // Handle Firebase Auth errors
       if (error instanceof FirebaseError) {
@@ -342,13 +343,13 @@ function SignUpForm() {
           </div>
 
           {/* Sign Up Button */}
-          <AuthButton
-            type="submit"
-            disabled={isSubmitting}
-            aria-describedby="signup-description"
-          >
-            {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}
-          </AuthButton>
+          {/*<AuthButton*/}
+          {/*  type="submit"*/}
+          {/*  disabled={isSubmitting}*/}
+          {/*  aria-describedby="signup-description"*/}
+          {/*>*/}
+          {/*  {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}*/}
+          {/*</AuthButton>*/}
         </form>
 
         {/* Already have account */}

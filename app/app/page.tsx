@@ -47,7 +47,7 @@ export default function AppPage() {
                   asLink
                   href={ROUTES.YOUR_AGE}
                 >
-                  CALL BOBBY
+                  📞 CALL BOBBY
                 </CartoonButton>
               </div>
             </div>

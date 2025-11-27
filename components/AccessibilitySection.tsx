@@ -165,13 +165,13 @@ export default function AccessibilitySection({
               <text
                 x="50"
                 y="90"
-                font-family="Arial"
-                font-size="100"
-                font-weight="bold"
-                fill="none"
+                fontFamily="Arial"
+                fontSize="100"
+                fontWeight="bold"
+                fill="black"
                 stroke="black"
-                stroke-width="4"
-                text-anchor="middle"
+                strokeWidth="4"
+                textAnchor="middle"
               >
                 A
               </text>

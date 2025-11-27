@@ -1,12 +1,10 @@
-'use client';
-
-import React from 'react';
+import React, { memo } from 'react';
 
 interface VoiceAnimationProps {
   state: 'listening' | 'processing' | 'speaking' | 'error' | 'idle';
 }
 
-export default function VoiceAnimations({ state }: VoiceAnimationProps) {
+const VoiceAnimations = memo(function VoiceAnimations({ state }: VoiceAnimationProps) {
   return (
     <div className="voice-animations-container">
       {/* AI Speaking State - Waveform */}
@@ -23,18 +21,12 @@ export default function VoiceAnimations({ state }: VoiceAnimationProps) {
       {/* User Listening State - Animated Microphone */}
       {state === 'listening' && (
         <div className="user-listening-visual">
-          <div className="microphone-container">
-            <div className="microphone-body">
-              <div className="microphone-top"></div>
-              <div className="microphone-middle"></div>
-              <div className="microphone-bottom"></div>
-            </div>
-            <div className="microphone-stand"></div>
-            <div className="microphone-base"></div>
+          <div className="mic-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+            </svg>
           </div>
-          <div className="sound-wave wave-1"></div>
-          <div className="sound-wave wave-2"></div>
-          <div className="sound-wave wave-3"></div>
         </div>
       )}
 
@@ -51,4 +43,6 @@ export default function VoiceAnimations({ state }: VoiceAnimationProps) {
       {state === 'error' && <div className="error-visual">⚠️</div>}
     </div>
   );
-}
+});
+
+export default VoiceAnimations;

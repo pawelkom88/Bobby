@@ -104,7 +104,7 @@ export default function YourAgePage() {
                   asLink
                   href={ROUTES.APP}
                 >
-                  BACK
+                  ← BACK
                 </CartoonButton>
               </div>
             </div>

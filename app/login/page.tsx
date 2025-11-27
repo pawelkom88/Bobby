@@ -8,6 +8,7 @@ import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
+import { logger } from '@/lib/logger';
 
 function LoginForm() {
   const router = useRouter();
@@ -66,7 +67,7 @@ function LoginForm() {
       // Redirect to the intended page or default to /app
       router.push(redirectUrl);
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
 
       // Handle Firebase Auth errors
       if (error instanceof FirebaseError) {
@@ -148,17 +149,6 @@ function LoginForm() {
             Please enter your email and password to log in to your Bobby
             account.
           </p>
-
-          {/* General Error Message */}
-          {errors.general && (
-            <div
-              className="login-error-message"
-              role="alert"
-              style={{ marginBottom: '20px', textAlign: 'center' }}
-            >
-              {errors.general}
-            </div>
-          )}
 
           {/* Email Input */}
           <div className="login-input-group">
@@ -261,6 +251,17 @@ function LoginForm() {
             )}
           </div>
 
+          {/* General Error Message */}
+          {errors.general && (
+            <div
+              className="reset-warning"
+              role="alert"
+              style={{ marginBottom: '20px', textAlign: 'center' }}
+            >
+              {errors.general}
+            </div>
+          )}
+
           {/* Login Button */}
           <AuthButton
             type="submit"
@@ -274,13 +275,13 @@ function LoginForm() {
         {/* Forgot Password */}
         <div className="login-forgot-password">
           <Link href={ROUTES.FORGOT_PASSWORD} className="login-forgot-link">
-            Password playing hide and seek? 🔍
+            Password playing hide and seek?
           </Link>
         </div>
 
         {/* Sign Up */}
         <div className="login-signup">
-          First time caller?{' '}
+          First time caller? <br />
           <Link href={ROUTES.SIGNUP} className="login-signup-link">
             Sign up to join the fun!
           </Link>

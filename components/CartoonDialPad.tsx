@@ -230,7 +230,7 @@ export default function CartoonDialPad({
             onClick={onBack}
             aria-label="Go back to emergency selection"
           >
-            <span>BACK</span>
+            <span>← BACK</span>
           </button>
         </div>
       )}

@@ -37,7 +37,7 @@
    ============================================================================ */
 
 .chewy-regular {
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   font-weight: 400;
   font-style: normal;
 }
@@ -176,12 +176,12 @@
 }
 
 html {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: var(--font-size-base);
 }
 
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -204,7 +204,7 @@ h5,
 h6,
 [class*='heading'],
 [class*='title'] {
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
@@ -252,7 +252,7 @@ h6,
 
 .heading-cartoon,
 .kavoon {
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   font-weight: 700;
 }
 
@@ -261,13 +261,13 @@ h6,
    ============================================================================ */
 
 .body-text-regular {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
 .body-text-bold {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: bold;
   font-style: normal;
 }
@@ -279,7 +279,7 @@ h6,
 /* Dyslexia-friendly font class - uses Nunito across entire app */
 .dyslexia-font {
   font-family:
-    "Nunito",
+    'Nunito',
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -289,7 +289,7 @@ h6,
 
 .dyslexia-font * {
   font-family:
-    "Nunito",
+    'Nunito',
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -305,7 +305,7 @@ h6,
 .dyslexia-font h5,
 .dyslexia-font h6 {
   font-family:
-    "Nunito",
+    'Nunito',
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -1160,7 +1160,7 @@ a,
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   min-height: 60px;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .number-button:not(:disabled):hover {
@@ -1308,7 +1308,7 @@ a,
   transition: all 0.1s;
   user-select: none;
   border: none;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .key:active {
@@ -1368,7 +1368,7 @@ a,
   box-shadow:
     0 6px 0 rgba(0, 0, 0, 0.2),
     0 8px 15px rgba(0, 0, 0, 0.3);
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .action-btn:active {
@@ -1449,7 +1449,7 @@ a,
   font-weight: 700;
   text-align: center;
   line-height: 1.5;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   position: relative;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1536,7 +1536,7 @@ a,
 .question {
   font-size: 2rem;
   color: var(--btn-text-color);
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .btn-container {
@@ -1554,7 +1554,7 @@ a,
   background-color: var(--btn-color);
   text-decoration: none;
   color: var(--btn-text-color);
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   outline: 0;
   position: relative;
   overflow: hidden;
@@ -1597,11 +1597,6 @@ a,
   transform: rotateY(calc(var(--rotate-angle) * var(--direction) * -1));
   z-index: 2;
   font-size: 2rem;
-  margin-left: 1.5rem;
-}
-
-.cartoon-btn-danger span {
-  font-size: 1rem;
 }
 
 .cartoon-btn:hover:not(:disabled) {
@@ -1633,6 +1628,14 @@ a,
   z-index: 10;
 }
 
+.bobby-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+}
+
 .conversation-header {
   display: flex;
   justify-content: space-between;
@@ -1645,7 +1648,7 @@ a,
   font-size: 1.3rem;
   font-weight: 600;
   color: #333;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   margin: 0.6rem 0;
 }
 
@@ -1660,7 +1663,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1754,7 +1757,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1796,7 +1799,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1863,7 +1866,7 @@ a,
   margin: 1rem 0;
   text-transform: uppercase;
 
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .welcome-subtitle {
@@ -1871,7 +1874,7 @@ a,
   text-align: center;
   color: black;
   margin: 0;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .welcome-image {
@@ -1897,8 +1900,9 @@ a,
 .progress-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
+  justify-items: center;
 }
 
 .progress-left {
@@ -2012,7 +2016,7 @@ a,
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   border: none;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   min-height: 60px;
 }
 
@@ -2371,7 +2375,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .achievements-content {
@@ -2393,7 +2397,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2429,7 +2433,6 @@ a,
   align-items: center;
   padding: 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 200, 100, 0.15);
 }
 
 .conversation-service {
@@ -2441,14 +2444,14 @@ a,
 }
 
 .conversation-date {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 
 .conversation-xp {
   color: #10b981;
   font-weight: 700;
-    font-size: 1.2rem;
+  font-size: 1.2rem;
   text-align: right;
 }
 
@@ -2473,7 +2476,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   text-transform: uppercase;
   text-align: center;
   letter-spacing: 0.05em;
@@ -2546,7 +2549,7 @@ a,
   color: #333;
   cursor: pointer;
   transition: color 0.2s ease;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   user-select: none;
 }
 
@@ -2666,7 +2669,7 @@ a,
   font-size: 0.95rem;
   font-weight: 600;
   color: #333;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -2680,7 +2683,7 @@ a,
   background: linear-gradient(135deg, var(--btn-light-color), var(--btn-color));
   color: var(--btn-text-color);
   font-weight: 600;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -2769,7 +2772,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .settings-content {
@@ -2825,6 +2828,7 @@ a,
 .reset-warning {
   color: #dc2626 !important;
   font-weight: 600;
+  font-family: 'Nunito', sans-serif;
   padding: 1rem;
   background-color: rgba(220, 38, 38, 0.1);
   border-left: 4px solid #dc2626;
@@ -2870,7 +2874,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .completion-content {
@@ -2891,7 +2895,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2937,7 +2941,7 @@ a,
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
   color: #92400e;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .level-up-message p,
@@ -2996,7 +3000,7 @@ a,
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
 }
 
 .assessment-feedback ul {
@@ -3143,7 +3147,6 @@ a,
   .xp-earned p {
     font-size: 1rem;
   }
-
 }
 
 /* ============================================================================
@@ -3500,6 +3503,121 @@ a,
 }
 
 /* ============================================================================
+   CARTOON TIMER - Above End Call Button
+   ============================================================================ */
+
+.cartoon-timer-widget {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.cartoon-timer-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 5px 15px rgba(0, 0, 0, 0.08),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.03);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.cartoon-timer-card::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  border-radius: 2rem;
+  z-index: -1;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.cartoon-timer-card.low-time::before {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  opacity: 0.7;
+  animation: pulse-warning 1s ease-in-out infinite;
+}
+
+.cartoon-timer-icon {
+  font-size: 1.5rem;
+  animation: timer-bounce 2s ease-in-out infinite;
+}
+
+.cartoon-timer-text {
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.05em;
+  color: #3b82f6;
+  text-shadow:
+    0 2px 4px rgba(59, 130, 246, 0.2),
+    0 4px 8px rgba(59, 130, 246, 0.1);
+  transition: color 0.3s ease;
+}
+
+.cartoon-timer-text.low-time {
+  color: #ef4444;
+  animation: pulse-text 1s ease-in-out infinite;
+}
+
+@keyframes timer-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse-warning {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-text {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .cartoon-timer-card {
+    padding: 0.5rem 1rem;
+  }
+
+  .cartoon-timer-icon {
+    font-size: 1.25rem;
+  }
+
+  .cartoon-timer-text {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================================================
    AGE SELECTION PAGE STYLES
    ============================================================================ */
 
@@ -3544,7 +3662,7 @@ a,
 
 .age-title,
 .emergency-title {
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   font-size: 2.2rem;
   font-weight: bold;
   color: #333;
@@ -3554,7 +3672,7 @@ a,
 
 .age-subtitle,
 .emergency-subtitle {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1.3rem;
   color: black;
   font-weight: 500;
@@ -3577,7 +3695,7 @@ a,
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
   min-height: 100px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -3617,7 +3735,7 @@ a,
 
 .age-tile-label,
 .emergency-tile-label {
-  font-family: "Chewy", system-ui;
+  font-family: 'Chewy', system-ui;
   font-size: 1.6rem;
   font-weight: bold;
   color: white;
@@ -4121,20 +4239,20 @@ a,
   font-weight: 700;
   color: #333;
   font-size: 1.8rem;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .badge-level {
   color: #10b981;
   font-weight: 600;
   font-size: 0.95rem;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .badge-requirement {
   font-weight: 500;
   font-size: 0.9rem;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 /* ============================================================================
@@ -4327,141 +4445,7 @@ a,
   }
 }
 
-.microphone-container {
-  position: relative;
-  z-index: 2;
-  animation: mic-bounce 1.5s ease-in-out infinite;
-}
-
-@keyframes mic-bounce {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-10px) scale(1.05);
-  }
-}
-
-.microphone-body {
-  position: relative;
-  width: 60px;
-  height: 80px;
-  margin: 0 auto;
-}
-
-.microphone-top {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #f58b47 0%, #ff6b35 100%);
-  border-radius: 30px 30px 0 0;
-  position: relative;
-  box-shadow:
-    inset -3px -3px 10px rgba(0, 0, 0, 0.2),
-    inset 3px 3px 10px rgba(255, 255, 255, 0.3),
-    0 5px 15px rgba(245, 139, 71, 0.4);
-}
-
-.microphone-top::before {
-  content: '';
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  border-radius: 50%;
-}
-
-.microphone-top::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 3px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
-}
-
-.microphone-middle {
-  width: 60px;
-  height: 15px;
-  background: linear-gradient(135deg, #333 0%, #555 100%);
-  position: relative;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.microphone-bottom {
-  width: 60px;
-  height: 5px;
-  background: #222;
-  border-radius: 0 0 3px 3px;
-}
-
-.microphone-stand {
-  width: 4px;
-  height: 30px;
-  background: linear-gradient(to bottom, #555 0%, #333 100%);
-  margin: 0 auto;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.microphone-base {
-  width: 40px;
-  height: 8px;
-  background: linear-gradient(135deg, #333 0%, #555 100%);
-  margin: 0 auto;
-  border-radius: 4px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* Animated Sound Waves */
-.sound-wave {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 4px solid #f58b47;
-  opacity: 0;
-  animation: sound-pulse 2s ease-out infinite;
-}
-
-.sound-wave.wave-1 {
-  animation-delay: 0s;
-}
-
-.sound-wave.wave-2 {
-  animation-delay: 0.6s;
-}
-
-.sound-wave.wave-3 {
-  animation-delay: 1.2s;
-}
-
-@keyframes sound-pulse {
-  0% {
-    transform: scale(0.8);
-    opacity: 0.8;
-    border-width: 4px;
-  }
-  50% {
-    opacity: 0.4;
-    border-width: 3px;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-    border-width: 1px;
-  }
-}
-
-/* User Listening - Animated Microphone */
+/* User Listening - Animated Microphone Icon */
 .user-listening-visual {
   position: relative;
   display: flex;
@@ -4469,6 +4453,91 @@ a,
   align-items: center;
   width: 200px;
   height: 200px;
+}
+
+.mic-icon {
+  width: 100px;
+  height: 100px;
+  background: #ff4e50; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #f9d423,
+    #ff4e50
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #f9d423, #ff4e50);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow:
+    0 10px 40px rgba(255, 78, 80, 0.5),
+    0 0 0 0 rgba(255, 78, 80, 0.7);
+  animation: mic-pulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+.mic-icon::before,
+.mic-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #ff4e50;
+  animation: mic-sound-wave 2s ease-out infinite;
+}
+
+.mic-icon::after {
+  animation-delay: 1s;
+}
+
+.mic-icon svg {
+  width: 44px;
+  height: 44px;
+  animation: mic-bounce 0.6s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 10px 40px rgba(255, 78, 80, 0.5),
+      0 0 0 0 rgba(255, 78, 80, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 15px 50px rgba(255, 78, 80, 0.6),
+      0 0 0 15px rgba(255, 78, 80, 0);
+  }
+}
+
+@keyframes mic-sound-wave {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes mic-bounce {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-3px) rotate(-2deg);
+  }
 }
 
 /* AI Speaking - Colorful Waveform */
@@ -4547,6 +4616,12 @@ a,
   justify-content: center;
   padding: 40px 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 10px;
+  }
 }
 
 .landing-wrapper {
@@ -4708,7 +4783,7 @@ a,
    ============================================================================ */
 
 .dial-heading {
-  font-family: var(--font-family-amity-jack);
+  font-family: 'Chewy', system-ui;
   font-size: 48px;
   font-weight: bold;
   text-align: center;
@@ -4718,7 +4793,7 @@ a,
 }
 
 .dial-display {
-  font-family: var(--font-family-amity-jack);
+  font-family: 'Chewy', system-ui;
   font-size: 36px;
   font-weight: bold;
   text-align: center;
@@ -4751,7 +4826,7 @@ a,
   width: 88px;
   height: 88px;
   font-size: 40px;
-  font-family: var(--font-family-amity-jack);
+  font-family: 'Chewy', system-ui;
   font-weight: 900;
   background-color: #fff;
   border: 3px solid #333;
@@ -5266,7 +5341,7 @@ a:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "'Nunito', 'Comic Sans MS', cursive, sans-serif";
+  font-family: "Nunito', sans-serif";
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -5339,7 +5414,7 @@ a:focus-visible {
   letter-spacing: 3px;
   width: 100%;
   margin-bottom: 20px;
-  font-family: var(--font-family-amity-jack);
+  font-family: 'Chewy', system-ui;
 }
 
 .ach-button:hover {
@@ -5412,6 +5487,10 @@ a:focus-visible {
   }
 }
 
+input {
+  font-family: 'Nunito', 'sans-serif' !important;
+}
+
 .login-title {
   text-align: center;
   font-size: 36px;
@@ -5419,7 +5498,7 @@ a:focus-visible {
   color: #2c3e50;
   margin: 30px 0;
   letter-spacing: -1px;
-  font-family: var(--font-family-amity-jack);
+  font-family: 'Chewy', system-ui;
 }
 
 .login-input-group {
@@ -5467,10 +5546,6 @@ a:focus-visible {
   outline: none;
 }
 
-.login-input::placeholder {
-  color: #a0a0b0;
-}
-
 .login-button {
   width: 100%;
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
@@ -5513,6 +5588,7 @@ a:focus-visible {
 .login-forgot-password {
   text-align: center;
   margin-bottom: 15px;
+  font-family: 'Nunito', 'sans-serif';
 }
 
 .login-forgot-link {
@@ -5529,6 +5605,13 @@ a:focus-visible {
   text-decoration: underline;
 }
 
+.login-description {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-wrap: pretty;
+}
+
 .login-forgot-link:focus {
   outline: 2px solid #4a90e2;
   outline-offset: 2px;
@@ -5538,6 +5621,7 @@ a:focus-visible {
   text-align: center;
   font-size: 16px;
   color: #4a4a5e;
+  font-family: 'Nunito', 'sans-serif';
 }
 
 .login-signup-link {

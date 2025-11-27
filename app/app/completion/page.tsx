@@ -16,8 +16,10 @@ const DEFAULT_SITUATION: Service = 'fire';
 export default function CompletionPage() {
   const { getJourneyState } = useUserData();
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
-  const [selectedAgeTier, setSelectedAgeTier] = useState<AgeTier>(DEFAULT_AGE_TIER);
-  const [selectedSituation, setSelectedSituation] = useState<Service>(DEFAULT_SITUATION);
+  const [selectedAgeTier, setSelectedAgeTier] =
+    useState<AgeTier>(DEFAULT_AGE_TIER);
+  const [selectedSituation, setSelectedSituation] =
+    useState<Service>(DEFAULT_SITUATION);
 
   useEffect(() => {
     // Get selected values from journey state
@@ -35,17 +37,17 @@ export default function CompletionPage() {
       const completionId = sessionStorage.getItem('completionId');
       const processedId = sessionStorage.getItem('processedCompletionId');
 
-      console.log('🔍 ===== COMPLETION PAGE LOAD =====');
-      console.log('🔍 assessmentData from sessionStorage:', assessmentData);
-      console.log('🔍 completionId:', completionId);
-      console.log('🔍 processedId:', processedId);
+      logger.log('🔍 ===== COMPLETION PAGE LOAD =====');
+      logger.log('🔍 assessmentData from sessionStorage:', assessmentData);
+      logger.log('🔍 completionId:', completionId);
+      logger.log('🔍 processedId:', processedId);
 
       if (assessmentData) {
         try {
           const data = JSON.parse(assessmentData);
-          console.log('🔍 Parsed assessment data:', data);
-          console.log('🔍 Assessment object:', data.assessment);
-          console.log('🔍 Assessment score:', data.assessment?.score);
+          logger.log('🔍 Parsed assessment data:', data);
+          logger.log('🔍 Assessment object:', data.assessment);
+          logger.log('🔍 Assessment score:', data.assessment?.score);
 
           setPerformance({
             completed: data.passed,
@@ -55,7 +57,10 @@ export default function CompletionPage() {
               : data.assessment.positives,
           });
 
-          console.log('🔍 Performance state set with assessment:', data.assessment);
+          logger.log(
+            '🔍 Performance state set with assessment:',
+            data.assessment
+          );
 
           // Only clear assessment data if this completion has been processed
           // This allows the data to persist for display on refresh
@@ -71,15 +76,10 @@ export default function CompletionPage() {
           console.error('🔍 ❌ Error parsing assessment:', error);
         }
       } else {
-        console.log('🔍 ⚠️ No assessment data found in sessionStorage');
+        logger.log('🔍 ⚠️ No assessment data found in sessionStorage');
       }
     }
   }, []);
-
-  const handleContinue = () => {
-    // Navigate back to welcome
-    window.location.href = ROUTES.APP;
-  };
 
   return (
     <ViewTransition>
@@ -90,8 +90,6 @@ export default function CompletionPage() {
               service={selectedSituation}
               ageTier={selectedAgeTier}
               performance={performance}
-              onContinue={handleContinue}
-              onViewAchievements={handleContinue}
             />
           </main>
         </ErrorBoundary>

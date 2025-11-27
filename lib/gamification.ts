@@ -4,6 +4,7 @@
 
 import type { Badge, PerformanceMetrics } from '@/types';
 import { scoreToXP } from './assessment';
+import { logger } from '@/lib/logger';
 
 // Level requirements: XP needed to reach each level
 export const LEVEL_REQUIREMENTS: number[] = [
@@ -147,8 +148,11 @@ export function getBadgeForScore(score: number): Badge | null {
 /**
  * Check if scenario explorer badge should be awarded
  */
-export function getBadgeForScenariosExplored(scenariosCount: number): Badge | null {
-  if (scenariosCount >= 3) { // Tried all 3 emergency types
+export function getBadgeForScenariosExplored(
+  scenariosCount: number
+): Badge | null {
+  if (scenariosCount >= 3) {
+    // Tried all 3 emergency types
     return BADGES.SCENARIO_EXPLORER;
   }
   return null;
@@ -161,23 +165,21 @@ export function calculateXPEarned(
   performance: PerformanceMetrics = {}
 ): number {
   // DEBUG: Log what we're working with
-  console.log('🔍 calculateXPEarned called with:', performance);
-  console.log('🔍 Has assessment?', !!performance.assessment);
-  console.log('🔍 Assessment:', performance.assessment);
+  logger.log('🔍 calculateXPEarned called with:', performance);
+  logger.log('🔍 Has assessment?', !!performance.assessment);
+  logger.log('🔍 Assessment:', performance.assessment);
 
   if (performance.assessment) {
-    const xp = scoreToXP(performance.assessment.score);
-    console.log('🔍 Using assessment score:', performance.assessment.score, '-> XP:', xp);
-    return xp;
+    return scoreToXP(performance.assessment.score);
   }
 
   // Fallback legacy behaviour if no assessment is present
-  console.log('🔍 No assessment found, using fallback XP calculation');
+  logger.log('🔍 No assessment found, using fallback XP calculation');
   let xp = 50;
   if (performance.completed) xp += 20;
   if (performance.clearCommunication) xp += 15;
   if (performance.stayedCalm) xp += 15;
 
-  console.log('🔍 Fallback XP:', xp);
+  logger.log('🔍 Fallback XP:', xp);
   return Math.min(xp, 100);
 }

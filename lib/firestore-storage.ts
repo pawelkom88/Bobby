@@ -66,7 +66,7 @@ export function getDefaultUserData(): UserData {
  */
 export async function getUserData(userId: string): Promise<UserData> {
   try {
-    console.log('🔍 📖 READING USER DATA FROM FIRESTORE');
+    logger.log('🔍 📖 READING USER DATA FROM FIRESTORE');
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
 
@@ -77,7 +77,7 @@ export async function getUserData(userId: string): Promise<UserData> {
         ...getDefaultUserData(),
         ...data,
       } as UserData;
-      console.log('🔍 📖 USER DATA READ:', {
+      logger.log('🔍 📖 USER DATA READ:', {
         totalXP: userData.totalXP,
         level: userData.level,
         badges: userData.badges.length,
@@ -85,12 +85,12 @@ export async function getUserData(userId: string): Promise<UserData> {
       });
       return userData;
     } else {
-      console.log('🔍 ⚠️ USER DOCUMENT NOT FOUND, RETURNING DEFAULTS');
+      logger.log('🔍 ⚠️ USER DOCUMENT NOT FOUND, RETURNING DEFAULTS');
       logger.info('User document not found, returning defaults:', userId);
       return getDefaultUserData();
     }
   } catch (error) {
-    console.log('🔍 ❌ ERROR READING USER DATA:', error);
+    logger.log('🔍 ❌ ERROR READING USER DATA:', error);
     logger.error('Error getting user data from Firestore:', error);
     return getDefaultUserData();
   }
@@ -137,7 +137,7 @@ export async function saveUserData(
   data: UserData
 ): Promise<void> {
   try {
-    console.log('🔍 💾 SAVING USER DATA TO FIRESTORE:', {
+    logger.log('🔍 💾 SAVING USER DATA TO FIRESTORE:', {
       totalXP: data.totalXP,
       level: data.level,
       badges: data.badges.length,
@@ -148,10 +148,10 @@ export async function saveUserData(
       ...data,
       updatedAt: serverTimestamp(),
     });
-    console.log('🔍 ✅ USER DATA SAVED TO FIRESTORE');
+    logger.log('🔍 ✅ USER DATA SAVED TO FIRESTORE');
     logger.info('User data saved to Firestore:', userId);
   } catch (error) {
-    console.log('🔍 ❌ ERROR SAVING USER DATA:', error);
+    logger.log('🔍 ❌ ERROR SAVING USER DATA:', error);
     logger.error('Error saving user data to Firestore:', error);
     throw error;
   }
@@ -202,16 +202,16 @@ export async function saveConversation(
 
     // Award "First Call Hero" badge if this is the first conversation
     if (data.conversations.length === 1) {
-      console.log('🔍 🎉 FIRST CONVERSATION! Awarding First Call Hero badge');
+      logger.log('🔍 🎉 FIRST CONVERSATION! Awarding First Call Hero badge');
       const firstCallBadge = getBadgeForFirstCall();
-      const existingBadge = data.badges.find((b) => b.id === firstCallBadge.id);
+      const existingBadge = data.badges.find(b => b.id === firstCallBadge.id);
       if (!existingBadge) {
         const badgeWithTimestamp = {
           ...firstCallBadge,
           timestamp: new Date().toISOString(),
         };
         data.badges.push(badgeWithTimestamp);
-        console.log('🔍 ✅ First Call Hero badge awarded!');
+        logger.log('🔍 ✅ First Call Hero badge awarded!');
       }
     }
 
@@ -229,13 +229,13 @@ export async function addXP(
   userId: string,
   amount: number
 ): Promise<LevelUpResult> {
-  console.log('🔍 ===== ADD XP FUNCTION =====');
-  console.log('🔍 userId:', userId);
-  console.log('🔍 amount:', amount);
+  logger.log('🔍 ===== ADD XP FUNCTION =====');
+  logger.log('🔍 userId:', userId);
+  logger.log('🔍 amount:', amount);
 
   // Validate XP amount
   if (!validateXP(amount)) {
-    console.log('🔍 ❌ Invalid XP amount:', amount);
+    logger.log('🔍 ❌ Invalid XP amount:', amount);
     logger.error('Invalid XP amount:', amount);
     const data = await getUserData(userId);
     return {
@@ -248,7 +248,7 @@ export async function addXP(
 
   try {
     const data = await getUserData(userId);
-    console.log('🔍 Current user data:', {
+    logger.log('🔍 Current user data:', {
       totalXP: data.totalXP,
       level: data.level,
       badges: data.badges.length,
@@ -261,7 +261,7 @@ export async function addXP(
     const newLevel = data.level;
     const leveledUp = newLevel > oldLevel;
 
-    console.log('🔍 After XP calculation:', {
+    logger.log('🔍 After XP calculation:', {
       oldTotalXP,
       newTotalXP: data.totalXP,
       oldLevel,
@@ -273,21 +273,21 @@ export async function addXP(
     if (leveledUp) {
       const badge = getBadgeForLevel(newLevel);
       if (badge) {
-        const existingBadge = data.badges.find((b) => b.id === badge.id);
+        const existingBadge = data.badges.find(b => b.id === badge.id);
         if (!existingBadge) {
           badgeAwarded = {
             ...badge,
             timestamp: new Date().toISOString(),
           };
           data.badges.push(badgeAwarded);
-          console.log('🔍 ✅ Badge awarded:', badgeAwarded.name);
+          logger.log('🔍 ✅ Badge awarded:', badgeAwarded.name);
         }
       }
     }
 
-    console.log('🔍 Saving user data to Firestore...');
+    logger.log('🔍 Saving user data to Firestore...');
     await saveUserData(userId, data);
-    console.log('🔍 ✅ User data saved successfully');
+    logger.log('🔍 ✅ User data saved successfully');
 
     const result = {
       newLevel,
@@ -295,11 +295,11 @@ export async function addXP(
       badgeAwarded,
       totalXP: data.totalXP,
     };
-    console.log('🔍 Returning result:', result);
+    logger.log('🔍 Returning result:', result);
 
     return result;
   } catch (error) {
-    console.log('🔍 ❌ Error in addXP:', error);
+    logger.log('🔍 ❌ Error in addXP:', error);
     logger.error('Error adding XP:', error);
     throw error;
   }
@@ -387,26 +387,29 @@ export async function awardScoreBadge(
   userId: string,
   score: number
 ): Promise<Badge | null> {
-  console.log('🔍 ===== AWARD SCORE BADGE =====');
-  console.log('🔍 userId:', userId);
-  console.log('🔍 score:', score);
+  logger.log('🔍 ===== AWARD SCORE BADGE =====');
+  logger.log('🔍 userId:', userId);
+  logger.log('🔍 score:', score);
 
   const badge = getBadgeForScore(score);
-  console.log('🔍 Badge for score:', badge?.name || 'none');
+  logger.log('🔍 Badge for score:', badge?.name || 'none');
 
   if (!badge) {
-    console.log('🔍 No badge for this score');
+    logger.log('🔍 No badge for this score');
     return null;
   }
 
   try {
     const data = await getUserData(userId);
-    console.log('🔍 Current badges:', data.badges.map(b => b.name));
+    logger.log(
+      '🔍 Current badges:',
+      data.badges.map(b => b.name)
+    );
 
     // Check if badge already exists
-    const existingBadge = data.badges.find((b) => b.id === badge.id);
+    const existingBadge = data.badges.find(b => b.id === badge.id);
     if (existingBadge) {
-      console.log('🔍 Badge already owned:', badge.name);
+      logger.log('🔍 Badge already owned:', badge.name);
       return null; // Already have this badge
     }
 
@@ -416,13 +419,13 @@ export async function awardScoreBadge(
       timestamp: new Date().toISOString(),
     };
     data.badges.push(badgeWithTimestamp);
-    console.log('🔍 Awarding badge:', badge.name);
+    logger.log('🔍 Awarding badge:', badge.name);
     await saveUserData(userId, data);
-    console.log('🔍 ✅ Badge saved successfully');
+    logger.log('🔍 ✅ Badge saved successfully');
 
     return badgeWithTimestamp;
   } catch (error) {
-    console.log('🔍 ❌ Error awarding badge:', error);
+    logger.log('🔍 ❌ Error awarding badge:', error);
     logger.error('Error awarding score badge:', error);
     throw error;
   }
@@ -464,7 +467,7 @@ export function subscribeToUserData(
 
   return onSnapshot(
     userDocRef,
-    (snapshot) => {
+    snapshot => {
       if (snapshot.exists()) {
         const data = {
           ...getDefaultUserData(),
@@ -475,10 +478,9 @@ export function subscribeToUserData(
         callback(getDefaultUserData());
       }
     },
-    (error) => {
+    error => {
       logger.error('Error in user data subscription:', error);
       callback(getDefaultUserData());
     }
   );
 }
-

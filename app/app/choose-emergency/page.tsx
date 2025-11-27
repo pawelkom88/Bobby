@@ -110,7 +110,7 @@ export default function ChooseEmergencyPage() {
                   containerClassName="emergency-back-button-container"
                   onClick={handleBack}
                 >
-                  BACK
+                  ← BACK
                 </CartoonButton>
               </div>
             </div>

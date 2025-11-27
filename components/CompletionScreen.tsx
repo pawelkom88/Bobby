@@ -47,21 +47,21 @@ export default function CompletionScreen({
       const completionId = sessionStorage.getItem('completionId');
       const processedId = sessionStorage.getItem('processedCompletionId');
 
-      console.log('🔍 ===== COMPLETION SCREEN USEEFFECT =====');
-      console.log('🔍 completionId:', completionId);
-      console.log('🔍 processedId:', processedId);
-      console.log(
+      logger.log('🔍 ===== COMPLETION SCREEN USEEFFECT =====');
+      logger.log('🔍 completionId:', completionId);
+      logger.log('🔍 processedId:', processedId);
+      logger.log(
         '🔍 completionId === processedId:',
         completionId === processedId
       );
-      console.log('🔍 service:', service);
-      console.log('🔍 ageTier:', ageTier);
-      console.log('🔍 performance:', performance);
-      console.log('🔍 performance.assessment:', performance.assessment);
+      logger.log('🔍 service:', service);
+      logger.log('🔍 ageTier:', ageTier);
+      logger.log('🔍 performance:', performance);
+      logger.log('🔍 performance.assessment:', performance.assessment);
 
       // CRITICAL: Don't award XP until we have the assessment data
       if (!performance.assessment) {
-        console.log(
+        logger.log(
           '🔍 ⏳ WAITING: No assessment in performance yet, skipping this render'
         );
         return;
@@ -69,7 +69,7 @@ export default function CompletionScreen({
 
       // If we have assessment data but no completionId, this is a page refresh - skip XP award
       if (assessmentData && !completionId) {
-        console.log('🔍 ❌ PATH 1: Page refresh detected, skipping XP award');
+        logger.log('🔍 ❌ PATH 1: Page refresh detected, skipping XP award');
         logger.log('Page refresh detected, skipping XP award', {
           assessmentData: !!assessmentData,
           completionId,
@@ -83,7 +83,7 @@ export default function CompletionScreen({
       // Only award XP if we have a valid completionId that hasn't been processed
       if (!completionId || completionId === processedId) {
         // Already processed, missing completionId, or no valid completion, just display existing results
-        console.log(
+        logger.log(
           '🔍 ❌ PATH 2: Completion already processed or invalid, skipping XP award'
         );
         logger.log(
@@ -100,7 +100,7 @@ export default function CompletionScreen({
         return;
       }
 
-      console.log('🔍 ✅ PATH 3: Awarding XP for new completion');
+      logger.log('🔍 ✅ PATH 3: Awarding XP for new completion');
       logger.log('Awarding XP for new completion', {
         completionId,
         processedId,
@@ -134,27 +134,27 @@ export default function CompletionScreen({
       (async () => {
         try {
           // Step 1: Award XP and handle level up
-          console.log('🔍 STEP 1: Adding XP...');
+          logger.log('🔍 STEP 1: Adding XP...');
           const result = await addXP(xp);
           setLeveledUp(result.leveledUp);
           setBadgeAwarded(result.badgeAwarded);
           setCurrentLevel(result.newLevel);
           setIsLevel10(result.newLevel === 10);
-          console.log('🔍 STEP 1 COMPLETE: XP added');
+          logger.log('🔍 STEP 1 COMPLETE: XP added');
 
           // Step 2: Award score-based badge if applicable
           if (assessment?.score) {
-            console.log('🔍 STEP 2: Awarding score badge...');
+            logger.log('🔍 STEP 2: Awarding score badge...');
             const scoreBadge = await awardScoreBadge(assessment.score);
             if (scoreBadge) {
               setScoreBadgeAwarded(scoreBadge);
             }
-            console.log('🔍 STEP 2 COMPLETE: Score badge awarded');
+            logger.log('🔍 STEP 2 COMPLETE: Score badge awarded');
           }
 
           // Step 3: Save conversation (this will also award First Call Hero badge if it's the first conversation)
           if (service && ageTier) {
-            console.log('🔍 STEP 3: Saving conversation...');
+            logger.log('🔍 STEP 3: Saving conversation...');
             await saveConversation(
               new Date().toISOString(),
               service,
@@ -163,10 +163,10 @@ export default function CompletionScreen({
               assessment?.score,
               feedbackSummary?.slice(0, 3)
             );
-            console.log('🔍 STEP 3 COMPLETE: Conversation saved');
+            logger.log('🔍 STEP 3 COMPLETE: Conversation saved');
           }
 
-          console.log('🔍 ✅ ALL STEPS COMPLETE');
+          logger.log('🔍 ✅ ALL STEPS COMPLETE');
         } catch (error) {
           logger.error('Error in completion flow:', error);
         }

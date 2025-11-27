@@ -70,7 +70,6 @@ export default function BadgeDisplay({
                   loading="lazy"
                 />
               </div>
-              <div className="badge-name">{badge.name}</div>
             </div>
           );
         })}

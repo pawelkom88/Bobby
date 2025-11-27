@@ -29,7 +29,7 @@ export const sendMicToSocket =
       );
       socket.send(audioDataToSend);
     } else {
-      console.warn(
+      logger.warn(
         'deepgramUtils: Socket not open, skipping audio send, readyState:',
         socket.readyState
       );
@@ -44,11 +44,9 @@ export const sendSocketMessage = (socket: WebSocket, message: any) => {
     logger.log('deepgramUtils: Sending message:', JSON.stringify(message));
     socket.send(JSON.stringify(message));
   } else {
-    console.warn(
+    logger.warn(
       'deepgramUtils: Socket not open, skipping message send, readyState:',
-      socket.readyState,
-      'message:',
-      message
+      socket.readyState
     );
   }
 };
@@ -62,7 +60,7 @@ export const sendKeepAliveMessage = (socket: WebSocket) => () => {
     logger.log('deepgramUtils: Sending KeepAlive');
     sendSocketMessage(socket, { type: 'KeepAlive' });
   } else {
-    console.warn(
+    logger.warn(
       'deepgramUtils: Socket not open, skipping keepalive, readyState:',
       socket.readyState
     );

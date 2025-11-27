@@ -33,22 +33,30 @@ class Logger {
   }
 
   info(message: string, data?: any): void {
-    console.info(this.formatMessage('info', message, data));
+    if (this.isDevelopment) {
+      console.info(this.formatMessage('info', message, data));
+    }
     this.addLog('info', message, data);
   }
 
   log(message: string, data?: any): void {
-    console.log(this.formatMessage('log', message, data));
+    if (this.isDevelopment) {
+      console.log(this.formatMessage('log', message, data));
+    }
     this.addLog('log', message, data);
   }
 
   warn(message: string, data?: any): void {
-    console.warn(this.formatMessage('warn', message, data));
+    if (this.isDevelopment) {
+      console.warn(this.formatMessage('warn', message, data));
+    }
     this.addLog('warn', message, data);
   }
 
   error(message: string, data?: any): void {
-    console.error(this.formatMessage('error', message, data));
+    if (this.isDevelopment) {
+      console.error(this.formatMessage('error', message, data));
+    }
     this.addLog('error', message, data);
   }
 
