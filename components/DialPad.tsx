@@ -6,6 +6,8 @@ interface DialPadProps {
   onCorrectNumber?: () => void;
   targetNumber?: string;
   onBack?: () => void;
+  isLoading?: boolean;
+  buttonLabel?: string;
 }
 
 /**
@@ -15,12 +17,16 @@ export default function DialPad({
   onCorrectNumber,
   targetNumber = '999',
   onBack,
+  isLoading,
+  buttonLabel,
 }: DialPadProps) {
   return (
     <CartoonDialPad
       onCorrectNumber={onCorrectNumber}
       targetNumber={targetNumber}
       onBack={onBack}
+      isLoading={isLoading}
+      buttonLabel={buttonLabel}
     />
   );
 }

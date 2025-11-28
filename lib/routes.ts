@@ -13,6 +13,7 @@ export const ROUTES = {
   DIAL: '/app/dial',
   CONVERSATION: '/app/conversation',
   COMPLETION: '/app/completion',
+  SUCCESS: '/app/success',
   ACHIEVEMENTS: '/app/achievements',
   SETTINGS: '/app/settings',
   CONTACT: '/contact',

@@ -1,31 +1,143 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
-export function proxy(request: NextRequest) {
-  // Clone the response
+/**
+ * Security Proxy (Middleware) for Next.js 16
+ *
+ * Security improvements:
+ * - CWE-602: Server-side route protection (not just client-side)
+ * - CWE-1021: Improved CSP configuration
+ * - Added CSRF token generation
+ * - Nonce-based CSP for inline scripts
+ */
+
+// Routes that require authentication
+const PROTECTED_ROUTES = ['/app'];
+
+// Routes that are always public
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/reset-password'];
+
+/**
+ * Generate a cryptographically secure nonce for CSP
+ */
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Buffer.from(array).toString('base64');
+}
+
+/**
+ * Generate CSRF token
+ */
+function generateCSRFToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Buffer.from(array).toString('base64url');
+}
+
+/**
+ * Check if a path matches any of the protected routes
+ */
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+}
+
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Generate nonce for CSP
+  const nonce = generateNonce();
+
+  // Check for authentication on protected routes
+  if (isProtectedRoute(pathname)) {
+    // Check for Firebase session cookie
+    // Note: Firebase Auth primarily uses client-side tokens, but we can check
+    // for a session indicator cookie that the client sets after authentication
+    const sessionCookie = request.cookies.get('__session');
+    const authIndicator = request.cookies.get('bobby_auth');
+
+    // If no auth indicator, redirect to login
+    // The actual token verification happens in API routes
+    // This is a first-line defense to prevent unauthenticated page access
+    if (!authIndicator && !sessionCookie) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Create response
   const response = NextResponse.next();
+
+  // Set nonce in response header for use by the application
+  response.headers.set('x-nonce', nonce);
 
   // Security Headers
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('X-DNS-Prefetch-Control', 'on');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+
+  // Permissions Policy - allow microphone for voice features
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
+    'camera=(), geolocation=(), payment=(self)'
   );
 
   // Content Security Policy
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com; frame-ancestors 'none';"
-  );
+  // Note: We still need 'unsafe-inline' for styles due to Next.js/React requirements
+  // but we've removed 'unsafe-eval' and added stricter connect-src
+  const cspDirectives = [
+    "default-src 'self'",
+    // Scripts: self + Stripe + nonce for inline scripts
+    // Note: 'unsafe-inline' is kept as fallback for browsers that don't support nonces
+    // and because Next.js injects inline scripts
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://checkout.stripe.com`,
+    // Styles: self + unsafe-inline (required for styled-jsx and inline styles)
+    "style-src 'self' 'unsafe-inline'",
+    // Images: self + data URIs + HTTPS
+    "img-src 'self' data: https: blob:",
+    // Fonts: self + data URIs
+    "font-src 'self' data:",
+    // Connections: self + required services
+    "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
+    // Frames: Stripe checkout
+    "frame-src https://js.stripe.com https://checkout.stripe.com",
+    // Frame ancestors: none (prevent clickjacking)
+    "frame-ancestors 'none'",
+    // Form actions: self only
+    "form-action 'self'",
+    // Base URI: self only
+    "base-uri 'self'",
+    // Object sources: none
+    "object-src 'none'",
+    // Upgrade insecure requests in production
+    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+  ];
 
-  // HTTPS Only
+  response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+
+  // HTTPS Only (HSTS)
   if (process.env.NODE_ENV === 'production') {
     response.headers.set(
       'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains'
+      'max-age=31536000; includeSubDomains; preload'
     );
+  }
+
+  // CSRF Token - set if not present
+  const existingCSRF = request.cookies.get('csrf_token');
+  if (!existingCSRF) {
+    const csrfToken = generateCSRFToken();
+    response.cookies.set('csrf_token', csrfToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
   }
 
   return response;
@@ -35,11 +147,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * - api (API routes - they have their own auth)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder files (images, fonts, etc.)
      */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],

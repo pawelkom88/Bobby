@@ -5,17 +5,20 @@ import { MicrophoneContextProvider } from '@/context/MicrophoneContextProvider';
 import { DeepgramContextProvider } from '@/context/DeepgramContextProvider';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserDataProvider } from '@/context/UserDataContext';
+import { CreditsProvider } from '@/context/CreditsContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <UserDataProvider>
-        <SoundProvider>
-          <DeepgramContextProvider>
-            <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
-          </DeepgramContextProvider>
-        </SoundProvider>
-      </UserDataProvider>
+      <CreditsProvider>
+        <UserDataProvider>
+          <SoundProvider>
+            <DeepgramContextProvider>
+              <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
+            </DeepgramContextProvider>
+          </SoundProvider>
+        </UserDataProvider>
+      </CreditsProvider>
     </AuthProvider>
   );
 }

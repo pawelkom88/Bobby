@@ -9,6 +9,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
 import { logger } from '@/lib/logger';
+import { validatePassword, validateEmail, getPasswordRequirements } from '@/lib/validation';
 
 function SignUpForm() {
   const router = useRouter();
@@ -17,6 +18,7 @@ function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'fair' | 'good' | 'strong' | null>(null);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -42,16 +44,21 @@ function SignUpForm() {
       confirmPassword?: string;
     } = {};
 
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+    // Validate email
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      newErrors.email = emailValidation.error;
     }
 
+    // Validate password with strong requirements
     if (!password.trim()) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else {
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        // Show the first error for cleaner UX
+        newErrors.password = passwordValidation.errors[0];
+      }
     }
 
     if (!confirmPassword.trim()) {
@@ -125,7 +132,17 @@ function SignUpForm() {
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+
+    // Update password strength indicator
+    if (newPassword.length > 0) {
+      const validation = validatePassword(newPassword);
+      setPasswordStrength(validation.strength);
+    } else {
+      setPasswordStrength(null);
+    }
+
     if (errors.password) {
       setErrors(prev => ({ ...prev, password: undefined }));
     }
@@ -262,18 +279,27 @@ function SignUpForm() {
               <input
                 id="password"
                 type="password"
-                placeholder="Password (min 6 characters)"
+                placeholder="Password (min 8 characters)"
                 value={password}
                 onChange={handlePasswordChange}
                 className="login-input"
                 required
                 aria-invalid={!!errors.password}
                 aria-describedby={
-                  errors.password ? 'password-error' : undefined
+                  errors.password ? 'password-error' : 'password-requirements'
                 }
                 autoComplete="new-password"
               />
             </div>
+            {/* Password strength indicator */}
+            {passwordStrength && (
+              <div
+                className={`password-strength password-strength-${passwordStrength}`}
+                aria-live="polite"
+              >
+                Password strength: <strong>{passwordStrength}</strong>
+              </div>
+            )}
             {errors.password && (
               <div
                 id="password-error"
@@ -283,6 +309,9 @@ function SignUpForm() {
                 {errors.password}
               </div>
             )}
+            <div id="password-requirements" className="sr-only">
+              Password must be at least 8 characters with uppercase, lowercase, number, and special character
+            </div>
           </div>
 
           {/* Confirm Password Input */}

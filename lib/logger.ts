@@ -1,5 +1,7 @@
 /**
  * Logger utility for debugging and monitoring
+ *
+ * Security: CWE-532 - Prevents sensitive information in logs
  */
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'log';
@@ -11,16 +13,111 @@ export interface LogEntry {
   data?: any;
 }
 
+/**
+ * Keys that should be redacted from logs
+ */
+const SENSITIVE_KEYS = [
+  'password',
+  'token',
+  'secret',
+  'key',
+  'authorization',
+  'auth',
+  'credential',
+  'apikey',
+  'api_key',
+  'accesstoken',
+  'access_token',
+  'refreshtoken',
+  'refresh_token',
+  'idtoken',
+  'id_token',
+  'privatekey',
+  'private_key',
+  'credit_card',
+  'creditcard',
+  'cvv',
+  'ssn',
+  'social_security',
+];
+
+/**
+ * Patterns that should be redacted from string values
+ */
+const SENSITIVE_PATTERNS = [
+  // JWT tokens
+  /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,
+  // API keys (common formats)
+  /sk_[a-zA-Z0-9]{20,}/g,
+  /pk_[a-zA-Z0-9]{20,}/g,
+  /[a-zA-Z0-9]{32,}/g, // Generic long alphanumeric strings (potential keys)
+];
+
 class Logger {
   private logs: LogEntry[] = [];
   private maxLogs = 100;
   private isDevelopment = process.env.NODE_ENV === 'development';
+  private isProduction = process.env.NODE_ENV === 'production';
+
+  /**
+   * Sanitize data to remove sensitive information
+   */
+  private sanitize(data: any, depth: number = 0): any {
+    // Prevent infinite recursion
+    if (depth > 10) {
+      return '[MAX_DEPTH_EXCEEDED]';
+    }
+
+    if (data === null || data === undefined) {
+      return data;
+    }
+
+    // Handle strings - check for sensitive patterns
+    if (typeof data === 'string') {
+      let sanitized = data;
+      for (const pattern of SENSITIVE_PATTERNS) {
+        sanitized = sanitized.replace(pattern, '[REDACTED]');
+      }
+      return sanitized;
+    }
+
+    // Handle arrays
+    if (Array.isArray(data)) {
+      return data.map(item => this.sanitize(item, depth + 1));
+    }
+
+    // Handle objects
+    if (typeof data === 'object') {
+      const sanitized: Record<string, any> = {};
+
+      for (const [key, value] of Object.entries(data)) {
+        const lowerKey = key.toLowerCase();
+
+        // Check if key contains sensitive information
+        const isSensitive = SENSITIVE_KEYS.some(sensitiveKey =>
+          lowerKey.includes(sensitiveKey)
+        );
+
+        if (isSensitive) {
+          sanitized[key] = '[REDACTED]';
+        } else {
+          sanitized[key] = this.sanitize(value, depth + 1);
+        }
+      }
+
+      return sanitized;
+    }
+
+    // Return primitives as-is
+    return data;
+  }
 
   private formatMessage(level: LogLevel, message: string, data?: any): string {
     const timestamp = new Date().toISOString();
     let formatted = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
     if (data) {
-      formatted += ` ${JSON.stringify(data)}`;
+      const sanitizedData = this.sanitize(data);
+      formatted += ` ${JSON.stringify(sanitizedData)}`;
     }
     return formatted;
   }
@@ -29,7 +126,10 @@ class Logger {
     if (this.isDevelopment) {
       console.debug(this.formatMessage('debug', message, data));
     }
-    this.addLog('debug', message, data);
+    // Don't store debug logs in production
+    if (!this.isProduction) {
+      this.addLog('debug', message, data);
+    }
   }
 
   info(message: string, data?: any): void {
@@ -43,7 +143,10 @@ class Logger {
     if (this.isDevelopment) {
       console.log(this.formatMessage('log', message, data));
     }
-    this.addLog('log', message, data);
+    // Don't store general logs in production
+    if (!this.isProduction) {
+      this.addLog('log', message, data);
+    }
   }
 
   warn(message: string, data?: any): void {
@@ -54,18 +157,20 @@ class Logger {
   }
 
   error(message: string, data?: any): void {
-    if (this.isDevelopment) {
-      console.error(this.formatMessage('error', message, data));
-    }
+    // Always log errors to console (even in production for monitoring)
+    console.error(this.formatMessage('error', message, data));
     this.addLog('error', message, data);
   }
 
   private addLog(level: LogLevel, message: string, data?: any): void {
+    // Sanitize data before storing
+    const sanitizedData = data ? this.sanitize(data) : undefined;
+
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
       message,
-      data,
+      data: sanitizedData,
     };
 
     this.logs.push(entry);
@@ -80,12 +185,32 @@ class Logger {
     return [...this.logs];
   }
 
+  /**
+   * Get logs filtered by level
+   */
+  getLogsByLevel(level: LogLevel): LogEntry[] {
+    return this.logs.filter(log => log.level === level);
+  }
+
+  /**
+   * Get only error and warning logs (safe for production monitoring)
+   */
+  getImportantLogs(): LogEntry[] {
+    return this.logs.filter(log =>
+      log.level === 'error' || log.level === 'warn'
+    );
+  }
+
   clearLogs(): void {
     this.logs = [];
   }
 
   exportLogs(): string {
-    return JSON.stringify(this.logs, null, 2);
+    // Only export important logs in production
+    const logsToExport = this.isProduction
+      ? this.getImportantLogs()
+      : this.logs;
+    return JSON.stringify(logsToExport, null, 2);
   }
 }
 

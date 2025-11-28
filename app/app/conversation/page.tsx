@@ -5,6 +5,7 @@ import { ViewTransition } from 'react';
 import VoiceConversation from '@/components/VoiceConversation';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import PaidRouteGuard from '@/components/PaidRouteGuard';
 import { useUserData } from '@/context/UserDataContext';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
@@ -15,7 +16,7 @@ import { ROUTES } from '@/lib/routes';
 const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
-export default function ConversationPage() {
+function ConversationPageContent() {
   const [isComplete, setIsComplete] = useState(false);
   const { getJourneyState } = useUserData();
 
@@ -133,5 +134,13 @@ export default function ConversationPage() {
         </ErrorBoundary>
       </PageWrapper>
     </ViewTransition>
+  );
+}
+
+export default function ConversationPage() {
+  return (
+    <PaidRouteGuard>
+      <ConversationPageContent />
+    </PaidRouteGuard>
   );
 }

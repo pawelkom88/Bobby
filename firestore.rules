@@ -13,6 +13,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
+    // Helper function to check if credits field is being modified
+    // Returns true if credits field is NOT being changed (safe to allow)
+    function creditsNotModified() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits']);
+    }
+
     // User data - users can only read/write their own data
     // This stores all user-specific data including:
     // - userName, totalXP, level
@@ -20,11 +26,44 @@ service cloud.firestore {
     // - badges array
     // - settings object
     // - journey state (optional)
+    // - credits (SERVER-ONLY modification via Admin SDK)
     match /users/{userId} {
+      // Users can read their own document
       allow read: if isAuthenticated() && isOwner(userId);
-      allow create: if isAuthenticated() && isOwner(userId);
-      allow update: if isAuthenticated() && isOwner(userId);
-      allow delete: if false; // Prevent accidental deletion
+
+      // Users can create their own document (initial signup)
+      // Note: credits field should not be set on create from client
+      allow create: if isAuthenticated()
+                    && isOwner(userId)
+                    && (!request.resource.data.keys().hasAny(['credits'])
+                        || request.resource.data.credits == 0);
+
+      // Users can update their own document EXCEPT the credits field
+      // Credits can only be modified by server (Admin SDK) via webhook
+      allow update: if isAuthenticated()
+                    && isOwner(userId)
+                    && creditsNotModified();
+
+      // Prevent accidental deletion
+      allow delete: if false;
+    }
+
+    // Purchases collection - server-only writes for audit trail
+    // Records all credit purchases for accounting and debugging
+    match /purchases/{purchaseId} {
+      // Users can read their own purchases
+      allow read: if isAuthenticated()
+                  && resource.data.userId == request.auth.uid;
+
+      // Only server (Admin SDK) can write purchases
+      // This is enforced by not having any allow write rules
+      allow write: if false;
+    }
+
+    // Credit logs collection - server-only for debugging
+    // Optional: tracks all credit changes for audit purposes
+    match /credit_logs/{logId} {
+      allow read, write: if false;
     }
 
     // Default deny all other access

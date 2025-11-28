@@ -5671,3 +5671,150 @@ input {
   margin-top: 5px;
   margin-left: 25px;
 }
+
+/* ============================================================================
+   CREDITS & PAYMENT STYLES
+   ============================================================================ */
+
+/* Credits display on dial page */
+.dial-credits-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3);
+  margin-bottom: 1.5rem;
+  font-family: 'Chewy', system-ui;
+}
+
+.dial-credits-label {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.dial-credits-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Status messages on dial page */
+.dial-message {
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-family: 'Chewy', system-ui;
+  font-size: 1.1rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dial-message-warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+  color: #856404;
+  border: 2px solid #ffc107;
+}
+
+.dial-message-info {
+  background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%);
+  color: #004085;
+  border: 2px solid #007bff;
+}
+
+.dial-message-error {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  border: 2px solid #dc3545;
+}
+
+/* Paid route guard loading */
+.paid-route-guard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  font-family: 'Chewy', system-ui;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Success page styles */
+.success-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.success-container {
+  background: white;
+  border-radius: 2rem;
+  padding: 3rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.success-container h1 {
+  font-family: 'Chewy', system-ui;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.success-email {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 1.5rem;
+}
+
+.success-details {
+  background: #f8f9fa;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.success-details p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+.success-cta-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 2rem;
+  font-family: 'Chewy', system-ui;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.success-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}

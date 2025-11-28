@@ -5,6 +5,7 @@ import { ViewTransition } from 'react';
 import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import PaidRouteGuard from '@/components/PaidRouteGuard';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
 import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
@@ -13,7 +14,7 @@ import { ROUTES } from '@/lib/routes';
 const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
-export default function CompletionPage() {
+function CompletionPageContent() {
   const { getJourneyState } = useUserData();
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
   const [selectedAgeTier, setSelectedAgeTier] =
@@ -95,5 +96,13 @@ export default function CompletionPage() {
         </ErrorBoundary>
       </PageWrapper>
     </ViewTransition>
+  );
+}
+
+export default function CompletionPage() {
+  return (
+    <PaidRouteGuard>
+      <CompletionPageContent />
+    </PaidRouteGuard>
   );
 }

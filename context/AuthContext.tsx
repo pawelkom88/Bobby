@@ -36,11 +36,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
 
       if (user) {
-        logger.info('User authenticated:', user.uid);
+        logger.info('User authenticated:', { userId: user.uid });
         // Sync user data to Firestore on auth state change
         await syncUserToFirestore(user);
+
+        // Set auth indicator cookie for server-side route protection
+        // This is a non-sensitive indicator that the user is authenticated
+        // Actual auth verification happens via Firebase ID token in API routes
+        document.cookie = `bobby_auth=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict${
+          process.env.NODE_ENV === 'production' ? '; Secure' : ''
+        }`;
       } else {
         logger.info('User signed out');
+        // Clear auth indicator cookie
+        document.cookie = 'bobby_auth=; path=/; max-age=0; SameSite=Strict';
       }
     });
 

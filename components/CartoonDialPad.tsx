@@ -9,6 +9,8 @@ interface CartoonDialPadProps {
   targetNumber?: string;
   onBack?: () => void;
   autoStartConversation?: boolean;
+  isLoading?: boolean;
+  buttonLabel?: string;
 }
 
 const CORRECT_NUMBER = '999';
@@ -49,6 +51,8 @@ export default function CartoonDialPad({
   onCorrectNumber,
   targetNumber = CORRECT_NUMBER,
   onBack,
+  isLoading = false,
+  buttonLabel = 'CALL',
 }: CartoonDialPadProps) {
   const [input, setInput] = useState('');
   const [hasError, setHasError] = useState(false);
@@ -203,10 +207,10 @@ export default function CartoonDialPad({
               }
             }}
             className="dial-call-btn"
-            disabled={input.length === 0}
+            disabled={input.length === 0 || isLoading}
             aria-label="Make call to Bobby"
           >
-            CALL
+            {isLoading ? 'Loading...' : buttonLabel}
           </button>
           <button
             onClick={() => {
