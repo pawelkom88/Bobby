@@ -7,18 +7,16 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import CartoonButton from '@/components/CartoonButton';
 import { ViewTransition } from 'react';
 import AnimatedImageWrapper from '@/components/AnimatedImageWrapper';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 
 export default function AppPage() {
+  const { clearSession } = useSecureSession();
+
   // Clear any leftover session data when landing on home page
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('conversationComplete');
-      sessionStorage.removeItem('lastAssessment');
-      sessionStorage.removeItem('completionId');
-      sessionStorage.removeItem('processedCompletionId');
-    }
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   return (
     <ViewTransition>

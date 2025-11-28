@@ -6,16 +6,17 @@ import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PaidRouteGuard from '@/components/PaidRouteGuard';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
 import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
-import { ROUTES } from '@/lib/routes';
 
 const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
 function CompletionPageContent() {
   const { getJourneyState } = useUserData();
+  const { getSession } = useSecureSession();
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
   const [selectedAgeTier, setSelectedAgeTier] =
     useState<AgeTier>(DEFAULT_AGE_TIER);
@@ -32,20 +33,18 @@ function CompletionPageContent() {
   }, [getJourneyState]);
 
   useEffect(() => {
-    // Retrieve assessment from sessionStorage
-    if (typeof window !== 'undefined') {
-      const assessmentData = sessionStorage.getItem('lastAssessment');
-      const completionId = sessionStorage.getItem('completionId');
-      const processedId = sessionStorage.getItem('processedCompletionId');
+    // Retrieve assessment from secure server-side session
+    const loadAssessment = async () => {
+      const sessionData = await getSession();
 
       logger.log('🔍 ===== COMPLETION PAGE LOAD =====');
-      logger.log('🔍 assessmentData from sessionStorage:', assessmentData);
-      logger.log('🔍 completionId:', completionId);
-      logger.log('🔍 processedId:', processedId);
+      logger.log('🔍 sessionData:', sessionData);
+      logger.log('🔍 completionId:', sessionData?.completionId);
+      logger.log('🔍 processedId:', sessionData?.processedCompletionId);
 
-      if (assessmentData) {
+      if (sessionData?.lastAssessment) {
         try {
-          const data = JSON.parse(assessmentData);
+          const data = sessionData.lastAssessment;
           logger.log('🔍 Parsed assessment data:', data);
           logger.log('🔍 Assessment object:', data.assessment);
           logger.log('🔍 Assessment score:', data.assessment?.score);
@@ -66,7 +65,10 @@ function CompletionPageContent() {
           // Only clear assessment data if this completion has been processed
           // This allows the data to persist for display on refresh
           // but prevents duplicate XP awards
-          if (completionId && completionId === processedId) {
+          if (
+            sessionData.completionId &&
+            sessionData.completionId === sessionData.processedCompletionId
+          ) {
             // Already processed, keep data for display but don't award XP again
             logger.log(
               'Completion already processed, showing existing results'
@@ -77,10 +79,12 @@ function CompletionPageContent() {
           console.error('🔍 ❌ Error parsing assessment:', error);
         }
       } else {
-        logger.log('🔍 ⚠️ No assessment data found in sessionStorage');
+        logger.log('🔍 ⚠️ No assessment data found in secure session');
       }
-    }
-  }, []);
+    };
+
+    loadAssessment();
+  }, [getSession]);
 
   return (
     <ViewTransition>

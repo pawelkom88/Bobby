@@ -7,6 +7,7 @@ import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { getAllAgeTiers } from '@/lib/ageTiers';
 import { useUserData } from '@/context/UserDataContext';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import type { AgeTier } from '@/types';
 import Image from 'next/image';
 import { ROUTES } from '@/lib/routes';
@@ -15,16 +16,12 @@ import { logger } from '@/lib/logger';
 export default function YourAgePage() {
   const router = useRouter();
   const { setSelectedAgeTier } = useUserData();
+  const { clearSession } = useSecureSession();
 
   // Clear session data when starting a new conversation flow
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('conversationComplete');
-      sessionStorage.removeItem('lastAssessment');
-      sessionStorage.removeItem('completionId');
-      sessionStorage.removeItem('processedCompletionId');
-    }
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const handleSelectAge = async (ageTier: AgeTier) => {
     try {

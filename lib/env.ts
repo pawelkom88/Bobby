@@ -26,6 +26,9 @@ const serverEnvSchema = z.object({
   // Deepgram
   DEEPGRAM_API_KEY: z.string().min(1, 'DEEPGRAM_API_KEY is required'),
   
+  // Session encryption (for secure server-side session storage)
+  SESSION_ENCRYPTION_KEY: z.string().min(1, 'SESSION_ENCRYPTION_KEY is required for secure session storage'),
+  
   // Upstash Redis (optional - falls back to in-memory if not set)
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
@@ -60,7 +63,7 @@ export function validateServerEnv(): ServerEnv {
   const result = serverEnvSchema.safeParse(process.env);
   
   if (!result.success) {
-    const errors = result.error.errors.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n');
+    const errors = result.error.issues.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n');
     throw new Error(`❌ Invalid server environment variables:\n${errors}`);
   }
   
@@ -82,7 +85,7 @@ export function validateClientEnv(): ClientEnv {
   });
   
   if (!result.success) {
-    const errors = result.error.errors.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n');
+    const errors = result.error.issues.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n');
     console.warn(`⚠️ Invalid client environment variables:\n${errors}`);
   }
   

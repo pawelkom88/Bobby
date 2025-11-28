@@ -7,6 +7,7 @@ import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PaidRouteGuard from '@/components/PaidRouteGuard';
 import { useUserData } from '@/context/UserDataContext';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
 import { logger } from '@/lib/logger';
@@ -19,6 +20,7 @@ const DEFAULT_SITUATION: Service = 'fire';
 function ConversationPageContent() {
   const [isComplete, setIsComplete] = useState(false);
   const { getJourneyState } = useUserData();
+  const { getSession, clearSession } = useSecureSession();
 
   // Get selected values from journey state
   const journeyState = getJourneyState();
@@ -27,20 +29,20 @@ function ConversationPageContent() {
 
   // Check if user is trying to return to a completed conversation
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const conversationComplete = sessionStorage.getItem(
-        'conversationComplete'
-      );
-      if (conversationComplete === 'true') {
+    const checkConversationStatus = async () => {
+      const sessionData = await getSession();
+      if (sessionData?.conversationComplete) {
         setIsComplete(true);
         // Clear the flag and redirect after a brief moment to show message
-        setTimeout(() => {
-          sessionStorage.removeItem('conversationComplete');
+        setTimeout(async () => {
+          await clearSession();
           window.location.href = ROUTES.APP;
         }, 2000);
       }
-    }
-  }, []);
+    };
+
+    checkConversationStatus();
+  }, [getSession, clearSession]);
 
   // Show message if trying to return to completed conversation
   if (isComplete) {
@@ -83,27 +85,25 @@ function ConversationPageContent() {
       logger.log('🔍 User turns:', assessment.metrics.userTurns);
       logger.log('🔍 Duration:', assessment.metrics.durationSeconds);
 
-      // Store assessment in sessionStorage for the completion page
+      // Store assessment in secure server-side session
       // Generate unique completion ID to prevent duplicate XP awards
-      if (typeof window !== 'undefined') {
-        const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        sessionStorage.setItem(
-          'lastAssessment',
-          JSON.stringify({
-            assessment,
-            passed: assessment.passed,
-          })
-        );
-        sessionStorage.setItem('completionId', completionId);
+      const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const stored = await setAssessment(
+        {
+          assessment,
+          passed: assessment.passed,
+        },
+        completionId
+      );
+
+      if (!stored) {
+        logger.error('Failed to store assessment in secure session');
       }
 
       logger.info('Assessment complete', {
         score: assessment.score,
         passed: assessment.passed,
       });
-
-      // Mark conversation as complete to prevent back navigation
-      sessionStorage.setItem('conversationComplete', 'true');
 
       // Navigate to completion
       window.location.href = ROUTES.COMPLETION;
@@ -113,6 +113,8 @@ function ConversationPageContent() {
       window.location.href = ROUTES.COMPLETION;
     }
   };
+
+  const { setAssessment } = useSecureSession();
 
   const handleBack = () => {
     window.location.href = ROUTES.DIAL;

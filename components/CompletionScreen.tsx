@@ -6,6 +6,7 @@ import Confetti from './Confetti';
 import BadgeDisplay from './BadgeDisplay';
 import LevelProgress from './LevelProgress';
 import { useUserData } from '@/context/UserDataContext';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { calculateXPEarned } from '@/lib/gamification';
 import { playFanfareSound } from '@/lib/uiSound';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
@@ -25,6 +26,7 @@ export default function CompletionScreen({
 }: CompletionScreenProps) {
   const router = useRouter();
   const { addXP, saveConversation, awardScoreBadge, getLevel } = useUserData();
+  const { getSession, clearSession } = useSecureSession();
   const [showConfetti, setShowConfetti] = useState(false);
   const [xpEarned, setXPEarned] = useState(0);
   const [leveledUp, setLeveledUp] = useState(false);
@@ -42,10 +44,11 @@ export default function CompletionScreen({
 
   useEffect(() => {
     // Check if this completion has already been processed to prevent duplicate XP awards
-    if (typeof window !== 'undefined') {
-      const assessmentData = sessionStorage.getItem('lastAssessment');
-      const completionId = sessionStorage.getItem('completionId');
-      const processedId = sessionStorage.getItem('processedCompletionId');
+    const processCompletion = async () => {
+      const sessionData = await getSession();
+      const assessmentData = sessionData?.lastAssessment;
+      const completionId = sessionData?.completionId;
+      const processedId = sessionData?.processedCompletionId;
 
       logger.log('🔍 ===== COMPLETION SCREEN USEEFFECT =====');
       logger.log('🔍 completionId:', completionId);
@@ -131,68 +134,52 @@ export default function CompletionScreen({
       // CRITICAL: Run these operations SEQUENTIALLY to avoid race conditions
       // Each operation reads from Firestore, modifies data, and writes back
       // Running them in parallel causes them to overwrite each other's changes
-      (async () => {
-        try {
-          // Step 1: Award XP and handle level up
-          logger.log('🔍 STEP 1: Adding XP...');
-          const result = await addXP(xp);
-          setLeveledUp(result.leveledUp);
-          setBadgeAwarded(result.badgeAwarded);
-          setCurrentLevel(result.newLevel);
-          setIsLevel10(result.newLevel === 10);
-          logger.log('🔍 STEP 1 COMPLETE: XP added');
+      try {
+        // Step 1: Award XP and handle level up
+        logger.log('🔍 STEP 1: Adding XP...');
+        const result = await addXP(xp);
+        setLeveledUp(result.leveledUp);
+        setBadgeAwarded(result.badgeAwarded);
+        setCurrentLevel(result.newLevel);
+        setIsLevel10(result.newLevel === 10);
+        logger.log('🔍 STEP 1 COMPLETE: XP added');
 
-          // Step 2: Award score-based badge if applicable
-          if (assessment?.score) {
-            logger.log('🔍 STEP 2: Awarding score badge...');
-            const scoreBadge = await awardScoreBadge(assessment.score);
-            if (scoreBadge) {
-              setScoreBadgeAwarded(scoreBadge);
-            }
-            logger.log('🔍 STEP 2 COMPLETE: Score badge awarded');
+        // Step 2: Award score-based badge if applicable
+        if (assessment?.score) {
+          logger.log('🔍 STEP 2: Awarding score badge...');
+          const scoreBadge = await awardScoreBadge(assessment.score);
+          if (scoreBadge) {
+            setScoreBadgeAwarded(scoreBadge);
           }
-
-          // Step 3: Save conversation (this will also award First Call Hero badge if it's the first conversation)
-          if (service && ageTier) {
-            logger.log('🔍 STEP 3: Saving conversation...');
-            await saveConversation(
-              new Date().toISOString(),
-              service,
-              ageTier,
-              xp,
-              assessment?.score,
-              feedbackSummary?.slice(0, 3)
-            );
-            logger.log('🔍 STEP 3 COMPLETE: Conversation saved');
-          }
-
-          logger.log('🔍 ✅ ALL STEPS COMPLETE');
-        } catch (error) {
-          logger.error('Error in completion flow:', error);
+          logger.log('🔍 STEP 2 COMPLETE: Score badge awarded');
         }
-      })();
 
-      // Mark this completion as processed
-      if (completionId) {
-        sessionStorage.setItem('processedCompletionId', completionId);
+        // Step 3: Save conversation (this will also award First Call Hero badge if it's the first conversation)
+        if (service && ageTier) {
+          logger.log('🔍 STEP 3: Saving conversation...');
+          await saveConversation(
+            new Date().toISOString(),
+            service,
+            ageTier,
+            xp,
+            assessment?.score,
+            feedbackSummary?.slice(0, 3)
+          );
+          logger.log('🔍 STEP 3 COMPLETE: Conversation saved');
+        }
+
+        logger.log('🔍 ✅ ALL STEPS COMPLETE');
+      } catch (error) {
+        logger.error('Error in completion flow:', error);
       }
-    } else {
-      // Fallback for SSR or if sessionStorage is not available
-      const xp = calculateXPEarned(performance);
-      setXPEarned(xp);
-      setCurrentLevel(getLevel());
-    }
-  }, [service, ageTier, performance.assessment]);
+    };
 
-  const handleContinue = () => {
+    processCompletion();
+  }, [service, ageTier, performance.assessment, getSession]);
+
+  const handleContinue = async () => {
     // Clear completion data when starting a new conversation
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('lastAssessment');
-      sessionStorage.removeItem('completionId');
-      sessionStorage.removeItem('processedCompletionId');
-      sessionStorage.removeItem('conversationComplete');
-    }
-
+    await clearSession();
     router.push(ROUTES.YOUR_AGE);
   };
 

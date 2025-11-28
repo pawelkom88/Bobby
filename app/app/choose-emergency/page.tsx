@@ -7,6 +7,7 @@ import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { useUserData } from '@/context/UserDataContext';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 import { Service } from '@/types';
 import { logger } from '@/lib/logger';
@@ -40,16 +41,12 @@ const services: Array<{
 export default function ChooseEmergencyPage() {
   const router = useRouter();
   const { setSelectedService } = useUserData();
+  const { clearSession } = useSecureSession();
 
   // Clear session data when in conversation setup flow
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('conversationComplete');
-      sessionStorage.removeItem('lastAssessment');
-      sessionStorage.removeItem('completionId');
-      sessionStorage.removeItem('processedCompletionId');
-    }
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const handleSelectService = async (service: Service) => {
     try {

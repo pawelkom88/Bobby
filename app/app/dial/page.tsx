@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
@@ -14,6 +15,7 @@ import { logger } from '@/lib/logger';
 function DialPageContent() {
   const { credits, hasCredits, loading: creditsLoading } = useCredits();
   const { user } = useAuth();
+  const { clearSession } = useSecureSession();
   const searchParams = useSearchParams();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -24,13 +26,8 @@ function DialPageContent() {
 
   // Clear session data before starting conversation
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('conversationComplete');
-      sessionStorage.removeItem('lastAssessment');
-      sessionStorage.removeItem('completionId');
-      sessionStorage.removeItem('processedCompletionId');
-    }
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const handleCorrectNumber = async () => {
     // If user has credits, navigate to conversation
