@@ -9,7 +9,6 @@ import { cookies } from 'next/headers';
  * - CWE-602: Server-side route protection (not just client-side)
  * - CWE-1021: Improved CSP configuration
  * - Added CSRF token generation
- * - Nonce-based CSP for inline scripts
  */
 
 // Routes that require authentication
@@ -17,15 +16,6 @@ const PROTECTED_ROUTES = ['/app'];
 
 // Routes that are always public
 const PUBLIC_ROUTES = ['/', '/login', '/signup', '/reset-password', '/app/success'];
-
-/**
- * Generate a cryptographically secure nonce for CSP
- */
-function generateNonce(): string {
-  const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
-  return Buffer.from(array).toString('base64');
-}
 
 /**
  * Generate CSRF token
@@ -57,12 +47,6 @@ export async function proxy(request: NextRequest) {
   if (isPublicRoute(pathname)) {
     // Still apply security headers for public routes
     const response = NextResponse.next();
-    
-    // Generate nonce for CSP
-    const nonce = generateNonce();
-    
-    // Set nonce in response header for use by the application
-    response.headers.set('x-nonce', nonce);
 
     // Security Headers
     response.headers.set('X-Frame-Options', 'DENY');
@@ -80,7 +64,7 @@ export async function proxy(request: NextRequest) {
     // Content Security Policy
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://checkout.stripe.com`,
+      `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data: https://fonts.gstatic.com",
@@ -106,8 +90,8 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Generate nonce for CSP
-  const nonce = generateNonce();
+  // Create response
+  const response = NextResponse.next();
 
   // Check for authentication on protected routes
   if (isProtectedRoute(pathname)) {
@@ -130,9 +114,6 @@ export async function proxy(request: NextRequest) {
   // Create response
   const response = NextResponse.next();
 
-  // Set nonce in response header for use by the application
-  response.headers.set('x-nonce', nonce);
-
   // Security Headers
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -147,14 +128,12 @@ export async function proxy(request: NextRequest) {
   );
 
   // Content Security Policy
-  // Note: We still need 'unsafe-inline' for styles due to Next.js/React requirements
+  // Note: We still need 'unsafe-inline' for scripts and styles due to Next.js/React requirements in static builds
   // but we've removed 'unsafe-eval' and added stricter connect-src
   const cspDirectives = [
     "default-src 'self'",
-    // Scripts: self + Stripe + nonce for inline scripts
-    // Note: 'unsafe-inline' is kept as fallback for browsers that don't support nonces
-    // and because Next.js injects inline scripts
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://checkout.stripe.com`,
+    // Scripts: self + Stripe + unsafe-inline (required for Next.js inline scripts in static builds)
+    `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com`,
     // Styles: self + unsafe-inline (required for styled-jsx and inline styles)
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Images: self + data URIs + HTTPS
