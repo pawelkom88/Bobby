@@ -1,23 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import CartoonButton from '@/components/CartoonButton';
 import { ViewTransition } from 'react';
 import AnimatedImageWrapper from '@/components/AnimatedImageWrapper';
-import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 import { SpeculationRules } from '@/components/SpeculationRules';
 
 export default function AppPage() {
-  const { clearSession } = useSecureSession();
-
-  // Clear any leftover session data when landing on home page
-  useEffect(() => {
-    clearSession();
-  }, [clearSession]);
-
   return (
     <>
       <ViewTransition>
