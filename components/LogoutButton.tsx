@@ -4,26 +4,30 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
+import { logger } from '@/lib/logger';
 
 interface LogoutButtonProps {
   className?: string;
   children?: React.ReactNode;
 }
 
-export default function LogoutButton({ className, children }: LogoutButtonProps) {
+export default function LogoutButton({
+  className,
+  children,
+}: LogoutButtonProps) {
   const { signOut } = useAuth();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
-    
+
     setIsLoggingOut(true);
     try {
       await signOut();
       router.push(ROUTES.LOGIN);
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
       setIsLoggingOut(false);
     }
   };
@@ -39,4 +43,3 @@ export default function LogoutButton({ className, children }: LogoutButtonProps)
     </button>
   );
 }
-

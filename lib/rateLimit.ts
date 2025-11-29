@@ -10,6 +10,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { isUpstashConfigured } from './env';
+import { logger } from '@/lib/logger';
 
 interface RateLimitEntry {
   count: number;
@@ -36,7 +37,9 @@ class InMemoryRateLimiter {
     }
   }
 
-  async isRateLimited(identifier: string): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
+  async isRateLimited(
+    identifier: string
+  ): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
     const now = Date.now();
     const entry = this.limits.get(identifier);
 
@@ -46,7 +49,11 @@ class InMemoryRateLimiter {
         count: 1,
         resetTime: now + this.windowMs,
       });
-      return { limited: false, remaining: this.maxRequests - 1, resetTime: now + this.windowMs };
+      return {
+        limited: false,
+        remaining: this.maxRequests - 1,
+        resetTime: now + this.windowMs,
+      };
     }
 
     if (entry.count >= this.maxRequests) {
@@ -54,7 +61,11 @@ class InMemoryRateLimiter {
     }
 
     entry.count++;
-    return { limited: false, remaining: this.maxRequests - entry.count, resetTime: entry.resetTime };
+    return {
+      limited: false,
+      remaining: this.maxRequests - entry.count,
+      resetTime: entry.resetTime,
+    };
   }
 
   private cleanup() {
@@ -90,7 +101,9 @@ class UpstashRateLimiter {
     });
   }
 
-  async isRateLimited(identifier: string): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
+  async isRateLimited(
+    identifier: string
+  ): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
     const result = await this.ratelimit.limit(identifier);
     return {
       limited: !result.success,
@@ -102,7 +115,9 @@ class UpstashRateLimiter {
 
 // Rate limiter interface
 interface IRateLimiter {
-  isRateLimited(identifier: string): Promise<{ limited: boolean; remaining: number; resetTime: number }>;
+  isRateLimited(
+    identifier: string
+  ): Promise<{ limited: boolean; remaining: number; resetTime: number }>;
 }
 
 // Create the appropriate rate limiter based on configuration
@@ -114,10 +129,12 @@ function getRateLimiter(): IRateLimiter {
   }
 
   if (isUpstashConfigured()) {
-    console.log('🔒 Using Upstash Redis for distributed rate limiting');
+    logger.log('🔒 Using Upstash Redis for distributed rate limiting');
     rateLimiterInstance = new UpstashRateLimiter();
   } else {
-    console.warn('⚠️ Upstash Redis not configured, using in-memory rate limiting (not suitable for production)');
+    logger.warn(
+      '⚠️ Upstash Redis not configured, using in-memory rate limiting (not suitable for production)'
+    );
     rateLimiterInstance = new InMemoryRateLimiter();
   }
 
@@ -208,7 +225,10 @@ export async function checkRateLimit(
 /**
  * Create a rate limiter with custom settings
  */
-export function createRateLimiter(maxRequests: number, windowMs: number): IRateLimiter {
+export function createRateLimiter(
+  maxRequests: number,
+  windowMs: number
+): IRateLimiter {
   if (isUpstashConfigured()) {
     return new UpstashRateLimiter(maxRequests, windowMs);
   }
@@ -218,15 +238,24 @@ export function createRateLimiter(maxRequests: number, windowMs: number): IRateL
 // Export for backward compatibility
 export const rateLimiter = {
   async isRateLimited(identifier: string): Promise<boolean> {
-    const result = await checkRateLimit(new Request('http://localhost'), identifier);
+    const result = await checkRateLimit(
+      new Request('http://localhost'),
+      identifier
+    );
     return result.limited;
   },
   getRemainingRequests: async (identifier: string): Promise<number> => {
-    const result = await checkRateLimit(new Request('http://localhost'), identifier);
+    const result = await checkRateLimit(
+      new Request('http://localhost'),
+      identifier
+    );
     return result.remaining;
   },
   getResetTime: async (identifier: string): Promise<number> => {
-    const result = await checkRateLimit(new Request('http://localhost'), identifier);
+    const result = await checkRateLimit(
+      new Request('http://localhost'),
+      identifier
+    );
     return result.resetTime;
   },
 };

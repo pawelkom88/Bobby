@@ -4859,8 +4859,7 @@ a,
 }
 
 .dial-call-btn {
-  width: 120px;
-  height: 60px;
+  padding: 0.5rem 1rem;
   font-size: 1.4rem;
   font-weight: bold;
   background-color: #4caf50;
@@ -4892,8 +4891,7 @@ a,
 }
 
 .dial-clear-btn {
-  width: 120px;
-  height: 60px;
+  padding: 0.5rem 1rem;
   font-size: 1.4rem;
   font-weight: bold;
   background-color: #f44336;
@@ -5811,7 +5809,9 @@ input {
   font-family: 'Chewy', system-ui;
   font-size: 1.3rem;
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .success-cta-button:hover {

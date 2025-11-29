@@ -11,6 +11,7 @@ import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
+import { SpeculationRules } from '@/components/SpeculationRules';
 
 function DialPageContent() {
   const { credits, hasCredits, loading: creditsLoading } = useCredits();
@@ -84,45 +85,48 @@ function DialPageContent() {
   };
 
   return (
-    <ViewTransition>
-      <PageWrapper>
-        <ErrorBoundary>
-          <main className="app-page" role="main">
-            {/* Status messages */}
-            {canceled && (
-              <div className="dial-message dial-message-warning" role="alert">
-                Payment was canceled. You can try again when you&apos;re ready!
-              </div>
-            )}
-            {needsCredits && (
-              <div className="dial-message dial-message-info" role="alert">
-                You need credits to start a practice call.
-              </div>
-            )}
-            {checkoutError && (
-              <div className="dial-message dial-message-error" role="alert">
-                {checkoutError}
-              </div>
-            )}
+    <>
+      <ViewTransition>
+        <PageWrapper>
+          <ErrorBoundary>
+            <main className="app-page" role="main">
+              {/* Status messages */}
+              {canceled && (
+                <div className="dial-message dial-message-warning" role="alert">
+                  Payment was canceled. You can try again when you&apos;re ready!
+                </div>
+              )}
+              {needsCredits && (
+                <div className="dial-message dial-message-info" role="alert">
+                  You need credits to start a practice call.
+                </div>
+              )}
+              {checkoutError && (
+                <div className="dial-message dial-message-error" role="alert">
+                  {checkoutError}
+                </div>
+              )}
 
-            {/* Credits display */}
-            {!creditsLoading && (
-              <div className="dial-credits-display">
-                <span className="dial-credits-label">Credits:</span>
-                <span className="dial-credits-value">{credits}</span>
-              </div>
-            )}
+              {/* Credits display */}
+              {!creditsLoading && (
+                <div className="dial-credits-display">
+                  <span className="dial-credits-label">Credits:</span>
+                  <span className="dial-credits-value">{credits}</span>
+                </div>
+              )}
 
-            <DialPad
-              onCorrectNumber={handleCorrectNumber}
-              onBack={handleBack}
-              isLoading={checkoutLoading}
-              buttonLabel={hasCredits ? 'CALL' : 'BUY & CALL'}
-            />
-          </main>
-        </ErrorBoundary>
-      </PageWrapper>
-    </ViewTransition>
+              <DialPad
+                onCorrectNumber={handleCorrectNumber}
+                onBack={handleBack}
+                isLoading={checkoutLoading}
+                buttonLabel={hasCredits ? 'CALL' : 'BUY & CALL'}
+              />
+            </main>
+          </ErrorBoundary>
+        </PageWrapper>
+      </ViewTransition>
+      <SpeculationRules prerenderPaths={[ROUTES.CONVERSATION]} />
+    </>
   );
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe } from '@/lib/stripe';
 import { verifyIdToken } from '@/lib/firebase-admin';
+import { logger } from '@/lib/logger';
 
 /**
  * Credit pack configuration - SERVER-SIDE ONLY
@@ -30,18 +31,18 @@ function isValidPackType(packType: string): packType is PackType {
 
 /**
  * POST /api/checkout_sessions
- * 
+ *
  * Creates a Stripe checkout session for purchasing credits.
- * 
+ *
  * Security:
  * - Requires valid Firebase ID token in Authorization header
  * - userId is extracted from verified token (NEVER from request body)
  * - Pack configuration (price, credits) is server-side only
- * 
+ *
  * Request:
  * - Headers: Authorization: Bearer <firebase_id_token>
  * - Body: { packType: 'responder' | 'hero' }
- * 
+ *
  * Response:
  * - 200: { url: string } - Stripe checkout URL
  * - 400: Invalid packType
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
   try {
     // 1. Extract and verify Authorization header
     const authHeader = request.headers.get('authorization');
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Missing or invalid Authorization header' },
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    
+
     if (!idToken) {
       return NextResponse.json(
         { error: 'Missing token in Authorization header' },
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
     try {
       decodedToken = await verifyIdToken(idToken);
     } catch (error) {
-      console.error('Token verification failed:', error);
+      logger.error('Token verification failed:', error);
       return NextResponse.json(
         { error: 'Invalid or expired token' },
         { status: 401 }
@@ -89,10 +90,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
     const { packType } = body;
@@ -106,7 +104,9 @@ export async function POST(request: NextRequest) {
 
     if (!isValidPackType(packType)) {
       return NextResponse.json(
-        { error: `Invalid packType. Must be one of: ${Object.keys(CREDIT_PACKS).join(', ')}` },
+        {
+          error: `Invalid packType. Must be one of: ${Object.keys(CREDIT_PACKS).join(', ')}`,
+        },
         { status: 400 }
       );
     }
@@ -116,9 +116,16 @@ export async function POST(request: NextRequest) {
 
     // 6. Get origin for redirect URLs
     const headersList = await headers();
-    const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const origin =
+      headersList.get('origin') ||
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      'http://localhost:3000';
 
     // 7. Create Stripe checkout session
+    const successUrl = `${origin}/app/success?session_id={CHECKOUT_SESSION_ID}&test=1`;
+    logger.log('Checkout - Success URL being set:', successUrl);
+    logger.log('Checkout - Origin used:', origin);
+
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -127,7 +134,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${origin}/app/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl,
       cancel_url: `${origin}/app/dial?canceled=true`,
       // Store metadata for webhook processing
       metadata: {
@@ -150,7 +157,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     // Log detailed error server-side only
-    console.error('Checkout session creation error:', error);
+    logger.error('Checkout session creation error:', error);
 
     // Return generic error message to client (CWE-209)
     return NextResponse.json(
@@ -159,4 +166,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -14,6 +14,9 @@ interface CartoonDialPadProps {
 }
 
 const CORRECT_NUMBER = '999';
+// bttf-dial-1
+// bttf-dial-2
+// bttf-dial-3
 const DIAL_SOUNDS = [
   'https://cdn.josetxu.com/audio/bttf-dial-1.mp3',
   'https://cdn.josetxu.com/audio/bttf-dial-2.mp3',

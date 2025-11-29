@@ -2,21 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { setAssessmentData, setCompletionId } from '@/lib/session-storage';
 import { verifyIdToken } from '@/lib/firebase-admin';
 import type { AssessmentData } from '@/lib/session-storage';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/session/assessment
- * 
+ *
  * Stores assessment data in secure server-side session
- * 
+ *
  * Security:
  * - Requires Firebase ID token authentication
  * - Data encrypted with AES-256-GCM
  * - Stored in httpOnly cookies
- * 
+ *
  * Request:
  * - Headers: Authorization: Bearer <firebase_id_token>
  * - Body: { assessment: AssessmentData, completionId: string }
- * 
+ *
  * Response:
  * - 200: Success
  * - 401: Unauthorized
@@ -28,14 +29,11 @@ export async function POST(request: NextRequest) {
     // Verify authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    
+
     try {
       await verifyIdToken(idToken);
     } catch {
@@ -50,10 +48,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
     const { assessment, completionId } = body;
@@ -71,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error storing assessment:', error);
+    logger.error('Error storing assessment:', error);
     return NextResponse.json(
       { error: 'Failed to store assessment' },
       { status: 500 }

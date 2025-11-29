@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 export default async function PreviewPage({
   searchParams,
 }: {
@@ -6,7 +8,7 @@ export default async function PreviewPage({
   const { canceled } = await searchParams;
 
   if (canceled) {
-    console.log(
+    logger.log(
       'Order canceled -- continue to shop around and checkout when you’re ready.'
     );
   }

@@ -3,10 +3,11 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCallback } from 'react';
 import type { AssessmentData, SessionData } from '@/lib/session-storage';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook for secure server-side session management
- * 
+ *
  * Replaces client-side sessionStorage with encrypted server-side storage
  * All data is transmitted over HTTPS with Firebase authentication
  */
@@ -15,12 +16,12 @@ export function useSecureSession() {
 
   const getAuthHeader = useCallback(async (): Promise<string | null> => {
     if (!user) return null;
-    
+
     try {
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true); // Force refresh to avoid expired tokens
       return `Bearer ${token}`;
     } catch (error) {
-      console.error('Error getting auth token:', error);
+      logger.error('Error getting auth token:', error);
       return null;
     }
   }, [user]);
@@ -29,10 +30,13 @@ export function useSecureSession() {
    * Store assessment data
    */
   const setAssessment = useCallback(
-    async (assessment: AssessmentData, completionId: string): Promise<boolean> => {
+    async (
+      assessment: AssessmentData,
+      completionId: string
+    ): Promise<boolean> => {
       const authHeader = await getAuthHeader();
       if (!authHeader) {
-        console.error('Not authenticated');
+        logger.error('Not authenticated');
         return false;
       }
 
@@ -41,19 +45,19 @@ export function useSecureSession() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': authHeader,
+            Authorization: authHeader,
           },
           body: JSON.stringify({ assessment, completionId }),
         });
 
         if (!response.ok) {
-          console.error('Failed to store assessment:', response.statusText);
+          logger.error('Failed to store assessment:', response.statusText);
           return false;
         }
 
         return true;
       } catch (error) {
-        console.error('Error storing assessment:', error);
+        logger.error('Error storing assessment:', error);
         return false;
       }
     },
@@ -66,7 +70,7 @@ export function useSecureSession() {
   const getSession = useCallback(async (): Promise<SessionData | null> => {
     const authHeader = await getAuthHeader();
     if (!authHeader) {
-      console.error('Not authenticated');
+      logger.error('Not authenticated');
       return null;
     }
 
@@ -74,18 +78,18 @@ export function useSecureSession() {
       const response = await fetch('/api/session/get', {
         method: 'GET',
         headers: {
-          'Authorization': authHeader,
+          Authorization: authHeader,
         },
       });
 
       if (!response.ok) {
-        console.error('Failed to get session:', response.statusText);
+        logger.error('Failed to get session:', response.statusText);
         return null;
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error getting session:', error);
+      logger.error('Error getting session:', error);
       return null;
     }
   }, [getAuthHeader]);
@@ -96,7 +100,7 @@ export function useSecureSession() {
   const clearSession = useCallback(async (): Promise<boolean> => {
     const authHeader = await getAuthHeader();
     if (!authHeader) {
-      console.error('Not authenticated');
+      logger.warn('Cannot clear session: user not authenticated');
       return false;
     }
 
@@ -104,18 +108,18 @@ export function useSecureSession() {
       const response = await fetch('/api/session/clear', {
         method: 'POST',
         headers: {
-          'Authorization': authHeader,
+          Authorization: authHeader,
         },
       });
 
       if (!response.ok) {
-        console.error('Failed to clear session:', response.statusText);
+        logger.error('Failed to clear session:', response.statusText);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error clearing session:', error);
+      logger.error('Error clearing session:', error);
       return false;
     }
   }, [getAuthHeader]);

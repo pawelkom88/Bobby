@@ -16,7 +16,7 @@ import { cookies } from 'next/headers';
 const PROTECTED_ROUTES = ['/app'];
 
 // Routes that are always public
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/reset-password'];
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/reset-password', '/app/success'];
 
 /**
  * Generate a cryptographically secure nonce for CSP
@@ -43,8 +43,68 @@ function isProtectedRoute(pathname: string): boolean {
   return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
 }
 
+/**
+ * Check if a path matches any of the public routes
+ */
+function isPublicRoute(pathname: string): boolean {
+  return PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'));
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Skip auth check for public routes
+  if (isPublicRoute(pathname)) {
+    // Still apply security headers for public routes
+    const response = NextResponse.next();
+    
+    // Generate nonce for CSP
+    const nonce = generateNonce();
+    
+    // Set nonce in response header for use by the application
+    response.headers.set('x-nonce', nonce);
+
+    // Security Headers
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('X-DNS-Prefetch-Control', 'on');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    // Permissions Policy - allow microphone for voice features
+    response.headers.set(
+      'Permissions-Policy',
+      'camera=(), geolocation=(), payment=(self)'
+    );
+
+    // Content Security Policy
+    const cspDirectives = [
+      "default-src 'self'",
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://checkout.stripe.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: https: blob:",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
+      "frame-src https://js.stripe.com https://checkout.stripe.com",
+      "frame-ancestors 'none'",
+      "form-action 'self'",
+      "base-uri 'self'",
+      "object-src 'none'",
+      ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+    ];
+
+    response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+
+    // HTTPS Only (HSTS)
+    if (process.env.NODE_ENV === 'production') {
+      response.headers.set(
+        'Strict-Transport-Security',
+        'max-age=31536000; includeSubDomains; preload'
+      );
+    }
+
+    return response;
+  }
 
   // Generate nonce for CSP
   const nonce = generateNonce();
@@ -96,11 +156,11 @@ export async function proxy(request: NextRequest) {
     // and because Next.js injects inline scripts
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://checkout.stripe.com`,
     // Styles: self + unsafe-inline (required for styled-jsx and inline styles)
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Images: self + data URIs + HTTPS
     "img-src 'self' data: https: blob:",
     // Fonts: self + data URIs
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
     // Connections: self + required services
     "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
     // Frames: Stripe checkout

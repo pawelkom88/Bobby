@@ -76,7 +76,7 @@ function CompletionPageContent() {
           }
         } catch (error) {
           logger.error('Error parsing assessment data:', error);
-          console.error('🔍 ❌ Error parsing assessment:', error);
+          logger.error('🔍 ❌ Error parsing assessment:', error);
         }
       } else {
         logger.log('🔍 ⚠️ No assessment data found in secure session');

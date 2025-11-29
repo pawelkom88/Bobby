@@ -196,8 +196,8 @@ class Logger {
    * Get only error and warning logs (safe for production monitoring)
    */
   getImportantLogs(): LogEntry[] {
-    return this.logs.filter(log =>
-      log.level === 'error' || log.level === 'warn'
+    return this.logs.filter(
+      log => log.level === 'error' || log.level === 'warn'
     );
   }
 

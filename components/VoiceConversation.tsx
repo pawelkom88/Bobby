@@ -132,7 +132,7 @@ export default function VoiceConversation({
   onComplete,
   onBack,
   autoStart = false,
-  disableConnection = true,
+  disableConnection = false,
 }: VoiceConversationProps) {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Thinking

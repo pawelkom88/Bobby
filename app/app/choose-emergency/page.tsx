@@ -11,6 +11,7 @@ import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 import { Service } from '@/types';
 import { logger } from '@/lib/logger';
+import { SpeculationRules } from '@/components/SpeculationRules';
 
 const services: Array<{
   id: Service;
@@ -63,57 +64,60 @@ export default function ChooseEmergencyPage() {
   };
 
   return (
-    <ViewTransition>
-      <PageWrapper>
-        <main className="emergency-page" role="main">
-          <div className="emergency-container">
-            <div className="emergency-card accessibility-section">
-              <div className="emergency-header">
-                <h1 className="emergency-title">WHAT'S THE EMERGENCY?</h1>
-                <p className="emergency-subtitle">Choose the emergency type</p>
-              </div>
+    <>
+      <ViewTransition>
+        <PageWrapper>
+          <main className="emergency-page" role="main">
+            <div className="emergency-container">
+              <div className="emergency-card accessibility-section">
+                <div className="emergency-header">
+                  <h1 className="emergency-title">WHAT'S THE EMERGENCY?</h1>
+                  <p className="emergency-subtitle">Choose the emergency type</p>
+                </div>
 
-              <div className="emergency-tiles-container">
-                {services.map(service => (
-                  <button
-                    key={service.id}
-                    onClick={() => handleSelectService(service.id)}
-                    className="emergency-tile"
-                    style={{
-                      backgroundColor: service.color,
-                    }}
-                    aria-label={`Select ${service.label}`}
-                  >
-                    <div className="emergency-tile-content">
-                      <Image
-                        src={service.imagePath}
-                        alt={service.label}
-                        width={120}
-                        height={100}
-                        className="emergency-tile-icon"
-                      />
-                      <div className="emergency-tile-text">
-                        <span className="emergency-tile-label">
-                          {service.label}
-                        </span>
+                <div className="emergency-tiles-container">
+                  {services.map(service => (
+                    <button
+                      key={service.id}
+                      onClick={() => handleSelectService(service.id)}
+                      className="emergency-tile"
+                      style={{
+                        backgroundColor: service.color,
+                      }}
+                      aria-label={`Select ${service.label}`}
+                    >
+                      <div className="emergency-tile-content">
+                        <Image
+                          src={service.imagePath}
+                          alt={service.label}
+                          width={120}
+                          height={100}
+                          className="emergency-tile-icon"
+                        />
+                        <div className="emergency-tile-text">
+                          <span className="emergency-tile-label">
+                            {service.label}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    </button>
+                  ))}
+                </div>
 
-              <div className="emergency-back-button">
-                <CartoonButton
-                  containerClassName="emergency-back-button-container"
-                  onClick={handleBack}
-                >
-                  ← BACK
-                </CartoonButton>
+                <div className="emergency-back-button">
+                  <CartoonButton
+                    containerClassName="emergency-back-button-container"
+                    onClick={handleBack}
+                  >
+                    ← BACK
+                  </CartoonButton>
+                </div>
               </div>
             </div>
-          </div>
-        </main>
-      </PageWrapper>
-    </ViewTransition>
+          </main>
+        </PageWrapper>
+      </ViewTransition>
+      <SpeculationRules prerenderPaths={[ROUTES.DIAL]} />
+    </>
   );
 }
