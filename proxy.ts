@@ -34,9 +34,9 @@ function generateCSRFToken(): string {
 /**
  * Check if a path matches any of the protected routes
  */
-function isProtectedRoute(pathname: string): boolean {
-  return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-}
+// function isProtectedRoute(pathname: string): boolean {
+//   return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+// }
 
 /**
  * Check if a path matches any of the public routes
@@ -178,17 +178,3 @@ export async function proxy(request: NextRequest) {
 
   return response;
 }
-
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes - they have their own auth)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files (images, fonts, etc.)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
-  ],
-};
