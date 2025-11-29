@@ -68,7 +68,7 @@ function ActiveConversationView({
       </div>
 
       {/* Subtitles (Agent only) */}
-      <Activity mode={visualState === 'processing' ? "hidden" : "visible"}>
+      <Activity mode={visualState === 'processing' ? 'hidden' : 'visible'}>
         {settings.subtitles && conversation.length > 0 && (
           <div
             className="subtitles"
@@ -756,10 +756,10 @@ export default function VoiceConversation({
               // type: 'cartesia',
               model_id: 'eleven_multilingual_v2',
               voice_id: 'lUTamkMw7gOzZbFIwmq4',
-              voice: {
-                mode: 'id',
-                id: 'lUTamkMw7gOzZbFIwmq4',
-              },
+              // voice: {
+              //   mode: 'id',
+              //   id: 'lUTamkMw7gOzZbFIwmq4',
+              // },
               // model_id: 'sonic-2',
               // voice: {
               //   mode: 'id',

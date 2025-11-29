@@ -12,10 +12,18 @@ import { logger } from '@/lib/logger';
  * All data is transmitted over HTTPS with Firebase authentication
  */
 export function useSecureSession() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const getAuthHeader = useCallback(async (): Promise<string | null> => {
-    if (!user) return null;
+    if (loading) {
+      logger.warn('Auth still loading, cannot get token yet');
+      return null;
+    }
+
+    if (!user) {
+      logger.warn('No user authenticated');
+      return null;
+    }
 
     try {
       const token = await user.getIdToken(true); // Force refresh to avoid expired tokens
@@ -24,7 +32,7 @@ export function useSecureSession() {
       logger.error('Error getting auth token:', error);
       return null;
     }
-  }, [user]);
+  }, [user, loading]);
 
   /**
    * Store assessment data

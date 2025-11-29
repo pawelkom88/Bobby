@@ -107,11 +107,6 @@ function DialPageContent() {
                   You need credits to start a practice call.
                 </div>
               )}
-              {checkoutError && (
-                <div className="dial-message dial-message-error" role="alert">
-                  {checkoutError}
-                </div>
-              )}
 
               {/* Credits display */}
               <Activity mode={isProcessingCheckout ? "hidden" : "visible"}>

@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { getAuthToken, sendKeepAliveMessage } from '@/utils/deepgramUtils';
 import {logger} from "@/lib/logger";
+import { useAuth } from '@/context/AuthContext';
 
 interface DeepgramContextType {
   socket: WebSocket | null;
@@ -27,6 +28,7 @@ export const DeepgramContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
+  const { user } = useAuth();
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketState, setSocketState] = useState<number>(3); // Start closed
   const keepAliveInterval = useRef<NodeJS.Timeout | null>(null);
@@ -42,8 +44,24 @@ export const DeepgramContextProvider = ({
     logger.log('DeepgramContext: Setting socket state to connecting (0)');
 
     try {
-      logger.log('DeepgramContext: Fetching auth token...');
-      const token = await getAuthToken();
+      if (!user) {
+        logger.error('DeepgramContext: User not authenticated');
+        setSocketState(2); // Error
+        return;
+      }
+
+      logger.log('DeepgramContext: Getting Firebase ID token...');
+      const idToken = await user.getIdToken(true);
+      logger.log('DeepgramContext: ID token obtained:', idToken ? `${idToken.substring(0, 20)}...` : 'NULL');
+      
+      if (!idToken) {
+        logger.error('DeepgramContext: Failed to get Firebase ID token');
+        setSocketState(2); // Error
+        return;
+      }
+
+      logger.log('DeepgramContext: Fetching Deepgram auth token...');
+      const token = await getAuthToken(idToken);
       logger.log(
         'DeepgramContext: Auth token received:',
         token ? 'SUCCESS' : 'FAILED'

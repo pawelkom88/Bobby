@@ -71,4 +71,3 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   // User has credits, render children
   return <>{children}</>;
 }
-
