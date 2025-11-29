@@ -113,6 +113,13 @@ export function useSecureSession() {
       });
 
       if (!response.ok) {
+        // If unauthorized, the session is effectively "cleared" since user can't access it
+        if (response.status === 401) {
+          logger.warn(
+            'Session clear failed due to authentication - treating as cleared'
+          );
+          return true;
+        }
         logger.error('Failed to clear session:', response.statusText);
         return false;
       }

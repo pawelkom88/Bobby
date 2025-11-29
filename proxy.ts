@@ -71,12 +71,12 @@ export async function proxy(request: NextRequest) {
     // Content Security Policy
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com`,
+      `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
-      'frame-src https://js.stripe.com https://checkout.stripe.com',
+      "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com https://recaptchaenterprise.googleapis.com https://www.google.com",
+      'frame-src https://js.stripe.com https://checkout.stripe.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.recaptcha.net',
       "frame-ancestors 'none'",
       "form-action 'self'",
       "base-uri 'self'",
@@ -127,18 +127,18 @@ export async function proxy(request: NextRequest) {
   // but we've removed 'unsafe-eval' and added stricter connect-src
   const cspDirectives = [
     "default-src 'self'",
-    // Scripts: self + Stripe + Google Analytics + unsafe-inline (required for Next.js inline scripts in static builds)
-    `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com`,
+    // Scripts: self + Stripe + Google Analytics + reCAPTCHA Enterprise + unsafe-inline (required for Next.js inline scripts in static builds)
+    `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/`,
     // Styles: self + unsafe-inline (required for styled-jsx and inline styles) + Stripe CDN
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
     // Images: self + data URIs + HTTPS
     "img-src 'self' data: https: blob:",
     // Fonts: self + data URIs
     "font-src 'self' data: https://fonts.gstatic.com",
-    // Connections: self + required services
-    "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
-    // Frames: Stripe checkout
-    'frame-src https://js.stripe.com https://checkout.stripe.com',
+    // Connections: self + required services + reCAPTCHA Enterprise
+    "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com https://recaptchaenterprise.googleapis.com https://www.google.com",
+    // Frames: Stripe checkout + reCAPTCHA Enterprise
+    'frame-src https://js.stripe.com https://checkout.stripe.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.recaptcha.net',
     // Frame ancestors: none (prevent clickjacking)
     "frame-ancestors 'none'",
     // Form actions: self only
