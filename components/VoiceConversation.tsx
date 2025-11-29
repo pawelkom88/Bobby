@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Activity } from 'react';
 import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
 import { CONFIG } from '@/lib/config';
@@ -67,40 +68,42 @@ function ActiveConversationView({
       </div>
 
       {/* Subtitles (Agent only) */}
-      {settings.subtitles && conversation.length > 0 && (
-        <div
-          className="subtitles"
-          role="region"
-          aria-label="Subtitles"
-          style={{
-            marginTop: 'auto',
-            marginBottom: '2rem',
-            padding: '1.25rem',
-            background: 'rgba(255,255,255,0.8)',
-            borderRadius: '1rem',
-            maxWidth: '85%',
-          }}
-        >
-          {conversation
-            .filter(msg => msg.type === 'agent')
-            .slice(-1)
-            .map((msg, index) => (
-              <p
-                key={index}
-                className="subtitle-text"
-                style={{
-                  fontSize: '1.2rem',
-                  textAlign: 'center',
-                  lineHeight: '1.5',
-                  margin: 0,
-                  color: '#333',
-                }}
-              >
-                {msg.text}
-              </p>
-            ))}
-        </div>
-      )}
+      <Activity mode={visualState === 'processing' ? "hidden" : "visible"}>
+        {settings.subtitles && conversation.length > 0 && (
+          <div
+            className="subtitles"
+            role="region"
+            aria-label="Subtitles"
+            style={{
+              marginTop: 'auto',
+              marginBottom: '2rem',
+              padding: '1.25rem',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '1rem',
+              maxWidth: '85%',
+            }}
+          >
+            {conversation
+              .filter(msg => msg.type === 'agent')
+              .slice(-1)
+              .map((msg, index) => (
+                <p
+                  key={index}
+                  className="subtitle-text"
+                  style={{
+                    fontSize: '1.2rem',
+                    textAlign: 'center',
+                    lineHeight: '1.5',
+                    margin: 0,
+                    color: '#333',
+                  }}
+                >
+                  {msg.text}
+                </p>
+              ))}
+          </div>
+        )}
+      </Activity>
 
       {/* Timer and Controls */}
       <div className="conversation-controls" style={{ marginTop: 'auto' }}>

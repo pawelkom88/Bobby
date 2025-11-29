@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { ViewTransition } from 'react';
+import { Activity } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
@@ -20,6 +21,7 @@ function DialPageContent() {
   const { clearSession } = useSecureSession();
   const searchParams = useSearchParams();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   // Check for query parameters
@@ -46,6 +48,7 @@ function DialPageContent() {
     }
 
     setCheckoutLoading(true);
+    setIsProcessingCheckout(true);
     setCheckoutError(null);
 
     try {
@@ -77,6 +80,7 @@ function DialPageContent() {
         error instanceof Error ? error.message : 'Failed to start checkout'
       );
       setCheckoutLoading(false);
+      setIsProcessingCheckout(false);
     }
   };
 
@@ -110,12 +114,14 @@ function DialPageContent() {
               )}
 
               {/* Credits display */}
-              {!creditsLoading && (
-                <div className="dial-credits-display">
-                  <span className="dial-credits-label">Credits:</span>
-                  <span className="dial-credits-value">{credits}</span>
-                </div>
-              )}
+              <Activity mode={isProcessingCheckout ? "hidden" : "visible"}>
+                {!creditsLoading && (
+                  <div className="dial-credits-display">
+                    <span className="dial-credits-label">Credits:</span>
+                    <span className="dial-credits-value">{credits}</span>
+                  </div>
+                )}
+              </Activity>
 
               <DialPad
                 onCorrectNumber={handleCorrectNumber}

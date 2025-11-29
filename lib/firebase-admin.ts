@@ -3,6 +3,7 @@ import 'server-only';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
+import { logger } from './logger';
 
 /**
  * Firebase Admin SDK initialization for server-side operations
@@ -38,15 +39,23 @@ function getAdminApp(): App {
     );
   }
 
-  // Initialize Firebase Admin with service account credentials
-  adminApp = initializeApp({
-    credential: cert({
-      projectId,
-      clientEmail,
-      // Private key comes with escaped newlines from env, need to unescape
-      privateKey: privateKey.replace(/\\n/g, '\n'),
-    }),
-  });
+  try {
+    // Initialize Firebase Admin with service account credentials
+    adminApp = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        // Private key may come with escaped newlines (\\n) or literal newlines (\n)
+        // Handle both cases: replace escaped newlines and preserve actual newlines
+        privateKey: privateKey.includes('\\n') 
+          ? privateKey.replace(/\\n/g, '\n')
+          : privateKey,
+      }),
+    });
+  } catch (error) {
+    logger.error('Failed to initialize Firebase Admin SDK', error);
+    throw error;
+  }
 
   return adminApp;
 }

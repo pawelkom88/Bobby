@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ViewTransition } from 'react';
+import { Activity } from 'react';
 import VoiceConversation from '@/components/VoiceConversation';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -19,6 +20,7 @@ const DEFAULT_SITUATION: Service = 'fire';
 
 function ConversationPageContent() {
   const [isComplete, setIsComplete] = useState(false);
+  const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
   const { getJourneyState } = useUserData();
   const { getSession, clearSession } = useSecureSession();
 
@@ -65,6 +67,7 @@ function ConversationPageContent() {
   const handleConversationComplete = async (
     conversation: ConversationMessage[]
   ) => {
+    setIsProcessingAssessment(true);
     try {
       // DEBUG: Log conversation details
       logger.log('🔍 CONVERSATION COMPLETE - Full conversation:', conversation);
@@ -111,6 +114,8 @@ function ConversationPageContent() {
       logger.error('Error assessing conversation', error);
       // Still navigate to completion even if assessment fails
       window.location.href = ROUTES.COMPLETION;
+    } finally {
+      setIsProcessingAssessment(false);
     }
   };
 
@@ -122,19 +127,21 @@ function ConversationPageContent() {
 
   return (
     <ViewTransition>
-      <PageWrapper>
-        <ErrorBoundary>
-          <main className="app-page" role="main">
-            <VoiceConversation
-              ageTier={selectedAgeTier}
-              situation={selectedSituation}
-              onComplete={handleConversationComplete}
-              onBack={handleBack}
-              autoStart={true}
-            />
-          </main>
-        </ErrorBoundary>
-      </PageWrapper>
+      <Activity mode={isProcessingAssessment ? "hidden" : "visible"}>
+        <PageWrapper>
+          <ErrorBoundary>
+            <main className="app-page" role="main">
+              <VoiceConversation
+                ageTier={selectedAgeTier}
+                situation={selectedSituation}
+                onComplete={handleConversationComplete}
+                onBack={handleBack}
+                autoStart={true}
+              />
+            </main>
+          </ErrorBoundary>
+        </PageWrapper>
+      </Activity>
     </ViewTransition>
   );
 }

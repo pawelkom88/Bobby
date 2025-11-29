@@ -71,8 +71,8 @@ export async function proxy(request: NextRequest) {
     // Content Security Policy
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
@@ -99,23 +99,12 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Check for authentication on protected routes
-  if (isProtectedRoute(pathname)) {
-    // Check for Firebase session cookie
-    // Note: Firebase Auth primarily uses client-side tokens, but we can check
-    // for a session indicator cookie that the client sets after authentication
-    const sessionCookie = request.cookies.get('__session');
-    const authIndicator = request.cookies.get('bobby_auth');
-
-    // If no auth indicator, redirect to login
-    // The actual token verification happens in API routes
-    // This is a first-line defense to prevent unauthenticated page access
-    if (!authIndicator && !sessionCookie) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
+  // Note: Protected routes are handled by client-side ProtectedRoute component
+  // and server-side API route authentication (Firebase ID token verification).
+  // We don't check for auth cookies here because:
+  // 1. Auth cookies are set client-side after hydration
+  // 2. Checking here would cause unnecessary redirects during initial page load
+  // 3. API routes verify Firebase tokens for actual data access
 
   // Create response
   const response = NextResponse.next();
@@ -138,10 +127,10 @@ export async function proxy(request: NextRequest) {
   // but we've removed 'unsafe-eval' and added stricter connect-src
   const cspDirectives = [
     "default-src 'self'",
-    // Scripts: self + Stripe + unsafe-inline (required for Next.js inline scripts in static builds)
-    `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com`,
-    // Styles: self + unsafe-inline (required for styled-jsx and inline styles)
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    // Scripts: self + Stripe + Google Analytics + unsafe-inline (required for Next.js inline scripts in static builds)
+    `script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com`,
+    // Styles: self + unsafe-inline (required for styled-jsx and inline styles) + Stripe CDN
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
     // Images: self + data URIs + HTTPS
     "img-src 'self' data: https: blob:",
     // Fonts: self + data URIs

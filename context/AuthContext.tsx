@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import {
   User,
   signInWithEmailAndPassword,
@@ -28,12 +28,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const authStateUpdateResolversRef = useRef<Array<(user: User | null) => void>>([]);
 
   useEffect(() => {
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setLoading(false);
+
+      // Resolve any pending auth state update promises
+      const resolvers = authStateUpdateResolversRef.current;
+      authStateUpdateResolversRef.current = [];
+      resolvers.forEach((resolve) => resolve(user));
 
       if (user) {
         logger.info('User authenticated:', { userId: user.uid });
@@ -85,6 +91,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       logger.info('User signed in successfully:', userCredential.user.uid);
+
+      // Wait for the auth state to be updated in the context
+      // This ensures that by the time signIn() returns, the user state is synchronized
+      await new Promise<User | null>((resolve) => {
+        authStateUpdateResolversRef.current.push(resolve);
+      });
+
       return userCredential;
     } catch (error) {
       logger.error('Sign in error:', error);
