@@ -12,6 +12,7 @@ import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
 import { SpeculationRules } from '@/components/SpeculationRules';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 function DialPageContent() {
   const { credits, hasCredits, loading: creditsLoading } = useCredits();
@@ -93,7 +94,8 @@ function DialPageContent() {
               {/* Status messages */}
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
-                  Payment was canceled. You can try again when you&apos;re ready!
+                  Payment was canceled. You can try again when you&apos;re
+                  ready!
                 </div>
               )}
               {needsCredits && (
@@ -132,7 +134,7 @@ function DialPageContent() {
 
 export default function DialPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <DialPageContent />
     </Suspense>
   );

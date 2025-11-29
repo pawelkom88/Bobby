@@ -7,9 +7,9 @@ import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AuthButton } from '@/components/AuthButton';
 import { logger } from '@/lib/logger';
-import { validatePassword, validateEmail, getPasswordRequirements } from '@/lib/validation';
+import { validatePassword, validateEmail } from '@/lib/validation';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 function SignUpForm() {
   const router = useRouter();
@@ -18,7 +18,9 @@ function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'fair' | 'good' | 'strong' | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<
+    'weak' | 'fair' | 'good' | 'strong' | null
+  >(null);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -310,7 +312,8 @@ function SignUpForm() {
               </div>
             )}
             <div id="password-requirements" className="sr-only">
-              Password must be at least 8 characters with uppercase, lowercase, number, and special character
+              Password must be at least 8 characters with uppercase, lowercase,
+              number, and special character
             </div>
           </div>
 
@@ -395,7 +398,7 @@ function SignUpForm() {
 
 export default function SignUpPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <SignUpForm />
     </Suspense>
   );

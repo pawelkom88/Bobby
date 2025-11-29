@@ -9,6 +9,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
 import { logger } from '@/lib/logger';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 function LoginForm() {
   const router = useRouter();
@@ -293,7 +294,7 @@ function LoginForm() {
 
 export default function BobbyLogin() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <LoginForm />
     </Suspense>
   );
