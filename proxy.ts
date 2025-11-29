@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
 
 /**
  * Security Proxy (Middleware) for Next.js 16
@@ -89,9 +88,6 @@ export async function proxy(request: NextRequest) {
 
     return response;
   }
-
-  // Create response
-  const response = NextResponse.next();
 
   // Check for authentication on protected routes
   if (isProtectedRoute(pathname)) {
