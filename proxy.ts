@@ -14,7 +14,13 @@ import type { NextRequest } from 'next/server';
 const PROTECTED_ROUTES = ['/app'];
 
 // Routes that are always public
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/reset-password', '/app/success'];
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/signup',
+  '/reset-password',
+  '/app/success',
+];
 
 /**
  * Generate CSRF token
@@ -36,7 +42,9 @@ function isProtectedRoute(pathname: string): boolean {
  * Check if a path matches any of the public routes
  */
 function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'));
+  return PUBLIC_ROUTES.some(
+    route => pathname === route || pathname.startsWith(route + '/')
+  );
 }
 
 export async function proxy(request: NextRequest) {
@@ -68,12 +76,14 @@ export async function proxy(request: NextRequest) {
       "img-src 'self' data: https: blob:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
-      "frame-src https://js.stripe.com https://checkout.stripe.com",
+      'frame-src https://js.stripe.com https://checkout.stripe.com',
       "frame-ancestors 'none'",
       "form-action 'self'",
       "base-uri 'self'",
       "object-src 'none'",
-      ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+      ...(process.env.NODE_ENV === 'production'
+        ? ['upgrade-insecure-requests']
+        : []),
     ];
 
     response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
@@ -139,7 +149,7 @@ export async function proxy(request: NextRequest) {
     // Connections: self + required services
     "connect-src 'self' https://*.deepgram.com wss://*.deepgram.com https://*.firebaseapp.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.stripe.com",
     // Frames: Stripe checkout
-    "frame-src https://js.stripe.com https://checkout.stripe.com",
+    'frame-src https://js.stripe.com https://checkout.stripe.com',
     // Frame ancestors: none (prevent clickjacking)
     "frame-ancestors 'none'",
     // Form actions: self only
@@ -149,7 +159,9 @@ export async function proxy(request: NextRequest) {
     // Object sources: none
     "object-src 'none'",
     // Upgrade insecure requests in production
-    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+    ...(process.env.NODE_ENV === 'production'
+      ? ['upgrade-insecure-requests']
+      : []),
   ];
 
   response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
