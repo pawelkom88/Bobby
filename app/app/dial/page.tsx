@@ -24,14 +24,31 @@ function DialPageContent() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isRefreshingFromPayment, setIsRefreshingFromPayment] = useState(false);
   const hasRefreshedRef = useRef(false);
+  const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
+
+  console.log('DialPageContent: Component rendered/updated', {
+    credits,
+    hasCredits,
+    creditsLoading,
+    isRefreshingFromPayment,
+    hasVerifiedCredits,
+    user: !!user
+  });
 
   // Check for query parameters
   const canceled = searchParams.get('canceled') === 'true';
   const needsCredits = searchParams.get('needsCredits') === 'true';
   const fromSuccess = searchParams.get('fromSuccess') === 'true';
 
+  console.log('DialPageContent: URL params -', {
+    canceled,
+    needsCredits,
+    fromSuccess
+  });
+
   // Clear session data before starting conversation
   useEffect(() => {
+    console.log('DialPageContent: useEffect - clearSession');
     clearSession();
   }, [clearSession]);
 
@@ -62,9 +79,21 @@ function DialPageContent() {
     refreshCreditsAfterPayment();
   }, [fromSuccess, user, forceRefreshCredits]);
 
+  // Reset verification state when credits change
+  useEffect(() => {
+    console.log('DialPageContent: useEffect - credits changed, resetting hasVerifiedCredits');
+    setHasVerifiedCredits(false);
+  }, [credits]);
+
   // Clean up needsCredits param if user actually has credits
   useEffect(() => {
+    console.log('DialPageContent: useEffect - checking if needsCredits param should be cleaned up', {
+      needsCredits,
+      hasCredits,
+      creditsLoading
+    });
     if (needsCredits && hasCredits && !creditsLoading) {
+      console.log('DialPageContent: Cleaning up needsCredits param from URL');
       const url = new URL(window.location.href);
       url.searchParams.delete('needsCredits');
       window.history.replaceState({}, '', url.toString());
@@ -78,21 +107,29 @@ function DialPageContent() {
       return;
     }
 
+    // If we've already verified credits, proceed directly
+    if (hasVerifiedCredits && hasCredits) {
+      console.log('Credits already verified, navigating to conversation');
+      window.location.href = ROUTES.CONVERSATION;
+      return;
+    }
+
     // Force a fresh check of credits before proceeding
     if (fromSuccess) {
       console.log('Post-payment: forcing fresh credit check');
       await forceRefreshCredits();
     }
 
-    // If user has credits, navigate to conversation
+    // Double-check: fetch credits directly to avoid stale state
+    console.log('Final verification: hasCredits =', hasCredits, 'credits =', credits);
+
+    // If user has credits, navigate to conversation and mark as verified
     if (hasCredits) {
       console.log('User has credits, navigating to conversation');
+      setHasVerifiedCredits(true);
       window.location.href = ROUTES.CONVERSATION;
       return;
     }
-
-    // Double-check: fetch credits directly to avoid stale state
-    console.log('hasCredits is false, verifying with direct fetch...');
 
     // No credits - redirect to Stripe checkout
     if (!user) {

@@ -13,13 +13,18 @@ export default async function Success({
   const params = await searchParams;
   const { session_id: sessionIdParam, test } = params;
 
+  console.log('SuccessPage: Component loaded with params:', { sessionIdParam, test });
+
   // Ensure session_id is a string
   const sessionId = Array.isArray(sessionIdParam)
     ? sessionIdParam[0]
     : sessionIdParam;
 
+  console.log('SuccessPage: Processing sessionId:', sessionId);
+
   // Handle missing session_id gracefully
   if (!sessionId) {
+    console.log('SuccessPage: No sessionId provided, showing generic success');
     return (
       <div className="success-page">
         <div className="success-container">
@@ -31,7 +36,7 @@ export default async function Success({
           <p className="success-email">
             You should receive a confirmation email from Stripe shortly.
           </p>
-          <Link href={ROUTES.DIAL} className="success-cta-button">
+          <Link href={`${ROUTES.DIAL}?fromSuccess=true`} className="success-cta-button">
             Start Practicing! 📞
           </Link>
         </div>
@@ -42,27 +47,32 @@ export default async function Success({
   // Check if user is authenticated (has bobby_auth cookie)
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has('bobby_auth');
+  console.log('SuccessPage: User authenticated:', isAuthenticated);
 
   try {
+    console.log('SuccessPage: Retrieving session from Stripe...');
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'payment_intent'],
     });
 
     const { status, customer_details, metadata } = session;
+    console.log('SuccessPage: Session status:', status);
 
     // Session is still open (payment not complete)
     if (status === 'open') {
+      console.log('SuccessPage: Session still open, redirecting to dial');
       return redirect(ROUTES.DIAL);
     }
 
     // Session expired
     if (status === 'expired') {
+      console.log('SuccessPage: Session expired');
       return (
         <div className="success-page">
           <div className="success-container">
             <h1>Session Expired</h1>
             <p>This payment session has expired.</p>
-            <Link href={ROUTES.DIAL} className="success-cta-button">
+            <Link href={`${ROUTES.DIAL}?fromSuccess=true`} className="success-cta-button">
               Try Again
             </Link>
           </div>
@@ -75,6 +85,7 @@ export default async function Success({
       const sessionEmail = customer_details?.email;
       const credits = metadata?.credits || '0';
       const packType = metadata?.packType || 'credits';
+      console.log('SuccessPage: Payment complete, credits:', credits, 'packType:', packType);
 
       // If user is authenticated, show full details
       // Otherwise, show generic success message to prevent information disclosure

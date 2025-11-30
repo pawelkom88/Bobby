@@ -19,6 +19,8 @@ const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
 function ConversationPageContent() {
+  console.log('ConversationPageContent: Component mounted/rendered');
+  
   const [isComplete, setIsComplete] = useState(false);
   const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
   const { getJourneyState } = useUserData();
@@ -147,6 +149,7 @@ function ConversationPageContent() {
 }
 
 export default function ConversationPage() {
+  console.log('ConversationPage: Export function called');
   return (
     <PaidRouteGuard>
       <ConversationPageContent />

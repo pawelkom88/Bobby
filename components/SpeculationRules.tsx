@@ -12,7 +12,7 @@ interface SpeculationRulesProps {
 export function SpeculationRules({
   prerenderPaths = [],
   prefetchPaths = [],
-  eagerness = 'conservative',
+  eagerness = 'eager',
 }: SpeculationRulesProps) {
   const [isSupported, setIsSupported] = useState(false);
 

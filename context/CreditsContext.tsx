@@ -42,16 +42,20 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   useEffect(() => {
     // If auth is still loading, wait
     if (authLoading) {
+      console.log('CreditsContext: Auth still loading, waiting...');
       return;
     }
 
     // If no user, reset state
     if (!user) {
+      console.log('CreditsContext: No user, resetting credits to 0');
       setCredits(0);
       setLoading(false);
       setError(null);
       return;
     }
+
+    console.log('CreditsContext: Setting up listener for user:', user.uid);
 
     // Set up real-time listener for user's credits
     const userDocRef = doc(db, 'users', user.uid);
@@ -59,22 +63,27 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     const unsubscribe = onSnapshot(
       userDocRef,
       (docSnapshot) => {
+        console.log('CreditsContext: onSnapshot triggered for user:', user.uid);
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
           // Credits field may not exist for new users, default to 0
           const userCredits = typeof data.credits === 'number' ? data.credits : 0;
+          console.log('CreditsContext: User document exists, credits:', userCredits);
           setCredits(userCredits);
-          logger.info('Credits updated:', userCredits);
+          console.log('CreditsContext: Credits updated to:', userCredits);
         } else {
           // User document doesn't exist yet
+          console.log('CreditsContext: User document not found, setting credits to 0');
           setCredits(0);
-          logger.info('User document not found, credits set to 0');
+          console.log('CreditsContext: User document not found, credits set to 0');
         }
+        console.log('CreditsContext: Setting loading to false');
         setLoading(false);
         setError(null);
       },
       (err) => {
-        logger.error('Error listening to credits:', err);
+        console.error('CreditsContext: Error listening to credits:', err.message);
+        console.error('CreditsContext: Full error:', err);
         setError('Failed to load credits');
         setLoading(false);
       }
@@ -82,6 +91,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
     // Cleanup listener on unmount or user change
     return () => {
+      console.log('CreditsContext: Cleaning up listener for user:', user.uid);
       unsubscribe();
     };
   }, [user, authLoading]);
@@ -92,30 +102,36 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
    */
   const forceRefreshCredits = async (): Promise<void> => {
     if (!user) {
-      logger.warn('Cannot refresh credits: no authenticated user');
+      console.log('CreditsContext: Cannot refresh credits: no authenticated user');
       return;
     }
+
+    console.log('CreditsContext: Starting force refresh for user:', user.uid);
 
     try {
       setLoading(true);
       setError(null);
 
+      console.log('CreditsContext: Fetching user document from Firestore...');
       const userDocRef = doc(db, 'users', user.uid);
       const docSnapshot = await getDoc(userDocRef);
 
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
         const userCredits = typeof data.credits === 'number' ? data.credits : 0;
+        console.log('CreditsContext: Force refresh - document exists, credits:', userCredits);
         setCredits(userCredits);
-        logger.info('Credits force refreshed:', userCredits);
+        console.log('CreditsContext: Credits force refreshed to:', userCredits);
       } else {
+        console.log('CreditsContext: Force refresh - user document not found, setting credits to 0');
         setCredits(0);
-        logger.info('User document not found during force refresh, credits set to 0');
+        console.log('CreditsContext: Credits set to 0 during force refresh');
       }
     } catch (error) {
-      logger.error('Error force refreshing credits:', error);
+      console.error('CreditsContext: Error force refreshing credits');
       setError('Failed to refresh credits');
     } finally {
+      console.log('CreditsContext: Force refresh completed, setting loading to false');
       setLoading(false);
     }
   };

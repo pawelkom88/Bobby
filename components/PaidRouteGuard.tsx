@@ -32,20 +32,27 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   useEffect(() => {
     // Wait for loading to complete
     if (isLoading) {
+      console.log('PaidRouteGuard: Still loading, waiting...');
       return;
     }
 
+    console.log('PaidRouteGuard: Checking access - user:', !!user, 'hasCredits:', hasCredits);
+
     // If not authenticated, redirect to login
     if (!user) {
+      console.log('PaidRouteGuard: No user, redirecting to login');
       router.replace(ROUTES.LOGIN);
       return;
     }
 
     // If no credits, redirect to dial page with needsCredits flag
     if (!hasCredits) {
+      console.log('PaidRouteGuard: No credits, redirecting to dial with needsCredits');
       router.replace(`${ROUTES.DIAL}?needsCredits=true`);
       return;
     }
+
+    console.log('PaidRouteGuard: Access granted');
   }, [isLoading, user, hasCredits, router]);
 
   // Show loading spinner while checking
