@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { ViewTransition } from 'react';
 import { Activity } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -11,7 +11,6 @@ import { useSecureSession } from '@/hooks/useSecureSession';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
-import { logger } from '@/lib/logger';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -23,6 +22,8 @@ function DialPageContent() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isRefreshingFromPayment, setIsRefreshingFromPayment] = useState(false);
+  const hasRefreshedRef = useRef(false);
 
   // Check for query parameters
   const canceled = searchParams.get('canceled') === 'true';
@@ -36,22 +37,66 @@ function DialPageContent() {
 
   // Force refresh credits when returning from successful payment
   useEffect(() => {
-    if (fromSuccess && user && !creditsLoading) {
-      logger.info('Returning from successful payment, forcing credits refresh');
-      forceRefreshCredits();
+    const refreshCreditsAfterPayment = async () => {
+      if (fromSuccess && user && !hasRefreshedRef.current) {
+        hasRefreshedRef.current = true;
+        setIsRefreshingFromPayment(true);
+        console.log('Returning from successful payment, forcing credits refresh');
+
+        try {
+          await forceRefreshCredits();
+
+          // Clean up URL params after successful refresh
+          const url = new URL(window.location.href);
+          url.searchParams.delete('fromSuccess');
+          url.searchParams.delete('needsCredits');
+          window.history.replaceState({}, '', url.toString());
+        } catch (error) {
+          console.error('Failed to refresh credits after payment');
+        } finally {
+          setIsRefreshingFromPayment(false);
+        }
+      }
+    };
+
+    refreshCreditsAfterPayment();
+  }, [fromSuccess, user, forceRefreshCredits]);
+
+  // Clean up needsCredits param if user actually has credits
+  useEffect(() => {
+    if (needsCredits && hasCredits && !creditsLoading) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('needsCredits');
+      window.history.replaceState({}, '', url.toString());
     }
-  }, [fromSuccess, user, creditsLoading, forceRefreshCredits]);
+  }, [needsCredits, hasCredits, creditsLoading]);
 
   const handleCorrectNumber = async () => {
+    // Don't proceed if still loading/refreshing credits
+    if (creditsLoading || isRefreshingFromPayment) {
+      console.log('Credits still loading, waiting...');
+      return;
+    }
+
+    // Force a fresh check of credits before proceeding
+    if (fromSuccess) {
+      console.log('Post-payment: forcing fresh credit check');
+      await forceRefreshCredits();
+    }
+
     // If user has credits, navigate to conversation
     if (hasCredits) {
+      console.log('User has credits, navigating to conversation');
       window.location.href = ROUTES.CONVERSATION;
       return;
     }
 
+    // Double-check: fetch credits directly to avoid stale state
+    console.log('hasCredits is false, verifying with direct fetch...');
+
     // No credits - redirect to Stripe checkout
     if (!user) {
-      logger.error('No user found when trying to checkout');
+      console.error('No user found when trying to checkout');
       setCheckoutError('Please log in to continue');
       return;
     }
@@ -61,17 +106,15 @@ function DialPageContent() {
     setCheckoutError(null);
 
     try {
-      // Get fresh Firebase ID token with forced refresh to ensure validity
       const idToken = await user.getIdToken(true);
 
-      // Create checkout session
       const response = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ packType: 'responder' }), // Default to responder pack (2 calls)
+        body: JSON.stringify({ packType: 'responder' }),
       });
 
       if (!response.ok) {
@@ -80,11 +123,9 @@ function DialPageContent() {
       }
 
       const { url } = await response.json();
-
-      // Redirect to Stripe checkout
       window.location.href = url;
     } catch (error) {
-      logger.error('Checkout error:', error);
+      console.error('Checkout error occurred');
       setCheckoutError(
         error instanceof Error ? error.message : 'Failed to start checkout'
       );
@@ -94,9 +135,11 @@ function DialPageContent() {
   };
 
   const handleBack = () => {
-    // Navigate back to emergency selection
     window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
+
+  // Show loading state while refreshing from payment
+  const isLoading = creditsLoading || isRefreshingFromPayment;
 
   return (
     <>
@@ -104,22 +147,26 @@ function DialPageContent() {
         <PageWrapper>
           <ErrorBoundary>
             <main className="app-page" role="main">
-              {/* Status messages */}
+              {/* Status messages - only show needsCredits if actually no credits */}
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
-                  Payment was canceled. You can try again when you&apos;re
-                  ready!
+                  Payment was canceled. You can try again when you&apos;re ready!
                 </div>
               )}
-              {needsCredits && (
+              {needsCredits && !hasCredits && !isLoading && (
                 <div className="dial-message dial-message-info" role="alert">
                   You need credits to start a practice call.
+                </div>
+              )}
+              {isRefreshingFromPayment && (
+                <div className="dial-message dial-message-success" role="status">
+                  Loading your credits...
                 </div>
               )}
 
               {/* Credits display */}
               <Activity mode={isProcessingCheckout ? "hidden" : "visible"}>
-                {!creditsLoading && (
+                {!isLoading && (
                   <div className="dial-credits-display">
                     <span className="dial-credits-label">Credits:</span>
                     <span className="dial-credits-value">{credits}</span>
@@ -130,8 +177,8 @@ function DialPageContent() {
               <DialPad
                 onCorrectNumber={handleCorrectNumber}
                 onBack={handleBack}
-                isLoading={checkoutLoading}
-                buttonLabel={hasCredits ? 'CALL' : 'BUY & CALL'}
+                isLoading={checkoutLoading || isLoading}
+                buttonLabel={hasCredits ? 'CALL' : isLoading ? 'LOADING...' : 'BUY & CALL'}
               />
             </main>
           </ErrorBoundary>
