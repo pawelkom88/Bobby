@@ -55,44 +55,70 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
       return;
     }
 
-    console.log('CreditsContext: Setting up listener for user:', user.uid);
+    console.log('CreditsContext: Setting up credits for user:', user.uid);
+    setLoading(true);
 
-    // Set up real-time listener for user's credits
-    const userDocRef = doc(db, 'users', user.uid);
-    
-    const unsubscribe = onSnapshot(
-      userDocRef,
-      (docSnapshot) => {
-        console.log('CreditsContext: onSnapshot triggered for user:', user.uid);
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          // Credits field may not exist for new users, default to 0
+    const setupCredits = async () => {
+      try {
+        // First, do an immediate fetch to get current credits
+        console.log('CreditsContext: Doing initial fetch for current credits...');
+        const userDocRef = doc(db, 'users', user.uid);
+        const initialDoc = await getDoc(userDocRef);
+
+        if (initialDoc.exists()) {
+          const data = initialDoc.data();
           const userCredits = typeof data.credits === 'number' ? data.credits : 0;
-          console.log('CreditsContext: User document exists, credits:', userCredits);
+          console.log('CreditsContext: Initial fetch - credits:', userCredits);
           setCredits(userCredits);
-          console.log('CreditsContext: Credits updated to:', userCredits);
         } else {
-          // User document doesn't exist yet
-          console.log('CreditsContext: User document not found, setting credits to 0');
+          console.log('CreditsContext: Initial fetch - user document not found');
           setCredits(0);
-          console.log('CreditsContext: User document not found, credits set to 0');
         }
-        console.log('CreditsContext: Setting loading to false');
-        setLoading(false);
-        setError(null);
-      },
-      (err) => {
-        console.error('CreditsContext: Error listening to credits:', err.message);
-        console.error('CreditsContext: Full error:', err);
-        setError('Failed to load credits');
-        setLoading(false);
-      }
-    );
 
-    // Cleanup listener on unmount or user change
+        // Now set up real-time listener for future updates
+        console.log('CreditsContext: Setting up real-time listener...');
+        const unsubscribe = onSnapshot(
+          userDocRef,
+          (docSnapshot) => {
+            console.log('CreditsContext: onSnapshot triggered for user:', user.uid);
+            if (docSnapshot.exists()) {
+              const data = docSnapshot.data();
+              const userCredits = typeof data.credits === 'number' ? data.credits : 0;
+              console.log('CreditsContext: User document exists, credits:', userCredits);
+              setCredits(userCredits);
+              console.log('CreditsContext: Credits updated to:', userCredits);
+            } else {
+              console.log('CreditsContext: User document not found, setting credits to 0');
+              setCredits(0);
+              console.log('CreditsContext: User document not found, credits set to 0');
+            }
+            console.log('CreditsContext: Setting loading to false');
+            setLoading(false);
+            setError(null);
+          },
+          (err) => {
+            console.error('CreditsContext: Error listening to credits:', err.message);
+            console.error('CreditsContext: Full error:', err);
+            setError('Failed to load credits');
+            setLoading(false);
+          }
+        );
+
+        return unsubscribe;
+      } catch (error) {
+        console.error('CreditsContext: Error during initial fetch:', error);
+        setCredits(0);
+        setLoading(false);
+        setError('Failed to load credits');
+        return () => {}; // Return empty cleanup function
+      }
+    };
+
+    const cleanupPromise = setupCredits();
+
+    // Cleanup function
     return () => {
-      console.log('CreditsContext: Cleaning up listener for user:', user.uid);
-      unsubscribe();
+      cleanupPromise.then(cleanup => cleanup?.());
     };
   }, [user, authLoading]);
 

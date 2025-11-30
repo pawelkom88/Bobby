@@ -34,38 +34,34 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   const isLoading = authLoading || creditsLoading;
 
   useEffect(() => {
-    const checkAccess = async () => {
-      // Wait for loading to complete
-      if (isLoading) return;
+    // Wait for loading to complete
+    if (isLoading) return;
 
-      // If not authenticated, redirect to login
-      if (!user) {
-        router.replace(ROUTES.LOGIN);
-        return;
-      }
+    // If not authenticated, redirect to login
+    if (!user) {
+      router.replace(ROUTES.LOGIN);
+      return;
+    }
 
-      // If we have credits, allow access
-      if (hasCredits) return;
+    // If we have credits, allow access
+    if (hasCredits) {
+      console.log('PaidRouteGuard: Access granted (credits available)');
+      return;
+    }
 
-      // If no credits, try to refresh and give it a moment to update
-      console.log('PaidRouteGuard: No credits found, attempting refresh...');
-      await forceRefreshCredits();
+    // If no credits, try one refresh attempt
+    console.log('PaidRouteGuard: No credits found, attempting final refresh...');
+    forceRefreshCredits(); // Fire and forget - context will update if credits exist
 
-      // Brief delay to allow context to update from the refresh
-      // await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Check again after refresh
+    // Since context now loads with correct data immediately, if we still have no credits
+    // after the initial load + refresh, the user genuinely has no credits
+    setTimeout(() => {
       if (!hasCredits) {
-        console.log(
-          'PaidRouteGuard: Still no credits after refresh, redirecting'
-        );
+        console.log('PaidRouteGuard: Still no credits after refresh, redirecting');
         router.replace(`${ROUTES.DIAL}?needsCredits=true`);
-      } else {
-        console.log('PaidRouteGuard: Credits became available after refresh');
       }
-    };
+    }, 1000);
 
-    checkAccess();
   }, [isLoading, user, hasCredits, forceRefreshCredits, router]);
 
   // Show loading spinner while checking
