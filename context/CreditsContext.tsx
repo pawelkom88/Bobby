@@ -8,7 +8,7 @@ import React, {
   useRef,
   ReactNode,
 } from 'react';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc, getDocFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
 import { logger } from '@/lib/logger';
@@ -68,7 +68,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         // First, do an immediate fetch to get current credits
         console.log('CreditsContext: Doing initial fetch for current credits...');
         const userDocRef = doc(db, 'users', user.uid);
-        const initialDoc = await getDoc(userDocRef, { source: 'server' });
+        const initialDoc = await getDocFromServer(userDocRef);
 
         if (initialDoc.exists()) {
           const data = initialDoc.data();
@@ -163,7 +163,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
       console.log('CreditsContext: Fetching user document from Firestore...');
       const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDoc(userDocRef, { source: 'server' });
+      const docSnapshot = await getDocFromServer(userDocRef);
 
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
