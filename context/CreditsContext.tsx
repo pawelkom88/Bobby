@@ -7,11 +7,11 @@ import React, {
   useState,
   useRef,
   ReactNode,
+  useCallback,
 } from 'react';
-import { doc, onSnapshot, getDoc, getDocFromServer } from 'firebase/firestore';
+import { doc, onSnapshot, getDocFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
-import { logger } from '@/lib/logger';
 
 interface CreditsContextType {
   credits: number;
@@ -20,6 +20,7 @@ interface CreditsContextType {
   error: string | null;
   forceRefreshCredits: () => Promise<void>;
   isInitialized: boolean;
+  isServerConfirmed: boolean; // NEW: Explicitly track server confirmation
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -28,162 +29,186 @@ interface CreditsProviderProps {
   children: ReactNode;
 }
 
-/**
- * CreditsProvider - Provides real-time credits state across the app
- * 
- * Listens to the user's Firestore document for credits changes.
- * Credits are only modified server-side (via Stripe webhook), so this
- * provides a read-only view of the user's credit balance.
- */
 export function CreditsProvider({ children }: CreditsProviderProps) {
   const { user, loading: authLoading } = useAuth();
   const [credits, setCredits] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
-  const listenerSetupRef = useRef(false);
+  const [isServerConfirmed, setIsServerConfirmed] = useState<boolean>(false);
+
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const serverConfirmedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // If auth is still loading, wait
+    // Cleanup previous listener
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
+    // Reset state
+    serverConfirmedRef.current = false;
+    setIsServerConfirmed(false);
+
     if (authLoading) {
       console.log('CreditsContext: Auth still loading, waiting...');
       return;
     }
 
-    // If no user, reset state
     if (!user) {
       console.log('CreditsContext: No user, resetting credits to 0');
       setCredits(0);
       setLoading(false);
       setError(null);
       setIsInitialized(true);
+      setIsServerConfirmed(true);
       return;
     }
 
     console.log('CreditsContext: Setting up credits for user:', user.uid);
     setLoading(true);
+    setIsInitialized(false);
+    setIsServerConfirmed(false);
 
-    const setupCredits = async () => {
-      try {
-        // First, do an immediate fetch to get current credits
-        console.log('CreditsContext: Doing initial fetch for current credits...');
-        const userDocRef = doc(db, 'users', user.uid);
-        const initialDoc = await getDocFromServer(userDocRef);
+    const userDocRef = doc(db, 'users', user.uid);
 
-        if (initialDoc.exists()) {
-          const data = initialDoc.data();
-          const userCredits = typeof data.credits === 'number' ? data.credits : 0;
-          console.log('CreditsContext: Initial fetch - credits:', userCredits);
-          setCredits(userCredits);
-        } else {
-          console.log('CreditsContext: Initial fetch - user document not found');
-          setCredits(0);
+    // KEY FIX: Use includeMetadataChanges to detect cache vs server
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      { includeMetadataChanges: true },
+      docSnapshot => {
+        const metadata = docSnapshot.metadata;
+        const fromCache = metadata.fromCache;
+        const hasPendingWrites = metadata.hasPendingWrites;
+
+        console.log('CreditsContext: onSnapshot triggered', {
+          userId: user.uid,
+          fromCache,
+          hasPendingWrites,
+          exists: docSnapshot.exists(),
+          source: fromCache ? 'CACHE' : 'SERVER',
+        });
+
+        let userCredits = 0;
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          userCredits = typeof data.credits === 'number' ? data.credits : 0;
         }
 
-        // Now set up real-time listener for future updates
-        console.log('CreditsContext: Setting up real-time listener...');
-        let isFirstSnapshot = true;
-        const unsubscribe = onSnapshot(
-          userDocRef,
-          (docSnapshot) => {
-            console.log('CreditsContext: onSnapshot triggered for user:', user.uid);
-            if (docSnapshot.exists()) {
-              const data = docSnapshot.data();
-              const userCredits = typeof data.credits === 'number' ? data.credits : 0;
-              console.log('CreditsContext: User document exists, credits:', userCredits);
-              setCredits(userCredits);
-              console.log('CreditsContext: Credits updated to:', userCredits);
-            } else {
-              console.log('CreditsContext: User document not found, setting credits to 0');
-              setCredits(0);
-              console.log('CreditsContext: User document not found, credits set to 0');
-            }
-            console.log('CreditsContext: Setting loading to false');
-            setLoading(false);
-            setError(null);
-            
-            // Mark as initialized only after the first snapshot callback
-            // Add a small delay to ensure we get the most up-to-date data from the listener
-            if (isFirstSnapshot) {
-              console.log('CreditsContext: First snapshot received, waiting to mark as initialized');
-              isFirstSnapshot = false;
-              listenerSetupRef.current = true;
-              // Wait 100ms to allow listener to receive any pending updates
-              setTimeout(() => {
-                console.log('CreditsContext: Marking as initialized after listener delay');
-                setIsInitialized(true);
-              }, 100);
-            }
-          },
-          (err) => {
-            console.error('CreditsContext: Error listening to credits:', err.message);
-            console.error('CreditsContext: Full error:', err);
-            setError('Failed to load credits');
-            setLoading(false);
-            listenerSetupRef.current = true;
-            setIsInitialized(true);
-          }
+        console.log(
+          `CreditsContext: Credits = ${userCredits} (from ${fromCache ? 'CACHE' : 'SERVER'})`
         );
 
-        return unsubscribe;
-      } catch (error) {
-        console.error('CreditsContext: Error during initial fetch:', error);
-        setCredits(0);
-        setLoading(false);
+        // Always update credits with latest value
+        setCredits(userCredits);
+        setError(null);
+
+        // KEY LOGIC: Only finalize loading state when we have SERVER data
+        if (!fromCache && !hasPendingWrites) {
+          console.log('CreditsContext: ✓ SERVER data confirmed');
+          serverConfirmedRef.current = true;
+          setIsServerConfirmed(true);
+          setLoading(false);
+          setIsInitialized(true);
+        } else if (fromCache && !serverConfirmedRef.current) {
+          console.log(
+            'CreditsContext: ⏳ Cache data received, waiting for server confirmation...'
+          );
+          // Keep loading = true, don't mark as initialized yet
+          // But we can show the cached value as a preview
+        }
+      },
+      err => {
+        console.error('CreditsContext: Error listening to credits:', err);
         setError('Failed to load credits');
-        listenerSetupRef.current = true;
+        setLoading(false);
         setIsInitialized(true);
-        return () => {}; // Return empty cleanup function
+        setIsServerConfirmed(true); // Treat error as "confirmed" to unblock UI
       }
-    };
+    );
 
-    const cleanupPromise = setupCredits();
+    unsubscribeRef.current = unsubscribe;
 
-    // Cleanup function
+    // Safety timeout: If server doesn't respond within 15s, use cached data
+    const timeoutId = setTimeout(() => {
+      if (!serverConfirmedRef.current) {
+        console.warn(
+          'CreditsContext: ⚠️ Server timeout (15s), using available data'
+        );
+        setLoading(false);
+        setIsInitialized(true);
+        setIsServerConfirmed(true);
+      }
+    }, 15000);
+
     return () => {
-      cleanupPromise.then(cleanup => cleanup?.());
+      console.log('CreditsContext: Cleaning up listener');
+      clearTimeout(timeoutId);
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
     };
   }, [user, authLoading]);
 
-  /**
-   * Force refresh credits by manually fetching from Firestore
-   * Useful when real-time listener might be delayed (e.g., after payment)
-   */
-  const forceRefreshCredits = async (): Promise<void> => {
+  const forceRefreshCredits = useCallback(async (): Promise<void> => {
     if (!user) {
-      console.log('CreditsContext: Cannot refresh credits: no authenticated user');
+      console.log(
+        'CreditsContext: Cannot refresh credits: no authenticated user'
+      );
       return;
     }
 
     console.log('CreditsContext: Starting force refresh for user:', user.uid);
 
     try {
-      setLoading(true);
-      setError(null);
-
-      console.log('CreditsContext: Fetching user document from Firestore...');
       const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDocFromServer(userDocRef);
 
-      if (docSnapshot.exists()) {
-        const data = docSnapshot.data();
-        const userCredits = typeof data.credits === 'number' ? data.credits : 0;
-        console.log('CreditsContext: Force refresh - document exists, credits:', userCredits);
-        setCredits(userCredits);
-        console.log('CreditsContext: Credits force refreshed to:', userCredits);
-      } else {
-        console.log('CreditsContext: Force refresh - user document not found, setting credits to 0');
-        setCredits(0);
-        console.log('CreditsContext: Credits set to 0 during force refresh');
+      // Retry logic for webhook timing issues
+      const maxAttempts = 5;
+      const delayMs = 1000;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        console.log(
+          `CreditsContext: Force refresh attempt ${attempt}/${maxAttempts}`
+        );
+
+        const docSnapshot = await getDocFromServer(userDocRef);
+
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          const userCredits =
+            typeof data.credits === 'number' ? data.credits : 0;
+          console.log(
+            `CreditsContext: Server returned credits: ${userCredits}`
+          );
+          setCredits(userCredits);
+
+          if (userCredits > 0) {
+            console.log(
+              'CreditsContext: ✓ Credits found, force refresh complete'
+            );
+            return;
+          }
+        }
+
+        if (attempt < maxAttempts) {
+          console.log(
+            `CreditsContext: No credits yet, waiting ${delayMs}ms before retry...`
+          );
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
       }
+
+      console.log(
+        'CreditsContext: Force refresh complete (no credits after retries)'
+      );
     } catch (error) {
-      console.error('CreditsContext: Error force refreshing credits');
+      console.error('CreditsContext: Error force refreshing credits:', error);
       setError('Failed to refresh credits');
-    } finally {
-      console.log('CreditsContext: Force refresh completed, setting loading to false');
-      setLoading(false);
     }
-  };
+  }, [user]);
 
   const value: CreditsContextType = {
     credits,
@@ -192,6 +217,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     error,
     forceRefreshCredits,
     isInitialized,
+    isServerConfirmed,
   };
 
   return (
@@ -199,11 +225,6 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   );
 }
 
-/**
- * Hook to access credits state
- * @returns CreditsContextType with credits, hasCredits, loading, and error
- * @throws Error if used outside of CreditsProvider
- */
 export function useCredits(): CreditsContextType {
   const context = useContext(CreditsContext);
   if (context === undefined) {
@@ -211,4 +232,3 @@ export function useCredits(): CreditsContextType {
   }
   return context;
 }
-

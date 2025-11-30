@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
@@ -11,65 +11,85 @@ interface PaidRouteGuardProps {
   children: ReactNode;
 }
 
-/**
- * PaidRouteGuard - Client-side route protection requiring credits
- *
- * Wraps protected pages that require credits to access.
- * - Shows loading spinner while checking credits
- * - Redirects to /app/dial?needsCredits=true if user has no credits
- * - Renders children if user has credits
- *
- * Note: This is client-side protection. Server-side validation
- * should also be implemented for sensitive operations.
- */
 export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   const {
+    credits,
     hasCredits,
     loading: creditsLoading,
     isInitialized,
+    isServerConfirmed,
   } = useCredits();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const isLoading = authLoading || creditsLoading;
+  // Track if we've made a decision to prevent flicker
+  const [accessDecision, setAccessDecision] = useState<
+    'pending' | 'granted' | 'denied'
+  >('pending');
+
+  const isFullyLoaded =
+    !authLoading && !creditsLoading && isInitialized && isServerConfirmed;
 
   useEffect(() => {
-    // Wait for loading to complete AND for credits to be initialized
-    // isInitialized ensures we've set up the real-time listener and aren't just
-    // looking at the initial fetch result
-    // We also need to ensure credits have been loaded (not just initialized)
-    if (isLoading || !isInitialized || creditsLoading) return;
+    // Don't make any decisions until we have SERVER-confirmed data
+    if (!isFullyLoaded) {
+      console.log('PaidRouteGuard: Waiting for server-confirmed data...', {
+        authLoading,
+        creditsLoading,
+        isInitialized,
+        isServerConfirmed,
+        credits,
+      });
+      return;
+    }
 
     // If not authenticated, redirect to login
     if (!user) {
+      console.log('PaidRouteGuard: No user, redirecting to login');
+      setAccessDecision('denied');
       router.replace(ROUTES.LOGIN);
       return;
     }
 
-    // If we have credits, allow access
+    // Now we have SERVER-confirmed credit data
     if (hasCredits) {
-      console.log('PaidRouteGuard: Access granted (credits available)');
-      return;
+      console.log(
+        'PaidRouteGuard: ✓ Access granted (server-confirmed credits:',
+        credits,
+        ')'
+      );
+      setAccessDecision('granted');
+    } else {
+      console.log(
+        'PaidRouteGuard: ✗ No credits (server-confirmed), redirecting to dial'
+      );
+      setAccessDecision('denied');
+      router.replace(`${ROUTES.DIAL}?needsCredits=true`);
     }
+  }, [
+    isFullyLoaded,
+    user,
+    hasCredits,
+    credits,
+    router,
+    authLoading,
+    creditsLoading,
+    isInitialized,
+    isServerConfirmed,
+  ]);
 
-    // If no credits after loading is complete, user genuinely has no credits
-    console.log('PaidRouteGuard: No credits available, redirecting to dial');
-    router.replace(`${ROUTES.DIAL}?needsCredits=true`);
-
-  }, [isLoading, isInitialized, creditsLoading, user, hasCredits, router]);
-
-  // Show loading spinner while checking
-  if (isLoading) {
+  // Show loading while waiting for SERVER confirmation
+  if (!isFullyLoaded || accessDecision === 'pending') {
     return (
       <div className="paid-route-guard-loading">
         <LoadingSpinner />
-        <p>Checking access...</p>
+        <p>Verifying access...</p>
       </div>
     );
   }
 
-  // If not authenticated or no credits, show nothing (redirect will happen)
-  if (!user || !hasCredits) {
+  // If denied, show redirecting state
+  if (accessDecision === 'denied') {
     return (
       <div className="paid-route-guard-loading">
         <LoadingSpinner text="Redirecting..." />
@@ -77,6 +97,6 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     );
   }
 
-  // User has credits, render children
+  // Access granted - render children
   return <>{children}</>;
 }
