@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useRef,
   ReactNode,
 } from 'react';
 import { doc, onSnapshot, getDoc } from 'firebase/firestore';
@@ -40,6 +41,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const listenerSetupRef = useRef(false);
 
   useEffect(() => {
     // If auth is still loading, wait
@@ -66,7 +68,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         // First, do an immediate fetch to get current credits
         console.log('CreditsContext: Doing initial fetch for current credits...');
         const userDocRef = doc(db, 'users', user.uid);
-        const initialDoc = await getDoc(userDocRef);
+        const initialDoc = await getDoc(userDocRef, { source: 'server' });
 
         if (initialDoc.exists()) {
           const data = initialDoc.data();
@@ -80,6 +82,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
         // Now set up real-time listener for future updates
         console.log('CreditsContext: Setting up real-time listener...');
+        let isFirstSnapshot = true;
         const unsubscribe = onSnapshot(
           userDocRef,
           (docSnapshot) => {
@@ -98,14 +101,26 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
             console.log('CreditsContext: Setting loading to false');
             setLoading(false);
             setError(null);
-            // Mark as initialized once real-time listener is set up
-            setIsInitialized(true);
+            
+            // Mark as initialized only after the first snapshot callback
+            // Add a small delay to ensure we get the most up-to-date data from the listener
+            if (isFirstSnapshot) {
+              console.log('CreditsContext: First snapshot received, waiting to mark as initialized');
+              isFirstSnapshot = false;
+              listenerSetupRef.current = true;
+              // Wait 100ms to allow listener to receive any pending updates
+              setTimeout(() => {
+                console.log('CreditsContext: Marking as initialized after listener delay');
+                setIsInitialized(true);
+              }, 100);
+            }
           },
           (err) => {
             console.error('CreditsContext: Error listening to credits:', err.message);
             console.error('CreditsContext: Full error:', err);
             setError('Failed to load credits');
             setLoading(false);
+            listenerSetupRef.current = true;
             setIsInitialized(true);
           }
         );
@@ -116,6 +131,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         setCredits(0);
         setLoading(false);
         setError('Failed to load credits');
+        listenerSetupRef.current = true;
         setIsInitialized(true);
         return () => {}; // Return empty cleanup function
       }
@@ -147,7 +163,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
       console.log('CreditsContext: Fetching user document from Firestore...');
       const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDoc(userDocRef);
+      const docSnapshot = await getDoc(userDocRef, { source: 'server' });
 
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
