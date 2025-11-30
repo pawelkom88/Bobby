@@ -101,11 +101,7 @@ function DialPageContent() {
   }, [needsCredits, hasCredits, creditsLoading]);
 
   const handleCorrectNumber = async () => {
-    // Don't proceed if still loading/refreshing credits
-    if (creditsLoading || isRefreshingFromPayment) {
-      console.log('Credits still loading, waiting...');
-      return;
-    }
+    console.log('handleCorrectNumber called - user should have credits');
 
     // If we've already verified credits, proceed directly
     if (hasVerifiedCredits && hasCredits) {
@@ -113,6 +109,8 @@ function DialPageContent() {
       window.location.href = ROUTES.CONVERSATION;
       return;
     }
+
+    console.log('Starting credit verification process...');
 
     // Force a fresh check of credits before proceeding
     if (fromSuccess) {
@@ -123,15 +121,39 @@ function DialPageContent() {
     // Double-check: fetch credits directly to avoid stale state
     console.log('Final verification: hasCredits =', hasCredits, 'credits =', credits);
 
-    // If user has credits, navigate to conversation and mark as verified
-    if (hasCredits) {
-      console.log('User has credits, navigating to conversation');
-      setHasVerifiedCredits(true);
-      window.location.href = ROUTES.CONVERSATION;
-      return;
+    // Extra verification: wait for real-time listener to update
+    if (fromSuccess) {
+      console.log('Post-payment: waiting 2 seconds for real-time updates...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Check credits again after the delay
+      console.log('Post-delay verification: hasCredits =', hasCredits, 'credits =', credits);
+      if (!hasCredits) {
+        console.log('Still no credits after delay, staying on dial page');
+        return;
+      }
     }
 
-    // No credits - redirect to Stripe checkout
+    // Final verification - force refresh one more time if needed
+    if (!hasCredits) {
+      console.log('Final check: forcing one more refresh before navigation');
+      await forceRefreshCredits();
+
+      if (!hasCredits) {
+        console.log('Still no credits after final refresh, staying on dial page');
+        return;
+      }
+    }
+
+    // If user has credits, navigate to conversation and mark as verified
+    console.log('User has credits, navigating to conversation');
+    setHasVerifiedCredits(true);
+    window.location.href = ROUTES.CONVERSATION;
+  };
+
+  const handleCheckoutNeeded = async () => {
+    console.log('No credits available, starting checkout process');
+
     if (!user) {
       console.error('No user found when trying to checkout');
       setCheckoutError('Please log in to continue');
@@ -160,6 +182,7 @@ function DialPageContent() {
       }
 
       const { url } = await response.json();
+      console.log('Redirecting to Stripe checkout:', url);
       window.location.href = url;
     } catch (error) {
       console.error('Checkout error occurred');
@@ -212,7 +235,7 @@ function DialPageContent() {
               </Activity>
 
               <DialPad
-                onCorrectNumber={handleCorrectNumber}
+                onCorrectNumber={hasCredits ? handleCorrectNumber : handleCheckoutNeeded}
                 onBack={handleBack}
                 isLoading={checkoutLoading || isLoading}
                 buttonLabel={hasCredits ? 'CALL' : isLoading ? 'LOADING...' : 'BUY & CALL'}

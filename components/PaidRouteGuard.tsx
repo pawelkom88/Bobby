@@ -32,11 +32,15 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   useEffect(() => {
     // Wait for loading to complete
     if (isLoading) {
-      console.log('PaidRouteGuard: Still loading, waiting...');
+      console.log('PaidRouteGuard: Still loading, waiting...', {
+        authLoading,
+        creditsLoading,
+        isLoading
+      });
       return;
     }
 
-    console.log('PaidRouteGuard: Checking access - user:', !!user, 'hasCredits:', hasCredits);
+    console.log('PaidRouteGuard: Checking access - user:', !!user, 'hasCredits:', hasCredits, 'creditsLoading:', creditsLoading, 'authLoading:', authLoading);
 
     // If not authenticated, redirect to login
     if (!user) {
