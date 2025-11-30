@@ -3,6 +3,7 @@ import { getAnalytics } from 'firebase/analytics';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { logger } from '@/lib/logger';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -33,10 +34,10 @@ if (typeof window !== 'undefined') {
       });
     } catch (error) {
       // App Check might already be initialized in development/testing
-      console.warn('App Check initialization warning:', error);
+      logger.warn('App Check initialization warning:', error);
     }
   } else {
-    console.warn(
+    logger.warn(
       'reCAPTCHA Enterprise site key not found. App Check will not be initialized.'
     );
   }

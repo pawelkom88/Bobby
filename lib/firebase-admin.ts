@@ -27,34 +27,35 @@ function getAdminApp(): App {
     return adminApp;
   }
 
-  // Validate required environment variables
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  // Use JSON-based service account credentials (more reliable)
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-  if (!projectId || !clientEmail || !privateKey) {
-    throw new Error(
-      'Missing Firebase Admin SDK environment variables. ' +
-        'Please set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.'
-    );
+  if (!serviceAccountJson) {
+    logger.log('FIREBASE_SERVICE_ACCOUNT environment variable is required.');
+    throw new Error('FIREBASE_SERVICE_ACCOUNT is required');
   }
 
   try {
-    // Process private key to handle escaped newlines
-    const processedPrivateKey = privateKey
-      .replace(/\\n/g, '\n')  // Replace escaped newlines
-      .replace(/\\r/g, '\r');  // Also handle escaped carriage returns
-    
-    // Initialize Firebase Admin with service account credentials
+    // Parse the JSON service account
+    const serviceAccount = JSON.parse(serviceAccountJson);
+
+    // Ensure private key has proper newlines
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(
+        /\\n/g,
+        '\n'
+      );
+    }
+
+    // Initialize Firebase Admin with parsed service account credentials
     adminApp = initializeApp({
-      credential: cert({
-        projectId,
-        clientEmail,
-        privateKey: processedPrivateKey,
-      }),
+      credential: cert(serviceAccount),
     });
   } catch (error) {
-    logger.error('Failed to initialize Firebase Admin SDK:', error instanceof Error ? error.message : String(error));
+    logger.error(
+      'Failed to initialize Firebase Admin SDK:',
+      error instanceof Error ? error.message : String(error)
+    );
     throw error;
   }
 
@@ -95,4 +96,3 @@ export async function verifyIdToken(idToken: string) {
   const auth = getAdminAuth();
   return auth.verifyIdToken(idToken);
 }
-
