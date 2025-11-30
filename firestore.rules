@@ -66,6 +66,28 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Conversations collection - server-only writes for tracking conversation lifecycle
+    // Stores: userId, ageTier, service, startedAt, endedAt, status, charged
+    match /conversations/{conversationId} {
+      // Users can read their own conversations
+      allow read: if isAuthenticated()
+                  && resource.data.userId == request.auth.uid;
+
+      // Only server (Admin SDK) can write conversations
+      allow write: if false;
+    }
+
+    // Credit deductions collection - server-only writes for audit trail
+    // Records all credit deductions for accounting and debugging
+    match /creditDeductions/{conversationId} {
+      // Users can read their own deductions
+      allow read: if isAuthenticated()
+                  && resource.data.userId == request.auth.uid;
+
+      // Only server (Admin SDK) can write deductions
+      allow write: if false;
+    }
+
     // Default deny all other access
     match /{document=**} {
       allow read, write: if false;

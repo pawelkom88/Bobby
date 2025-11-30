@@ -1,0 +1,217 @@
+/**
+ * POST /api/conversation/end
+ * Marks a conversation as ended with server-side timestamp
+ * 
+ * Security:
+ * - Requires valid Firebase ID token
+ * - Verifies user owns the conversation
+ * - Server-side timestamp (client cannot manipulate)
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { verifyToken } from '@/lib/token-verifier';
+import { validateOwnership, OwnershipValidationError } from '@/lib/ownership-validator';
+import { logger } from '@/lib/logger';
+
+// Initialize Firebase Admin
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
+const auth = getAuth();
+const db = getFirestore();
+
+interface EndConversationRequest {
+  conversationId: string;
+}
+
+interface EndConversationResponse {
+  conversationId: string;
+  endedAt: string;
+  status: string;
+  error?: string;
+  message?: string;
+}
+
+/**
+ * Validates request body
+ */
+function validateRequest(body: any): { valid: boolean; error?: string } {
+  if (!body) {
+    return { valid: false, error: 'Request body is required' };
+  }
+
+  if (!body.conversationId || typeof body.conversationId !== 'string') {
+    return { valid: false, error: 'conversationId is required and must be a string' };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Extracts and verifies user from token
+ */
+async function verifyUserFromToken(
+  authHeader: string | null
+): Promise<{ userId: string } | { error: string; status: number }> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    logger.warn('Missing or invalid Authorization header');
+    return { error: 'Missing or invalid Authorization header', status: 401 };
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    const result = await verifyToken(
+      (token) => auth.verifyIdToken(token),
+      token
+    );
+
+    if (!result.success || !result.uid) {
+      logger.warn('Token verification failed');
+      return { error: 'Invalid token', status: 401 };
+    }
+
+    return { userId: result.uid };
+  } catch (error: any) {
+    logger.warn('Token verification error:', error.code);
+    return { error: 'Invalid token', status: 401 };
+  }
+}
+
+/**
+ * Fetches conversation from Firestore
+ */
+async function getConversation(conversationId: string) {
+  try {
+    const doc = await db.collection('conversations').doc(conversationId).get();
+    if (!doc.exists) {
+      return null;
+    }
+    return { id: doc.id, ...doc.data() };
+  } catch (error) {
+    logger.error('Error fetching conversation:', error);
+    throw error;
+  }
+}
+
+/**
+ * Main handler
+ */
+export async function POST(request: NextRequest): Promise<NextResponse<EndConversationResponse>> {
+  try {
+    // 1. Parse and validate request
+    const body = await request.json();
+    const validation = validateRequest(body);
+
+    if (!validation.valid) {
+      logger.warn('Invalid request:', validation.error);
+      return NextResponse.json(
+        { 
+          conversationId: '',
+          endedAt: '',
+          status: 'error',
+          error: 'invalid-request',
+          message: validation.error 
+        },
+        { status: 400 }
+      );
+    }
+
+    const { conversationId } = body as EndConversationRequest;
+
+    // 2. Verify user from token
+    const authHeader = request.headers.get('Authorization');
+    const userResult = await verifyUserFromToken(authHeader);
+
+    if ('error' in userResult) {
+      return NextResponse.json(
+        { 
+          conversationId: '',
+          endedAt: '',
+          status: 'error',
+          error: 'unauthorized',
+          message: userResult.error 
+        },
+        { status: userResult.status }
+      );
+    }
+
+    const userId = userResult.userId;
+
+    // 3. Verify user owns conversation
+    try {
+      await validateOwnership(userId, conversationId, getConversation);
+    } catch (error: any) {
+      if (error instanceof OwnershipValidationError) {
+        if (error.code === 'conversation/not-found') {
+          logger.warn(`Conversation ${conversationId} not found`);
+          return NextResponse.json(
+            { 
+              conversationId: '',
+              endedAt: '',
+              status: 'error',
+              error: 'conversation-not-found',
+              message: 'Conversation not found' 
+            },
+            { status: 404 }
+          );
+        }
+        if (error.code === 'auth/not-authorized') {
+          logger.warn(`User ${userId} not authorized for conversation ${conversationId}`);
+          return NextResponse.json(
+            { 
+              conversationId: '',
+              endedAt: '',
+              status: 'error',
+              error: 'not-authorized',
+              message: 'Not authorized' 
+            },
+            { status: 403 }
+          );
+        }
+      }
+      throw error;
+    }
+
+    // 4. Update conversation with server-side end timestamp
+    const now = new Date().toISOString();
+    await db.collection('conversations').doc(conversationId).update({
+      endedAt: now,
+      status: 'completed',
+    });
+
+    logger.log(`Ended conversation ${conversationId} for user ${userId}`);
+
+    return NextResponse.json(
+      {
+        conversationId,
+        endedAt: now,
+        status: 'completed',
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    logger.error('Error in conversation/end:', error);
+
+    return NextResponse.json(
+      { 
+        conversationId: '',
+        endedAt: '',
+        status: 'error',
+        error: 'internal-error',
+        message: 'An internal error occurred' 
+      },
+      { status: 500 }
+    );
+  }
+}
