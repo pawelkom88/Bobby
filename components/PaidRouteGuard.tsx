@@ -49,20 +49,11 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
       return;
     }
 
-    // If no credits, try one refresh attempt
-    console.log('PaidRouteGuard: No credits found, attempting final refresh...');
-    forceRefreshCredits(); // Fire and forget - context will update if credits exist
+    // If no credits after initial load, user genuinely has no credits
+    console.log('PaidRouteGuard: No credits available, redirecting to dial');
+    router.replace(`${ROUTES.DIAL}?needsCredits=true`);
 
-    // Since context now loads with correct data immediately, if we still have no credits
-    // after the initial load + refresh, the user genuinely has no credits
-    setTimeout(() => {
-      if (!hasCredits) {
-        console.log('PaidRouteGuard: Still no credits after refresh, redirecting');
-        router.replace(`${ROUTES.DIAL}?needsCredits=true`);
-      }
-    }, 1000);
-
-  }, [isLoading, user, hasCredits, forceRefreshCredits, router]);
+  }, [isLoading, user, hasCredits, router]);
 
   // Show loading spinner while checking
   if (isLoading) {
