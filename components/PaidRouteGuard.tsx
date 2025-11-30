@@ -37,7 +37,8 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     // Wait for loading to complete AND for credits to be initialized
     // isInitialized ensures we've set up the real-time listener and aren't just
     // looking at the initial fetch result
-    if (isLoading || !isInitialized) return;
+    // We also need to ensure credits have been loaded (not just initialized)
+    if (isLoading || !isInitialized || creditsLoading) return;
 
     // If not authenticated, redirect to login
     if (!user) {
@@ -51,11 +52,11 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
       return;
     }
 
-    // If no credits after initial load, user genuinely has no credits
+    // If no credits after loading is complete, user genuinely has no credits
     console.log('PaidRouteGuard: No credits available, redirecting to dial');
     router.replace(`${ROUTES.DIAL}?needsCredits=true`);
 
-  }, [isLoading, isInitialized, user, hasCredits, router]);
+  }, [isLoading, isInitialized, creditsLoading, user, hasCredits, router]);
 
   // Show loading spinner while checking
   if (isLoading) {
