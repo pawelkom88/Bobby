@@ -121,28 +121,10 @@ function DialPageContent() {
     // Double-check: fetch credits directly to avoid stale state
     console.log('Final verification: hasCredits =', hasCredits, 'credits =', credits);
 
-    // Extra verification: wait for real-time listener to update
-    if (fromSuccess) {
-      console.log('Post-payment: waiting 2 seconds for real-time updates...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Check credits again after the delay
-      console.log('Post-delay verification: hasCredits =', hasCredits, 'credits =', credits);
-      if (!hasCredits) {
-        console.log('Still no credits after delay, staying on dial page');
-        return;
-      }
-    }
-
-    // Final verification - force refresh one more time if needed
+    // CRITICAL: If we don't have credits, don't navigate
     if (!hasCredits) {
-      console.log('Final check: forcing one more refresh before navigation');
-      await forceRefreshCredits();
-
-      if (!hasCredits) {
-        console.log('Still no credits after final refresh, staying on dial page');
-        return;
-      }
+      console.log('No credits available after verification, staying on dial page');
+      return;
     }
 
     // If user has credits, navigate to conversation and mark as verified
