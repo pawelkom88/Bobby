@@ -711,7 +711,7 @@ export default function VoiceConversation({
       // Dynamic greeting based on scenario
       const greeting =
         situation === 'ambulance'
-          ? "Hi, I'm Bobby from Ambulance Service. Is the patient breathing?"
+          ? "Hi, I'm Bobby from Ambulance Service. Can you tell me if the person needs help?"
           : situation === 'fire'
             ? "Hi, I'm Bobby from Fire and Rescue. What is the problem?"
             : "Hi, I'm Bobby from Police. What's wrong?";

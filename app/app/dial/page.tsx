@@ -52,8 +52,8 @@ function DialPageContent() {
     setCheckoutError(null);
 
     try {
-      // Get fresh Firebase ID token
-      const idToken = await user.getIdToken();
+      // Get fresh Firebase ID token with forced refresh to ensure validity
+      const idToken = await user.getIdToken(true);
 
       // Create checkout session
       const response = await fetch('/api/checkout_sessions', {

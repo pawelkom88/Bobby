@@ -65,24 +65,24 @@ describe('Checkout Sessions API Logic', () => {
   describe('Token Extraction', () => {
     it('should extract token from valid Bearer header', () => {
       const authHeader = 'Bearer abc123token';
-      const token = authHeader.startsWith('Bearer ') 
-        ? authHeader.split('Bearer ')[1] 
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.split('Bearer ')[1]
         : null;
       expect(token).toBe('abc123token');
     });
 
     it('should return null for missing Bearer prefix', () => {
       const authHeader = 'abc123token';
-      const token = authHeader.startsWith('Bearer ') 
-        ? authHeader.split('Bearer ')[1] 
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.split('Bearer ')[1]
         : null;
       expect(token).toBeNull();
     });
 
     it('should return null for empty token after Bearer', () => {
       const authHeader = 'Bearer ';
-      const token = authHeader.startsWith('Bearer ') 
-        ? authHeader.split('Bearer ')[1] 
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.split('Bearer ')[1]
         : null;
       expect(token).toBe('');
     });
@@ -94,9 +94,9 @@ describe('Checkout Sessions API Logic', () => {
         uid: 'user123',
         email: 'test@example.com',
       };
-      
+
       vi.mocked(verifyIdToken).mockResolvedValue(mockDecodedToken as any);
-      
+
       const result = await verifyIdToken('valid-token');
       expect(result.uid).toBe('user123');
       expect(result.email).toBe('test@example.com');
@@ -104,8 +104,10 @@ describe('Checkout Sessions API Logic', () => {
 
     it('should throw on invalid token', async () => {
       vi.mocked(verifyIdToken).mockRejectedValue(new Error('Invalid token'));
-      
-      await expect(verifyIdToken('invalid-token')).rejects.toThrow('Invalid token');
+
+      await expect(verifyIdToken('invalid-token')).rejects.toThrow(
+        'Invalid token'
+      );
     });
   });
 
@@ -154,13 +156,119 @@ describe('Checkout Sessions API Logic', () => {
       vi.mocked(verifyIdToken).mockResolvedValue(mockDecodedToken as any);
 
       const decodedToken = await verifyIdToken('some-token');
-      
+
       // The API should use decodedToken.uid, NOT requestBodyUserId
       const userIdToUse = decodedToken.uid;
-      
+
       expect(userIdToUse).toBe(tokenUserId);
       expect(userIdToUse).not.toBe(requestBodyUserId);
     });
   });
-});
 
+  describe('Firebase Private Key Formatting', () => {
+    it('should handle escaped newlines in private key', () => {
+      // Simulate environment variable with escaped newlines (common in deployment platforms)
+      const privateKeyWithEscapedNewlines =
+        '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7\\n-----END PRIVATE KEY-----';
+
+      // Process the key as the firebase-admin.ts does
+      const processedKey = privateKeyWithEscapedNewlines
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // Verify newlines are actual newlines, not escaped
+      expect(processedKey).toContain('\n');
+      expect(processedKey).not.toContain('\\n');
+      expect(processedKey.split('\n').length).toBe(3); // BEGIN, content, END
+    });
+
+    it('should handle already-formatted private key with real newlines', () => {
+      // Simulate a key that already has real newlines
+      const privateKeyWithRealNewlines =
+        '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7\n-----END PRIVATE KEY-----';
+
+      // Process the key
+      const processedKey = privateKeyWithRealNewlines
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // Should remain unchanged since it already has real newlines
+      expect(processedKey).toBe(privateKeyWithRealNewlines);
+      expect(processedKey.split('\n').length).toBe(3);
+    });
+
+    it('should handle mixed escaped and real newlines', () => {
+      // Edge case: mix of escaped and real newlines
+      const privateKeyMixed =
+        '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7\n-----END PRIVATE KEY-----';
+
+      const processedKey = privateKeyMixed
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // All should be real newlines after processing
+      expect(processedKey).not.toContain('\\n');
+      expect(processedKey.split('\n').length).toBe(3);
+    });
+
+    it('should handle escaped carriage returns', () => {
+      // Some systems might have escaped carriage returns
+      const privateKeyWithEscapedCR =
+        '-----BEGIN PRIVATE KEY-----\\r\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7\\r\\n-----END PRIVATE KEY-----';
+
+      const processedKey = privateKeyWithEscapedCR
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // Should have real carriage returns and newlines
+      expect(processedKey).not.toContain('\\r');
+      expect(processedKey).not.toContain('\\n');
+      expect(processedKey).toContain('\r\n');
+    });
+
+    it('should preserve key structure after formatting', () => {
+      const originalKey =
+        '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VeryLongKeyContent\\n-----END PRIVATE KEY-----';
+
+      const processedKey = originalKey
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // Verify structure is preserved
+      expect(processedKey.startsWith('-----BEGIN PRIVATE KEY-----')).toBe(true);
+      expect(processedKey.endsWith('-----END PRIVATE KEY-----')).toBe(true);
+      expect(
+        processedKey.includes(
+          'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VeryLongKeyContent'
+        )
+      ).toBe(true);
+    });
+
+    it('should handle production-format private key with escaped newlines', () => {
+      // Real production key format with escaped newlines (as shown in deployment UI)
+      const productionKey =
+        '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7FxNlpXrMsL9d\\nqXZ8eHn0lE5jKL6vRtG2xMn4P8hWkJfNzQxCmDVYhT9wKmUeG1sXkFJ3rZuBpN9V\\ncRk7Y5vMHgKxnG3tLfWnYpJ9E8cFh2qYbXwzK1mPvCx4jHfL5sUdRnk9GqM2h7eF\\ntZC1wXvNkJqT8P9yD3uRhL2vYwF6K0xNjM4p5rQgS1nY8WmJzH3tXqN7c4vL6fKd\\nB9s2xYjE1qR5wUmT3hNvK7zP8aLe0gJfY4cH9nMrWvN1dF3xLsB2yXuTtQ6p5ZhN\\nwK9cMqF3jG7vYnR4hUmS5eP1xLtN7kJ9cWvB3fQ2yXsZnM4pK6hNqD1rYwL8zTvF\\njH5eXgMnAgMBAAECggEABkxJrN3P8cGvMHfpJqTK1xbZfHk2jSqYfGtnL9VnMdkE\\nxFgTQ5xNvhMr7PjWkYn3hQvlR8G5tNq2cFxVe4p9jRn7HkGtLmsBfKwzXYnTsJfN\\nhN5cMpR8vGzLxYqT9nJeFVk4wPbMdK2sNvQmGxfRnPjTyXkC1jHsLmfPqVzgK8eF\\ncY5r7xNtG2kMvVnDjWsRH8pXfNq3L9hVmQ4bJkLNzGtPwYxReUhvMsF5nMpXe7cN\\nxJfGvhPT6nkRqYsNqM2sLkJfT4vNqXhYLpG3jNsRfM4xhVpT9qLkFnGzC5tNqXsR\\nvYhJeLkMcP2xnQ7fMvJsTyNqXsLfGhPnRvMcT5qYLwKBgQDmFkVnG3pJhNqXsLcM\\nfYxRvTpNqLsGhXjQnM4fKwPxT5cNqRvYsLhJfGkMnP2xQ7cFvJsLyMqXsNfGhRnT\\nvPcM5qYLJxwKBgQDRnNqM2sLfJhT4vXsLpGhPjNqRxM4cFvYsLkJfT5qNhYLpXsG\\nhRnM3cPfJsLyTqvNfGHvRmNqT2sLfJxP4cYLpGhXjQnM3cFvYsLkJfT5q\\nNhYLsGhRnP6cMfJsLyTqvNfGkMnQ2xhPvRmNqLsKfGhJeT4vPcM5qXsLfYhRnPvJ\\nsLkMfGxQ7T5pNqYhLJxwvRcNqM2sLfKBgQCxnQ7fMvJsLyNqXsGhPnRvMcT5qYLJ\\nxwKfGhJeT4vPcM5qXsLfYhRnPvJsLkMfGxQ7T5pNqYhLfGhRnM3cPfJsLyTqvNf7T5pNq\\nsGhXjQnM4fKwPxNqXsLcMfYxRvTpNqLsGhXjQnM4fKwPxT5cNqRvYsLhJfGkMnP2\\nxQ7cFvJsLyMqXsNfGhRnTvPcM5qY=\\n-----END PRIVATE KEY-----\\n';
+
+      const processedKey = productionKey
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r');
+
+      // Verify it's properly formatted
+      expect(processedKey.startsWith('-----BEGIN PRIVATE KEY-----')).toBe(true);
+      expect(processedKey.endsWith('-----END PRIVATE KEY-----\n')).toBe(true);
+
+      // Verify no escaped newlines remain
+      expect(processedKey).not.toContain('\\n');
+
+      // Verify it has multiple lines (proper PEM format)
+      const lines = processedKey.split('\n');
+      expect(lines.length).toBeGreaterThan(3);
+
+      // Verify key content is preserved
+      expect(processedKey).toContain(
+        'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7FxNlpXrMsL9d'
+      );
+      expect(processedKey).toContain('xQ7cFvJsLyMqXsNfGhRnTvPcM5qY=');
+    });
+  });
+});

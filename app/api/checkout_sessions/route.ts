@@ -73,9 +73,13 @@ export async function POST(request: NextRequest) {
     // 2. Verify token with Firebase Admin SDK
     let decodedToken;
     try {
+      console.log('[Checkout] Verifying Firebase ID token');
       decodedToken = await verifyIdToken(idToken);
+      console.log('[Checkout] Token verified successfully for user:', decodedToken.uid);
     } catch (error) {
-      logger.error('Token verification failed:', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[Checkout] Token verification failed:', errorMsg);
+      logger.error('Token verification failed:', errorMsg);
       return NextResponse.json(
         { error: 'Invalid or expired token' },
         { status: 401 }
