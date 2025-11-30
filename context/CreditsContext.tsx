@@ -7,7 +7,7 @@ import React, {
   useState,
   ReactNode,
 } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
 import { logger } from '@/lib/logger';
@@ -17,6 +17,7 @@ interface CreditsContextType {
   hasCredits: boolean;
   loading: boolean;
   error: string | null;
+  forceRefreshCredits: () => Promise<void>;
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -85,11 +86,46 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     };
   }, [user, authLoading]);
 
+  /**
+   * Force refresh credits by manually fetching from Firestore
+   * Useful when real-time listener might be delayed (e.g., after payment)
+   */
+  const forceRefreshCredits = async (): Promise<void> => {
+    if (!user) {
+      logger.warn('Cannot refresh credits: no authenticated user');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const docSnapshot = await getDoc(userDocRef);
+
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        const userCredits = typeof data.credits === 'number' ? data.credits : 0;
+        setCredits(userCredits);
+        logger.info('Credits force refreshed:', userCredits);
+      } else {
+        setCredits(0);
+        logger.info('User document not found during force refresh, credits set to 0');
+      }
+    } catch (error) {
+      logger.error('Error force refreshing credits:', error);
+      setError('Failed to refresh credits');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value: CreditsContextType = {
     credits,
     hasCredits: credits > 0,
     loading: authLoading || loading,
     error,
+    forceRefreshCredits,
   };
 
   return (

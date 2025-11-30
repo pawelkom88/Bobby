@@ -16,7 +16,7 @@ import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 function DialPageContent() {
-  const { credits, hasCredits, loading: creditsLoading } = useCredits();
+  const { credits, hasCredits, loading: creditsLoading, forceRefreshCredits } = useCredits();
   const { user } = useAuth();
   const { clearSession } = useSecureSession();
   const searchParams = useSearchParams();
@@ -27,11 +27,20 @@ function DialPageContent() {
   // Check for query parameters
   const canceled = searchParams.get('canceled') === 'true';
   const needsCredits = searchParams.get('needsCredits') === 'true';
+  const fromSuccess = searchParams.get('fromSuccess') === 'true';
 
   // Clear session data before starting conversation
   useEffect(() => {
     clearSession();
   }, [clearSession]);
+
+  // Force refresh credits when returning from successful payment
+  useEffect(() => {
+    if (fromSuccess && user && !creditsLoading) {
+      logger.info('Returning from successful payment, forcing credits refresh');
+      forceRefreshCredits();
+    }
+  }, [fromSuccess, user, creditsLoading, forceRefreshCredits]);
 
   const handleCorrectNumber = async () => {
     // If user has credits, navigate to conversation

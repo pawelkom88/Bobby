@@ -98,7 +98,7 @@ export default async function Success({
                 </p>
                 <p>Credits Added: {credits}</p>
               </div>
-              <Link href={ROUTES.DIAL} className="success-cta-button">
+              <Link href={`${ROUTES.DIAL}?fromSuccess=true`} className="success-cta-button">
                 Start Practicing! 📞
               </Link>
             </div>
@@ -123,7 +123,7 @@ export default async function Success({
                   <em>Please log in to view your purchase details.</em>
                 </p>
               </div>
-              <Link href={ROUTES.DIAL} className="success-cta-button">
+              <Link href={`${ROUTES.DIAL}?fromSuccess=true`} className="success-cta-button">
                 Start Practicing! 📞
               </Link>
             </div>
@@ -159,7 +159,7 @@ export default async function Success({
             We couldn&apos;t verify your payment. Please contact support if you
             were charged.
           </p>
-          <Link href={ROUTES.DIAL} className="success-cta-button">
+          <Link href={`${ROUTES.DIAL}?fromSuccess=true`} className="success-cta-button">
             Go to Practice
           </Link>
         </div>
