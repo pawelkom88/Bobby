@@ -26,7 +26,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   const {
     hasCredits,
     loading: creditsLoading,
-    forceRefreshCredits,
+    isInitialized,
   } = useCredits();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -34,8 +34,10 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   const isLoading = authLoading || creditsLoading;
 
   useEffect(() => {
-    // Wait for loading to complete
-    if (isLoading) return;
+    // Wait for loading to complete AND for credits to be initialized
+    // isInitialized ensures we've set up the real-time listener and aren't just
+    // looking at the initial fetch result
+    if (isLoading || !isInitialized) return;
 
     // If not authenticated, redirect to login
     if (!user) {
@@ -53,7 +55,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     console.log('PaidRouteGuard: No credits available, redirecting to dial');
     router.replace(`${ROUTES.DIAL}?needsCredits=true`);
 
-  }, [isLoading, user, hasCredits, router]);
+  }, [isLoading, isInitialized, user, hasCredits, router]);
 
   // Show loading spinner while checking
   if (isLoading) {

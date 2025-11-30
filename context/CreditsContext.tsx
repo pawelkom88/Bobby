@@ -7,7 +7,7 @@ import React, {
   useState,
   ReactNode,
 } from 'react';
-import { doc, onSnapshot, getDoc, getDocFromServer } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
 import { logger } from '@/lib/logger';
@@ -18,6 +18,7 @@ interface CreditsContextType {
   loading: boolean;
   error: string | null;
   forceRefreshCredits: () => Promise<void>;
+  isInitialized: boolean;
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -38,6 +39,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   const [credits, setCredits] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     // If auth is still loading, wait
@@ -52,6 +54,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
       setCredits(0);
       setLoading(false);
       setError(null);
+      setIsInitialized(true);
       return;
     }
 
@@ -60,10 +63,10 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
     const setupCredits = async () => {
       try {
-        // First, do an immediate fetch to get current credits from server
+        // First, do an immediate fetch to get current credits
         console.log('CreditsContext: Doing initial fetch for current credits...');
         const userDocRef = doc(db, 'users', user.uid);
-        const initialDoc = await getDocFromServer(userDocRef);
+        const initialDoc = await getDoc(userDocRef);
 
         if (initialDoc.exists()) {
           const data = initialDoc.data();
@@ -95,12 +98,15 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
             console.log('CreditsContext: Setting loading to false');
             setLoading(false);
             setError(null);
+            // Mark as initialized once real-time listener is set up
+            setIsInitialized(true);
           },
           (err) => {
             console.error('CreditsContext: Error listening to credits:', err.message);
             console.error('CreditsContext: Full error:', err);
             setError('Failed to load credits');
             setLoading(false);
+            setIsInitialized(true);
           }
         );
 
@@ -110,6 +116,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         setCredits(0);
         setLoading(false);
         setError('Failed to load credits');
+        setIsInitialized(true);
         return () => {}; // Return empty cleanup function
       }
     };
@@ -138,9 +145,9 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
       setLoading(true);
       setError(null);
 
-      console.log('CreditsContext: Fetching user document from Firestore (server)...');
+      console.log('CreditsContext: Fetching user document from Firestore...');
       const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDocFromServer(userDocRef);
+      const docSnapshot = await getDoc(userDocRef);
 
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
@@ -168,6 +175,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     loading: authLoading || loading,
     error,
     forceRefreshCredits,
+    isInitialized,
   };
 
   return (
