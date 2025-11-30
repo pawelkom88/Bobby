@@ -45,8 +45,6 @@ function getAdminApp(): App {
       .replace(/\\n/g, '\n')  // Replace escaped newlines
       .replace(/\\r/g, '\r');  // Also handle escaped carriage returns
     
-    console.log('[Firebase Admin] Initializing with project:', projectId);
-    
     // Initialize Firebase Admin with service account credentials
     adminApp = initializeApp({
       credential: cert({
@@ -55,10 +53,7 @@ function getAdminApp(): App {
         privateKey: processedPrivateKey,
       }),
     });
-    
-    console.log('[Firebase Admin] Successfully initialized');
   } catch (error) {
-    console.error('[Firebase Admin] Initialization failed:', error instanceof Error ? error.message : String(error));
     logger.error('Failed to initialize Firebase Admin SDK:', error instanceof Error ? error.message : String(error));
     throw error;
   }
