@@ -12,9 +12,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getAdminAuth } from '@/lib/firebase-admin';
+import { getAdminDb } from '@/lib/firebase-admin';
 import { verifyToken } from '@/lib/token-verifier';
 import {
   validateOwnership,
@@ -25,19 +24,9 @@ import { calculateDuration } from '@/lib/duration-calculator';
 import { isEligibleForCharge } from '@/lib/charge-eligibility';
 import { logger } from '@/lib/logger';
 
-// Initialize Firebase Admin
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
-}
-
-const auth = getAuth();
-const db = getFirestore();
+// Initialize Firebase Admin lazily (runtime only)
+const auth = getAdminAuth();
+const db = getAdminDb();
 
 interface DeductCreditsRequest {
   conversationId: string;
