@@ -7,8 +7,8 @@ import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AuthButton } from '@/components/AuthButton';
 import { logger } from '@/lib/logger';
+import { AuthButton } from '@/components/AuthButton';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 function LoginForm() {
@@ -252,17 +252,6 @@ function LoginForm() {
             )}
           </div>
 
-          {/* General Error Message */}
-          {errors.general && (
-            <div
-              className="reset-warning"
-              role="alert"
-              style={{ marginBottom: '20px', textAlign: 'center' }}
-            >
-              {errors.general}
-            </div>
-          )}
-
           {/* Login Button */}
           <AuthButton
             type="submit"
@@ -272,6 +261,24 @@ function LoginForm() {
             {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
           </AuthButton>
         </form>
+
+        {/* Divider */}
+        {/*<div className="login-divider">*/}
+        {/*  <span className="login-divider-text">or</span>*/}
+        {/*</div>*/}
+
+        {/*<GoogleSignInButton />*/}
+
+        {/* General Error Message */}
+        {errors.general && (
+          <div
+            className="reset-warning"
+            role="alert"
+            style={{ marginBottom: '20px', textAlign: 'center' }}
+          >
+            {errors.general}
+          </div>
+        )}
 
         {/* Forgot Password */}
         <div className="login-forgot-password">

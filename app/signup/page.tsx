@@ -192,16 +192,6 @@ function SignUpForm() {
           <p id="signup-description" className="sr-only">
             Create your Bobby account by entering your email and password.
           </p>
-          {/* General Error Message */}
-          {errors.general && (
-            <div
-              className="login-error-message"
-              role="alert"
-              style={{ marginBottom: '20px', textAlign: 'center' }}
-            >
-              {errors.general}
-            </div>
-          )}
           {/* Email Input */}
           <div className="login-input-group">
             <div
@@ -297,7 +287,15 @@ function SignUpForm() {
                 className={`password-strength password-strength-${passwordStrength}`}
                 aria-live="polite"
               >
-                Password strength: <strong>{passwordStrength}</strong>
+                <br />
+                Password strength:{' '}
+                <strong
+                  style={{
+                    color: passwordStrength === 'weak' ? 'red' : 'green',
+                  }}
+                >
+                  {passwordStrength}
+                </strong>
               </div>
             )}
             {errors.password && (
@@ -370,7 +368,6 @@ function SignUpForm() {
               </div>
             )}
           </div>
-          Sign Up Button
           <AuthButton
             type="submit"
             disabled={isSubmitting}
@@ -380,6 +377,21 @@ function SignUpForm() {
           </AuthButton>
         </form>
 
+        {/* Divider */}
+        {/*<div className="login-divider">*/}
+        {/*  <span className="login-divider-text">or</span>*/}
+        {/*</div>*/}
+
+        {/*<GoogleSignInButton />*/}
+        {errors.general && (
+          <div
+            className="reset-warning"
+            role="alert"
+            style={{ marginBottom: '20px', textAlign: 'center' }}
+          >
+            {errors.general}
+          </div>
+        )}
         {/* Already have account */}
         <div className="login-signup">
           Already part of the team?{' '}

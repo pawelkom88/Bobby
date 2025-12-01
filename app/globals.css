@@ -5687,10 +5687,105 @@ input {
 }
 
 /* ============================================================================
-   CREDITS & PAYMENT STYLES
+   GOOGLE SIGN IN BUTTON STYLES
    ============================================================================ */
 
-/* Credits display on dial page */
+.google-signin-button {
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #dadce0;
+  border-radius: 25px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #3c4043;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.google-signin-button:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #c4c4c4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.google-signin-button:active:not(:disabled) {
+  background: #f1f3f4;
+  transform: translateY(0);
+}
+
+.google-signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-signin-button:focus-visible {
+  outline: 3px solid #4285f4;
+  outline-offset: 2px;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+.google-button-text {
+  font-weight: 600;
+  color: #3c4043;
+}
+
+/* ============================================================================
+   LOGIN DIVIDER STYLES
+   ============================================================================ */
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #dadce0;
+}
+
+.login-divider::before {
+  margin-right: 20px;
+}
+
+.login-divider::after {
+  margin-left: 20px;
+}
+
+.login-divider-text {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 10px;
+  background: white;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ============================================================================
+   CREDITS & PAYMENT STYLES
+   ============================================================================ */
 .dial-credits-display,
 .select-package-existing-credits {
   display: flex;
