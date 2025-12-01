@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { logger } from '@/lib/logger';
 
 type SoundContextValue = {
   soundEnabled: boolean;
@@ -37,7 +38,7 @@ function preloadAudioFiles() {
       audio.load();
     } catch (error) {
       // Silently ignore preloading errors
-      console.warn(`Failed to preload audio: ${url}`, error);
+      logger.warn(`Failed to preload audio: ${url}`, error);
     }
   });
 }

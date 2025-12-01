@@ -205,7 +205,6 @@ export default function ForgotPasswordPage() {
           <p id="forgot-password-description" className="sr-only">
             Enter your email address to receive a password reset link.
           </p>
-
           {/* General Error Message */}
           {errors.general && (
             <div
@@ -216,7 +215,6 @@ export default function ForgotPasswordPage() {
               {errors.general}
             </div>
           )}
-
           {/* Email Input */}
           <div className="login-input-group">
             <div
@@ -260,15 +258,14 @@ export default function ForgotPasswordPage() {
               </div>
             )}
           </div>
-
-          {/* Submit Button */}
-          {/*<AuthButton*/}
-          {/*  type="submit"*/}
-          {/*  disabled={isSubmitting}*/}
-          {/*  aria-describedby="forgot-password-description"*/}
-          {/*>*/}
-          {/*  {isSubmitting ? 'SENDING...' : 'SEND RESET LINK'}*/}
-          {/*</AuthButton>*/}
+          Submit Button
+          <AuthButton
+            type="submit"
+            disabled={isSubmitting}
+            aria-describedby="forgot-password-description"
+          >
+            {isSubmitting ? 'SENDING...' : 'SEND RESET LINK'}
+          </AuthButton>
         </form>
 
         {/* Back to Login */}

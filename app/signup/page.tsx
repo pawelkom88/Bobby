@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { validatePassword, validateEmail } from '@/lib/validation';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { AuthButton } from '@/components/AuthButton';
 
 function SignUpForm() {
   const router = useRouter();
@@ -191,7 +192,6 @@ function SignUpForm() {
           <p id="signup-description" className="sr-only">
             Create your Bobby account by entering your email and password.
           </p>
-
           {/* General Error Message */}
           {errors.general && (
             <div
@@ -202,7 +202,6 @@ function SignUpForm() {
               {errors.general}
             </div>
           )}
-
           {/* Email Input */}
           <div className="login-input-group">
             <div
@@ -246,7 +245,6 @@ function SignUpForm() {
               </div>
             )}
           </div>
-
           {/* Password Input */}
           <div className="login-password-group">
             <div
@@ -316,7 +314,6 @@ function SignUpForm() {
               number, and special character
             </div>
           </div>
-
           {/* Confirm Password Input */}
           <div className="login-password-group">
             <div
@@ -373,15 +370,14 @@ function SignUpForm() {
               </div>
             )}
           </div>
-
-          {/* Sign Up Button */}
-          {/*<AuthButton*/}
-          {/*  type="submit"*/}
-          {/*  disabled={isSubmitting}*/}
-          {/*  aria-describedby="signup-description"*/}
-          {/*>*/}
-          {/*  {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}*/}
-          {/*</AuthButton>*/}
+          Sign Up Button
+          <AuthButton
+            type="submit"
+            disabled={isSubmitting}
+            aria-describedby="signup-description"
+          >
+            {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}
+          </AuthButton>
         </form>
 
         {/* Already have account */}

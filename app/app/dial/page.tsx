@@ -77,7 +77,7 @@ function DialPageContent() {
           url.searchParams.delete('needsCredits');
           window.history.replaceState({}, '', url.toString());
         } catch (error) {
-          console.error('Failed to refresh credits after payment');
+          logger.error('Failed to refresh credits after payment');
         } finally {
           setIsRefreshingFromPayment(false);
         }
@@ -132,12 +132,7 @@ function DialPageContent() {
     }
 
     // Double-check: fetch credits directly to avoid stale state
-    logger.log(
-      'Final verification: hasCredits =',
-      hasCredits,
-      'credits =',
-      credits
-    );
+    logger.log('Final verification: hasCredits =', hasCredits);
 
     // CRITICAL: If we don't have credits, don't navigate
     if (!hasCredits) {
@@ -157,7 +152,7 @@ function DialPageContent() {
     logger.log('No credits available, starting checkout process');
 
     if (!user) {
-      console.error('No user found when trying to checkout');
+      logger.error('No user found when trying to checkout');
       setCheckoutError('Please log in to continue');
       return;
     }
@@ -187,7 +182,7 @@ function DialPageContent() {
       logger.log('Redirecting to Stripe checkout:', url);
       window.location.href = url;
     } catch (error) {
-      console.error('Checkout error occurred');
+      logger.error('Checkout error occurred');
       setCheckoutError(
         error instanceof Error ? error.message : 'Failed to start checkout'
       );

@@ -18,6 +18,7 @@ import {
 } from '@/config/packages';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import Image from 'next/image';
+import { logger } from '@/lib/logger';
 
 function SelectPackagePageContent() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -100,7 +101,7 @@ function SelectPackagePageContent() {
 
       window.location.href = data.url;
     } catch (error) {
-      console.error('Checkout error:', error);
+      logger.error('Checkout error:', error);
       setCheckoutError(
         error instanceof Error ? error.message : 'Failed to start checkout'
       );
