@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ViewTransition } from 'react';
 import { Activity } from 'react';
-import VoiceConversation from '@/components/VoiceConversation';
+import CreditDeductionIntegration from '@/components/CreditDeductionIntegration';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PaidRouteGuard from '@/components/PaidRouteGuard';
@@ -133,7 +133,7 @@ function ConversationPageContent() {
         <PageWrapper>
           <ErrorBoundary>
             <main className="app-page" role="main">
-              <VoiceConversation
+              <CreditDeductionIntegration
                 ageTier={selectedAgeTier}
                 situation={selectedSituation}
                 onComplete={handleConversationComplete}
