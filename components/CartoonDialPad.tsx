@@ -60,6 +60,7 @@ export default function CartoonDialPad({
   const [input, setInput] = useState('');
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isWrongNumber, setIsWrongNumber] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const playKeySound = (digit: string) => {
@@ -137,7 +138,7 @@ export default function CartoonDialPad({
 
         {/* Number display */}
         <div
-          className={`dial-display ${!input ? 'empty' : ''}`}
+          className={`dial-display ${!input ? 'empty' : ''} ${isWrongNumber ? 'wrong-number' : ''}`}
           aria-live="polite"
           aria-atomic="true"
         >
@@ -196,10 +197,12 @@ export default function CartoonDialPad({
                   ];
                 setErrorMessage(randomMessage);
                 setHasError(true);
+                setIsWrongNumber(true);
                 setTimeout(() => {
                   setInput('');
                   setHasError(false);
                   setErrorMessage('');
+                  setIsWrongNumber(false);
                 }, 2500);
                 return;
               }
@@ -220,6 +223,7 @@ export default function CartoonDialPad({
               setInput('');
               setHasError(false);
               setErrorMessage('');
+              setIsWrongNumber(false);
             }}
             className="dial-clear-btn"
             aria-label="Clear display"

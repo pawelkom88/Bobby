@@ -52,8 +52,8 @@ export default function ChooseEmergencyPage() {
   const handleSelectService = async (service: Service) => {
     try {
       await setSelectedService(service);
-      // Navigate to dial pad
-      router.push(ROUTES.DIAL);
+      // Navigate to package selection
+      router.push(ROUTES.SELECT_PACKAGE);
     } catch (error) {
       logger.error('Error setting service:', error);
     }

@@ -65,8 +65,8 @@ export default function BadgeDisplay({
                   src={badge.image!}
                   alt={`${badge.name} badge ${isEarned ? 'earned' : 'locked'}`}
                   className={`badge-image ${isEarned ? 'earned' : 'locked'}`}
-                  width={300}
-                  height={300}
+                  width={250}
+                  height={250}
                   loading="lazy"
                 />
               </div>

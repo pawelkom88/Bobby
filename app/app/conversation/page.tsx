@@ -19,8 +19,8 @@ const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
 
 function ConversationPageContent() {
-  console.log('ConversationPageContent: Component mounted/rendered');
-  
+  logger.log('ConversationPageContent: Component mounted/rendered');
+
   const [isComplete, setIsComplete] = useState(false);
   const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
   const { getJourneyState } = useUserData();
@@ -74,9 +74,18 @@ function ConversationPageContent() {
       // DEBUG: Log conversation details
       logger.log('🔍 CONVERSATION COMPLETE - Full conversation:', conversation);
       logger.log('🔍 Total messages:', conversation.length);
-      logger.log('🔍 User messages:', conversation.filter(m => m.type === 'user').length);
-      logger.log('🔍 Agent messages:', conversation.filter(m => m.type === 'agent').length);
-      logger.log('🔍 User message texts:', conversation.filter(m => m.type === 'user').map(m => m.text));
+      logger.log(
+        '🔍 User messages:',
+        conversation.filter(m => m.type === 'user').length
+      );
+      logger.log(
+        '🔍 Agent messages:',
+        conversation.filter(m => m.type === 'agent').length
+      );
+      logger.log(
+        '🔍 User message texts:',
+        conversation.filter(m => m.type === 'user').map(m => m.text)
+      );
 
       // Assess the conversation using Gemini
       const assessment = await assessWithGemini(conversation, {
@@ -129,7 +138,7 @@ function ConversationPageContent() {
 
   return (
     <ViewTransition>
-      <Activity mode={isProcessingAssessment ? "hidden" : "visible"}>
+      <Activity mode={isProcessingAssessment ? 'hidden' : 'visible'}>
         <PageWrapper>
           <ErrorBoundary>
             <main className="app-page" role="main">
@@ -149,7 +158,7 @@ function ConversationPageContent() {
 }
 
 export default function ConversationPage() {
-  console.log('ConversationPage: Export function called');
+  logger.log('ConversationPage: Export function called');
   return (
     <PaidRouteGuard>
       <ConversationPageContent />

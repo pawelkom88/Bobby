@@ -10,6 +10,7 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   YOUR_AGE: '/app/your-age',
   CHOOSE_EMERGENCY: '/app/choose-emergency',
+  SELECT_PACKAGE: '/app/select-package',
   DIAL: '/app/dial',
   CONVERSATION: '/app/conversation',
   COMPLETION: '/app/completion',

@@ -6,6 +6,7 @@ import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import LoadingSpinner from './LoadingSpinner';
+import { logger } from '@/lib/logger';
 
 interface PaidRouteGuardProps {
   children: ReactNode;
@@ -33,7 +34,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   useEffect(() => {
     // Don't make any decisions until we have SERVER-confirmed data
     if (!isFullyLoaded) {
-      console.log('PaidRouteGuard: Waiting for server-confirmed data...', {
+      logger.log('PaidRouteGuard: Waiting for server-confirmed data...', {
         authLoading,
         creditsLoading,
         isInitialized,
@@ -45,7 +46,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
 
     // If not authenticated, redirect to login
     if (!user) {
-      console.log('PaidRouteGuard: No user, redirecting to login');
+      logger.log('PaidRouteGuard: No user, redirecting to login');
       setAccessDecision('denied');
       router.replace(ROUTES.LOGIN);
       return;
@@ -53,14 +54,13 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
 
     // Now we have SERVER-confirmed credit data
     if (hasCredits) {
-      console.log(
+      logger.log(
         'PaidRouteGuard: ✓ Access granted (server-confirmed credits:',
-        credits,
-        ')'
+        credits
       );
       setAccessDecision('granted');
     } else {
-      console.log(
+      logger.log(
         'PaidRouteGuard: ✗ No credits (server-confirmed), redirecting to dial'
       );
       setAccessDecision('denied');

@@ -13,9 +13,15 @@ import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { logger } from '@/lib/logger';
 
 function DialPageContent() {
-  const { credits, hasCredits, loading: creditsLoading, forceRefreshCredits } = useCredits();
+  const {
+    credits,
+    hasCredits,
+    loading: creditsLoading,
+    forceRefreshCredits,
+  } = useCredits();
   const { user } = useAuth();
   const { clearSession } = useSecureSession();
   const searchParams = useSearchParams();
@@ -26,13 +32,13 @@ function DialPageContent() {
   const hasRefreshedRef = useRef(false);
   const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
 
-  console.log('DialPageContent: Component rendered/updated', {
+  logger.log('DialPageContent: Component rendered/updated', {
     credits,
     hasCredits,
     creditsLoading,
     isRefreshingFromPayment,
     hasVerifiedCredits,
-    user: !!user
+    user: !!user,
   });
 
   // Check for query parameters
@@ -40,15 +46,15 @@ function DialPageContent() {
   const needsCredits = searchParams.get('needsCredits') === 'true';
   const fromSuccess = searchParams.get('fromSuccess') === 'true';
 
-  console.log('DialPageContent: URL params -', {
+  logger.log('DialPageContent: URL params -', {
     canceled,
     needsCredits,
-    fromSuccess
+    fromSuccess,
   });
 
   // Clear session data before starting conversation
   useEffect(() => {
-    console.log('DialPageContent: useEffect - clearSession');
+    logger.log('DialPageContent: useEffect - clearSession');
     clearSession();
   }, [clearSession]);
 
@@ -58,7 +64,9 @@ function DialPageContent() {
       if (fromSuccess && user && !hasRefreshedRef.current) {
         hasRefreshedRef.current = true;
         setIsRefreshingFromPayment(true);
-        console.log('Returning from successful payment, forcing credits refresh');
+        logger.log(
+          'Returning from successful payment, forcing credits refresh'
+        );
 
         try {
           await forceRefreshCredits();
@@ -81,19 +89,24 @@ function DialPageContent() {
 
   // Reset verification state when credits change
   useEffect(() => {
-    console.log('DialPageContent: useEffect - credits changed, resetting hasVerifiedCredits');
+    logger.log(
+      'DialPageContent: useEffect - credits changed, resetting hasVerifiedCredits'
+    );
     setHasVerifiedCredits(false);
   }, [credits]);
 
   // Clean up needsCredits param if user actually has credits
   useEffect(() => {
-    console.log('DialPageContent: useEffect - checking if needsCredits param should be cleaned up', {
-      needsCredits,
-      hasCredits,
-      creditsLoading
-    });
+    logger.log(
+      'DialPageContent: useEffect - checking if needsCredits param should be cleaned up',
+      {
+        needsCredits,
+        hasCredits,
+        creditsLoading,
+      }
+    );
     if (needsCredits && hasCredits && !creditsLoading) {
-      console.log('DialPageContent: Cleaning up needsCredits param from URL');
+      logger.log('DialPageContent: Cleaning up needsCredits param from URL');
       const url = new URL(window.location.href);
       url.searchParams.delete('needsCredits');
       window.history.replaceState({}, '', url.toString());
@@ -101,40 +114,47 @@ function DialPageContent() {
   }, [needsCredits, hasCredits, creditsLoading]);
 
   const handleCorrectNumber = async () => {
-    console.log('handleCorrectNumber called - user should have credits');
+    logger.log('handleCorrectNumber called - user should have credits');
 
     // If we've already verified credits, proceed directly
     if (hasVerifiedCredits && hasCredits) {
-      console.log('Credits already verified, navigating to conversation');
+      logger.log('Credits already verified, navigating to conversation');
       window.location.href = ROUTES.CONVERSATION;
       return;
     }
 
-    console.log('Starting credit verification process...');
+    logger.log('Starting credit verification process...');
 
     // Force a fresh check of credits before proceeding
     if (fromSuccess) {
-      console.log('Post-payment: forcing fresh credit check');
+      logger.log('Post-payment: forcing fresh credit check');
       await forceRefreshCredits();
     }
 
     // Double-check: fetch credits directly to avoid stale state
-    console.log('Final verification: hasCredits =', hasCredits, 'credits =', credits);
+    logger.log(
+      'Final verification: hasCredits =',
+      hasCredits,
+      'credits =',
+      credits
+    );
 
     // CRITICAL: If we don't have credits, don't navigate
     if (!hasCredits) {
-      console.log('No credits available after verification, staying on dial page');
+      logger.log(
+        'No credits available after verification, staying on dial page'
+      );
       return;
     }
 
     // If user has credits, navigate to conversation and mark as verified
-    console.log('User has credits, navigating to conversation');
+    logger.log('User has credits, navigating to conversation');
     setHasVerifiedCredits(true);
     window.location.href = ROUTES.CONVERSATION;
   };
 
   const handleCheckoutNeeded = async () => {
-    console.log('No credits available, starting checkout process');
+    logger.log('No credits available, starting checkout process');
 
     if (!user) {
       console.error('No user found when trying to checkout');
@@ -164,7 +184,7 @@ function DialPageContent() {
       }
 
       const { url } = await response.json();
-      console.log('Redirecting to Stripe checkout:', url);
+      logger.log('Redirecting to Stripe checkout:', url);
       window.location.href = url;
     } catch (error) {
       console.error('Checkout error occurred');
@@ -192,7 +212,8 @@ function DialPageContent() {
               {/* Status messages - only show needsCredits if actually no credits */}
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
-                  Payment was canceled. You can try again when you&apos;re ready!
+                  Payment was canceled. You can try again when you&apos;re
+                  ready!
                 </div>
               )}
               {needsCredits && !hasCredits && !isLoading && (
@@ -201,13 +222,16 @@ function DialPageContent() {
                 </div>
               )}
               {isRefreshingFromPayment && (
-                <div className="dial-message dial-message-success" role="status">
+                <div
+                  className="dial-message dial-message-success"
+                  role="status"
+                >
                   Loading your credits...
                 </div>
               )}
 
               {/* Credits display */}
-              <Activity mode={isProcessingCheckout ? "hidden" : "visible"}>
+              <Activity mode={isProcessingCheckout ? 'hidden' : 'visible'}>
                 {!isLoading && (
                   <div className="dial-credits-display">
                     <span className="dial-credits-label">Credits:</span>
@@ -217,10 +241,14 @@ function DialPageContent() {
               </Activity>
 
               <DialPad
-                onCorrectNumber={hasCredits ? handleCorrectNumber : handleCheckoutNeeded}
+                onCorrectNumber={
+                  hasCredits ? handleCorrectNumber : handleCheckoutNeeded
+                }
                 onBack={handleBack}
                 isLoading={checkoutLoading || isLoading}
-                buttonLabel={hasCredits ? 'CALL' : isLoading ? 'LOADING...' : 'BUY & CALL'}
+                buttonLabel={
+                  hasCredits ? 'CALL' : isLoading ? 'LOADING...' : 'BUY & CALL'
+                }
               />
             </main>
           </ErrorBoundary>

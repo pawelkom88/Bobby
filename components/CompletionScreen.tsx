@@ -12,6 +12,18 @@ import { playFanfareSound } from '@/lib/uiSound';
 import type { Service, AgeTier, PerformanceMetrics, Badge } from '@/types';
 import { logger } from '@/lib/logger';
 import { ROUTES } from '@/lib/routes';
+import Image from 'next/image';
+
+// Determine image based on assessment score
+const getPerformanceImage = (score: number) => {
+  if (score >= 90) {
+    return { src: '/flawless.png', alt: 'Flawless performance!' };
+  }
+  if (score >= 60) {
+    return { src: '/welldone.png', alt: 'Well done!' };
+  }
+  return { src: '/donotworry.png', alt: 'Don\'t worry, keep practicing!' };
+};
 
 interface CompletionScreenProps {
   service?: Service;
@@ -187,6 +199,10 @@ export default function CompletionScreen({
     router.push(ROUTES.ACHIEVEMENTS);
   };
 
+  const { src: imageSrc, alt: imageAlt } = assessment?.score
+    ? getPerformanceImage(assessment.score)
+    : { src: '/donotworry.png', alt: 'Practice session' };
+
   return (
     <div
       className="completion-content-wrapper"
@@ -236,6 +252,7 @@ export default function CompletionScreen({
               </div>
             ) : (
               <div className="completion-message">
+                <Image width={200} height={200} src={imageSrc} alt={imageAlt} />
                 <p>You completed the {service} emergency scenario!</p>
                 {leveledUp && (
                   <div className="level-up-message" role="alert">
