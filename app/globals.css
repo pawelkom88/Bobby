@@ -210,6 +210,11 @@ h6,
   letter-spacing: 0.05em;
 }
 
+.completion-image {
+    margin: 0 auto;
+    display: block;
+}
+
 .completion-actions {
   display: flex;
   flex-direction: column;

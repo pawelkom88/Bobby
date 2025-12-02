@@ -22,7 +22,7 @@ const getPerformanceImage = (score: number) => {
   if (score >= 60) {
     return { src: '/welldone.png', alt: 'Well done!' };
   }
-  return { src: '/donotworry.png', alt: 'Don\'t worry, keep practicing!' };
+  return { src: '/donotworry.png', alt: "Don't worry, keep practicing!" };
 };
 
 interface CompletionScreenProps {
@@ -252,7 +252,14 @@ export default function CompletionScreen({
               </div>
             ) : (
               <div className="completion-message">
-                <Image width={200} height={200} src={imageSrc} alt={imageAlt} />
+                <Image
+                  className="completion-image"
+                  preload
+                  width={200}
+                  height={200}
+                  src={imageSrc}
+                  alt={imageAlt}
+                />
                 <p>You completed the {service} emergency scenario!</p>
                 {leveledUp && (
                   <div className="level-up-message" role="alert">
