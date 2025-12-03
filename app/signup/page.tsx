@@ -85,8 +85,34 @@ function SignUpForm() {
     setErrors({});
 
     try {
-      await signUp(email, password);
-      // Redirect to the intended page or default to /app
+      // 1. Create Firebase user
+      const userCredential = await signUp(email, password);
+      
+      // 2. Get ID token
+      const idToken = await userCredential.user.getIdToken();
+      
+      // 3. Send welcome email (don't block signup if email fails)
+      try {
+        const response = await fetch('/api/send-welcome-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({}),
+        });
+        
+        if (!response.ok) {
+          logger.error('Welcome email failed:', { status: response.status });
+        } else {
+          logger.info('Welcome email sent successfully');
+        }
+      } catch (emailError) {
+        logger.error('Welcome email error:', emailError);
+        // Don't block signup if email fails
+      }
+      
+      // 4. Redirect to the intended page or default to /app
       router.push(redirectUrl);
     } catch (error) {
       logger.error('Sign up error:', error);

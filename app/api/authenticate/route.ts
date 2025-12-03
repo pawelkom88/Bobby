@@ -1,7 +1,11 @@
 import { createClient } from '@deepgram/sdk';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 import { verifyIdToken, getAdminDb } from '@/lib/firebase-admin';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +37,9 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get('authorization');
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logger.warn('Missing or invalid Authorization header for authenticate endpoint');
+      logger.warn(
+        'Missing or invalid Authorization header for authenticate endpoint'
+      );
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -67,13 +73,17 @@ export async function GET(request: Request) {
     const clientIp = getClientIP(request);
     const rateLimitIdentifier = `${userId}:${clientIp}`;
 
-    const rateLimit = await checkRateLimit(request, rateLimitIdentifier);
+    // ✅ NEW: Using pre-configured API rate limiter
+    const rateLimit = await rateLimiters.api.isRateLimited(rateLimitIdentifier);
+
     if (rateLimit.limited) {
       logger.warn('Rate limit exceeded for authenticate endpoint', {
         userId,
         remaining: rateLimit.remaining,
         resetTime: rateLimit.resetTime,
       });
+
+      // ✅ NEW: Using helper for headers
       return NextResponse.json(
         {
           error: 'Too many requests',
@@ -81,13 +91,7 @@ export async function GET(request: Request) {
         },
         {
           status: 429,
-          headers: {
-            'Retry-After': Math.ceil(
-              (rateLimit.resetTime - Date.now()) / 1000
-            ).toString(),
-            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-            'X-RateLimit-Reset': rateLimit.resetTime.toString(),
-          },
+          headers: createRateLimitHeaders(rateLimit),
         }
       );
     }
@@ -101,7 +105,10 @@ export async function GET(request: Request) {
     if (credits <= 0) {
       logger.info('User attempted to get token without credits', { userId });
       return NextResponse.json(
-        { error: 'Insufficient credits. Please purchase more credits to continue.' },
+        {
+          error:
+            'Insufficient credits. Please purchase more credits to continue.',
+        },
         { status: 403 }
       );
     }
@@ -129,7 +136,6 @@ export async function GET(request: Request) {
 
     logger.info('Deepgram token generated successfully', { userId });
     return NextResponse.json({ ...tokenResult });
-
   } catch (error) {
     logger.error('Unexpected error in authenticate endpoint');
     return NextResponse.json(

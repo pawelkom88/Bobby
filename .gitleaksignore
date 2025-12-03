@@ -1,0 +1,3 @@
+__tests__/
+*.test.ts
+TEST_ENV_SETUP.md

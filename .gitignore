@@ -46,3 +46,5 @@ next-env.d.ts
 /.idea/
 /docs/
 /.windsurf/workflows/tdd-credit-deduction.md
+/app/api/test-email/route.ts
+/gitleaks-report.json
