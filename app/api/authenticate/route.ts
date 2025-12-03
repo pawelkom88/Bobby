@@ -1,5 +1,5 @@
 import { createClient } from '@deepgram/sdk';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { logger } from '@/lib/logger';
 import {
   rateLimiters,
@@ -7,6 +7,7 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 import { verifyIdToken, getAdminDb } from '@/lib/firebase-admin';
+import { extractAndValidateToken } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,26 +32,14 @@ export const dynamic = 'force-dynamic';
  * - 429: Rate limited
  * - 500: Server error
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // 1. Extract and verify Authorization header
-    const authHeader = request.headers.get('authorization');
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logger.warn(
-        'Missing or invalid Authorization header for authenticate endpoint'
-      );
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const idToken = authHeader.split('Bearer ')[1];
+    // 1. Extract and validate Bearer token
+    const idToken = extractAndValidateToken(request, 'authenticate');
 
     if (!idToken) {
       return NextResponse.json(
-        { error: 'Missing token in Authorization header' },
+        { error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
     }

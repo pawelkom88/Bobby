@@ -13,6 +13,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import VoiceConversation from './VoiceConversation';
 import { useCreditDeduction } from '@/hooks/useCreditDeduction';
 import { useAuth } from '@/context/AuthContext';
+import { useSecureSession } from '@/hooks/useSecureSession';
 import { logger } from '@/lib/logger';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 
@@ -39,6 +40,7 @@ export default function CreditDeductionIntegration({
   const { user } = useAuth();
   const { state, startConversation, endConversation, deductCredits, reset } =
     useCreditDeduction();
+  const { setConversationComplete } = useSecureSession();
   const [isInitialized, setIsInitialized] = useState(false);
   const [deductionError, setDeductionError] = useState<string | null>(null);
 
@@ -78,6 +80,17 @@ export default function CreditDeductionIntegration({
       try {
         logger.log('Conversation completed, processing credit deduction');
 
+        // CRITICAL: Mark conversation as complete BEFORE credit deduction
+        // This ensures users can access completion page even with 0 credits
+        if (user) {
+          const markedComplete = await setConversationComplete(true);
+          if (!markedComplete) {
+            logger.error('Failed to mark conversation as complete');
+          } else {
+            logger.log('Conversation marked as complete - granting 24-hour access');
+          }
+        }
+
         // 1. End the conversation (set endedAt timestamp)
         if (state.conversationId) {
           const endSuccess = await endConversation(state.conversationId);
@@ -86,7 +99,7 @@ export default function CreditDeductionIntegration({
             logger.warn('Failed to end conversation, but continuing with deduction');
           }
 
-          // 2. Deduct credits
+          // 2. Deduct credits (AFTER marking conversation complete)
           const deductSuccess = await deductCredits(state.conversationId);
 
           if (!deductSuccess) {
@@ -112,7 +125,7 @@ export default function CreditDeductionIntegration({
         }
       }
     },
-    [state.conversationId, endConversation, deductCredits, onComplete]
+    [state.conversationId, endConversation, deductCredits, onComplete, user, setConversationComplete]
   );
 
   /**

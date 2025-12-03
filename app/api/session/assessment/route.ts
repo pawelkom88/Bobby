@@ -3,6 +3,7 @@ import { setAssessmentData, setCompletionId } from '@/lib/session-storage';
 import { verifyIdToken } from '@/lib/firebase-admin';
 import type { AssessmentData } from '@/lib/session-storage';
 import { logger } from '@/lib/logger';
+import { extractAndValidateToken } from '@/lib/auth-utils';
 
 /**
  * POST /api/session/assessment
@@ -27,12 +28,14 @@ import { logger } from '@/lib/logger';
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const idToken = extractAndValidateToken(request, 'session/assessment');
+    
+    if (!idToken) {
+      return NextResponse.json(
+        { error: 'Invalid or missing authorization token' },
+        { status: 401 }
+      );
     }
-
-    const idToken = authHeader.split('Bearer ')[1];
 
     try {
       await verifyIdToken(idToken);

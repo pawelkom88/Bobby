@@ -39,10 +39,13 @@ export interface AssessmentData {
 }
 
 export interface SessionData {
+  userId?: string; // NEW: Store userId for validation
   lastAssessment?: AssessmentData;
   completionId?: string;
   processedCompletionId?: string;
   conversationComplete?: boolean;
+  completedAt?: number; // NEW: Timestamp when conversation completed
+  expiresAt?: number; // NEW: 24-hour expiration timestamp
 }
 
 /**
@@ -111,6 +114,7 @@ export async function clearAllSessionValues(): Promise<void> {
  * Get all session data
  */
 export async function getAllSessionData(): Promise<SessionData> {
+  const userId = await getSessionValue<string>('userId');
   const lastAssessment =
     await getSessionValue<AssessmentData>('lastAssessment');
   const completionId = await getSessionValue<string>('completionId');
@@ -120,12 +124,17 @@ export async function getAllSessionData(): Promise<SessionData> {
   const conversationComplete = await getSessionValue<boolean>(
     'conversationComplete'
   );
+  const completedAt = await getSessionValue<number>('completedAt');
+  const expiresAt = await getSessionValue<number>('expiresAt');
 
   return {
+    userId: userId || undefined,
     lastAssessment: lastAssessment || undefined,
     completionId: completionId || undefined,
     processedCompletionId: processedCompletionId || undefined,
     conversationComplete: conversationComplete || undefined,
+    completedAt: completedAt || undefined,
+    expiresAt: expiresAt || undefined,
   };
 }
 
@@ -172,12 +181,20 @@ export async function getProcessedCompletionId(): Promise<string | null> {
 }
 
 /**
- * Set conversation complete flag
+ * Set conversation complete flag with 24-hour expiration
  */
 export async function setConversationComplete(
+  userId: string,
   complete: boolean
 ): Promise<void> {
+  await setSessionValue('userId', userId); // Store userId for validation
   await setSessionValue('conversationComplete', complete);
+  if (complete) {
+    // Set completion timestamp and 24-hour expiration
+    const now = Date.now();
+    await setSessionValue('completedAt', now);
+    await setSessionValue('expiresAt', now + (24 * 60 * 60 * 1000)); // 24 hours
+  }
 }
 
 /**

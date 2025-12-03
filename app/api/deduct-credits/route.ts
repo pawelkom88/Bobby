@@ -23,6 +23,7 @@ import { CreditTransactionError } from '@/lib/credit-transaction';
 import { calculateDuration } from '@/lib/duration-calculator';
 import { isEligibleForCharge } from '@/lib/charge-eligibility';
 import { logger } from '@/lib/logger';
+import { extractBearerToken } from '@/lib/auth-utils';
 
 // Initialize Firebase Admin lazily (runtime only)
 const auth = getAdminAuth();
@@ -77,17 +78,20 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  authHeader: string | null
+  request: NextRequest
 ): Promise<{ userId: string } | { error: string; status: number }> {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    logger.warn('Missing or invalid Authorization header');
-    return { error: 'Missing or invalid Authorization header', status: 401 };
+  const tokenResult = extractBearerToken(request);
+  
+  if (!tokenResult.success) {
+    logger.warn('Token extraction failed', {
+      error: tokenResult.error,
+      endpoint: 'deduct-credits'
+    });
+    return { error: tokenResult.message, status: 401 };
   }
 
-  const token = authHeader.substring(7);
-
   try {
-    const result = await verifyToken(token => auth.verifyIdToken(token), token);
+    const result = await verifyToken(token => auth.verifyIdToken(token), tokenResult.token);
 
     if (!result.success || !result.uid) {
       logger.warn('Token verification failed');
@@ -244,8 +248,7 @@ export async function POST(
     const { conversationId } = body as DeductCreditsRequest;
 
     // 2. Verify user from token
-    const authHeader = request.headers.get('Authorization');
-    const userResult = await verifyUserFromToken(authHeader);
+    const userResult = await verifyUserFromToken(request);
 
     if ('error' in userResult) {
       return NextResponse.json(

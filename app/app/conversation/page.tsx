@@ -35,7 +35,9 @@ function ConversationPageContent() {
   useEffect(() => {
     const checkConversationStatus = async () => {
       const sessionData = await getSession();
-      if (sessionData?.conversationComplete) {
+      // Only redirect if conversation is complete AND assessment is already stored
+      // This allows the completion flow to work properly
+      if (sessionData?.conversationComplete && sessionData?.lastAssessment) {
         setIsComplete(true);
         // Clear the flag and redirect after a brief moment to show message
         setTimeout(async () => {

@@ -370,6 +370,9 @@ export const rateLimiters = {
 
   // Strict: 10 per minute (for sensitive operations)
   strict: createRateLimiter(10, 60 * 1000, 'strict'),
+
+  // Password reset: 3 per hour per email (prevents email bombing)
+  passwordReset: createRateLimiter(3, 60 * 60 * 1000, 'password_reset'),
 };
 
 // ============================================

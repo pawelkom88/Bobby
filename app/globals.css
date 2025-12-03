@@ -211,8 +211,8 @@ h6,
 }
 
 .completion-image {
-    margin: 0 auto;
-    display: block;
+  margin: 0 auto;
+  display: block;
 }
 
 .completion-actions {
@@ -4912,7 +4912,7 @@ a,
 }
 
 .dial-clear-btn {
-    padding: 1rem 2rem;
+  padding: 1rem 2rem;
   font-size: 1.4rem;
   font-weight: bold;
   background-color: #f44336;
@@ -5434,6 +5434,7 @@ a:focus-visible {
   width: 100%;
   margin-bottom: 20px;
   font-family: 'Chewy', system-ui;
+  text-decoration: none;
 }
 
 .ach-button:hover {
@@ -5479,6 +5480,11 @@ a:focus-visible {
     padding: 20px 32px;
     font-size: 24px;
   }
+}
+
+.login-password-toggle {
+    background: none;
+    border:none
 }
 
 .login-container {

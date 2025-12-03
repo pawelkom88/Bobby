@@ -139,9 +139,45 @@ export function useSecureSession() {
     }
   }, [getAuthHeader]);
 
+  /**
+   * Mark conversation as complete (sets 24-hour expiration)
+   */
+  const setConversationComplete = useCallback(
+    async (complete: boolean): Promise<boolean> => {
+      const authHeader = await getAuthHeader();
+      if (!authHeader) {
+        logger.error('Not authenticated');
+        return false;
+      }
+
+      try {
+        const response = await fetch('/api/session/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authHeader,
+          },
+          body: JSON.stringify({ complete }),
+        });
+
+        if (!response.ok) {
+          logger.error('Failed to set conversation complete:', response.statusText);
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        logger.error('Error setting conversation complete:', error);
+        return false;
+      }
+    },
+    [getAuthHeader]
+  );
+
   return {
     setAssessment,
     getSession,
     clearSession,
+    setConversationComplete,
   };
 }

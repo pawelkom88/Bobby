@@ -3,6 +3,7 @@ import { sendWelcomeEmail } from '@/lib/mailer';
 import { logger } from '@/lib/logger';
 import { rateLimiters, createRateLimitHeaders } from '@/lib/rateLimit';
 import { verifyIdToken, getAdminDb } from '@/lib/firebase-admin';
+import { extractAndValidateToken } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,17 +27,13 @@ export async function POST(request: NextRequest) {
     const name = body.name?.slice(0, 100).trim();
 
     // 3. Auth header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    const idToken = extractAndValidateToken(request, 'send-welcome-email');
+    
+    if (!idToken) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
-    }
-
-    const idToken = authHeader.slice(7);
-    if (!idToken) {
-      return NextResponse.json({ error: 'Missing token' }, { status: 401 });
     }
 
     // 4. Verify token

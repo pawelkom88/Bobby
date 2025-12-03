@@ -13,6 +13,7 @@ import { getAdminAuth } from '@/lib/firebase-admin';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { verifyToken } from '@/lib/token-verifier';
 import { logger } from '@/lib/logger';
+import { extractBearerToken } from '@/lib/auth-utils';
 
 // Initialize Firebase Admin lazily (runtime only)
 const auth = getAdminAuth();
@@ -56,19 +57,22 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  authHeader: string | null
+  request: NextRequest
 ): Promise<{ userId: string } | { error: string; status: number }> {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    logger.warn('Missing or invalid Authorization header');
-    return { error: 'Missing or invalid Authorization header', status: 401 };
+  const tokenResult = extractBearerToken(request);
+  
+  if (!tokenResult.success) {
+    logger.warn('Token extraction failed', {
+      error: tokenResult.error,
+      endpoint: 'conversation/start'
+    });
+    return { error: tokenResult.message, status: 401 };
   }
-
-  const token = authHeader.substring(7);
 
   try {
     const result = await verifyToken(
       (token) => auth.verifyIdToken(token),
-      token
+      tokenResult.token
     );
 
     if (!result.success || !result.uid) {
@@ -109,8 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
     const { ageTier, service } = body as StartConversationRequest;
 
     // 2. Verify user from token
-    const authHeader = request.headers.get('Authorization');
-    const userResult = await verifyUserFromToken(authHeader);
+    const userResult = await verifyUserFromToken(request);
 
     if ('error' in userResult) {
       return NextResponse.json(

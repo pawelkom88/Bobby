@@ -7,7 +7,6 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  sendPasswordResetEmail,
   UserCredential,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -141,9 +140,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string): Promise<void> => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      console.log('Sending password reset request for:', email);
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log('Password reset response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Password reset error response:', errorData);
+        throw new Error(errorData.error || 'Failed to send reset email');
+      }
+
+      const responseData = await response.json();
+      console.log('Password reset success:', responseData);
       logger.info('Password reset email sent to:', email);
     } catch (error) {
+      console.error('Password reset error:', error);
       logger.error('Password reset error:', error);
       throw error;
     }

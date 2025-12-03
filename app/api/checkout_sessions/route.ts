@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { stripe } from '@/lib/stripe';
 import { verifyIdToken } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger';
+import { extractAndValidateToken } from '@/lib/auth-utils';
 
 /**
  * Credit pack configuration - SERVER-SIDE ONLY
@@ -51,21 +52,12 @@ function isValidPackType(packType: string): packType is PackType {
  */
 export async function POST(request: NextRequest) {
   try {
-    // 1. Extract and verify Authorization header
-    const authHeader = request.headers.get('authorization');
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Missing or invalid Authorization header' },
-        { status: 401 }
-      );
-    }
-
-    const idToken = authHeader.split('Bearer ')[1];
-
+    // 1. Extract and validate Bearer token
+    const idToken = extractAndValidateToken(request, 'checkout_sessions');
+    
     if (!idToken) {
       return NextResponse.json(
-        { error: 'Missing token in Authorization header' },
+        { error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
     }

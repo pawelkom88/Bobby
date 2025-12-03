@@ -135,11 +135,9 @@ export default function ForgotPasswordPage() {
 
           <Link
             href={ROUTES.LOGIN}
-            className="login-button"
+            className="ach-button"
             style={{
               textDecoration: 'none',
-              display: 'block',
-              textAlign: 'center',
             }}
           >
             BACK TO LOGIN
@@ -258,7 +256,6 @@ export default function ForgotPasswordPage() {
               </div>
             )}
           </div>
-          Submit Button
           <AuthButton
             type="submit"
             disabled={isSubmitting}
