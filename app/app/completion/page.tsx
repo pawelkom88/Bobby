@@ -12,6 +12,7 @@ import { useUserData } from '@/context/UserDataContext';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { logger } from '@/lib/logger';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const DEFAULT_AGE_TIER: AgeTier = 1;
 const DEFAULT_SITUATION: Service = 'fire';
@@ -27,6 +28,7 @@ function CompletionPageContent() {
   const [selectedSituation, setSelectedSituation] =
     useState<Service>(DEFAULT_SITUATION);
   const [isSessionValid, setIsSessionValid] = useState<boolean | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   useEffect(() => {
     // Get selected values from journey state
@@ -80,6 +82,11 @@ function CompletionPageContent() {
       // Set session as valid
       setIsSessionValid(true);
 
+      // Capture conversation ID if available
+      if (sessionData?.conversationId) {
+        setConversationId(sessionData.conversationId);
+      }
+
       if (sessionData?.lastAssessment) {
         try {
           const data = sessionData.lastAssessment;
@@ -130,11 +137,7 @@ function CompletionPageContent() {
       <ViewTransition>
         <PageWrapper>
           <ErrorBoundary>
-            <main className="app-page" role="main">
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-                <div>Loading...</div>
-              </div>
-            </main>
+            <LoadingSpinner />
           </ErrorBoundary>
         </PageWrapper>
       </ViewTransition>
@@ -150,6 +153,7 @@ function CompletionPageContent() {
               service={selectedSituation}
               ageTier={selectedAgeTier}
               performance={performance}
+              conversationId={conversationId}
             />
           </main>
         </ErrorBoundary>

@@ -46,6 +46,7 @@ export interface SessionData {
   conversationComplete?: boolean;
   completedAt?: number; // NEW: Timestamp when conversation completed
   expiresAt?: number; // NEW: 24-hour expiration timestamp
+  conversationId?: string; // NEW: Store actual Firestore conversation ID
 }
 
 /**
@@ -126,6 +127,7 @@ export async function getAllSessionData(): Promise<SessionData> {
   );
   const completedAt = await getSessionValue<number>('completedAt');
   const expiresAt = await getSessionValue<number>('expiresAt');
+  const conversationId = await getSessionValue<string>('conversationId');
 
   return {
     userId: userId || undefined,
@@ -135,6 +137,7 @@ export async function getAllSessionData(): Promise<SessionData> {
     conversationComplete: conversationComplete || undefined,
     completedAt: completedAt || undefined,
     expiresAt: expiresAt || undefined,
+    conversationId: conversationId || undefined,
   };
 }
 
@@ -195,6 +198,20 @@ export async function setConversationComplete(
     await setSessionValue('completedAt', now);
     await setSessionValue('expiresAt', now + (24 * 60 * 60 * 1000)); // 24 hours
   }
+}
+
+/**
+ * Set conversation ID
+ */
+export async function setConversationId(id: string): Promise<void> {
+  await setSessionValue('conversationId', id);
+}
+
+/**
+ * Get conversation ID
+ */
+export async function getConversationId(): Promise<string | null> {
+  return getSessionValue<string>('conversationId');
 }
 
 /**

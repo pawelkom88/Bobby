@@ -29,12 +29,14 @@ interface CompletionScreenProps {
   service?: Service;
   ageTier?: AgeTier;
   performance?: PerformanceMetrics;
+  conversationId?: string | null;
 }
 
 export default function CompletionScreen({
   service,
   ageTier,
   performance = {},
+  conversationId,
 }: CompletionScreenProps) {
   const router = useRouter();
   const { addXP, saveConversation, awardScoreBadge, getLevel } = useUserData();
@@ -255,7 +257,7 @@ export default function CompletionScreen({
                 <Image
                   className="completion-image"
                   preload
-                  width={200}
+                  width={250}
                   height={200}
                   src={imageSrc}
                   alt={imageAlt}
@@ -363,6 +365,36 @@ export default function CompletionScreen({
             </div>
           </section>
         )}
+
+        <div className="completion-actions">
+          <button
+            onClick={handleContinue}
+            className="cartoon-btn"
+            aria-label="Practice again"
+          >
+            <span>Practice Again</span>
+          </button>
+          <button
+            onClick={handleViewAchievements}
+            className="cartoon-btn cartoon-btn--secondary"
+            aria-label="View achievements"
+          >
+            <span>View Achievements</span>
+          </button>
+          <button
+            onClick={() =>
+              router.push(
+                conversationId
+                  ? `${ROUTES.CHATS}/${conversationId}`
+                  : ROUTES.CHATS
+              )
+            }
+            className="cartoon-btn cartoon-btn--tertiary"
+            aria-label="View conversation history"
+          >
+            <span>View Conversation</span>
+          </button>
+        </div>
       </div>
     </div>
   );

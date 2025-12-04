@@ -15,6 +15,7 @@ import { verifyToken } from '@/lib/token-verifier';
 import { validateOwnership, OwnershipValidationError } from '@/lib/ownership-validator';
 import { logger } from '@/lib/logger';
 import { extractBearerToken } from '@/lib/auth-utils';
+import { ConversationMessage } from '@/types';
 
 // Initialize Firebase Admin lazily (runtime only)
 const auth = getAdminAuth();
@@ -22,6 +23,7 @@ const db = getAdminDb();
 
 interface EndConversationRequest {
   conversationId: string;
+  messages?: ConversationMessage[];
 }
 
 interface EndConversationResponse {
@@ -42,6 +44,20 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
 
   if (!body.conversationId || typeof body.conversationId !== 'string') {
     return { valid: false, error: 'conversationId is required and must be a string' };
+  }
+
+  if (body.messages !== undefined) {
+    if (!Array.isArray(body.messages)) {
+      return { valid: false, error: 'messages must be an array' };
+    }
+    for (const msg of body.messages) {
+      if (!msg.type || !['user', 'agent'].includes(msg.type)) {
+        return { valid: false, error: 'Each message must have type "user" or "agent"' };
+      }
+      if (typeof msg.text !== 'string') {
+        return { valid: false, error: 'Each message must have a text string' };
+      }
+    }
   }
 
   return { valid: true };
@@ -120,7 +136,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
       );
     }
 
-    const { conversationId } = body as EndConversationRequest;
+    const { conversationId, messages } = body as EndConversationRequest;
 
     // 2. Verify user from token
     const userResult = await verifyUserFromToken(request);
@@ -175,12 +191,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
       throw error;
     }
 
-    // 4. Update conversation with server-side end timestamp
+    // 4. Update conversation with server-side end timestamp and messages
     const now = new Date().toISOString();
-    await db.collection('conversations').doc(conversationId).update({
+    const updateData: Record<string, any> = {
       endedAt: now,
       status: 'completed',
-    });
+    };
+
+    if (messages && messages.length > 0) {
+      updateData.messages = messages.map(msg => ({
+        type: msg.type,
+        text: msg.text,
+        timestamp: msg.timestamp || now,
+      }));
+      logger.log(`Saving ${messages.length} messages for conversation ${conversationId}`);
+    }
+
+    await db.collection('conversations').doc(conversationId).update(updateData);
 
     logger.log(`Ended conversation ${conversationId} for user ${userId}`);
 

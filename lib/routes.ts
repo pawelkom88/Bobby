@@ -17,6 +17,7 @@ export const ROUTES = {
   SUCCESS: '/app/success',
   ACHIEVEMENTS: '/app/achievements',
   SETTINGS: '/app/settings',
+  CHATS: '/app/chats',
   CONTACT: '/contact',
   FAQ: '/faq',
 } as const;

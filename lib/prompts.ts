@@ -9,7 +9,7 @@ const AGE_CONFIGS = {
     style:
       'Very gentle and reassuring, like talking to your own child. Use simple words (1-2 syllables). Repeat back what they say to show you\'re listening. Say "well done" often. Give ONE instruction at a time, then wait.',
     location_strategy:
-      'Ask: "What\'s your address? That\'s where your front door is." If they don\'t know, say: "That\'s okay. Can you find a grown-up next door to help?" If no neighbor: "Can you see any letters or numbers on your door or post?" Last resort: "Don\'t worry, we can find you from the phone."',
+      'Ask: "What\'s your address?" If they don\'t know, say: "That\'s okay. Can you find a grown-up next door to help?" If no neighbor: "Can you see any letters or numbers on your door or post?" Last resort: "Don\'t worry, we can find you from the phone."',
     safety_check:
       'Say slowly: "I need you to be really brave now. Get close to mummy. Put your hand flat on her tummy, right in the middle. Can you feel it going up... and down... up... and down? Like when she breathes?" If unclear: "Is she making any sounds? Any snoring or funny noises?"',
     neighbor_escalation:

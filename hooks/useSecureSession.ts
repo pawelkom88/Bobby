@@ -174,10 +174,46 @@ export function useSecureSession() {
     [getAuthHeader]
   );
 
+  /**
+   * Set conversation ID in session
+   */
+  const setConversationId = useCallback(
+    async (conversationId: string): Promise<boolean> => {
+      const authHeader = await getAuthHeader();
+      if (!authHeader) {
+        logger.error('Not authenticated');
+        return false;
+      }
+
+      try {
+        const response = await fetch('/api/session/conversation-id', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authHeader,
+          },
+          body: JSON.stringify({ conversationId }),
+        });
+
+        if (!response.ok) {
+          logger.error('Failed to set conversation ID:', response.statusText);
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        logger.error('Error setting conversation ID:', error);
+        return false;
+      }
+    },
+    [getAuthHeader]
+  );
+
   return {
     setAssessment,
     getSession,
     clearSession,
     setConversationComplete,
+    setConversationId,
   };
 }

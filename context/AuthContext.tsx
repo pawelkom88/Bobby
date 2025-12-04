@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
 import {
   User,
   signInWithEmailAndPassword,
@@ -17,7 +23,11 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<UserCredential>;
-  signUp: (email: string, password: string, name?: string) => Promise<UserCredential>;
+  signUp: (
+    email: string,
+    password: string,
+    name?: string
+  ) => Promise<UserCredential>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
@@ -27,18 +37,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const authStateUpdateResolversRef = useRef<Array<(user: User | null) => void>>([]);
+  const authStateUpdateResolversRef = useRef<
+    Array<(user: User | null) => void>
+  >([]);
 
   useEffect(() => {
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async user => {
       setUser(user);
       setLoading(false);
 
       // Resolve any pending auth state update promises
       const resolvers = authStateUpdateResolversRef.current;
       authStateUpdateResolversRef.current = [];
-      resolvers.forEach((resolve) => resolve(user));
+      resolvers.forEach(resolve => resolve(user));
 
       if (user) {
         logger.info('User authenticated:', { userId: user.uid });
@@ -86,14 +98,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string): Promise<UserCredential> => {
+  const signIn = async (
+    email: string,
+    password: string
+  ): Promise<UserCredential> => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       logger.info('User signed in successfully:', userCredential.user.uid);
 
       // Wait for the auth state to be updated in the context
       // This ensures that by the time signIn() returns, the user state is synchronized
-      await new Promise<User | null>((resolve) => {
+      await new Promise<User | null>(resolve => {
         authStateUpdateResolversRef.current.push(resolve);
       });
 
@@ -104,9 +123,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, name?: string): Promise<UserCredential> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    name?: string
+  ): Promise<UserCredential> => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       logger.info('User signed up successfully:', userCredential.user.uid);
 
       // Create initial user document in Firestore
@@ -119,7 +146,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         lastLogin: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      logger.info('User document created in Firestore:', userCredential.user.uid);
+      logger.info(
+        'User document created in Firestore:',
+        userCredential.user.uid
+      );
 
       return userCredential;
     } catch (error) {
@@ -140,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string): Promise<void> => {
     try {
-      console.log('Sending password reset request for:', email);
+      logger.log('Sending password reset request for:', email);
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: {
@@ -149,19 +179,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email }),
       });
 
-      console.log('Password reset response status:', response.status);
-      
+      logger.log('Password reset response status:', response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Password reset error response:', errorData);
+        logger.error('Password reset error response:', errorData);
         throw new Error(errorData.error || 'Failed to send reset email');
       }
 
       const responseData = await response.json();
-      console.log('Password reset success:', responseData);
+      logger.log('Password reset success:', responseData);
       logger.info('Password reset email sent to:', email);
     } catch (error) {
-      console.error('Password reset error:', error);
+      logger.error('Password reset error:', error);
       logger.error('Password reset error:', error);
       throw error;
     }
@@ -186,4 +216,3 @@ export function useAuth() {
   }
   return context;
 }
-

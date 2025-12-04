@@ -1,0 +1,88 @@
+'use client';
+
+import { useEffect, useState, use } from 'react';
+import { ViewTransition } from 'react';
+import PageWrapper from '@/components/PageWrapper';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import ConversationDetail from '@/components/ConversationDetail';
+import { useAuth } from '@/context/AuthContext';
+import { logger } from '@/lib/logger';
+import { ROUTES } from '@/lib/routes';
+import type { StoredConversation } from '@/types';
+
+interface ConversationDetailPageProps {
+  params: Promise<{ conversationId: string }>;
+}
+
+function ConversationDetailContent({ params }: ConversationDetailPageProps) {
+  const { conversationId } = use(params);
+  const { user } = useAuth();
+  const [conversation, setConversation] = useState<StoredConversation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchConversation() {
+      if (!user || !conversationId) return;
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const token = await user.getIdToken();
+        const response = await fetch(`/api/conversations/${conversationId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Conversation not found');
+          }
+          throw new Error('Failed to fetch conversation');
+        }
+
+        const data = await response.json();
+        setConversation(data.conversation);
+      } catch (err) {
+        logger.error('Error fetching conversation:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load conversation');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchConversation();
+  }, [user, conversationId]);
+
+  const handleBack = () => {
+    window.location.href = ROUTES.CHATS;
+  };
+
+  return (
+    <ViewTransition>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <ConversationDetail
+              conversation={conversation}
+              isLoading={isLoading}
+              error={error}
+              onBack={handleBack}
+            />
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
+    </ViewTransition>
+  );
+}
+
+export default function ConversationDetailPage(props: ConversationDetailPageProps) {
+  return (
+    <ProtectedRoute>
+      <ConversationDetailContent {...props} />
+    </ProtectedRoute>
+  );
+}

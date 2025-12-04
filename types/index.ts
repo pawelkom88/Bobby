@@ -35,6 +35,27 @@ export interface Conversation {
   feedback?: string[];
 }
 
+export interface StoredConversation {
+  id: string;
+  userId: string;
+  ageTier: AgeTier;
+  service: Service;
+  startedAt: string;
+  endedAt?: string;
+  status: 'active' | 'completed';
+  charged: boolean;
+  messages?: ConversationMessage[];
+}
+
+export interface ConversationListItem {
+  id: string;
+  service: Service;
+  ageTier: AgeTier;
+  startedAt: string;
+  endedAt?: string;
+  messageCount: number;
+}
+
 export interface Badge {
   id: string;
   name: string;

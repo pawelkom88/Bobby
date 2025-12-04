@@ -8,9 +8,8 @@ import { CONFIG } from '@/lib/config';
 import LoadingSpinner from './LoadingSpinner';
 import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
-import { startConnectingSound, playEndConversationSound } from '@/lib/uiSound';
+import { playEndConversationSound } from '@/lib/uiSound';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
-import Image from 'next/image';
 import VoiceAnimations from './VoiceAnimations';
 import CartoonTimer from './CartoonTimer';
 import { useDeepgram } from '@/context/DeepgramContextProvider';
@@ -627,9 +626,6 @@ export default function VoiceConversation({
     try {
       setIsConnecting(true);
       setError(null);
-
-      // Start connecting sound
-      stopConnectingSoundRef.current = startConnectingSound(soundEnabled);
 
       if (!disableConnection) {
         // Connect to Deepgram

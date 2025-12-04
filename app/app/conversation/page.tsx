@@ -69,7 +69,8 @@ function ConversationPageContent() {
     );
   }
   const handleConversationComplete = async (
-    conversation: ConversationMessage[]
+    conversation: ConversationMessage[],
+    conversationId: string
   ) => {
     setIsProcessingAssessment(true);
     try {
@@ -111,6 +112,12 @@ function ConversationPageContent() {
         },
         completionId
       );
+      
+      // Store the actual Firestore conversation ID for linking to chat history
+      if (conversationId) {
+        await setConversationId(conversationId);
+        logger.log('Stored conversationId in session:', conversationId);
+      }
 
       if (!stored) {
         logger.error('Failed to store assessment in secure session');
@@ -132,7 +139,7 @@ function ConversationPageContent() {
     }
   };
 
-  const { setAssessment } = useSecureSession();
+  const { setAssessment, setConversationId } = useSecureSession();
 
   const handleBack = () => {
     window.location.href = ROUTES.DIAL;

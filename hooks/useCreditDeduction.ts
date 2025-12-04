@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
+import type { ConversationMessage } from '@/types';
 
 export interface CreditDeductionState {
   conversationId: string | null;
@@ -142,10 +143,10 @@ export function useCreditDeduction() {
   );
 
   /**
-   * End a conversation
+   * End a conversation and save messages
    */
   const endConversation = useCallback(
-    async (conversationId: string) => {
+    async (conversationId: string, messages?: ConversationMessage[]) => {
       if (!user) {
         setState((prev) => ({
           ...prev,
@@ -174,6 +175,7 @@ export function useCreditDeduction() {
           },
           body: JSON.stringify({
             conversationId,
+            messages,
           }),
         });
 

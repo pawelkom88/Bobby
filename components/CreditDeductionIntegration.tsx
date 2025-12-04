@@ -20,7 +20,7 @@ import type { AgeTier, Service, ConversationMessage } from '@/types';
 interface CreditDeductionIntegrationProps {
   ageTier?: AgeTier;
   situation?: Service;
-  onComplete?: (conversation: ConversationMessage[]) => void;
+  onComplete?: (conversation: ConversationMessage[], conversationId: string) => void;
   onBack?: () => void;
   autoStart?: boolean;
   disableConnection?: boolean;
@@ -91,9 +91,9 @@ export default function CreditDeductionIntegration({
           }
         }
 
-        // 1. End the conversation (set endedAt timestamp)
+        // 1. End the conversation (set endedAt timestamp and save messages)
         if (state.conversationId) {
-          const endSuccess = await endConversation(state.conversationId);
+          const endSuccess = await endConversation(state.conversationId, conversation);
 
           if (!endSuccess) {
             logger.warn('Failed to end conversation, but continuing with deduction');
@@ -112,7 +112,7 @@ export default function CreditDeductionIntegration({
 
         // 3. Call the original onComplete callback
         if (onComplete) {
-          onComplete(conversation);
+          onComplete(conversation, state.conversationId || '');
         }
       } catch (error) {
         logger.error('Error processing conversation completion:', error);
@@ -121,7 +121,7 @@ export default function CreditDeductionIntegration({
 
         // Still call onComplete even if deduction fails
         if (onComplete) {
-          onComplete(conversation);
+          onComplete(conversation, state.conversationId || '');
         }
       }
     },
