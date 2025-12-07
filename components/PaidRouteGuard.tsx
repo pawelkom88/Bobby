@@ -19,6 +19,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     loading: creditsLoading,
     isInitialized,
     isServerConfirmed,
+    conversationActive,
   } = useCredits();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -53,10 +54,12 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     }
 
     // Now we have SERVER-confirmed credit data
-    if (hasCredits) {
+    // CRITICAL: If conversation is active, allow access even with 0 credits
+    // This prevents redirect during the completion flow
+    if (hasCredits || conversationActive) {
       logger.log(
         'PaidRouteGuard: ✓ Access granted (server-confirmed credits:',
-        credits
+        conversationActive
       );
       setAccessDecision('granted');
     } else {
@@ -76,14 +79,14 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
     creditsLoading,
     isInitialized,
     isServerConfirmed,
+    conversationActive,
   ]);
 
   // Show loading while waiting for SERVER confirmation
   if (!isFullyLoaded || accessDecision === 'pending') {
     return (
       <div className="paid-route-guard-loading">
-        <LoadingSpinner />
-        <p>Verifying access...</p>
+        <LoadingSpinner text="Verifying access.." />
       </div>
     );
   }

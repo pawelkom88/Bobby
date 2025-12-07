@@ -4,7 +4,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LoadingSpinner text="Loading ..." />}>
       <ProtectedRoute>{children}</ProtectedRoute>
     </Suspense>
   );

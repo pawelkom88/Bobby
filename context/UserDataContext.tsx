@@ -5,14 +5,11 @@ import React, {
   useContext,
   useEffect,
   useState,
-  useCallback,
   ReactNode,
 } from 'react';
 import { useAuth } from './AuthContext';
 import {
-  getUserData,
   initializeUserData,
-  saveUserData,
   saveConversation as firestoreSaveConversation,
   addXP as firestoreAddXP,
   updateSettings as firestoreUpdateSettings,
@@ -40,7 +37,6 @@ interface UserDataContextType {
   userData: UserData;
   loading: boolean;
   
-  // User data operations
   saveConversation: (
     timestamp: string,
     service: Service,
@@ -57,7 +53,6 @@ interface UserDataContextType {
   awardScoreBadge: (score: number) => Promise<Badge | null>;
   resetProgress: () => Promise<void>;
   
-  // Getters (derived from userData state)
   getLevel: () => number;
   getXP: () => number;
   getBadges: () => Badge[];
@@ -83,20 +78,17 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<UserData>(getDefaultUserData());
   const [loading, setLoading] = useState(true);
 
-  // Initialize and subscribe to user data when user is authenticated
   useEffect(() => {
     if (authLoading) {
       return;
     }
 
     if (!user) {
-      // User is not authenticated, use default data
       setUserData(getDefaultUserData());
       setLoading(false);
       return;
     }
 
-    // Initialize user document if it doesn't exist
     const initUser = async () => {
       try {
         await initializeUserData(user.uid);
@@ -107,7 +99,6 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
 
     initUser();
 
-    // Subscribe to real-time updates
     const unsubscribe = subscribeToUserData(user.uid, (data) => {
       setUserData(data);
       setLoading(false);
@@ -118,118 +109,85 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     };
   }, [user, authLoading]);
 
-  // Wrapper functions that use the current user's UID
-  const saveConversation = useCallback(
-    async (
-      timestamp: string,
-      service: Service,
-      ageTier: AgeTier,
-      xpEarned: number,
-      score?: number,
-      feedback?: string[]
-    ) => {
-      if (!user) {
-        throw new Error('User must be authenticated to save conversation');
-      }
-      await firestoreSaveConversation(
-        user.uid,
-        timestamp,
-        service,
-        ageTier,
-        xpEarned,
-        score,
-        feedback
-      );
-    },
-    [user]
-  );
+  const saveConversation = async (
+    timestamp: string,
+    service: Service,
+    ageTier: AgeTier,
+    xpEarned: number,
+    score?: number,
+    feedback?: string[]
+  ) => {
+    if (!user) {
+      throw new Error('User must be authenticated to save conversation');
+    }
+    await firestoreSaveConversation(
+      user.uid,
+      timestamp,
+      service,
+      ageTier,
+      xpEarned,
+      score,
+      feedback
+    );
+  };
 
-  const addXP = useCallback(
-    async (amount: number): Promise<LevelUpResult> => {
-      if (!user) {
-        throw new Error('User must be authenticated to add XP');
-      }
-      return await firestoreAddXP(user.uid, amount);
-    },
-    [user]
-  );
+  const addXP = async (amount: number): Promise<LevelUpResult> => {
+    if (!user) {
+      throw new Error('User must be authenticated to add XP');
+    }
+    return await firestoreAddXP(user.uid, amount);
+  };
 
-  const updateSettings = useCallback(
-    async (newSettings: Partial<UserSettings>) => {
-      if (!user) {
-        throw new Error('User must be authenticated to update settings');
-      }
-      await firestoreUpdateSettings(user.uid, newSettings);
-    },
-    [user]
-  );
+  const updateSettings = async (newSettings: Partial<UserSettings>) => {
+    if (!user) {
+      throw new Error('User must be authenticated to update settings');
+    }
+    await firestoreUpdateSettings(user.uid, newSettings);
+  };
 
-  const setUserName = useCallback(
-    async (name: string) => {
-      if (!user) {
-        throw new Error('User must be authenticated to set user name');
-      }
-      await firestoreSetUserName(user.uid, name);
-    },
-    [user]
-  );
+  const setUserName = async (name: string) => {
+    if (!user) {
+      throw new Error('User must be authenticated to set user name');
+    }
+    await firestoreSetUserName(user.uid, name);
+  };
 
-  const setSelectedAgeTier = useCallback(
-    async (ageTier: AgeTier) => {
-      if (!user) {
-        throw new Error('User must be authenticated to set age tier');
-      }
-      await firestoreSetSelectedAgeTier(user.uid, ageTier);
-    },
-    [user]
-  );
+  const setSelectedAgeTier = async (ageTier: AgeTier) => {
+    if (!user) {
+      throw new Error('User must be authenticated to set age tier');
+    }
+    await firestoreSetSelectedAgeTier(user.uid, ageTier);
+  };
 
-  const setSelectedService = useCallback(
-    async (service: Service) => {
-      if (!user) {
-        throw new Error('User must be authenticated to set service');
-      }
-      await firestoreSetSelectedService(user.uid, service);
-    },
-    [user]
-  );
+  const setSelectedService = async (service: Service) => {
+    if (!user) {
+      throw new Error('User must be authenticated to set service');
+    }
+    await firestoreSetSelectedService(user.uid, service);
+  };
 
-  const awardScoreBadge = useCallback(
-    async (score: number): Promise<Badge | null> => {
-      if (!user) {
-        throw new Error('User must be authenticated to award badge');
-      }
-      return await firestoreAwardScoreBadge(user.uid, score);
-    },
-    [user]
-  );
+  const awardScoreBadge = async (score: number): Promise<Badge | null> => {
+    if (!user) {
+      throw new Error('User must be authenticated to award badge');
+    }
+    return await firestoreAwardScoreBadge(user.uid, score);
+  };
 
-  const resetProgress = useCallback(async () => {
+  const resetProgress = async () => {
     if (!user) {
       throw new Error('User must be authenticated to reset progress');
     }
     await firestoreResetProgress(user.uid);
-  }, [user]);
+  };
 
-  // Getter functions that derive from current state
-  const getLevel = useCallback(() => userData.level, [userData.level]);
-  const getXP = useCallback(() => userData.totalXP, [userData.totalXP]);
-  const getBadges = useCallback(() => userData.badges, [userData.badges]);
-  const getConversations = useCallback(
-    () => userData.conversations,
-    [userData.conversations]
-  );
-  const getSettings = useCallback(
-    () => userData.settings,
-    [userData.settings]
-  );
-  const getJourneyState = useCallback(
-    () => userData.journey,
-    [userData.journey]
-  );
+  const getLevel = () => userData.level;
+  const getXP = () => userData.totalXP;
+  const getBadges = () => userData.badges;
+  const getConversations = () => userData.conversations;
+  const getSettings = () => userData.settings;
+  const getJourneyState = () => userData.journey;
 
-  const getUserProgress = useCallback(() => {
-    // Calculate XP to next level
+  const getUserProgress = () => {
     const levelRanges = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
     const currentLevelEnd = levelRanges[userData.level] || 2700;
     const xpToNextLevel = Math.max(0, currentLevelEnd - userData.totalXP);
@@ -242,7 +200,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
       conversations: userData.conversations,
       userName: userData.userName,
     };
-  }, [userData]);
+  };
 
   const value: UserDataContextType = {
     userData,
@@ -271,9 +229,6 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Hook to use user data context
- */
 export function useUserData(): UserDataContextType {
   const context = useContext(UserDataContext);
   if (context === undefined) {

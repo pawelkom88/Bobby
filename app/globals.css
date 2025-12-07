@@ -1896,7 +1896,7 @@ a,
 .progress-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
   align-items: center;
   justify-items: center;
 }
@@ -2090,6 +2090,10 @@ a,
    ============================================================================ */
 
 .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   max-width: 768px;
   margin: 0 auto;
   width: 100%;
@@ -2101,7 +2105,7 @@ a,
   gap: 0.5rem;
   justify-content: space-around;
   align-items: center;
-  margin-top: auto;
+  z-index: 50;
 }
 
 .bottom-nav-item {
@@ -2353,7 +2357,7 @@ a,
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem 1rem 120px 1rem;
+  padding: 2rem 1rem 1rem 1rem;
 }
 
 .achievements-header {
@@ -3049,7 +3053,7 @@ a,
 /* Accessibility improvements for mobile */
 @media (max-width: 768px) {
   .settings-page {
-    padding: 1.5rem 1rem 120px 1rem;
+    padding: 1.5rem 1rem 1rem;
     gap: 1.5rem;
   }
 
@@ -3093,7 +3097,7 @@ a,
   }
 
   .achievements-page {
-    padding: 1.5rem 1rem 120px 1rem;
+    padding: 1.5rem 1rem 1rem 1rem;
     gap: 1.5rem;
   }
 
@@ -3659,10 +3663,8 @@ a,
   justify-content: center;
 }
 
-/* Reuse accessibility-section for journey cards */
 .age-card,
 .emergency-card,
-.pricing-card,
 .planet-image-container {
   display: flex;
   flex-direction: column;
@@ -6478,7 +6480,7 @@ input {
 .success-container {
   background: white;
   border-radius: 2rem;
-  padding: 3rem;
+  padding: 2rem 1rem;
   max-width: 500px;
   width: 100%;
   text-align: center;
@@ -6492,33 +6494,19 @@ input {
 
 .success-container h1 {
   font-family: 'Chewy', system-ui;
-  font-size: 2rem;
+  font-size: 3rem;
   color: #333;
   margin-bottom: 1rem;
 }
 
 .success-message {
-  font-size: 1.2rem;
-  color: #555;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
 }
 
 .success-email {
-  font-size: 1rem;
-  color: #777;
+  font-size: 1.2rem;
   margin-bottom: 1.5rem;
-}
-
-.success-details {
-  background: #f8f9fa;
-  border-radius: 1rem;
-  padding: 1rem;
-  margin-bottom: 2rem;
-}
-
-.success-details p {
-  margin: 0.5rem 0;
-  color: #555;
 }
 
 .success-cta-button {
@@ -6530,15 +6518,99 @@ input {
   border-radius: 2rem;
   font-family: 'Chewy', system-ui;
   font-size: 1.3rem;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+  box-shadow:
+    0 8px 20px rgba(76, 175, 80, 0.4),
+    0 4px 10px rgba(0, 0, 0, 0.1);
   transition:
     transform 0.2s,
     box-shadow 0.2s;
+  position: relative;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 .success-cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 12px 30px rgba(76, 175, 80, 0.5),
+    0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.success-cta-button:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow:
+    0 6px 15px rgba(76, 175, 80, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.success-cta-button:focus-visible {
+  outline: 4px solid rgba(76, 175, 80, 0.6);
+  outline-offset: 4px;
+}
+
+/* ============================================================================
+   SUCCESS DETAILS PACKAGE-SPECIFIC STYLING
+   ============================================================================ */
+
+.success-details {
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.success-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 1.5rem 1.5rem 0 0;
+  opacity: 0.9;
+}
+
+.success-details.pack-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 105, 189, 0.15) 0%,
+    rgba(59, 89, 152, 0.1) 100%
+  );
+  color: #1a2f5a;
+}
+
+.success-details.pack-responder {
+  background: linear-gradient(
+    135deg,
+    rgba(184, 233, 148, 0.2) 0%,
+    rgba(120, 224, 143, 0.15) 100%
+  );
+  color: #22543d;
+}
+
+.success-details > * {
+  position: relative;
+  z-index: 1;
+}
+
+.success-details p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+}
+
+.success-details p:first-child {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Chewy', system-ui;
+  margin-bottom: 1rem;
 }
 
 /* ============================================================================
@@ -6555,7 +6627,97 @@ input {
   gap: 2rem;
   position: relative;
   border: 2px solid #ffc86433;
-  background: linear-gradient(135deg, #fffffff2 0%, #f0f8ffe6 100%);
+  background: white;
+}
+
+.pricing-card.card-yellow {
+  position: relative;
+}
+
+.pricing-card.card-yellow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 2rem 2rem 0 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.3) 60%,
+      rgba(255, 255, 255, 0.5) 70%,
+      rgba(255, 255, 255, 0.7) 80%,
+      rgba(255, 255, 255, 0.85) 90%,
+      white 100%
+    ),
+    radial-gradient(
+      circle,
+      transparent 20%,
+      #b8e994 20%,
+      #b8e994 80%,
+      transparent 80%,
+      transparent
+    ),
+    radial-gradient(
+        circle,
+        transparent 20%,
+        #b8e994 20%,
+        #b8e994 80%,
+        transparent 80%,
+        transparent
+      )
+      25px 25px,
+    linear-gradient(#78e08f 2px, transparent 2px) 0 -1px,
+    linear-gradient(90deg, #78e08f 2px, #b8e994 2px) -1px 0;
+  background-color: #b8e994;
+  background-size:
+    100% 100%,
+    50px 50px,
+    50px 50px,
+    25px 25px,
+    25px 25px;
+  z-index: 0;
+}
+
+.pricing-card.card-blue {
+  position: relative;
+}
+
+.pricing-card.card-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 2rem 2rem 0 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 30%,
+      rgba(255, 255, 255, 0.05) 40%,
+      rgba(255, 255, 255, 0.15) 55%,
+      rgba(255, 255, 255, 0.3) 65%,
+      rgba(255, 255, 255, 0.5) 75%,
+      rgba(255, 255, 255, 0.7) 85%,
+      rgba(255, 255, 255, 0.9) 95%,
+      white 100%
+    ),
+    repeating-radial-gradient(circle at 0 0, transparent 0, #4a69bd 10px),
+    repeating-linear-gradient(#3b599855, #3b5998);
+  background-color: #4a69bd;
+  z-index: 0;
+}
+
+/* Ensure card content is above the background */
+.pricing-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .character-box {
@@ -6573,6 +6735,7 @@ input {
   background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
 }
 
+/* Package card background patterns - modify existing classes */
 .card-content {
   flex-grow: 1;
 }
@@ -7177,6 +7340,7 @@ input {
 .conversation-card__header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
@@ -7435,6 +7599,39 @@ input {
   .conversation-detail__header {
     padding: 0.75rem;
   }
+}
 
+.skeleton {
+  position: relative;
+  width: 119px;
+  height: 54px;
+  margin: 0 0 1rem 0;
+  background-color: #f4c542;
+  border-radius: 9999px;
+  overflow: hidden;
+}
 
+.shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

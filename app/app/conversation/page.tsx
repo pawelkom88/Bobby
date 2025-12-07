@@ -8,6 +8,7 @@ import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PaidRouteGuard from '@/components/PaidRouteGuard';
 import { useUserData } from '@/context/UserDataContext';
+import { useCredits } from '@/context/CreditsContext';
 import { useSecureSession } from '@/hooks/useSecureSession';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
@@ -24,6 +25,7 @@ function ConversationPageContent() {
   const [isComplete, setIsComplete] = useState(false);
   const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
   const { getJourneyState } = useUserData();
+  const { setConversationActive } = useCredits();
   const { getSession, clearSession } = useSecureSession();
 
   // Get selected values from journey state
@@ -49,6 +51,18 @@ function ConversationPageContent() {
 
     checkConversationStatus();
   }, [getSession, clearSession]);
+
+  // Set conversation as active when component mounts
+  useEffect(() => {
+    logger.log('ConversationPage: Setting conversation as active');
+    setConversationActive(true);
+    
+    // Cleanup: clear conversation active when unmounting or navigating away
+    return () => {
+      logger.log('ConversationPage: Clearing conversation active');
+      setConversationActive(false);
+    };
+  }, [setConversationActive]);
 
   // Show message if trying to return to completed conversation
   if (isComplete) {
@@ -129,10 +143,15 @@ function ConversationPageContent() {
       });
 
       // Navigate to completion
+      // CRITICAL: Clear conversationActive flag before navigation
+      // This prevents the flag from persisting after full page reload
+      setConversationActive(false);
       window.location.href = ROUTES.COMPLETION;
     } catch (error) {
       logger.error('Error assessing conversation', error);
       // Still navigate to completion even if assessment fails
+      // CRITICAL: Clear conversationActive flag before navigation
+      setConversationActive(false);
       window.location.href = ROUTES.COMPLETION;
     } finally {
       setIsProcessingAssessment(false);

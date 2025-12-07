@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Show loading spinner while checking auth
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner text="Loading ..." />;
   }
 
   // If not authenticated, don't render children (redirect will happen)

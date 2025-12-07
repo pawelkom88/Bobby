@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { Providers } from '@/components/Providers';
+import { OptimizedProviders } from '@/components/OptimizedProviders';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com'),
@@ -72,7 +72,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <OptimizedProviders>{children}</OptimizedProviders>
       </body>
     </html>
   );

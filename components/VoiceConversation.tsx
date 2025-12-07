@@ -918,7 +918,7 @@ export default function VoiceConversation({
         className="conversation-ending"
         style={{ textAlign: 'center', padding: '2rem' }}
       >
-        <LoadingSpinner text="" heading="Processing your conversation..." />
+        <LoadingSpinner text="Processing your conversation..." />
       </div>
     );
   }
@@ -969,7 +969,9 @@ export default function VoiceConversation({
           endConversation={endConversation}
         />
       )}
-      {!conversationEnded && !sessionActive && <LoadingSpinner />}
+      {!conversationEnded && !sessionActive && (
+        <LoadingSpinner text="Loading..." />
+      )}
       {error && sessionActive && <SessionError />}
     </div>
   );

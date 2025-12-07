@@ -22,6 +22,8 @@ interface CreditsContextType {
   forceRefreshCredits: () => Promise<void>;
   isInitialized: boolean;
   isServerConfirmed: boolean; // NEW: Explicitly track server confirmation
+  conversationActive: boolean; // NEW: Track if user is in active conversation
+  setConversationActive: (active: boolean) => void; // NEW: Allow setting conversation state
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -37,6 +39,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isServerConfirmed, setIsServerConfirmed] = useState<boolean>(false);
+  const [conversationActive, setConversationActive] = useState<boolean>(false);
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const serverConfirmedRef = useRef<boolean>(false);
@@ -217,6 +220,8 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     forceRefreshCredits,
     isInitialized,
     isServerConfirmed,
+    conversationActive,
+    setConversationActive,
   };
 
   return (

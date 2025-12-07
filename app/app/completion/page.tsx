@@ -137,7 +137,7 @@ function CompletionPageContent() {
       <ViewTransition>
         <PageWrapper>
           <ErrorBoundary>
-            <LoadingSpinner />
+            <LoadingSpinner text="Loading ..." />
           </ErrorBoundary>
         </PageWrapper>
       </ViewTransition>

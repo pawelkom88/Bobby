@@ -6,10 +6,14 @@ import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
-import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { AuthButton } from '@/components/AuthButton';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import AuthPageLayout, {
+  AuthPageHeader,
+  AuthErrorMessage,
+} from '@/components/AuthPageLayout';
+import AuthInput from '@/components/AuthInput';
 
 function LoginForm() {
   const router = useRouter();
@@ -23,11 +27,8 @@ function LoginForm() {
     general?: string;
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Get redirect URL from query params
   const redirectUrl = searchParams.get('redirect') || ROUTES.APP;
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
       router.push(redirectUrl);
@@ -65,25 +66,19 @@ function LoginForm() {
 
     try {
       await signIn(email, password);
-      // Redirect to the intended page or default to /app
       router.push(redirectUrl);
     } catch (error) {
       logger.error('Login error:', error);
 
-      // Handle Firebase Auth errors
       if (error instanceof FirebaseError) {
         switch (error.code) {
           case 'auth/invalid-credential':
           case 'auth/user-not-found':
           case 'auth/wrong-password':
-            setErrors({
-              general: 'Invalid email or password. Please try again.',
-            });
+            setErrors({ general: 'Invalid email or password. Please try again.' });
             break;
           case 'auth/too-many-requests':
-            setErrors({
-              general: 'Too many failed attempts. Please try again later.',
-            });
+            setErrors({ general: 'Too many failed attempts. Please try again later.' });
             break;
           case 'auth/user-disabled':
             setErrors({ general: 'This account has been disabled.' });
@@ -92,9 +87,7 @@ function LoginForm() {
             setErrors({ general: 'Login failed. Please try again.' });
         }
       } else {
-        setErrors({
-          general: 'An unexpected error occurred. Please try again.',
-        });
+        setErrors({ general: 'An unexpected error occurred. Please try again.' });
       }
     } finally {
       setIsSubmitting(false);
@@ -103,199 +96,74 @@ function LoginForm() {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    // Clear error when user starts typing
-    if (errors.email) {
-      setErrors(prev => ({ ...prev, email: undefined }));
-    }
+    if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    // Clear error when user starts typing
-    if (errors.password) {
-      setErrors(prev => ({ ...prev, password: undefined }));
-    }
+    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
   };
 
-  return (
-    <div className="login-page">
-      {/* Decorative sparkles */}
-      <div className="login-sparkle" aria-hidden="true" />
+  if (authLoading) {
+    return <LoadingSpinner text="Redirecting to app..." />;
+  }
 
-      <div
-        className="login-container"
-        role="main"
-        aria-labelledby="login-title"
-      >
-        {/* Character Placeholder */}
-        <Image
-          src="/login-bobby.png"
-          alt="Bobby Logo"
-          width={200}
-          height={200}
-          className="login-character"
+  return (
+    <AuthPageLayout titleId="login-title">
+      <AuthPageHeader title="Welcome Back to Bobby!" titleId="login-title" />
+
+      <form onSubmit={handleSubmit} noValidate aria-describedby="login-description">
+        <p id="login-description" className="sr-only">
+          Please enter your email and password to log in to your Bobby account.
+        </p>
+
+        <AuthInput
+          id="email"
+          type="email"
+          placeholder="Parent Email"
+          value={email}
+          onChange={handleEmailChange}
+          error={errors.email}
+          errorId="email-error"
+          label="Parent Email"
+          icon="user"
+          autoComplete="email"
+          autoFocus
         />
 
-        {/* Welcome Text */}
-        <h1 id="login-title" className="login-title">
-          Welcome Back to Bobby!
-        </h1>
+        <AuthInput
+          id="password"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={handlePasswordChange}
+          error={errors.password}
+          errorId="password-error"
+          label="Password"
+          icon="lock"
+          autoComplete="current-password"
+        />
 
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          aria-describedby="login-description"
-        >
-          <p id="login-description" className="sr-only">
-            Please enter your email and password to log in to your Bobby
-            account.
-          </p>
+        <AuthButton type="submit" disabled={isSubmitting} aria-describedby="login-description">
+          {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
+        </AuthButton>
+      </form>
 
-          {/* Email Input */}
-          <div className="login-input-group">
-            <div
-              className={`login-input-container ${errors.email ? 'login-input-error' : ''}`}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="login-input-icon"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="8" r="5" fill="#A0A0B0" />
-                <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" fill="#A0A0B0" />
-              </svg>
-              <label htmlFor="email" className="sr-only">
-                Parent Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Parent Email"
-                value={email}
-                onChange={handleEmailChange}
-                className="login-input"
-                required
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                autoComplete="email"
-                autoFocus
-              />
-            </div>
-            {errors.email && (
-              <div
-                id="email-error"
-                className="login-error-message"
-                role="alert"
-              >
-                {errors.email}
-              </div>
-            )}
-          </div>
+      <AuthErrorMessage error={errors.general} />
 
-          {/* Password Input */}
-          <div className="login-password-group">
-            <div
-              className={`login-input-container ${errors.password ? 'login-input-error' : ''}`}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="login-input-icon"
-                aria-hidden="true"
-              >
-                <rect
-                  x="5"
-                  y="11"
-                  width="14"
-                  height="10"
-                  rx="2"
-                  fill="#A0A0B0"
-                />
-                <path
-                  d="M8 11V7a4 4 0 018 0v4"
-                  stroke="#A0A0B0"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={handlePasswordChange}
-                className="login-input"
-                required
-                aria-invalid={!!errors.password}
-                aria-describedby={
-                  errors.password ? 'password-error' : undefined
-                }
-                autoComplete="current-password"
-              />
-            </div>
-            {errors.password && (
-              <div
-                id="password-error"
-                className="login-error-message"
-                role="alert"
-              >
-                {errors.password}
-              </div>
-            )}
-          </div>
-
-          {/* Login Button */}
-          <AuthButton
-            type="submit"
-            disabled={isSubmitting}
-            aria-describedby="login-description"
-          >
-            {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
-          </AuthButton>
-        </form>
-
-        {/* Divider */}
-        {/*<div className="login-divider">*/}
-        {/*  <span className="login-divider-text">or</span>*/}
-        {/*</div>*/}
-
-        {/*<GoogleSignInButton />*/}
-
-        {/* General Error Message */}
-        {errors.general && (
-          <div
-            className="reset-warning"
-            role="alert"
-            style={{ marginBottom: '20px', textAlign: 'center' }}
-          >
-            {errors.general}
-          </div>
-        )}
-
-        {/* Forgot Password */}
-        <div className="login-forgot-password">
-          <Link href={ROUTES.FORGOT_PASSWORD} className="login-forgot-link">
-            Password playing hide and seek?
-          </Link>
-        </div>
-
-        {/* Sign Up */}
-        <div className="login-signup">
-          First time caller? <br />
-          <Link href={ROUTES.SIGNUP} className="login-signup-link">
-            Sign up to join the fun!
-          </Link>
-        </div>
+      <div className="login-forgot-password">
+        <Link href={ROUTES.FORGOT_PASSWORD} className="login-forgot-link">
+          Password playing hide and seek?
+        </Link>
       </div>
-    </div>
+
+      <div className="login-signup">
+        First time caller? <br />
+        <Link href={ROUTES.SIGNUP} className="login-signup-link">
+          Sign up to join the fun!
+        </Link>
+      </div>
+    </AuthPageLayout>
   );
 }
 

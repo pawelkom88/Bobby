@@ -33,6 +33,7 @@ export interface Conversation {
   xpEarned: number;
   score?: number;
   feedback?: string[];
+  conversationId?: string;
 }
 
 export interface StoredConversation {

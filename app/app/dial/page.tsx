@@ -195,7 +195,6 @@ function DialPageContent() {
     window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
 
-  // Show loading state while refreshing from payment
   const isLoading = creditsLoading || isRefreshingFromPayment;
 
   return (
@@ -204,7 +203,6 @@ function DialPageContent() {
         <PageWrapper>
           <ErrorBoundary>
             <main className="app-page" role="main">
-              {/* Status messages - only show needsCredits if actually no credits */}
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
                   Payment was canceled. You can try again when you&apos;re
@@ -225,9 +223,12 @@ function DialPageContent() {
                 </div>
               )}
 
-              {/* Credits display */}
               <Activity mode={isProcessingCheckout ? 'hidden' : 'visible'}>
-                {!isLoading && (
+                {isLoading ? (
+                  <div className="skeleton">
+                    <div className="shimmer" />
+                  </div>
+                ) : (
                   <div className="dial-credits-display">
                     <span className="dial-credits-label">Credits:</span>
                     <span className="dial-credits-value">{credits}</span>
@@ -256,7 +257,7 @@ function DialPageContent() {
 
 export default function DialPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LoadingSpinner text="Loading ..." />}>
       <DialPageContent />
     </Suspense>
   );

@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { stripe } from '@/lib/stripe';
 import { ROUTES } from '@/lib/routes';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 import Image from 'next/image';
-import CartoonButton from '@/components/CartoonButton';
+import SuccessPageLayout, {
+  SuccessContent,
+  SuccessDetails,
+} from '@/components/SuccessPageLayout';
 
 export default async function Success({
   searchParams,
@@ -20,42 +22,35 @@ export default async function Success({
     test,
   });
 
-  // Ensure session_id is a string
   const sessionId = Array.isArray(sessionIdParam)
     ? sessionIdParam[0]
     : sessionIdParam;
 
   logger.log('SuccessPage: Processing sessionId:', sessionId);
 
-  // Handle missing session_id gracefully
   if (!sessionId) {
-    logger.log('SuccessPage: No sessionId provided, showing generic success');
+    logger.log(
+      'SuccessPage: No sessionId provided - payment incomplete or invalid'
+    );
     return (
-      <div className="success-page">
-        <div className="success-container">
-          <h1>Payment Successful!</h1>
-          <Image
-            src="/bobby-payment-successful.png"
-            alt="Success"
-            width={250}
-            height={200}
-          />
-          <p className="success-message">
-            Thank you for your purchase! Your credits have been added to your
-            account.
-          </p>
-          <p className="success-email">
-            You should receive a confirmation email from Stripe shortly.
-          </p>
-          <CartoonButton asLink href={`${ROUTES.DIAL}?fromSuccess=true`}>
-            Let's go !
-          </CartoonButton>
-        </div>
-      </div>
+      <SuccessPageLayout>
+        <Image
+          src="/bobby-payment-failed.png"
+          alt="Success"
+          width={250}
+          height={200}
+        />
+        <SuccessContent
+          title="Payment Incomplete"
+          message="We couldn't verify your payment status. Please check your email or try again."
+          email="If you completed a payment, your credits will be added automatically."
+          ctaText="Try Again"
+          ctaHref={ROUTES.SELECT_PACKAGE}
+        />
+      </SuccessPageLayout>
     );
   }
 
-  // Check if user is authenticated (has bobby_auth cookie)
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has('bobby_auth');
   logger.log('SuccessPage: User authenticated:', isAuthenticated);
@@ -69,111 +64,94 @@ export default async function Success({
     const { status, customer_details, metadata } = session;
     logger.log('SuccessPage: Session status:', status);
 
-    // Session is still open (payment not complete)
     if (status === 'open') {
       logger.log('SuccessPage: Session still open, redirecting to dial');
       return redirect(ROUTES.DIAL);
     }
 
-    // Session expired
     if (status === 'expired') {
       logger.log('SuccessPage: Session expired');
       return (
-        <div className="success-page">
-          <div className="success-container">
-            <h1>Session Expired</h1>
-            <p>This payment session has expired.</p>
-            <Link
-              href={`${ROUTES.DIAL}?fromSuccess=true`}
-              className="success-cta-button"
-            >
-              Try Again
-            </Link>
-          </div>
-        </div>
+        <SuccessPageLayout>
+          <Image
+            src="/bobby-payment-failed.png"
+            alt="Success"
+            width={250}
+            height={200}
+          />
+          <SuccessContent
+            title="Session Expired"
+            message="This payment session has expired."
+            ctaText="Try Again"
+          />
+        </SuccessPageLayout>
       );
     }
 
-    // Payment complete
+    if (status !== 'complete') {
+      logger.log('SuccessPage: Payment failed or cancelled', { status });
+      return (
+        <SuccessPageLayout>
+          <Image
+            src="/bobby-payment-failed.png"
+            alt="Success"
+            width={250}
+            height={200}
+          />
+          <SuccessContent
+            title="Payment Failed"
+            message="Your payment could not be processed. Please try again or contact your bank."
+            email="You were not charged. Please try a different payment method if the issue persists."
+            ctaText="Try Again"
+            ctaHref={ROUTES.SELECT_PACKAGE}
+          />
+        </SuccessPageLayout>
+      );
+    }
+
     if (status === 'complete') {
       const sessionEmail = customer_details?.email;
       const credits = metadata?.credits || '0';
       const packType = metadata?.packType || 'credits';
       logger.log('SuccessPage: Payment complete, credits:', credits);
 
-      // If user is authenticated, show full details
-      // Otherwise, show generic success message to prevent information disclosure
-      if (isAuthenticated) {
-        return (
-          <div className="success-page">
-            <div className="success-container">
-              <div className="success-icon">🎉</div>
-              <h1>Payment Successful!</h1>
-              <p className="success-message">
-                Thank you for your purchase! You&apos;ve received{' '}
-                <strong>{credits} credits</strong>.
-              </p>
-              <p className="success-email">
-                A confirmation email will be sent to{' '}
-                <strong>{sessionEmail || 'you'}</strong>.
-              </p>
-              <div className="success-details">
-                <p>
-                  Pack: {packType.charAt(0).toUpperCase() + packType.slice(1)}
-                </p>
-                <p>Credits Added: {credits}</p>
-              </div>
-              <Link
-                href={`${ROUTES.DIAL}?fromSuccess=true`}
-                className="success-cta-button"
-              >
-                Start Practicing! 📞
-              </Link>
-            </div>
-          </div>
-        );
-      } else {
-        // Not authenticated - show generic message to prevent information disclosure
-        return (
-          <div className="success-page">
-            <div className="success-container">
-              <div className="success-icon">🎉</div>
-              <h1>Payment Successful!</h1>
-              <p className="success-message">
-                Thank you for your purchase! Your credits have been added to
-                your account.
-              </p>
-              <p className="success-email">
-                You should receive a confirmation email from Stripe shortly.
-              </p>
-              <div className="success-note">
-                <p>
-                  <em>Please log in to view your purchase details.</em>
-                </p>
-              </div>
-              <Link
-                href={`${ROUTES.DIAL}?fromSuccess=true`}
-                className="success-cta-button"
-              >
-                Start Practicing! 📞
-              </Link>
-            </div>
-          </div>
-        );
-      }
+      return (
+        <SuccessPageLayout>
+          <Image
+            src="/bobby-payment-successful.png"
+            alt="Success"
+            width={250}
+            height={200}
+          />
+          <SuccessContent
+            title="Payment Successful!"
+            message={`Thank you for your purchase! You've received ${credits} credits.`}
+            email={`A confirmation email will be sent to ${sessionEmail || 'you'}.`}
+            ctaText="Start Practicing!"
+          >
+            <SuccessDetails packType={packType} />
+          </SuccessContent>
+        </SuccessPageLayout>
+      );
     }
 
-    // Unknown status
+    logger.log('SuccessPage: Unhandled session status', { status });
     return (
-      <div className="success-page">
-        <div className="success-container">
-          <h1>Payment Status Unknown</h1>
-          <p>Please check your email for confirmation.</p>
-          <Link href={ROUTES.DIAL} className="success-cta-button">
-            Go to Practice
-          </Link>
-        </div>
-      </div>
+      <SuccessPageLayout>
+        <Image
+          src="/bobby-payment-failed.png"
+          alt="Success"
+          width={250}
+          height={200}
+        />
+        <SuccessContent
+          title="Payment Status Unclear"
+          message="We couldn't determine your payment status. Please check your email for confirmation."
+          email="If you were charged, your credits will be added automatically. Otherwise, please try again."
+          ctaText="Check Payment Status"
+          ctaHref={ROUTES.SELECT_PACKAGE}
+        />
+      </SuccessPageLayout>
     );
   } catch (error) {
     logger.error('Success page - Error retrieving session:', {
@@ -183,21 +161,19 @@ export default async function Success({
       stack: error instanceof Error ? error.stack : undefined,
     });
     return (
-      <div className="success-page">
-        <div className="success-container">
-          <h1>Something Went Wrong</h1>
-          <p>
-            We couldn&apos;t verify your payment. Please contact support if you
-            were charged.
-          </p>
-          <Link
-            href={`${ROUTES.DIAL}?fromSuccess=true`}
-            className="success-cta-button"
-          >
-            Go to Practice
-          </Link>
-        </div>
-      </div>
+      <SuccessPageLayout>
+        <Image
+          src="/bobby-payment-failed.png"
+          alt="Success"
+          width={250}
+          height={200}
+        />
+        <SuccessContent
+          title="Something Went Wrong"
+          message="We couldn't verify your payment. Please contact support if you were charged."
+          ctaText="Go to Practice"
+        />
+      </SuccessPageLayout>
     );
   }
 }

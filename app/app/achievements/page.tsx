@@ -4,12 +4,9 @@ import { ViewTransition } from 'react';
 import LevelProgress from '@/components/LevelProgress';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
-import { useUserData } from '@/context/UserDataContext';
+import TrainingHistorySection from '@/components/TrainingHistorySection';
 
 export default function AchievementsPage() {
-  const { getUserProgress } = useUserData();
-  const progress = getUserProgress();
-
   return (
     <ViewTransition>
       <PageWrapper>
@@ -44,35 +41,7 @@ export default function AchievementsPage() {
             >
               <h2 id="history-heading">Training History</h2>
               <div className="achievements-card">
-                {progress.conversations.length === 0 ? (
-                  <p className="no-history">
-                    No training sessions yet. Start your first scenario!
-                  </p>
-                ) : (
-                  <ul className="conversation-list" role="list">
-                    {progress.conversations
-                      .slice()
-                      .reverse()
-                      .slice(0, 10)
-                      .map((conv, index) => (
-                        <li
-                          key={index}
-                          className="conversation-item"
-                          role="listitem"
-                        >
-                          <div className="conversation-service">
-                            {conv.service.toUpperCase()}
-                          </div>
-                          <div className="conversation-date">
-                            {new Date(conv.timestamp).toLocaleDateString()}
-                          </div>
-                          <div className="conversation-xp">
-                            +{conv.xpEarned} XP
-                          </div>
-                        </li>
-                      ))}
-                  </ul>
-                )}
+                <TrainingHistorySection />
               </div>
             </section>
           </div>

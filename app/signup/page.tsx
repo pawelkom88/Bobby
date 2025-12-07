@@ -6,11 +6,36 @@ import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
-import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { validatePassword, validateEmail } from '@/lib/validation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { AuthButton } from '@/components/AuthButton';
+import AuthPageLayout, {
+  AuthPageHeader,
+  AuthErrorMessage,
+} from '@/components/AuthPageLayout';
+import AuthInput from '@/components/AuthInput';
+
+function PasswordStrengthIndicator({
+  strength,
+}: {
+  strength: 'weak' | 'fair' | 'good' | 'strong' | null;
+}) {
+  if (!strength) return null;
+
+  return (
+    <div
+      className={`password-strength password-strength-${strength}`}
+      aria-live="polite"
+    >
+      <br />
+      Password strength:{' '}
+      <strong style={{ color: strength === 'weak' ? 'red' : 'green' }}>
+        {strength}
+      </strong>
+    </div>
+  );
+}
 
 function SignUpForm() {
   const router = useRouter();
@@ -30,10 +55,8 @@ function SignUpForm() {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get redirect URL from query params
   const redirectUrl = searchParams.get('redirect') || ROUTES.APP;
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
       router.push(redirectUrl);
@@ -47,19 +70,16 @@ function SignUpForm() {
       confirmPassword?: string;
     } = {};
 
-    // Validate email
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
       newErrors.email = emailValidation.error;
     }
 
-    // Validate password with strong requirements
     if (!password.trim()) {
       newErrors.password = 'Password is required';
     } else {
       const passwordValidation = validatePassword(password);
       if (!passwordValidation.valid) {
-        // Show the first error for cleaner UX
         newErrors.password = passwordValidation.errors[0];
       }
     }
@@ -76,32 +96,25 @@ function SignUpForm() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     setErrors({});
 
     try {
-      // 1. Create Firebase user
       const userCredential = await signUp(email, password);
-      
-      // 2. Get ID token
       const idToken = await userCredential.user.getIdToken();
-      
-      // 3. Send welcome email (don't block signup if email fails)
+
+      // Send welcome email (don't block signup if email fails)
       try {
         const response = await fetch('/api/send-welcome-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`,
+            Authorization: `Bearer ${idToken}`,
           },
           body: JSON.stringify({}),
         });
-        
         if (!response.ok) {
           logger.error('Welcome email failed:', { status: response.status });
         } else {
@@ -109,44 +122,31 @@ function SignUpForm() {
         }
       } catch (emailError) {
         logger.error('Welcome email error:', emailError);
-        // Don't block signup if email fails
       }
-      
-      // 4. Redirect to the intended page or default to /app
+
       router.push(redirectUrl);
     } catch (error) {
       logger.error('Sign up error:', error);
 
-      // Handle Firebase Auth errors
       if (error instanceof FirebaseError) {
         switch (error.code) {
           case 'auth/email-already-in-use':
-            setErrors({
-              general:
-                'This email is already registered. Please log in instead.',
-            });
+            setErrors({ general: 'This email is already registered. Please log in instead.' });
             break;
           case 'auth/invalid-email':
             setErrors({ email: 'Invalid email address.' });
             break;
           case 'auth/operation-not-allowed':
-            setErrors({
-              general:
-                'Email/password accounts are not enabled. Please contact support.',
-            });
+            setErrors({ general: 'Email/password accounts are not enabled. Please contact support.' });
             break;
           case 'auth/weak-password':
-            setErrors({
-              password: 'Password is too weak. Please use a stronger password.',
-            });
+            setErrors({ password: 'Password is too weak. Please use a stronger password.' });
             break;
           default:
             setErrors({ general: 'Sign up failed. Please try again.' });
         }
       } else {
-        setErrors({
-          general: 'An unexpected error occurred. Please try again.',
-        });
+        setErrors({ general: 'An unexpected error occurred. Please try again.' });
       }
     } finally {
       setIsSubmitting(false);
@@ -155,16 +155,13 @@ function SignUpForm() {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    if (errors.email) {
-      setErrors(prev => ({ ...prev, email: undefined }));
-    }
+    if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
 
-    // Update password strength indicator
     if (newPassword.length > 0) {
       const validation = validatePassword(newPassword);
       setPasswordStrength(validation.strength);
@@ -172,267 +169,89 @@ function SignUpForm() {
       setPasswordStrength(null);
     }
 
-    if (errors.password) {
-      setErrors(prev => ({ ...prev, password: undefined }));
-    }
+    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
   };
 
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
-    if (errors.confirmPassword) {
-      setErrors(prev => ({ ...prev, confirmPassword: undefined }));
-    }
+    if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined }));
   };
 
   return (
-    <div className="login-page">
-      {/* Decorative sparkles */}
-      <div className="login-sparkle" aria-hidden="true" />
+    <AuthPageLayout titleId="signup-title">
+      <AuthPageHeader title="Join Bobby!" titleId="signup-title" />
 
-      <div
-        className="login-container"
-        role="main"
-        aria-labelledby="signup-title"
-      >
-        {/* Character Placeholder */}
-        <Image
-          src="/login-bobby.png"
-          alt="Bobby Logo"
-          width={200}
-          height={200}
-          className="login-character"
+      <form onSubmit={handleSubmit} noValidate aria-describedby="signup-description">
+        <p id="signup-description" className="sr-only">
+          Create your Bobby account by entering your email and password.
+        </p>
+
+        <AuthInput
+          id="email"
+          type="email"
+          placeholder="Parent Email"
+          value={email}
+          onChange={handleEmailChange}
+          error={errors.email}
+          errorId="email-error"
+          label="Parent Email"
+          icon="user"
+          autoComplete="email"
+          autoFocus
         />
 
-        {/* Welcome Text */}
-        <h1 id="login-title" className="login-title">
-          Join Bobby!
-        </h1>
-
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          aria-describedby="signup-description"
+        <AuthInput
+          id="password"
+          type="password"
+          placeholder="Password (min 8 characters)"
+          value={password}
+          onChange={handlePasswordChange}
+          error={errors.password}
+          errorId="password-error"
+          label="Password"
+          icon="lock"
+          autoComplete="new-password"
+          describedBy={errors.password ? undefined : 'password-requirements'}
         >
-          <p id="signup-description" className="sr-only">
-            Create your Bobby account by entering your email and password.
-          </p>
-          {/* Email Input */}
-          <div className="login-input-group">
-            <div
-              className={`login-input-container ${errors.email ? 'login-input-error' : ''}`}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="login-input-icon"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="8" r="5" fill="#A0A0B0" />
-                <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" fill="#A0A0B0" />
-              </svg>
-              <label htmlFor="email" className="sr-only">
-                Parent Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Parent Email"
-                value={email}
-                onChange={handleEmailChange}
-                className="login-input"
-                required
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                autoComplete="email"
-                autoFocus
-              />
-            </div>
-            {errors.email && (
-              <div
-                id="email-error"
-                className="login-error-message"
-                role="alert"
-              >
-                {errors.email}
-              </div>
-            )}
+          <PasswordStrengthIndicator strength={passwordStrength} />
+          <div id="password-requirements" className="sr-only">
+            Password must be at least 8 characters with uppercase, lowercase, number, and special character
           </div>
-          {/* Password Input */}
-          <div className="login-password-group">
-            <div
-              className={`login-input-container ${errors.password ? 'login-input-error' : ''}`}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="login-input-icon"
-                aria-hidden="true"
-              >
-                <rect
-                  x="5"
-                  y="11"
-                  width="14"
-                  height="10"
-                  rx="2"
-                  fill="#A0A0B0"
-                />
-                <path
-                  d="M8 11V7a4 4 0 018 0v4"
-                  stroke="#A0A0B0"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Password (min 8 characters)"
-                value={password}
-                onChange={handlePasswordChange}
-                className="login-input"
-                required
-                aria-invalid={!!errors.password}
-                aria-describedby={
-                  errors.password ? 'password-error' : 'password-requirements'
-                }
-                autoComplete="new-password"
-              />
-            </div>
-            {/* Password strength indicator */}
-            {passwordStrength && (
-              <div
-                className={`password-strength password-strength-${passwordStrength}`}
-                aria-live="polite"
-              >
-                <br />
-                Password strength:{' '}
-                <strong
-                  style={{
-                    color: passwordStrength === 'weak' ? 'red' : 'green',
-                  }}
-                >
-                  {passwordStrength}
-                </strong>
-              </div>
-            )}
-            {errors.password && (
-              <div
-                id="password-error"
-                className="login-error-message"
-                role="alert"
-              >
-                {errors.password}
-              </div>
-            )}
-            <div id="password-requirements" className="sr-only">
-              Password must be at least 8 characters with uppercase, lowercase,
-              number, and special character
-            </div>
-          </div>
-          {/* Confirm Password Input */}
-          <div className="login-password-group">
-            <div
-              className={`login-input-container ${errors.confirmPassword ? 'login-input-error' : ''}`}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="login-input-icon"
-                aria-hidden="true"
-              >
-                <rect
-                  x="5"
-                  y="11"
-                  width="14"
-                  height="10"
-                  rx="2"
-                  fill="#A0A0B0"
-                />
-                <path
-                  d="M8 11V7a4 4 0 018 0v4"
-                  stroke="#A0A0B0"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              <label htmlFor="confirm-password" className="sr-only">
-                Confirm Password
-              </label>
-              <input
-                id="confirm-password"
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
-                className="login-input"
-                required
-                aria-invalid={!!errors.confirmPassword}
-                aria-describedby={
-                  errors.confirmPassword ? 'confirm-password-error' : undefined
-                }
-                autoComplete="new-password"
-              />
-            </div>
-            {errors.confirmPassword && (
-              <div
-                id="confirm-password-error"
-                className="login-error-message"
-                role="alert"
-              >
-                {errors.confirmPassword}
-              </div>
-            )}
-          </div>
-          <AuthButton
-            type="submit"
-            disabled={isSubmitting}
-            aria-describedby="signup-description"
-          >
-            {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}
-          </AuthButton>
-        </form>
+        </AuthInput>
 
-        {/* Divider */}
-        {/*<div className="login-divider">*/}
-        {/*  <span className="login-divider-text">or</span>*/}
-        {/*</div>*/}
+        <AuthInput
+          id="confirm-password"
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={handleConfirmPasswordChange}
+          error={errors.confirmPassword}
+          errorId="confirm-password-error"
+          label="Confirm Password"
+          icon="lock"
+          autoComplete="new-password"
+        />
 
-        {/*<GoogleSignInButton />*/}
-        {errors.general && (
-          <div
-            className="reset-warning"
-            role="alert"
-            style={{ marginBottom: '20px', textAlign: 'center' }}
-          >
-            {errors.general}
-          </div>
-        )}
-        {/* Already have account */}
-        <div className="login-signup">
-          Already part of the team?{' '}
-          <Link href={ROUTES.LOGIN} className="login-signup-link">
-            Jump back in!
-          </Link>
-        </div>
+        <AuthButton type="submit" disabled={isSubmitting} aria-describedby="signup-description">
+          {isSubmitting ? 'CREATING ACCOUNT...' : 'SIGN UP'}
+        </AuthButton>
+      </form>
+
+      <AuthErrorMessage error={errors.general} />
+
+      <div className="login-signup">
+        Already part of the team?{' '}
+        <Link href={ROUTES.LOGIN} className="login-signup-link">
+          Jump back in!
+        </Link>
       </div>
-    </div>
+    </AuthPageLayout>
   );
 }
 
 export default function SignUpPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LoadingSpinner text="Loading ..." />}>
       <SignUpForm />
     </Suspense>
   );

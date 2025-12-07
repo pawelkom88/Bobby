@@ -15,7 +15,7 @@ const AGE_CONFIGS = {
     neighbor_escalation:
       'If child struggles with instructions: "Is there a safe grown-up nearby? A neighbor you know? Can you run to get them and bring them back?"',
     speakerphone_instruction:
-      '"Can you press the speaker button on the phone? It looks like a little loudspeaker. Then put the phone on the floor next to you. That way your hands are free to help."',
+      '"Can you put the phone on the floor next to you. That way your hands are free to help."',
     forbidden:
       'Never use medical terms. Never ask them to do anything complicated. Never sound rushed or worried. Never give multiple instructions at once.',
   },
@@ -60,19 +60,15 @@ function getSilencePhrases(
   const phrases = {
     '5–7 years old': [
       'Are you still there?',
-      "It's okay, I'm right here with you.",
-      'Can you tell me what happened?',
-      "I'm waiting for you to talk to me.",
+      'Talk to me mate.',
       "Don't worry, take your time.",
       'Are you okay?',
       "Tell me when you're ready.",
-      'I can hear you breathing. Take your time.',
     ],
     '8–10 years old': [
       'Are you still there?',
       "I'm still on the line with you.",
       "What's going on?",
-      'You can tell me anything.',
       "Take your time, I'm listening.",
       'Are you okay?',
       "Let me know what's happening.",
@@ -82,7 +78,6 @@ function getSilencePhrases(
       'Everything alright?',
       'Can you update me on the situation?',
       "Let me know what's going on.",
-      "I'm still listening.",
       'Take your time if you need it.',
       'Are you okay?',
       "What's the latest?",
@@ -926,7 +921,6 @@ In real UK 999 calls from mobiles, if a caller can't speak, they need to press 5
 
 **If child indicates they can't speak freely:**
 → "If you can't speak, that's okay. I'm going to ask you questions. You can tap the phone for answers."
-→ "Tap once for yes. Tap twice for no. Can you do that?"
 → "Is there someone dangerous in the house with you? Tap once for yes, twice for no."
 → Keep questions simple and answerable with taps
 → "The police are coming. You don't need to say anything. Just stay hidden and keep the phone with you."

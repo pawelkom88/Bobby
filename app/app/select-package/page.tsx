@@ -116,12 +116,12 @@ function SelectPackagePageContent() {
   // KEY FIX: Don't render UI until we have SERVER-CONFIRMED credits state
   // This prevents the flash of package selection UI
   if (authLoading || creditsLoading || !isServerConfirmed) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner text="Loading ..." />;
   }
 
   // If user has credits, show loading while redirect happens
   if (hasCredits) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner text="Loading ..." />;
   }
 
   return (
@@ -192,7 +192,7 @@ function SelectPackagePageContent() {
 
 export default function SelectPackagePage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LoadingSpinner text="Loading ..." />}>
       <SelectPackagePageContent />
     </Suspense>
   );
@@ -213,7 +213,7 @@ function PackCard({
 
   return (
     <>
-      <div className={`pricing-card ${isHero ? 'card-yellow' : 'card-blue'}`}>
+      <div className={`pricing-card ${isHero ? 'card-blue' : 'card-yellow'}`}>
         <Image
           width={150}
           height={150}

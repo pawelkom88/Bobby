@@ -1,39 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { ViewTransition } from 'react';
 import AccessibilitySection from '@/components/AccessibilitySection';
-import CartoonButton from '@/components/CartoonButton';
 import PageWrapper from '@/components/PageWrapper';
 import LogoutButton from '@/components/LogoutButton';
-import { useUserData } from '@/context/UserDataContext';
+import ResetProgressSection from '@/components/ResetProgressSection';
+import DeleteAccountSection from '@/components/DeleteAccountSection';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
-import { logger } from '@/lib/logger';
 
 export default function SettingsPage() {
-  const { resetProgress } = useUserData();
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [resetConfirmed, setResetConfirmed] = useState(false);
-
-  const handleResetProgress = async () => {
-    if (showResetConfirm) {
-      try {
-        await resetProgress();
-        setShowResetConfirm(false);
-        setResetConfirmed(true);
-      } catch (error) {
-        logger.error('Error resetting progress:', error);
-      }
-    } else {
-      setShowResetConfirm(true);
-    }
-  };
-
-  const handleCancelReset = () => {
-    setShowResetConfirm(false);
-  };
-
   return (
     <ViewTransition>
       <PageWrapper>
@@ -54,45 +30,7 @@ export default function SettingsPage() {
               aria-labelledby="progress-heading"
             >
               <h2 id="progress-heading">Progress</h2>
-              {!showResetConfirm ? (
-                <div className="progress-section">
-                  <p>Reset all progress, badges, and conversation history.</p>
-                  <CartoonButton
-                    onClick={handleResetProgress}
-                    ariaLabel="Reset progress"
-                    className="cartoon-btn-danger"
-                  >
-                    💣 Reset Progress
-                  </CartoonButton>
-                  {resetConfirmed && (
-                    <p className="reset-confirmation" role="alert">
-                      Progress reset successfully.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <p className="reset-warning" role="alert">
-                    Are you sure you want to reset all progress? This cannot be
-                    undone.
-                  </p>
-                  <div className="reset-actions">
-                    <CartoonButton
-                      onClick={handleResetProgress}
-                      ariaLabel="Confirm reset progress"
-                      className="cartoon-btn-danger"
-                    >
-                      Yes, Reset Everything
-                    </CartoonButton>
-                    <CartoonButton
-                      onClick={handleCancelReset}
-                      ariaLabel="Cancel reset"
-                    >
-                      Cancel
-                    </CartoonButton>
-                  </div>
-                </>
-              )}
+              <ResetProgressSection />
             </section>
 
             <section
@@ -102,6 +40,7 @@ export default function SettingsPage() {
               <h2 id="account-heading">Account</h2>
               <div className="progress-section">
                 <LogoutButton className="cartoon-btn">← Sign Out</LogoutButton>
+                <DeleteAccountSection />
               </div>
             </section>
 
