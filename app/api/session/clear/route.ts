@@ -3,6 +3,11 @@ import { clearAllSessionValues } from '@/lib/session-storage';
 import { verifyIdToken } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 
 /**
  * POST /api/session/clear
@@ -33,12 +38,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let decodedToken: { uid: string };
     try {
-      await verifyIdToken(idToken);
+      decodedToken = await verifyIdToken(idToken);
     } catch {
       return NextResponse.json(
         { error: 'Invalid or expired token' },
         { status: 401 }
+      );
+    }
+
+    const userId = decodedToken.uid;
+    const clientIp = getClientIP(request);
+    const rateLimitIdentifier = `session-clear:${userId}:${clientIp}`;
+    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        {
+          error: 'Too many requests',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimit),
+        }
       );
     }
 

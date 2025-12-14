@@ -14,6 +14,11 @@ import { getAdminDb } from '@/lib/firebase-admin';
 import { verifyToken } from '@/lib/token-verifier';
 import { logger } from '@/lib/logger';
 import { extractBearerToken } from '@/lib/auth-utils';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 
 // Initialize Firebase Admin lazily (runtime only)
 const auth = getAdminAuth();
@@ -30,6 +35,7 @@ interface StartConversationResponse {
   status: string;
   error?: string;
   message?: string;
+  retryAfter?: number;
 }
 
 /**
@@ -92,43 +98,77 @@ async function verifyUserFromToken(
  */
 export async function POST(request: NextRequest): Promise<NextResponse<StartConversationResponse>> {
   try {
-    // 1. Parse and validate request
-    const body = await request.json();
-    const validation = validateRequest(body);
-
-    if (!validation.valid) {
-      logger.warn('Invalid request:', validation.error);
-      return NextResponse.json(
-        { 
-          conversationId: '',
-          startedAt: '',
-          status: 'error',
-          error: 'invalid-request',
-          message: validation.error 
-        },
-        { status: 400 }
-      );
-    }
-
-    const { ageTier, service } = body as StartConversationRequest;
-
-    // 2. Verify user from token
     const userResult = await verifyUserFromToken(request);
 
     if ('error' in userResult) {
       return NextResponse.json(
-        { 
+        {
           conversationId: '',
           startedAt: '',
           status: 'error',
           error: 'unauthorized',
-          message: userResult.error 
+          message: userResult.error,
         },
         { status: userResult.status }
       );
     }
 
     const userId = userResult.userId;
+
+    const clientIp = getClientIP(request);
+    const rateLimitIdentifier = `conversation-start:${userId}:${clientIp}`;
+    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        {
+          conversationId: '',
+          startedAt: '',
+          status: 'error',
+          error: 'rate-limited',
+          message: 'Too many requests',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimit),
+        }
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          conversationId: '',
+          startedAt: '',
+          status: 'error',
+          error: 'invalid-request',
+          message: 'Invalid JSON body',
+        },
+        { status: 400 }
+      );
+    }
+
+    const validation = validateRequest(body);
+
+    if (!validation.valid) {
+      logger.warn('Invalid request:', validation.error);
+      return NextResponse.json(
+        {
+          conversationId: '',
+          startedAt: '',
+          status: 'error',
+          error: 'invalid-request',
+          message: validation.error,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { ageTier, service } = body as StartConversationRequest;
 
     // 3. Create conversation record with server timestamp
     const conversationRef = db.collection('conversations').doc();

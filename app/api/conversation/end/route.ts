@@ -15,6 +15,11 @@ import { verifyToken } from '@/lib/token-verifier';
 import { validateOwnership, OwnershipValidationError } from '@/lib/ownership-validator';
 import { logger } from '@/lib/logger';
 import { extractBearerToken } from '@/lib/auth-utils';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 import { ConversationMessage } from '@/types';
 
 // Initialize Firebase Admin lazily (runtime only)
@@ -32,6 +37,7 @@ interface EndConversationResponse {
   status: string;
   error?: string;
   message?: string;
+  retryAfter?: number;
 }
 
 /**
@@ -118,27 +124,6 @@ async function getConversation(conversationId: string) {
  */
 export async function POST(request: NextRequest): Promise<NextResponse<EndConversationResponse>> {
   try {
-    // 1. Parse and validate request
-    const body = await request.json();
-    const validation = validateRequest(body);
-
-    if (!validation.valid) {
-      logger.warn('Invalid request:', validation.error);
-      return NextResponse.json(
-        { 
-          conversationId: '',
-          endedAt: '',
-          status: 'error',
-          error: 'invalid-request',
-          message: validation.error 
-        },
-        { status: 400 }
-      );
-    }
-
-    const { conversationId, messages } = body as EndConversationRequest;
-
-    // 2. Verify user from token
     const userResult = await verifyUserFromToken(request);
 
     if ('error' in userResult) {
@@ -155,6 +140,61 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
     }
 
     const userId = userResult.userId;
+
+    const clientIp = getClientIP(request);
+    const rateLimitIdentifier = `conversation-end:${userId}:${clientIp}`;
+    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        {
+          conversationId: '',
+          endedAt: '',
+          status: 'error',
+          error: 'rate-limited',
+          message: 'Too many requests',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimit),
+        }
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          conversationId: '',
+          endedAt: '',
+          status: 'error',
+          error: 'invalid-request',
+          message: 'Invalid JSON body',
+        },
+        { status: 400 }
+      );
+    }
+
+    const validation = validateRequest(body);
+
+    if (!validation.valid) {
+      logger.warn('Invalid request:', validation.error);
+      return NextResponse.json(
+        {
+          conversationId: '',
+          endedAt: '',
+          status: 'error',
+          error: 'invalid-request',
+          message: validation.error,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { conversationId, messages } = body as EndConversationRequest;
 
     // 3. Verify user owns conversation
     try {
