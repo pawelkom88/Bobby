@@ -24,7 +24,8 @@ import {
   getAmbulancePrompt,
   getFirePrompt,
   getPolicePrompt,
-} from '@/lib/prompts';
+} from '@/lib/prompts/prompts';
+import { useLocale } from 'next-intl';
 
 interface ActiveConversationViewProps {
   visualState: 'listening' | 'processing' | 'speaking' | 'error' | 'idle';
@@ -655,6 +656,8 @@ export default function VoiceConversation({
     }
   };
 
+  const currentLocale = useLocale();
+
   // When socket opens, send configuration
   useEffect(() => {
     logger.log(
@@ -751,7 +754,10 @@ export default function VoiceConversation({
               type: 'eleven_labs',
               // type: 'cartesia',
               model_id: 'eleven_multilingual_v2',
-              voice_id: 'lUTamkMw7gOzZbFIwmq4',
+              voice_id:
+                currentLocale === 'pl'
+                  ? 'JWUOwsYG4XgR9Od3eeon'
+                  : 'lUTamkMw7gOzZbFIwmq4',
               // voice: {
               //   mode: 'id',
               //   id: 'lUTamkMw7gOzZbFIwmq4',

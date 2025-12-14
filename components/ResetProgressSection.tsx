@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import CartoonButton from '@/components/CartoonButton';
 import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
 
 export default function ResetProgressSection() {
+  const t = useTranslations('resetProgress');
   const { resetProgress } = useUserData();
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -31,17 +33,17 @@ export default function ResetProgressSection() {
   if (!showConfirm) {
     return (
       <div className="progress-section">
-        <p>Reset all progress, badges, and conversation history.</p>
+        <p>{t('description')}</p>
         <CartoonButton
           onClick={handleReset}
-          ariaLabel="Reset progress"
+          ariaLabel={t('button')}
           className="cartoon-btn-danger"
         >
-          💣 Reset Progress
+          💣 {t('button')}
         </CartoonButton>
         {confirmed && (
           <p className="reset-confirmation" role="alert">
-            Progress reset successfully.
+            {t('success')}
           </p>
         )}
       </div>
@@ -51,18 +53,18 @@ export default function ResetProgressSection() {
   return (
     <>
       <p className="reset-warning" role="alert">
-        Are you sure you want to reset all progress? This cannot be undone.
+        {t('confirmMessage')}
       </p>
       <div className="reset-actions">
         <CartoonButton
           onClick={handleReset}
-          ariaLabel="Confirm reset progress"
+          ariaLabel={t('confirmButton')}
           className="cartoon-btn-danger"
         >
-          Yes, Reset Everything
+          {t('confirmButton')}
         </CartoonButton>
-        <CartoonButton onClick={handleCancel} ariaLabel="Cancel reset">
-          Cancel
+        <CartoonButton onClick={handleCancel} ariaLabel={t('cancel')}>
+          {t('cancel')}
         </CartoonButton>
       </div>
     </>

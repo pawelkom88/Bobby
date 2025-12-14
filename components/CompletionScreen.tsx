@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Confetti from './Confetti';
 import BadgeDisplay from './BadgeDisplay';
 import LevelProgress from './LevelProgress';
@@ -22,6 +23,8 @@ export default function CompletionScreen({
   performance = {},
   conversationId,
 }: CompletionScreenProps) {
+  const t = useTranslations('completionMessage');
+  const tScreen = useTranslations('completionScreen');
   const {
     showConfetti,
     xpEarned,
@@ -33,7 +36,7 @@ export default function CompletionScreen({
     assessment,
   } = useCompletionState({ service, ageTier, performance });
 
-  const title = getCompletionTitle(isLevel10, xpEarned);
+  const title = getCompletionTitle(isLevel10, xpEarned, t);
   const showProgress = xpEarned > 0;
   const showBadges = badgeAwarded || scoreBadgeAwarded;
 
@@ -68,7 +71,7 @@ export default function CompletionScreen({
 
         {showProgress && (
           <section className="completion-section" aria-labelledby="progress-heading">
-            <h2 id="progress-heading">Your Progress</h2>
+            <h2 id="progress-heading">{tScreen('yourProgress')}</h2>
             <div className="completion-card">
               <LevelProgress showLabel={true} />
             </div>
@@ -77,7 +80,7 @@ export default function CompletionScreen({
 
         {showBadges && (
           <section className="completion-section" aria-labelledby="badges-heading">
-            <h2 id="badges-heading">Your Badges</h2>
+            <h2 id="badges-heading">{tScreen('yourBadges')}</h2>
             <div className="completion-card">
               <BadgeDisplay showAll={false} />
             </div>
@@ -86,7 +89,7 @@ export default function CompletionScreen({
 
         {assessment && (
           <section className="completion-section" aria-labelledby="feedback-heading">
-            <h2 id="feedback-heading">Feedback</h2>
+            <h2 id="feedback-heading">{tScreen('feedback')}</h2>
             <AssessmentFeedback assessment={assessment} />
           </section>
         )}

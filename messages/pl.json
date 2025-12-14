@@ -1,0 +1,491 @@
+{
+  "metadata": {
+    "title": "Bobby - Trening Alarmowy dla Dzieci",
+    "description": "Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "back": "← WSTECZ",
+    "next": "Dalej",
+    "home": "Strona główna",
+    "settings": "Ustawienia",
+    "scenarios": "Scenariusze",
+    "tryAgain": "Spróbuj ponownie",
+    "credits": "Kredyty"
+  },
+  "loading": {
+    "heading": "Chwileczkę ...",
+    "default": "Bobby przygotowuje się do rozmowy!",
+    "redirecting": "Przekierowywanie do aplikacji...",
+    "generic": "Ładowanie ...",
+    "completionData": "Ładowanie danych ukończenia...",
+    "credits": "Ładowanie twoich kredytów...",
+    "pleaseWait": "Proszę czekać..."
+  },
+  "auth": {
+    "login": {
+      "title": "Witaj ponownie w Bobby!",
+      "description": "Wprowadź swój email i hasło, aby zalogować się do konta Bobby.",
+      "emailPlaceholder": "Email rodzica",
+      "emailLabel": "Email rodzica",
+      "passwordPlaceholder": "Hasło",
+      "passwordLabel": "Hasło",
+      "submit": "ZALOGUJ SIĘ",
+      "submitting": "LOGOWANIE...",
+      "forgotPassword": "Hasło gra w chowanego?",
+      "signupPrompt": "Pierwszy raz dzwonisz?",
+      "signupLink": "Zarejestruj się i dołącz do zabawy!"
+    },
+    "signup": {
+      "title": "Dołącz do Bobby!",
+      "description": "Utwórz konto Bobby podając swój email i hasło.",
+      "emailPlaceholder": "Email rodzica",
+      "emailLabel": "Email rodzica",
+      "passwordPlaceholder": "Hasło (min. 8 znaków)",
+      "passwordLabel": "Hasło",
+      "confirmPasswordPlaceholder": "Potwierdź hasło",
+      "confirmPasswordLabel": "Potwierdź hasło",
+      "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny",
+      "passwordStrength": "Siła hasła",
+      "submit": "ZAREJESTRUJ SIĘ",
+      "submitting": "TWORZENIE KONTA...",
+      "loginPrompt": "Już jesteś w drużynie?",
+      "loginLink": "Wróć do gry!"
+    },
+    "forgotPassword": {
+      "title": "Zresetuj hasło",
+      "description": "Podaj swój email, a wyślemy ci link do resetowania hasła.",
+      "emailPlaceholder": "Email rodzica",
+      "submit": "WYŚLIJ LINK",
+      "submitting": "WYSYŁANIE...",
+      "successMessage": "Sprawdź swoją skrzynkę email!",
+      "backToLogin": "Powrót do logowania"
+    },
+    "errors": {
+      "emailRequired": "Email jest wymagany",
+      "emailInvalid": "Wprowadź prawidłowy adres email",
+      "passwordRequired": "Hasło jest wymagane",
+      "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
+      "confirmPasswordRequired": "Potwierdź swoje hasło",
+      "passwordsMismatch": "Hasła nie są takie same",
+      "invalidCredential": "Nieprawidłowy email lub hasło. Spróbuj ponownie.",
+      "tooManyRequests": "Zbyt wiele nieudanych prób. Spróbuj ponownie później.",
+      "userDisabled": "To konto zostało zablokowane.",
+      "loginFailed": "Logowanie nie powiodło się. Spróbuj ponownie.",
+      "emailInUse": "Ten email jest już zarejestrowany. Zaloguj się.",
+      "invalidEmail": "Nieprawidłowy adres email.",
+      "operationNotAllowed": "Konta email/hasło nie są włączone. Skontaktuj się z pomocą techniczną.",
+      "weakPassword": "Hasło jest za słabe. Użyj silniejszego hasła.",
+      "signupFailed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+      "pleaseLogin": "Zaloguj się, aby kontynuować"
+    }
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "Jak to działa?",
+      "startTraining": "Rozpocznij trening"
+    },
+    "hero": {
+      "title": "Opanuj połączenie alarmowe 112 zanim nadejdzie sytuacja awaryjna.",
+      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci (w wieku 5-12 lat) jak pewnie obsługiwać połączenia z policją, strażą pożarną i pogotowiem. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w bezpiecznym środowisku.",
+      "cta": "Rozpocznij trening",
+      "secondaryCta": "Zobacz jak to działa"
+    },
+    "footer": {
+      "ready": "Gotowy do rozpoczęcia?",
+      "privacy": "Polityka prywatności"
+    }
+  },
+  "yourAge": {
+    "title": "DLA KOGO TO JEST?",
+    "subtitle": "Wybierz grupę wiekową",
+    "ages": {
+      "tier1": "WIEK 4-6",
+      "tier2": "WIEK 7-10",
+      "tier3": "WIEK 11-13"
+    }
+  },
+  "chooseEmergency": {
+    "title": "JAKA TO SYTUACJA AWARYJNA?",
+    "subtitle": "Wybierz typ sytuacji",
+    "services": {
+      "fire": "POŻAR",
+      "ambulance": "POGOTOWIE",
+      "police": "POLICJA"
+    }
+  },
+  "selectPackage": {
+    "title": "Wybierz Pakiet",
+    "subtitle": "Każdy kredyt = 1 rozmowa ćwiczebna",
+    "loading": "Ładowanie...",
+    "buyPrefix": "Kup £",
+    "messages": {
+      "canceled": "Płatność została anulowana. Wybierz pakiet, aby spróbować ponownie."
+    },
+    "errors": {
+      "loginRequired": "Zaloguj się, aby kontynuować",
+      "checkoutFailed": "Nie udało się rozpocząć płatności"
+    }
+  },
+  "dial": {
+    "creditsLabel": "Kredyty:",
+    "messages": {
+      "canceled": "Płatność została anulowana. Możesz spróbować ponownie, kiedy będziesz gotowy!",
+      "needsCredits": "Potrzebujesz kredytów, aby rozpocząć połączenie ćwiczebne.",
+      "loadingCredits": "Ładowanie twoich kredytów..."
+    },
+    "buttons": {
+      "call": "ZADZWOŃ",
+      "loading": "ŁADOWANIE...",
+      "buyAndCall": "KUP I ZADZWOŃ"
+    }
+  },
+  "completion": {
+    "title": "Świetna robota!",
+    "loading": "Ładowanie danych ukończenia...",
+    "error": {
+      "title": "Nie udało się załadować danych ukończenia",
+      "tryAgain": "Spróbuj ponownie"
+    }
+  },
+  "faq": {
+    "title": "CZĘSTO ZADAWANE PYTANIA",
+    "subtitle": "Znajdź odpowiedzi tutaj!",
+    "stillHaveQuestions": "Masz jeszcze pytania?",
+    "contactUs": "Skontaktuj się z nami",
+    "items": {
+      "1": {
+        "question": "Do czego służy ta aplikacja?",
+        "answer": "Bobby pomaga dzieciom ćwiczyć dzwonienie na 112 w bezpieczny i zabawny sposób. Uczy dzieci jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak dzwonić po pomoc."
+      },
+      "2": {
+        "question": "Jak działają scenariusze wiekowe?",
+        "answer": "Aplikacja oferuje trzy grupy wiekowe: 5-7 lat (bardzo prosty język i krótkie scenariusze), 8-10 lat (bardziej realistyczne rozmowy) i 11-12 lat (niemal realistyczny przebieg rozmowy z operatorem)."
+      },
+      "3": {
+        "question": "Czy dane mojego dziecka są bezpieczne?",
+        "answer": "Tak! Przechowujemy minimalne dane tylko lokalnie na twoim urządzeniu. Żadne wrażliwe informacje nie są zbierane ani przechowywane. Śledzimy tylko ukończenie scenariuszy, XP i odznaki, aby nauka była zabawą."
+      },
+      "4": {
+        "question": "Czy ta aplikacja wymaga internetu?",
+        "answer": "Tak, aplikacja wymaga połączenia z internetem do korzystania z funkcji rozmowy głosowej z Bobbym. Jednak twój postęp jest przechowywany lokalnie na urządzeniu."
+      },
+      "5": {
+        "question": "Czy kilkoro dzieci może korzystać z aplikacji?",
+        "answer": "Tak! Możesz zresetować postęp w Ustawieniach, aby pozwolić różnym dzieciom korzystać z aplikacji. Każde dziecko zacznie od nowa z własnym postępem i odznakami."
+      }
+    }
+  },
+  "contact": {
+    "title": "KONTAKT",
+    "subtitle": "Masz pytanie? Jesteśmy tu, aby pomóc!",
+    "options": {
+      "chat": "POROZMAWIAJ Z ZESPOŁEM BOBBY",
+      "email": "WYŚLIJ EMAIL",
+      "faq": "FAQ"
+    },
+    "responseTime": "Odpowiemy w ciągu 24 godzin."
+  },
+  "settings": {
+    "title": "USTAWIENIA",
+    "language": {
+      "title": "Language / Język",
+      "description": "Wybierz preferowany język"
+    },
+    "accessibility": {
+      "title": "Ustawienia dostępności"
+    },
+    "progress": {
+      "title": "Postęp"
+    },
+    "account": {
+      "title": "Konto",
+      "signOut": "← Wyloguj się"
+    },
+    "about": {
+      "title": "O aplikacji",
+      "appName": "Bobby - Trening Alarmowy dla Dzieci",
+      "version": "Wersja 1.0.0",
+      "contactSupport": "Kontakt z pomocą"
+    }
+  },
+  "accessibility": {
+    "title": "Ustawienia dostępności",
+    "uiSound": {
+      "label": "Dźwięki interfejsu",
+      "on": "Włącz dźwięki interfejsu",
+      "off": "Wyłącz dźwięki interfejsu"
+    },
+    "dyslexiaFont": {
+      "label": "Czcionka dla dyslektyków",
+      "aria": "Użyj czcionki przyjaznej dla dyslektyków"
+    },
+    "slowedSpeech": {
+      "label": "Tryb wolniejszej mowy",
+      "aria": "Zwolnij mowę dla lepszego zrozumienia"
+    },
+    "reducedSensory": {
+      "label": "Tryb zmniejszonych bodźców",
+      "aria": "Zmniejsz animacje i efekty wizualne"
+    },
+    "fontSize": {
+      "label": "Rozmiar czcionki",
+      "aria": "Wybierz rozmiar czcionki",
+      "small": "Mały",
+      "medium": "Średni",
+      "large": "Duży",
+      "xlarge": "Bardzo duży"
+    },
+    "colorMode": {
+      "label": "Tryb kolorów",
+      "aria": "Wybierz tryb kolorów dla lepszej widoczności",
+      "default": "Domyślny",
+      "highContrast": "Wysoki kontrast"
+    }
+  },
+  "deleteAccount": {
+    "button": "Usuń konto",
+    "confirmMessage": "Czy na pewno chcesz usunąć swoje konto? Spowoduje to trwałe usunięcie wszystkich danych, postępów, odznak i historii rozmów. Tej czynności nie można cofnąć.",
+    "confirmButton": "Tak, jestem pewien",
+    "deleting": "Usuwanie...",
+    "cancel": "Anuluj",
+    "errors": {
+      "failed": "Nie udało się usunąć konta. Spróbuj ponownie."
+    }
+  },
+  "resetProgress": {
+    "description": "Zresetuj wszystkie postępy, odznaki i historię rozmów.",
+    "button": "Resetuj postępy",
+    "success": "Postępy zostały zresetowane.",
+    "confirmMessage": "Czy na pewno chcesz zresetować wszystkie postępy? Tej czynności nie można cofnąć.",
+    "confirmButton": "Tak, zresetuj wszystko",
+    "cancel": "Anuluj"
+  },
+  "errorBoundary": {
+    "title": "Coś poszło nie tak",
+    "message": "Przepraszamy, ale wydarzyło się coś nieoczekiwanego.",
+    "devDetails": "Szczegóły błędu (tylko w trybie deweloperskim)",
+    "tryAgain": "Spróbuj ponownie"
+  },
+  "completionScreen": {
+    "yourProgress": "Twoje postępy",
+    "yourBadges": "Twoje odznaki",
+    "feedback": "Opinia"
+  },
+  "completionActions": {
+    "practiceAgain": "Ćwicz ponownie",
+    "viewAchievements": "Zobacz osiągnięcia",
+    "viewConversation": "Zobacz rozmowę"
+  },
+  "assessmentFeedback": {
+    "didWell": "Co zrobiłeś dobrze",
+    "greatEffort": "Świetny wysiłek!",
+    "nextTime": "Następnym razem spróbuj",
+    "keepPracticing": "Ćwicz dalej, aby być w formie.",
+    "reminders": "Przyjazne przypomnienia"
+  },
+  "completionMessage": {
+    "title": {
+      "trainingComplete": "🎉 Trening ukończony! 🎉",
+      "practiceComplete": "Sesja ćwiczeniowa zakończona",
+      "wellDone": "Świetna robota! 🎉"
+    },
+    "performance": {
+      "flawless": "Bezbłędne wykonanie!",
+      "wellDone": "Świetna robota!",
+      "keepPracticing": "Nie martw się, ćwicz dalej!",
+      "practiceSession": "Sesja ćwiczeniowa"
+    },
+    "level10": {
+      "congratulations": "Gratulacje! Opanowałeś połączenia alarmowe!",
+      "mastered": "Nauczyłeś się zachować spokój, komunikować się jasno i uzyskać pomoc, gdy jej potrzebujesz. Jesteś teraz przygotowany i pewny siebie. Świetna robota!",
+      "keepPracticing": "Pamiętaj, że zawsze możesz ćwiczyć więcej, aby być w formie. Tak trzymaj!"
+    },
+    "noXP": {
+      "tried": "Wypróbowałeś scenariusz alarmowy {service}.",
+      "encouragement": "Nie martw się! Połączenia alarmowe mogą być trudne. Spróbujmy jeszcze raz, a pójdzie ci lepiej!"
+    },
+    "success": {
+      "completed": "Ukończyłeś scenariusz alarmowy {service}!",
+      "levelUp": "Awans! 🚀",
+      "reachedLevel": "Osiągnąłeś poziom {level}!",
+      "newBadge": "Nowa odznaka! 🏆"
+    },
+    "xp": {
+      "earned": "Zdobyłeś {xp} XP!",
+      "noXP": "Tym razem nie zdobyto XP",
+      "score": "Wynik: {score} / 100"
+    }
+  },
+  "chats": {
+    "title": "Twoje Rozmowy",
+    "subtitle": "Przejrzyj historię rozmów z Bobby",
+    "loadingError": "Nie udało się załadować rozmów. Spróbuj ponownie."
+  },
+  "achievements": {
+    "title": "MOJE OSIĄGNIĘCIA",
+    "score": "Twój Wynik",
+    "badges": "Twoje Odznaki",
+    "history": "Historia Treningów"
+  },
+  "completion": {
+    "loading": "Ładowanie ...",
+    "loadingData": "Ładowanie danych zakończenia...",
+    "error": {
+      "title": "Nie udało się załadować danych zakończenia",
+      "retry": "Spróbuj ponownie"
+    }
+  },
+  "forgotPassword": {
+    "title": "Resetuj Hasło",
+    "description": "Wprowadź swój adres e-mail, a my wyślemy Ci link do resetowania hasła.",
+    "srDescription": "Wprowadź swój adres e-mail, aby otrzymać link do resetowania hasła.",
+    "emailPlaceholder": "Adres E-mail",
+    "emailLabel": "Adres E-mail",
+    "sendButton": "WYŚLIJ LINK RESETUJĄCY",
+    "sending": "WYSYŁANIE...",
+    "backToLogin": "WRÓĆ DO LOGOWANIA",
+    "rememberedPassword": "Pamiętasz swoje hasło?",
+    "emailSent": {
+      "title": "Sprawdź Swoją Skrzynkę!",
+      "sentTo": "Wysłaliśmy link do resetowania hasła na adres:",
+      "instructions": "Kliknij w link w e-mailu, aby zresetować swoje hasło.",
+      "checkSpam": "Nie zapomnij sprawdzić folderu spam!",
+      "notReceived": "Nie otrzymałeś e-maila?",
+      "tryAgain": "Spróbuj ponownie"
+    },
+    "validation": {
+      "emailRequired": "E-mail jest wymagany",
+      "emailInvalid": "Wprowadź prawidłowy adres e-mail"
+    },
+    "errors": {
+      "userNotFound": "Nie znaleziono konta z tym adresem e-mail.",
+      "emailInvalid": "Nieprawidłowy adres e-mail.",
+      "tooManyRequests": "Zbyt wiele prób. Spróbuj ponownie później.",
+      "sendFailed": "Nie udało się wysłać e-maila resetującego. Spróbuj ponownie.",
+      "unexpected": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."
+    }
+  },
+  "resetPassword": {
+    "title": "Resetuj Swoje Hasło",
+    "enterNewFor": "Wprowadź nowe hasło dla:",
+    "newPasswordPlaceholder": "Nowe Hasło",
+    "newPasswordLabel": "Nowe Hasło",
+    "confirmPasswordPlaceholder": "Potwierdź Nowe Hasło",
+    "confirmPasswordLabel": "Potwierdź Nowe Hasło",
+    "resetButton": "Resetuj Hasło",
+    "resetting": "Resetowanie...",
+    "backToLogin": "Wróć do Logowania",
+    "loading": "Ładowanie ...",
+    "verifying": "Weryfikacja linku resetującego...",
+    "passwordStrength": "Siła hasła",
+    "routes": {
+      "login": "/login"
+    },
+    "strength": {
+      "weak": "słabe",
+      "fair": "akceptowalne",
+      "good": "dobre",
+      "strong": "silne"
+    },
+    "success": {
+      "title": "Hasło Zresetowane Pomyślnie!",
+      "message": "Twoje hasło zostało pomyślnie zresetowane. Zostaniesz przekierowany na stronę logowania.",
+      "continue": "Przejdź do Logowania"
+    },
+    "invalidLink": {
+      "title": "Nieprawidłowy Link Resetujący"
+    },
+    "errors": {
+      "invalidLink": "Nieprawidłowy link resetujący hasło. Poproś o nowy.",
+      "expiredLink": "Link resetujący hasło wygasł. Poproś o nowy.",
+      "userDisabled": "To konto zostało zablokowane.",
+      "userNotFound": "Nie znaleziono konta z tym adresem e-mail.",
+      "verifyFailed": "Nie udało się zweryfikować linku resetującego. Spróbuj ponownie.",
+      "unexpected": "Wystąpił błąd. Spróbuj ponownie.",
+      "passwordMismatch": "Hasła nie są identyczne",
+      "weakPassword": "Hasło jest zbyt słabe. Wybierz silniejsze hasło.",
+      "resetFailed": "Nie udało się zresetować hasła. Spróbuj ponownie."
+    }
+  },
+  "notFound": {
+    "alt": "Planeta",
+    "goHome": "Strona Główna"
+  },
+  "badgeDisplay": {
+    "noBadges": "Brak odznak. Ćwicz dalej!",
+    "showMore": "Pokaż więcej",
+    "showLess": "Pokaż mniej"
+  },
+  "trainingHistory": {
+    "loading": "Ładowanie historii treningów...",
+    "noHistory": "Brak sesji treningowych. Rozpocznij swój pierwszy scenariusz!",
+    "fetchError": "Nie udało się pobrać ocenionych rozmów",
+    "loadError": "Nie udało się załadować historii treningów. Spróbuj ponownie."
+  },
+  "conversationList": {
+    "loading": "Ładowanie rozmów...",
+    "noConversations": "Brak rozmów",
+    "noConversationsHint": "Ukończ rozmowę z Bobby, aby zobaczyć historię rozmów."
+  },
+  "loadingSpinner": {
+    "defaultText": "Bobby przygotowuje się do rozmowy!",
+    "defaultHeading": "Chwileczkę ...",
+    "alt": "Bobby przygotowuje się do rozmowy"
+  },
+  "app": {
+    "welcomeTitle": "Cześć, Bohaterze!",
+    "welcomeSubtitle": "Jestem Bobby. Nauczmy się ratować dzień!",
+    "bobbyAlt": "Bobby",
+    "callBobby": "ZADZWOŃ DO BOBBY'EGO"
+  },
+  "voiceConversation": {
+    "greeting": {
+      "ambulance": "Cześć, tu Bobby z pogotowia. Co się stało?",
+      "fire": "Cześć, tu Bobby ze straży pożarnej. Co się stało?",
+      "police": "Cześć, tu Bobby z policji. Co się dzieje?"
+    }
+  },
+  "success": {
+    "incomplete": {
+      "title": "Płatność niekompletna",
+      "message": "Nie mogliśmy zweryfikować statusu płatności. Sprawdź email lub spróbuj ponownie.",
+      "email": "Jeśli dokonałeś płatności, kredyty zostaną dodane automatycznie.",
+      "cta": "Spróbuj ponownie"
+    },
+    "expired": {
+      "title": "Sesja wygasła",
+      "message": "Ta sesja płatności wygasła.",
+      "cta": "Spróbuj ponownie"
+    },
+    "failed": {
+      "title": "Płatność nieudana",
+      "message": "Nie udało się przetworzyć płatności. Spróbuj ponownie lub skontaktuj się z bankiem.",
+      "email": "Nie zostałeś obciążony. Spróbuj innej metody płatności, jeśli problem się powtarza.",
+      "cta": "Spróbuj ponownie"
+    },
+    "complete": {
+      "title": "Płatność zakończona!",
+      "message": "Dziękujemy za zakup! Otrzymałeś {credits} kredytów.",
+      "email": "Email z potwierdzeniem zostanie wysłany na adres {email}.",
+      "emailFallback": "Ciebie",
+      "cta": "Zacznij ćwiczyć!"
+    },
+    "unclear": {
+      "title": "Status płatności niejasny",
+      "message": "Nie mogliśmy określić statusu płatności. Sprawdź email w celu potwierdzenia.",
+      "email": "Jeśli zostałeś obciążony, kredyty zostaną dodane automatycznie. W przeciwnym razie spróbuj ponownie.",
+      "cta": "Sprawdź status płatności"
+    },
+    "error": {
+      "title": "Coś poszło nie tak",
+      "message": "Nie mogliśmy zweryfikować płatności. Skontaktuj się z pomocą techniczną, jeśli zostałeś obciążony.",
+      "cta": "Przejdź do ćwiczeń"
+    }
+  }
+}

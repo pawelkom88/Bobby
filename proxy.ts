@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import createIntlMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
 /**
  * Security Proxy (Middleware) for Next.js 16
@@ -8,9 +10,18 @@ import type { NextRequest } from 'next/server';
  * - CWE-602: Server-side route protection (not just client-side)
  * - CWE-1021: Improved CSP configuration
  * - Added CSRF token generation
+ * - Integrated next-intl middleware for proper i18n
  */
 
-// Routes that are always public
+// Create next-intl middleware
+const intlMiddleware = createIntlMiddleware(routing);
+
+// i18n Configuration
+const LOCALES = ['en', 'pl'] as const;
+const DEFAULT_LOCALE = 'en';
+const LOCALE_COOKIE = 'NEXT_LOCALE';
+
+// Routes that are always public (without locale prefix)
 const PUBLIC_ROUTES = [
   '/',
   '/login',
@@ -29,6 +40,30 @@ function generateCSRFToken(): string {
 }
 
 /**
+ * Check if pathname has a locale prefix
+ */
+function pathnameHasLocale(pathname: string): boolean {
+  return LOCALES.some(
+    locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+}
+
+/**
+ * Get pathname without locale prefix
+ */
+function getPathnameWithoutLocale(pathname: string): string {
+  for (const locale of LOCALES) {
+    if (pathname.startsWith(`/${locale}/`)) {
+      return pathname.slice(locale.length + 1);
+    }
+    if (pathname === `/${locale}`) {
+      return '/';
+    }
+  }
+  return pathname;
+}
+
+/**
  * Check if a path matches any of the protected routes
  */
 // function isProtectedRoute(pathname: string): boolean {
@@ -39,18 +74,36 @@ function generateCSRFToken(): string {
  * Check if a path matches any of the public routes
  */
 function isPublicRoute(pathname: string): boolean {
+  // Check both with and without locale prefix
+  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
   return PUBLIC_ROUTES.some(
-    route => pathname === route || pathname.startsWith(route + '/')
+    route => pathnameWithoutLocale === route || pathnameWithoutLocale.startsWith(route + '/')
   );
 }
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip auth check for public routes
+  // Skip middleware for API routes and static files
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Use next-intl middleware for locale handling
+  // This properly sets the locale context for useTranslations hook
+  const response = intlMiddleware(request);
+
+  // Get pathname without locale for route checks
+  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
+
+  // Apply security headers to all responses
+  // Skip further processing for public routes but still add headers
   if (isPublicRoute(pathname)) {
-    // Still apply security headers for public routes
-    const response = NextResponse.next();
 
     // Security Headers
     response.headers.set('X-Frame-Options', 'DENY');
@@ -103,10 +156,7 @@ export async function proxy(request: NextRequest) {
   // 2. Checking here would cause unnecessary redirects during initial page load
   // 3. API routes verify Firebase tokens for actual data access
 
-  // Create response
-  const response = NextResponse.next();
-
-  // Security Headers
+  // Security Headers (response already created by intlMiddleware)
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');

@@ -8,8 +8,6 @@ import {
 } from '@/lib/rateLimit';
 import { sendPasswordResetEmail } from '@/lib/mailer';
 
-export const dynamic = 'force-dynamic';
-
 // Constants
 const MAX_EMAIL_LENGTH = 254;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

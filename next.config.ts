@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import bundleAnalyzer from '@next/bundle-analyzer';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -8,6 +9,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
+  // cacheComponents: true,
   turbopack: {
     root: __dirname,
   },
@@ -27,7 +29,9 @@ const nextConfig: NextConfig = {
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name(module: any) {
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                const packageName = module.context.match(
+                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                )[1];
                 return `npm.${packageName.replace('@', '')}`;
               },
               priority: 10,
@@ -65,16 +69,18 @@ const nextConfig: NextConfig = {
         },
       };
     }
-    
+
     // Reduce bundle size by excluding unnecessary modules
     config.resolve.alias = {
       ...config.resolve.alias,
       // Exclude server-only modules from client bundle
       '@mailersend/node': false,
     };
-    
+
     return config;
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
+export default withBundleAnalyzer(withNextIntl(nextConfig));

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import LoadingSpinner from './LoadingSpinner';
@@ -12,6 +13,7 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
+  const tLoading = useTranslations('loading');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -29,7 +31,12 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Show loading spinner while checking auth
   if (loading) {
-    return <LoadingSpinner text="Loading ..." />;
+    return (
+      <LoadingSpinner
+        text={tLoading('generic')}
+        heading={tLoading('heading')}
+      />
+    );
   }
 
   // If not authenticated, don't render children (redirect will happen)

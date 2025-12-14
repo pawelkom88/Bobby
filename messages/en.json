@@ -1,0 +1,491 @@
+{
+  "metadata": {
+    "title": "Bobby - Emergency Training for Kids",
+    "description": "Help children practice emergency calls in a safe, fun way"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "← BACK",
+    "next": "Next",
+    "home": "Home",
+    "settings": "Settings",
+    "scenarios": "Scenarios",
+    "tryAgain": "Try again",
+    "credits": "Credits"
+  },
+  "loading": {
+    "heading": "Just a moment ...",
+    "default": "Bobby is getting ready to chat!",
+    "redirecting": "Redirecting to app...",
+    "generic": "Loading ...",
+    "completionData": "Loading completion data...",
+    "credits": "Loading your credits...",
+    "pleaseWait": "Please wait..."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back to Bobby!",
+      "description": "Please enter your email and password to log in to your Bobby account.",
+      "emailPlaceholder": "Parent Email",
+      "emailLabel": "Parent Email",
+      "passwordPlaceholder": "Password",
+      "passwordLabel": "Password",
+      "submit": "LOG IN",
+      "submitting": "LOGGING IN...",
+      "forgotPassword": "Password playing hide and seek?",
+      "signupPrompt": "First time caller?",
+      "signupLink": "Sign up to join the fun!"
+    },
+    "signup": {
+      "title": "Join Bobby!",
+      "description": "Create your Bobby account by entering your email and password.",
+      "emailPlaceholder": "Parent Email",
+      "emailLabel": "Parent Email",
+      "passwordPlaceholder": "Password (min 8 characters)",
+      "passwordLabel": "Password",
+      "confirmPasswordPlaceholder": "Confirm Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character",
+      "passwordStrength": "Password strength",
+      "submit": "SIGN UP",
+      "submitting": "CREATING ACCOUNT...",
+      "loginPrompt": "Already part of the team?",
+      "loginLink": "Jump back in!"
+    },
+    "forgotPassword": {
+      "title": "Reset Your Password",
+      "description": "Enter your email and we'll send you a reset link.",
+      "emailPlaceholder": "Parent Email",
+      "submit": "SEND RESET LINK",
+      "submitting": "SENDING...",
+      "successMessage": "Check your email for the reset link!",
+      "backToLogin": "Back to Login"
+    },
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsMismatch": "Passwords do not match",
+      "invalidCredential": "Invalid email or password. Please try again.",
+      "tooManyRequests": "Too many failed attempts. Please try again later.",
+      "userDisabled": "This account has been disabled.",
+      "loginFailed": "Login failed. Please try again.",
+      "emailInUse": "This email is already registered. Please log in instead.",
+      "invalidEmail": "Invalid email address.",
+      "operationNotAllowed": "Email/password accounts are not enabled. Please contact support.",
+      "weakPassword": "Password is too weak. Please use a stronger password.",
+      "signupFailed": "Sign up failed. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "pleaseLogin": "Please log in to continue"
+    }
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "How it works ?",
+      "startTraining": "Start Training Now"
+    },
+    "hero": {
+      "title": "Master the 999 Call Before an Emergency Strikes.",
+      "subtitle": "Bobby is the interactive AI tutor that trains children (ages 5-12) to handle police, fire, and ambulance calls with confidence. Practice realistic voice simulations and learn critical safety protocols in a secure environment.",
+      "cta": "Start Training Now",
+      "secondaryCta": "Watch How It Works"
+    },
+    "footer": {
+      "ready": "Ready to get started?",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "yourAge": {
+    "title": "WHO IS THIS FOR?",
+    "subtitle": "Choose the age tier",
+    "ages": {
+      "tier1": "AGES 4-6",
+      "tier2": "AGES 7-10",
+      "tier3": "AGES 11-13"
+    }
+  },
+  "chooseEmergency": {
+    "title": "WHAT'S THE EMERGENCY?",
+    "subtitle": "Choose the emergency type",
+    "services": {
+      "fire": "FIRE",
+      "ambulance": "AMBULANCE",
+      "police": "POLICE"
+    }
+  },
+  "selectPackage": {
+    "title": "Choose Your Pack",
+    "subtitle": "Each credit = 1 practice call",
+    "loading": "Loading...",
+    "buyPrefix": "Buy £",
+    "messages": {
+      "canceled": "Checkout was canceled. Select a pack to try again."
+    },
+    "errors": {
+      "loginRequired": "Please log in to continue",
+      "checkoutFailed": "Failed to start checkout"
+    }
+  },
+  "dial": {
+    "creditsLabel": "Credits:",
+    "messages": {
+      "canceled": "Payment was canceled. You can try again when you're ready!",
+      "needsCredits": "You need credits to start a practice call.",
+      "loadingCredits": "Loading your credits..."
+    },
+    "buttons": {
+      "call": "CALL",
+      "loading": "LOADING...",
+      "buyAndCall": "BUY & CALL"
+    }
+  },
+  "completion": {
+    "title": "Great Job!",
+    "loading": "Loading completion data...",
+    "error": {
+      "title": "Failed to load completion data",
+      "tryAgain": "Try again"
+    }
+  },
+  "faq": {
+    "title": "FREQUENT QUESTIONS",
+    "subtitle": "Find answers here!",
+    "stillHaveQuestions": "Still have questions?",
+    "contactUs": "Contact Us",
+    "items": {
+      "1": {
+        "question": "What is this app for?",
+        "answer": "Bobby helps kids practice calling 999 in a safe, fun way. It teaches children how to communicate clearly, stay calm, and understand when and how to call for help."
+      },
+      "2": {
+        "question": "How do the age scenarios work?",
+        "answer": "The app offers three age tiers: Ages 5-7 (very simple language and short scenarios), Ages 8-10 (more realistic conversations), and Ages 11-12 (near-realistic operator flow)."
+      },
+      "3": {
+        "question": "Is my child's data safe?",
+        "answer": "Yes! We store minimal data locally on your device only. No sensitive information is collected or stored. We only track scenario completion, XP, and badges to make learning fun."
+      },
+      "4": {
+        "question": "Does this app require internet?",
+        "answer": "Yes, the app requires an internet connection to use the voice conversation features with Bobby. However, your progress is stored locally on your device."
+      },
+      "5": {
+        "question": "Can multiple children use the app?",
+        "answer": "Yes! You can reset progress in the Settings page to allow different children to use the app. Each child will start fresh with their own progress and badges."
+      }
+    }
+  },
+  "contact": {
+    "title": "CONTACT US",
+    "subtitle": "Got a question? We're here to help!",
+    "options": {
+      "chat": "CHAT WITH BOBBY'S TEAM",
+      "email": "EMAIL SUPPORT",
+      "faq": "FAQS"
+    },
+    "responseTime": "We'll get back to you within 24 hours."
+  },
+  "settings": {
+    "title": "SETTINGS",
+    "language": {
+      "title": "Language / Język",
+      "description": "Choose your preferred language"
+    },
+    "accessibility": {
+      "title": "Accessibility Settings"
+    },
+    "progress": {
+      "title": "Progress"
+    },
+    "account": {
+      "title": "Account",
+      "signOut": "← Sign Out"
+    },
+    "about": {
+      "title": "About",
+      "appName": "Bobby - Emergency Training for Kids",
+      "version": "Version 1.0.0",
+      "contactSupport": "Contact Support"
+    }
+  },
+  "accessibility": {
+    "title": "Accessibility Settings",
+    "uiSound": {
+      "label": "UI Sound",
+      "on": "Turn UI sound on",
+      "off": "Turn UI sound off"
+    },
+    "dyslexiaFont": {
+      "label": "Dyslexia-Friendly Font",
+      "aria": "Use dyslexia-friendly font for better readability"
+    },
+    "slowedSpeech": {
+      "label": "Slowed Speech Mode",
+      "aria": "Slow down speech for better understanding"
+    },
+    "reducedSensory": {
+      "label": "Reduced Sensory Mode",
+      "aria": "Reduce animations and visual effects"
+    },
+    "fontSize": {
+      "label": "Font Size",
+      "aria": "Select font size for text",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "xlarge": "Extra Large"
+    },
+    "colorMode": {
+      "label": "Color Mode",
+      "aria": "Select color mode for better visibility",
+      "default": "Default",
+      "highContrast": "High Contrast"
+    }
+  },
+  "deleteAccount": {
+    "button": "Delete Account",
+    "confirmMessage": "Are you sure you want to delete your account? This will permanently remove all your data, progress, badges, and conversation history. This action cannot be undone.",
+    "confirmButton": "I am sure",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "errors": {
+      "failed": "Failed to delete account. Please try again."
+    }
+  },
+  "resetProgress": {
+    "description": "Reset all progress, badges, and conversation history.",
+    "button": "Reset Progress",
+    "success": "Progress reset successfully.",
+    "confirmMessage": "Are you sure you want to reset all progress? This cannot be undone.",
+    "confirmButton": "Yes, Reset Everything",
+    "cancel": "Cancel"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "We're sorry, but something unexpected happened.",
+    "devDetails": "Error details (development only)",
+    "tryAgain": "Try Again"
+  },
+  "completionScreen": {
+    "yourProgress": "Your Progress",
+    "yourBadges": "Your Badges",
+    "feedback": "Feedback"
+  },
+  "completionActions": {
+    "practiceAgain": "Practice Again",
+    "viewAchievements": "View Achievements",
+    "viewConversation": "View Conversation"
+  },
+  "assessmentFeedback": {
+    "didWell": "What you did well",
+    "greatEffort": "Great effort!",
+    "nextTime": "Next time try",
+    "keepPracticing": "Keep practicing to stay sharp.",
+    "reminders": "Friendly reminders"
+  },
+  "completionMessage": {
+    "title": {
+      "trainingComplete": "🎉 Training Complete! 🎉",
+      "practiceComplete": "Practice Session Complete",
+      "wellDone": "Well Done! 🎉"
+    },
+    "performance": {
+      "flawless": "Flawless performance!",
+      "wellDone": "Well done!",
+      "keepPracticing": "Don't worry, keep practicing!",
+      "practiceSession": "Practice session"
+    },
+    "level10": {
+      "congratulations": "Congratulations! You've mastered emergency calls!",
+      "mastered": "You've learned how to stay calm, communicate clearly, and get help when you need it. You're now prepared and confident. Great job!",
+      "keepPracticing": "Remember, you can always practice more to stay sharp. Keep up the amazing work!"
+    },
+    "noXP": {
+      "tried": "You tried the {service} emergency scenario.",
+      "encouragement": "Don't worry! Emergency calls can be tricky. Let's try again and you'll do better!"
+    },
+    "success": {
+      "completed": "You completed the {service} emergency scenario!",
+      "levelUp": "Level Up! 🚀",
+      "reachedLevel": "You reached Level {level}!",
+      "newBadge": "New Badge Earned! 🏆"
+    },
+    "xp": {
+      "earned": "You earned {xp} XP!",
+      "noXP": "No XP earned this time",
+      "score": "Score: {score} / 100"
+    }
+  },
+  "chats": {
+    "title": "Your Conversations",
+    "subtitle": "Review your call history with Bobby",
+    "loadingError": "Failed to load your conversations. Please try again."
+  },
+  "achievements": {
+    "title": "MY ACHIEVEMENTS",
+    "score": "Your Score",
+    "badges": "Your Badges",
+    "history": "Training History"
+  },
+  "completion": {
+    "loading": "Loading ...",
+    "loadingData": "Loading completion data...",
+    "error": {
+      "title": "Failed to load completion data",
+      "retry": "Try again"
+    }
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "description": "Enter your email address and we'll send you a link to reset your password.",
+    "srDescription": "Enter your email address to receive a password reset link.",
+    "emailPlaceholder": "Email Address",
+    "emailLabel": "Email Address",
+    "sendButton": "SEND RESET LINK",
+    "sending": "SENDING...",
+    "backToLogin": "BACK TO LOGIN",
+    "rememberedPassword": "Password back in your head?",
+    "emailSent": {
+      "title": "Check Your Email!",
+      "sentTo": "We've sent a password reset link to:",
+      "instructions": "Click the link in the email to reset your password.",
+      "checkSpam": "Don't forget to check your spam folder!",
+      "notReceived": "Didn't receive the email?",
+      "tryAgain": "Try Again"
+    },
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address"
+    },
+    "errors": {
+      "userNotFound": "No account found with this email address.",
+      "emailInvalid": "Invalid email address.",
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "sendFailed": "Failed to send reset email. Please try again.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    }
+  },
+  "resetPassword": {
+    "title": "Reset Your Password",
+    "enterNewFor": "Enter a new password for:",
+    "newPasswordPlaceholder": "New Password",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordPlaceholder": "Confirm New Password",
+    "confirmPasswordLabel": "Confirm New Password",
+    "resetButton": "Reset Password",
+    "resetting": "Resetting...",
+    "backToLogin": "Back to Login",
+    "loading": "Loading ...",
+    "verifying": "Verifying reset link...",
+    "passwordStrength": "Password strength",
+    "routes": {
+      "login": "/login"
+    },
+    "strength": {
+      "weak": "weak",
+      "fair": "fair",
+      "good": "good",
+      "strong": "strong"
+    },
+    "success": {
+      "title": "Password Reset Successful!",
+      "message": "Your password has been successfully reset. You will be redirected to the login page shortly.",
+      "continue": "Continue to Login"
+    },
+    "invalidLink": {
+      "title": "Reset Link Invalid"
+    },
+    "errors": {
+      "invalidLink": "Invalid password reset link. Please request a new one.",
+      "expiredLink": "This password reset link has expired. Please request a new one.",
+      "userDisabled": "This account has been disabled.",
+      "userNotFound": "No account found with this email address.",
+      "verifyFailed": "Failed to verify reset link. Please try again.",
+      "unexpected": "An error occurred. Please try again.",
+      "passwordMismatch": "Passwords do not match",
+      "weakPassword": "Password is too weak. Please choose a stronger password.",
+      "resetFailed": "Failed to reset password. Please try again."
+    }
+  },
+  "notFound": {
+    "alt": "Planet",
+    "goHome": "Go Home"
+  },
+  "badgeDisplay": {
+    "noBadges": "No badges earned yet. Keep practicing!",
+    "showMore": "Show More",
+    "showLess": "Show Less"
+  },
+  "trainingHistory": {
+    "loading": "Loading training history...",
+    "noHistory": "No training sessions yet. Start your first scenario!",
+    "fetchError": "Failed to fetch assessed conversations",
+    "loadError": "Failed to load your training history. Please try again."
+  },
+  "conversationList": {
+    "loading": "Loading your conversations...",
+    "noConversations": "No conversations yet",
+    "noConversationsHint": "Complete a call with Bobby to see your conversation history here."
+  },
+  "loadingSpinner": {
+    "defaultText": "Bobby is getting ready to chat!",
+    "defaultHeading": "Just a moment ...",
+    "alt": "Bobby is getting ready to chat"
+  },
+  "app": {
+    "welcomeTitle": "Hello, Hero!",
+    "welcomeSubtitle": "I'm Bobby. Let's learn to save the day!",
+    "bobbyAlt": "Bobby",
+    "callBobby": "CALL BOBBY"
+  },
+  "voiceConversation": {
+    "greeting": {
+      "ambulance": "Hi, I'm Bobby from Ambulance Service. Can you tell me if the person needs help?",
+      "fire": "Hi, I'm Bobby from Fire and Rescue. What is the problem?",
+      "police": "Hi, I'm Bobby from Police. What's wrong?"
+    }
+  },
+  "success": {
+    "incomplete": {
+      "title": "Payment Incomplete",
+      "message": "We couldn't verify your payment status. Please check your email or try again.",
+      "email": "If you completed a payment, your credits will be added automatically.",
+      "cta": "Try Again"
+    },
+    "expired": {
+      "title": "Session Expired",
+      "message": "This payment session has expired.",
+      "cta": "Try Again"
+    },
+    "failed": {
+      "title": "Payment Failed",
+      "message": "Your payment could not be processed. Please try again or contact your bank.",
+      "email": "You were not charged. Please try a different payment method if the issue persists.",
+      "cta": "Try Again"
+    },
+    "complete": {
+      "title": "Payment Successful!",
+      "message": "Thank you for your purchase! You've received {credits} credits.",
+      "email": "A confirmation email will be sent to {email}.",
+      "emailFallback": "you",
+      "cta": "Start Practicing!"
+    },
+    "unclear": {
+      "title": "Payment Status Unclear",
+      "message": "We couldn't determine your payment status. Please check your email for confirmation.",
+      "email": "If you were charged, your credits will be added automatically. Otherwise, please try again.",
+      "cta": "Check Payment Status"
+    },
+    "error": {
+      "title": "Something Went Wrong",
+      "message": "We couldn't verify your payment. Please contact support if you were charged.",
+      "cta": "Go to Practice"
+    }
+  }
+}

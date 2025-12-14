@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUserData } from '@/context/UserDataContext';
 import type { UserSettings } from '@/types';
 import AccessibilityToggle from './AccessibilityToggle';
@@ -20,6 +21,7 @@ interface AccessibilitySectionProps {
 export default function AccessibilitySection({
   onSettingsChange,
 }: AccessibilitySectionProps) {
+  const t = useTranslations('accessibility');
   const { userData, updateSettings } = useUserData();
   const settings = userData.settings;
   const [mounted, setMounted] = useState(false);
@@ -117,7 +119,7 @@ export default function AccessibilitySection({
 
   return (
     <div role="region" aria-label="Accessibility settings">
-      <h2 className="accessibility-section-title">Accessibility Settings</h2>
+      <h2 className="accessibility-section-title">{t('title')}</h2>
       <Image
         className="accessibility-image"
         src="/bobby-accessibility.png"
@@ -129,7 +131,7 @@ export default function AccessibilitySection({
         {/* UI Sound Toggle */}
         <AccessibilityToggle
           id="ui-sound-toggle"
-          label="UI Sound"
+          label={t('uiSound.label')}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -148,13 +150,13 @@ export default function AccessibilitySection({
           }
           checked={soundEnabled}
           onChange={handleSoundToggle}
-          ariaLabel={soundEnabled ? 'Turn UI sound off' : 'Turn UI sound on'}
+          ariaLabel={soundEnabled ? t('uiSound.off') : t('uiSound.on')}
         />
 
         {/* Dyslexia-Friendly Font Toggle */}
         <AccessibilityToggle
           id="dyslexia-font-toggle"
-          label="Dyslexia-Friendly Font"
+          label={t('dyslexiaFont.label')}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -179,13 +181,13 @@ export default function AccessibilitySection({
           }
           checked={settings.dyslexiaFont}
           onChange={checked => handleSettingChange('dyslexiaFont', checked)}
-          ariaLabel="Use dyslexia-friendly font for better readability"
+          ariaLabel={t('dyslexiaFont.aria')}
         />
 
         {/* Slowed Speech Mode Toggle */}
         <AccessibilityToggle
           id="slowed-speech-toggle"
-          label="Slowed Speech Mode"
+          label={t('slowedSpeech.label')}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -216,13 +218,13 @@ export default function AccessibilitySection({
           }
           checked={settings.slowedSpeech}
           onChange={checked => handleSettingChange('slowedSpeech', checked)}
-          ariaLabel="Slow down speech for better understanding"
+          ariaLabel={t('slowedSpeech.aria')}
         />
 
         {/* Reduced Sensory Mode Toggle */}
         <AccessibilityToggle
           id="reduced-sensory-toggle"
-          label="Reduced Sensory Mode"
+          label={t('reducedSensory.label')}
           icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +243,7 @@ export default function AccessibilitySection({
           }
           checked={settings.reducedSensory}
           onChange={checked => handleSettingChange('reducedSensory', checked)}
-          ariaLabel="Reduce animations and visual effects"
+          ariaLabel={t('reducedSensory.aria')}
         />
       </div>
 
@@ -253,19 +255,19 @@ export default function AccessibilitySection({
             htmlFor="font-size-select"
             className="accessibility-setting-label"
           >
-            📏 Font Size
+            📏 {t('fontSize.label')}
           </label>
           <select
             id="font-size-select"
             value={settings.fontSize}
             onChange={e => handleSettingChange('fontSize', e.target.value)}
             className="accessibility-select"
-            aria-label="Select font size for text"
+            aria-label={t('fontSize.aria')}
           >
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-            <option value="xlarge">Extra Large</option>
+            <option value="small">{t('fontSize.small')}</option>
+            <option value="medium">{t('fontSize.medium')}</option>
+            <option value="large">{t('fontSize.large')}</option>
+            <option value="xlarge">{t('fontSize.xlarge')}</option>
           </select>
         </div>
 
@@ -275,17 +277,17 @@ export default function AccessibilitySection({
             htmlFor="color-mode-select"
             className="accessibility-setting-label"
           >
-            🎨 Color Mode
+            🎨 {t('colorMode.label')}
           </label>
           <select
             id="color-mode-select"
             value={settings.colorMode}
             onChange={e => handleSettingChange('colorMode', e.target.value)}
             className="accessibility-select"
-            aria-label="Select color mode for better visibility"
+            aria-label={t('colorMode.aria')}
           >
-            <option value="default">Default</option>
-            <option value="high-contrast">High Contrast</option>
+            <option value="default">{t('colorMode.default')}</option>
+            <option value="high-contrast">{t('colorMode.highContrast')}</option>
           </select>
         </div>
       </div>

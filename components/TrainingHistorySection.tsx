@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
 
@@ -18,6 +19,7 @@ interface AssessedConversation {
 
 export default function TrainingHistorySection() {
   const { user } = useAuth();
+  const t = useTranslations('trainingHistory');
   const [assessedConversations, setAssessedConversations] = useState<
     AssessedConversation[]
   >([]);
@@ -40,7 +42,7 @@ export default function TrainingHistorySection() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch assessed conversations');
+          throw new Error(t('fetchError'));
         }
 
         const data = await response.json();
@@ -50,12 +52,12 @@ export default function TrainingHistorySection() {
         } else {
           setError(
             data.message ||
-              'Failed to load your training history. Please try again.'
+              t('loadError')
           );
         }
       } catch (err) {
         logger.error('Error fetching assessed conversations:', err);
-        setError('Failed to load training history');
+        setError(t('loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -73,7 +75,7 @@ export default function TrainingHistorySection() {
             <div className="spinner-circle" />
             <div className="spinner-circle" />
           </div>
-          <p className="loading-message">Loading training history...</p>
+          <p className="loading-message">{t('loading')}</p>
         </div>
       </div>
     );
@@ -92,7 +94,7 @@ export default function TrainingHistorySection() {
   if (assessedConversations.length === 0) {
     return (
       <p className="no-history">
-        No training sessions yet. Start your first scenario!
+        {t('noHistory')}
       </p>
     );
   }

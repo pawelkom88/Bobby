@@ -9,8 +9,6 @@ import {
 import { verifyIdToken, getAdminDb } from '@/lib/firebase-admin';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 
-export const dynamic = 'force-dynamic';
-
 /**
  * GET /api/authenticate
  *

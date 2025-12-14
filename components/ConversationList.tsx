@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import ConversationCard from './ConversationCard';
 import type { ConversationListItem } from '@/types';
 
@@ -14,6 +15,7 @@ export default function ConversationList({
   isLoading,
   error,
 }: ConversationListProps) {
+  const t = useTranslations('conversationList');
   if (isLoading) {
     return (
       <div className="conversation-list conversation-list--loading">
@@ -23,7 +25,7 @@ export default function ConversationList({
             <div className="spinner-circle" />
             <div className="spinner-circle" />
           </div>
-          <p className="loading-message">Loading your conversations...</p>
+          <p className="loading-message">{t('loading')}</p>
         </div>
       </div>
     );
@@ -65,9 +67,9 @@ export default function ConversationList({
             <path d="M7 9h10" />
             <path d="M7 13h6" />
           </svg>
-          <h3>No conversations yet</h3>
+          <h3>{t('noConversations')}</h3>
           <p>
-            Complete a call with Bobby to see your conversation history here.
+            {t('noConversationsHint')}
           </p>
         </div>
       </div>

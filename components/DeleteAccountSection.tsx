@@ -2,12 +2,14 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import CartoonButton from '@/components/CartoonButton';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { logger } from '@/lib/logger';
 
 export default function DeleteAccountSection() {
+  const t = useTranslations('deleteAccount');
   const { user, signOut } = useAuth();
   const router = useRouter();
 
@@ -49,7 +51,7 @@ export default function DeleteAccountSection() {
         router.push(ROUTES.HOME);
       } catch (err: any) {
         logger.error('Error deleting account:', err);
-        setError(err.message || 'Failed to delete account. Please try again.');
+        setError(err.message || t('errors.failed'));
       }
     });
   };
@@ -64,11 +66,11 @@ export default function DeleteAccountSection() {
       <div className="progress-section">
         <CartoonButton
           onClick={handleDelete}
-          ariaLabel="Delete account"
+          ariaLabel={t('button')}
           className="cartoon-btn-danger"
           disabled={isPending}
         >
-          🗑️ Delete Account
+          🗑️ {t('button')}
         </CartoonButton>
         {error && (
           <p className="reset-warning" role="alert">
@@ -82,25 +84,23 @@ export default function DeleteAccountSection() {
   return (
     <div className="progress-section">
       <p className="reset-warning" role="alert">
-        Are you sure you want to delete your account? This will permanently
-        remove all your data, progress, badges, and conversation history. This
-        action cannot be undone.
+        {t('confirmMessage')}
       </p>
       <div className="reset-actions">
         <CartoonButton
           onClick={handleDelete}
-          ariaLabel="Confirm delete account"
+          ariaLabel={t('confirmButton')}
           className="cartoon-btn-danger"
           disabled={isPending}
         >
-          {isPending ? 'Deleting...' : 'I am sure'}
+          {isPending ? t('deleting') : t('confirmButton')}
         </CartoonButton>
         <CartoonButton
           onClick={handleCancel}
-          ariaLabel="Cancel delete"
+          ariaLabel={t('cancel')}
           disabled={isPending}
         >
-          Cancel
+          {t('cancel')}
         </CartoonButton>
       </div>
       {error && (

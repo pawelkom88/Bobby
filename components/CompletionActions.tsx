@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 
@@ -11,6 +12,7 @@ interface CompletionActionsProps {
 export default function CompletionActions({
   conversationId,
 }: CompletionActionsProps) {
+  const t = useTranslations('completionActions');
   const router = useRouter();
   const clearSession = useClearSession();
 
@@ -34,23 +36,23 @@ export default function CompletionActions({
       <button
         onClick={handleContinue}
         className="cartoon-btn"
-        aria-label="Practice again"
+        aria-label={t('practiceAgain')}
       >
-        <span>Practice Again</span>
+        <span>{t('practiceAgain')}</span>
       </button>
       <button
         onClick={handleViewAchievements}
         className="cartoon-btn cartoon-btn--secondary"
-        aria-label="View achievements"
+        aria-label={t('viewAchievements')}
       >
-        <span>View Achievements</span>
+        <span>{t('viewAchievements')}</span>
       </button>
       <button
         onClick={handleViewConversation}
         className="cartoon-btn cartoon-btn--tertiary"
-        aria-label="View conversation history"
+        aria-label={t('viewConversation')}
       >
-        <span>View Conversation</span>
+        <span>{t('viewConversation')}</span>
       </button>
     </div>
   );

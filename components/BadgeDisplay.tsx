@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useUserData } from '@/context/UserDataContext';
 import { BADGES } from '@/lib/gamification';
@@ -19,6 +20,7 @@ export default function BadgeDisplay({
   maxVisible = 1,
 }: BadgeDisplayProps) {
   const { userData } = useUserData();
+  const t = useTranslations('badgeDisplay');
   const badges = userData.badges;
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -42,7 +44,7 @@ export default function BadgeDisplay({
     return (
       <div className="badge-display" role="region" aria-label="Badges">
         <p className="no-badges-message">
-          No badges earned yet. Keep practicing!
+          {t('noBadges')}
         </p>
       </div>
     );
@@ -87,7 +89,7 @@ export default function BadgeDisplay({
               aria-controls="badge-grid"
               aria-label={`Show all ${displayedBadges.length} badges`}
             >
-              <span className="btn-text">Show More</span>
+              <span className="btn-text">{t('showMore')}</span>
               <span className="btn-icon">
                 <svg
                   width="14"
@@ -120,7 +122,7 @@ export default function BadgeDisplay({
               aria-expanded={isExpanded}
               aria-label="Show fewer badges"
             >
-              <span className="btn-text">Show Less</span>
+              <span className="btn-text">{t('showLess')}</span>
               <span className="btn-icon">
                 <svg
                   width="14"

@@ -1,22 +1,23 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import type { Service, ConversationAssessment, Badge } from '@/types';
 
 // ============================================================================
 // Helper Functions - Replace complex ternaries with readable functions
 // ============================================================================
 
-export function getCompletionTitle(isLevel10: boolean, xpEarned: number): string {
-  if (isLevel10) return '🎉 Training Complete! 🎉';
-  if (xpEarned === 0) return 'Practice Session Complete';
-  return 'Well Done! 🎉';
+export function getCompletionTitle(isLevel10: boolean, xpEarned: number, t: (key: string) => string): string {
+  if (isLevel10) return t('title.trainingComplete');
+  if (xpEarned === 0) return t('title.practiceComplete');
+  return t('title.wellDone');
 }
 
-export function getPerformanceImage(score: number): { src: string; alt: string } {
-  if (score >= 90) return { src: '/flawless.png', alt: 'Flawless performance!' };
-  if (score >= 60) return { src: '/welldone.png', alt: 'Well done!' };
-  return { src: '/donotworry.png', alt: "Don't worry, keep practicing!" };
+export function getPerformanceImage(score: number, t: (key: string) => string): { src: string; alt: string } {
+  if (score >= 90) return { src: '/flawless.png', alt: t('performance.flawless') };
+  if (score >= 60) return { src: '/welldone.png', alt: t('performance.wellDone') };
+  return { src: '/donotworry.png', alt: t('performance.keepPracticing') };
 }
 
 // ============================================================================
@@ -24,37 +25,29 @@ export function getPerformanceImage(score: number): { src: string; alt: string }
 // ============================================================================
 
 interface Level10MessageProps {
-  // No props needed - this is a static congratulations message
+  t: (key: string) => string;
 }
 
-function Level10Message({}: Level10MessageProps) {
+function Level10Message({ t }: Level10MessageProps) {
   return (
     <div className="completion-message">
-      <p>Congratulations! You&apos;ve mastered emergency calls!</p>
-      <p>
-        You&apos;ve learned how to stay calm, communicate clearly, and get help
-        when you need it. You&apos;re now prepared and confident. Great job!
-      </p>
-      <p>
-        Remember, you can always practice more to stay sharp. Keep up the
-        amazing work!
-      </p>
+      <p>{t('level10.congratulations')}</p>
+      <p>{t('level10.mastered')}</p>
+      <p>{t('level10.keepPracticing')}</p>
     </div>
   );
 }
 
 interface NoXPMessageProps {
   service?: Service;
+  t: (key: string, values?: Record<string, string>) => string;
 }
 
-function NoXPMessage({ service }: NoXPMessageProps) {
+function NoXPMessage({ service, t }: NoXPMessageProps) {
   return (
     <div className="completion-message">
-      <p>You tried the {service} emergency scenario.</p>
-      <p>
-        Don&apos;t worry! Emergency calls can be tricky. Let&apos;s try again
-        and you&apos;ll do better!
-      </p>
+      <p>{t('noXP.tried', { service: service || '' })}</p>
+      <p>{t('noXP.encouragement')}</p>
     </div>
   );
 }
@@ -66,6 +59,7 @@ interface SuccessMessageProps {
   currentLevel: number;
   badgeAwarded: Badge | null;
   assessment?: ConversationAssessment;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }
 
 function SuccessMessage({
@@ -75,10 +69,11 @@ function SuccessMessage({
   currentLevel,
   badgeAwarded,
   assessment,
+  t,
 }: SuccessMessageProps) {
   const { src: imageSrc, alt: imageAlt } = assessment?.score
-    ? getPerformanceImage(assessment.score)
-    : { src: '/donotworry.png', alt: 'Practice session' };
+    ? getPerformanceImage(assessment.score, t)
+    : { src: '/donotworry.png', alt: t('performance.practiceSession') };
 
   return (
     <div className="completion-message">
@@ -90,23 +85,23 @@ function SuccessMessage({
         src={imageSrc}
         alt={imageAlt}
       />
-      <p>You completed the {service} emergency scenario!</p>
+      <p>{t('success.completed', { service: service || '' })}</p>
 
       {leveledUp && (
         <div className="level-up-message" role="alert">
-          <h2>Level Up! 🚀</h2>
-          <p>You reached Level {currentLevel}!</p>
+          <h2>{t('success.levelUp')}</h2>
+          <p>{t('success.reachedLevel', { level: currentLevel })}</p>
         </div>
       )}
 
       {badgeAwarded && (
         <div className="badge-awarded-message" role="alert">
-          <h2>New Badge Earned! 🏆</h2>
+          <h2>{t('success.newBadge')}</h2>
           <p>{badgeAwarded.name}</p>
         </div>
       )}
 
-      <XPDisplay xpEarned={xpEarned} assessment={assessment} />
+      <XPDisplay xpEarned={xpEarned} assessment={assessment} t={t} />
     </div>
   );
 }
@@ -114,19 +109,20 @@ function SuccessMessage({
 interface XPDisplayProps {
   xpEarned: number;
   assessment?: ConversationAssessment;
+  t: (key: string, values?: Record<string, number>) => string;
 }
 
-function XPDisplay({ xpEarned, assessment }: XPDisplayProps) {
+function XPDisplay({ xpEarned, assessment, t }: XPDisplayProps) {
   return (
     <div className="xp-earned">
       {xpEarned > 0 ? (
-        <p>You earned {xpEarned} XP!</p>
+        <p>{t('xp.earned', { xp: xpEarned })}</p>
       ) : (
-        <p className="no-xp-message">No XP earned this time</p>
+        <p className="no-xp-message">{t('xp.noXP')}</p>
       )}
       {assessment && (
         <p className="assessment-score">
-          Score: {Math.round(assessment.score)} / 100
+          {t('xp.score', { score: Math.round(assessment.score) })}
         </p>
       )}
     </div>
@@ -160,14 +156,16 @@ export default function CompletionMessage({
   badgeAwarded,
   assessment,
 }: CompletionMessageProps) {
+  const t = useTranslations('completionMessage');
+
   // Level 10 completion - training complete!
   if (isLevel10) {
-    return <Level10Message />;
+    return <Level10Message t={t} />;
   }
 
   // No XP earned - encouragement message
   if (xpEarned === 0) {
-    return <NoXPMessage service={service} />;
+    return <NoXPMessage service={service} t={t} />;
   }
 
   // Normal success - show performance details
@@ -179,6 +177,7 @@ export default function CompletionMessage({
       currentLevel={currentLevel}
       badgeAwarded={badgeAwarded}
       assessment={assessment}
+      t={t}
     />
   );
 }

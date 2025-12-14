@@ -5,6 +5,14 @@ import { verifyIdToken } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 
+function toStripeLocale(locale: string) {
+  // Stripe expects a specific Locale union.
+  // We only support our app locales here and map to Stripe equivalents.
+  if (locale === 'pl') return 'pl' as const;
+  if (locale === 'en') return 'en' as const;
+  return undefined;
+}
+
 /**
  * Credit pack configuration - SERVER-SIDE ONLY
  * Never trust client-provided prices or credit amounts
@@ -51,10 +59,12 @@ function isValidPackType(packType: string): packType is PackType {
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
+  const localeParam = request.nextUrl.searchParams.get('locale') || 'en';
+  const stripeLocale = toStripeLocale(localeParam);
   try {
     // 1. Extract and validate Bearer token
     const idToken = extractAndValidateToken(request, 'checkout_sessions');
-    
+
     if (!idToken) {
       return NextResponse.json(
         { error: 'Invalid or missing authorization token' },
@@ -67,7 +77,10 @@ export async function POST(request: NextRequest) {
     try {
       decodedToken = await verifyIdToken(idToken);
     } catch (error) {
-      logger.error('Token verification failed:', error instanceof Error ? error.message : String(error));
+      logger.error(
+        'Token verification failed:',
+        error instanceof Error ? error.message : String(error)
+      );
       return NextResponse.json(
         { error: 'Invalid or expired token' },
         { status: 401 }
@@ -126,6 +139,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
+      ...(stripeLocale ? { locale: stripeLocale } : {}),
       success_url: successUrl,
       cancel_url: `${origin}/app/select-package?canceled=true`,
       // Store metadata for webhook processing

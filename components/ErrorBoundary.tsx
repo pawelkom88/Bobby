@@ -1,7 +1,40 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
+
+interface ErrorBoundaryFallbackProps {
+  error: Error | null;
+  onReset: () => void;
+}
+
+function ErrorBoundaryFallback({ error, onReset }: ErrorBoundaryFallbackProps) {
+  const t = useTranslations('errorBoundary');
+
+  return (
+    <div className="error-boundary" role="alert">
+      <div className="error-boundary-content">
+        <h2>{t('title')}</h2>
+        <p>{t('message')}</p>
+        {process.env.NODE_ENV === 'development' && error && (
+          <details className="error-details">
+            <summary>{t('devDetails')}</summary>
+            <pre>{error.toString()}</pre>
+          </details>
+        )}
+        <button
+          type="button"
+          onClick={onReset}
+          className="error-reset-button"
+          aria-label={t('tryAgain')}
+        >
+          {t('tryAgain')}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   children: ReactNode;
@@ -50,26 +83,10 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="error-boundary" role="alert">
-          <div className="error-boundary-content">
-            <h2>Something went wrong</h2>
-            <p>We're sorry, but something unexpected happened.</p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="error-details">
-                <summary>Error details (development only)</summary>
-                <pre>{this.state.error.toString()}</pre>
-              </details>
-            )}
-            <button
-              type="button"
-              onClick={this.handleReset}
-              className="error-reset-button"
-              aria-label="Try again"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
+        <ErrorBoundaryFallback
+          error={this.state.error}
+          onReset={this.handleReset}
+        />
       );
     }
 

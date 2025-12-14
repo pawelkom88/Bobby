@@ -5,8 +5,6 @@ import { rateLimiters, createRateLimitHeaders } from '@/lib/rateLimit';
 import { verifyIdToken, getAdminDb } from '@/lib/firebase-admin';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 
-export const dynamic = 'force-dynamic';
-
 export async function POST(request: NextRequest) {
   try {
     // 0. Request size check

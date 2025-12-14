@@ -50,3 +50,4 @@ next-env.d.ts
 /app/api/test-reset-email/route.ts
 /app/api/test-goodbye-email/route.ts
 /gitleaks-report.json
+/docs/
