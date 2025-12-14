@@ -48,18 +48,3 @@ export function SuccessContent({
     </>
   );
 }
-
-interface SuccessDetailsProps {
-  packType: string;
-}
-
-export function SuccessDetails({ packType }: SuccessDetailsProps) {
-  const packClass = packType.toLowerCase();
-  const displayName = packType.charAt(0).toUpperCase() + packType.slice(1);
-
-  return (
-    <div className={`success-details pack-${packClass}`}>
-      <p>Pack: {displayName}</p>
-    </div>
-  );
-}

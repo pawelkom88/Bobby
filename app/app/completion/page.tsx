@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import CompletionScreen from '@/components/CompletionScreen';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { QueryBoundary } from '@/components/QueryBoundary';
+import { useSession } from '@/hooks/queries/useSession';
 import type { PerformanceMetrics, AgeTier, Service } from '@/types';
 import { useUserData } from '@/context/UserDataContext';
 import { useAuth } from '@/context/AuthContext';
@@ -19,7 +20,7 @@ const DEFAULT_SITUATION: Service = 'fire';
 
 function CompletionPageContent() {
   const { getJourneyState } = useUserData();
-  const { getSession } = useSecureSession();
+  const { data: sessionData, isLoading: sessionLoading, error: sessionError } = useSession();
   const { user } = useAuth();
   const router = useRouter();
   const [performance, setPerformance] = useState<PerformanceMetrics>({});
@@ -41,14 +42,24 @@ function CompletionPageContent() {
 
   useEffect(() => {
     // Retrieve assessment from secure server-side session
-    const loadAssessment = async () => {
+    const loadAssessment = () => {
       // Wait for user authentication to resolve
       if (!user) {
         logger.log('🔍 User not authenticated yet, waiting...');
         return;
       }
 
-      const sessionData = await getSession();
+      // Wait for session query to resolve before making redirect decisions
+      if (sessionLoading) {
+        logger.log('🔍 Session still loading, waiting...');
+        return;
+      }
+
+      if (sessionError) {
+        logger.error('🔍 Failed to load session data, redirecting to dial', sessionError);
+        router.replace(ROUTES.DIAL);
+        return;
+      }
 
       logger.log('🔍 ===== COMPLETION PAGE LOAD =====');
       logger.log('🔍 sessionData:', sessionData);
@@ -56,10 +67,17 @@ function CompletionPageContent() {
       logger.log('🔍 processedId:', sessionData?.processedCompletionId);
 
       // Check if session has expired (24-hour limit)
-      if (sessionData?.expiresAt && Date.now() > sessionData.expiresAt) {
-        logger.log('🔍 Session expired, redirecting to dial');
-        router.replace(ROUTES.DIAL);
-        return;
+      if (sessionData?.expiresAt) {
+        const expiresAtMs =
+          typeof sessionData.expiresAt === 'number'
+            ? sessionData.expiresAt
+            : new Date(sessionData.expiresAt).getTime();
+
+        if (Number.isFinite(expiresAtMs) && Date.now() > expiresAtMs) {
+          logger.log('🔍 Session expired, redirecting to dial');
+          router.replace(ROUTES.DIAL);
+          return;
+        }
       }
 
       // CRITICAL: Validate that session belongs to the authenticated user
@@ -95,7 +113,7 @@ function CompletionPageContent() {
           logger.log('🔍 Assessment score:', data.assessment?.score);
 
           setPerformance({
-            completed: data.passed,
+            completed: data.assessment.passed,
             assessment: data.assessment,
             feedbackSummary: data.assessment.improvements.length
               ? data.assessment.improvements
@@ -129,7 +147,7 @@ function CompletionPageContent() {
     };
 
     loadAssessment();
-  }, [getSession, router, user]);
+  }, [router, sessionData, sessionError, sessionLoading, user]);
 
   // Show loading while checking session
   if (isSessionValid === null) {
@@ -145,20 +163,38 @@ function CompletionPageContent() {
   }
 
   return (
-    <ViewTransition>
-      <PageWrapper>
-        <ErrorBoundary>
-          <main className="app-page" role="main">
-            <CompletionScreen
-              service={selectedSituation}
-              ageTier={selectedAgeTier}
-              performance={performance}
-              conversationId={conversationId}
-            />
-          </main>
-        </ErrorBoundary>
-      </PageWrapper>
-    </ViewTransition>
+    <QueryBoundary
+      loadingFallback={<LoadingSpinner text="Loading completion data..." />}
+      errorFallback={({ error, resetErrorBoundary }) => (
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <h2 className="mb-2 text-xl font-semibold text-gray-900">
+            Failed to load completion data
+          </h2>
+          <p className="mb-4 text-gray-600">{error.message}</p>
+          <button
+            onClick={resetErrorBoundary}
+            className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+    >
+      <ViewTransition>
+        <PageWrapper>
+          <ErrorBoundary>
+            <main className="app-page" role="main">
+              <CompletionScreen
+                service={selectedSituation}
+                ageTier={selectedAgeTier}
+                performance={performance}
+                conversationId={conversationId}
+              />
+            </main>
+          </ErrorBoundary>
+        </PageWrapper>
+      </ViewTransition>
+    </QueryBoundary>
   );
 }
 

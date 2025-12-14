@@ -2,11 +2,13 @@
 
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { SoundProvider } from '@/components/SoundProvider';
 import { MicrophoneContextProvider } from '@/context/MicrophoneContextProvider';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserDataProvider } from '@/context/UserDataContext';
 import { CreditsProvider } from '@/context/CreditsContext';
+import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -32,22 +34,24 @@ export function OptimizedProviders({ children }: ProvidersProps) {
     pathname?.includes('/conversation') || pathname?.includes('/dial');
 
   return (
-    <AuthProvider>
-      <CreditsProvider>
-        <UserDataProvider>
-          <SoundProvider>
-            {isConversationPage ? (
-              <DeepgramContextProvider>
-                <MicrophoneContextProvider>
-                  {children}
-                </MicrophoneContextProvider>
-              </DeepgramContextProvider>
-            ) : (
-              <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
-            )}
-          </SoundProvider>
-        </UserDataProvider>
-      </CreditsProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CreditsProvider>
+          <UserDataProvider>
+            <SoundProvider>
+              {isConversationPage ? (
+                <DeepgramContextProvider>
+                  <MicrophoneContextProvider>
+                    {children}
+                  </MicrophoneContextProvider>
+                </DeepgramContextProvider>
+              ) : (
+                <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
+              )}
+            </SoundProvider>
+          </UserDataProvider>
+        </CreditsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

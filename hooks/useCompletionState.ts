@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUserData } from '@/context/UserDataContext';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { useSession } from '@/hooks/queries/useSession';
 import { calculateXPEarned } from '@/lib/gamification';
 import { playFanfareSound } from '@/lib/uiSound';
 import type { Service, AgeTier, PerformanceMetrics, Badge, ConversationAssessment } from '@/types';
@@ -36,7 +36,7 @@ export function useCompletionState({
   performance = {},
 }: UseCompletionStateProps): CompletionState {
   const { addXP, saveConversation, awardScoreBadge, getLevel } = useUserData();
-  const { getSession } = useSecureSession();
+  const { data: sessionData } = useSession();
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [xpEarned, setXPEarned] = useState(0);
@@ -51,10 +51,9 @@ export function useCompletionState({
 
   useEffect(() => {
     processCompletion();
-  }, [service, ageTier, performance.assessment, getSession]);
+  }, [service, ageTier, performance.assessment, sessionData]);
 
   async function processCompletion() {
-    const sessionData = await getSession();
     const completionId = sessionData?.completionId;
     const processedId = sessionData?.processedCompletionId;
     const assessmentData = sessionData?.lastAssessment;

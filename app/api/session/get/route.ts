@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     
     if (!idToken) {
       return NextResponse.json(
-        { error: 'Invalid or missing authorization token' },
+        { success: false, error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
     }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       await verifyIdToken(idToken);
     } catch {
       return NextResponse.json(
-        { error: 'Invalid or expired token' },
+        { success: false, error: 'Invalid or expired token' },
         { status: 401 }
       );
     }
@@ -45,11 +45,11 @@ export async function GET(request: NextRequest) {
     // Get all session data
     const sessionData = await getAllSessionData();
 
-    return NextResponse.json(sessionData);
+    return NextResponse.json({ success: true, data: sessionData });
   } catch (error) {
     logger.error('Error retrieving session data:', error);
     return NextResponse.json(
-      { error: 'Failed to retrieve session data' },
+      { success: false, error: 'Failed to retrieve session data' },
       { status: 500 }
     );
   }

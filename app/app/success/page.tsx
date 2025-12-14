@@ -6,7 +6,6 @@ import { logger } from '@/lib/logger';
 import Image from 'next/image';
 import SuccessPageLayout, {
   SuccessContent,
-  SuccessDetails,
 } from '@/components/SuccessPageLayout';
 
 export default async function Success({
@@ -128,9 +127,7 @@ export default async function Success({
             message={`Thank you for your purchase! You've received ${credits} credits.`}
             email={`A confirmation email will be sent to ${sessionEmail || 'you'}.`}
             ctaText="Start Practicing!"
-          >
-            <SuccessDetails packType={packType} />
-          </SuccessContent>
+          />
         </SuccessPageLayout>
       );
     }

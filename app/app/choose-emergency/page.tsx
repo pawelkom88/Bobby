@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { useUserData } from '@/context/UserDataContext';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { useAuth } from '@/context/AuthContext';
+import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 import { Service } from '@/types';
 import { logger } from '@/lib/logger';
@@ -42,12 +43,21 @@ const services: Array<{
 export default function ChooseEmergencyPage() {
   const router = useRouter();
   const { setSelectedService } = useUserData();
-  const { clearSession } = useSecureSession();
+  const clearSession = useClearSession();
+  const { user, loading } = useAuth();
+  const hasClearedSessionForUserRef = useRef<string | null>(null);
 
   // Clear session data when in conversation setup flow
   useEffect(() => {
-    clearSession();
-  }, [clearSession]);
+    if (loading || !user) return;
+    if (clearSession.isPending || clearSession.isSuccess) return;
+
+    const userId = user.uid;
+    if (hasClearedSessionForUserRef.current === userId) return;
+
+    hasClearedSessionForUserRef.current = userId;
+    clearSession.mutate();
+  }, [clearSession, user, loading]);
 
   const handleSelectService = async (service: Service) => {
     try {

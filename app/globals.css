@@ -6550,70 +6550,6 @@ input {
 }
 
 /* ============================================================================
-   SUCCESS DETAILS PACKAGE-SPECIFIC STYLING
-   ============================================================================ */
-
-.success-details {
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  margin: 1.5rem 0;
-  position: relative;
-  overflow: hidden;
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.1),
-    0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.success-details::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  border-radius: 1.5rem 1.5rem 0 0;
-  opacity: 0.9;
-}
-
-.success-details.pack-hero {
-  background: linear-gradient(
-    135deg,
-    rgba(74, 105, 189, 0.15) 0%,
-    rgba(59, 89, 152, 0.1) 100%
-  );
-  color: #1a2f5a;
-}
-
-.success-details.pack-responder {
-  background: linear-gradient(
-    135deg,
-    rgba(184, 233, 148, 0.2) 0%,
-    rgba(120, 224, 143, 0.15) 100%
-  );
-  color: #22543d;
-}
-
-.success-details > * {
-  position: relative;
-  z-index: 1;
-}
-
-.success-details p {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-family: 'Nunito', sans-serif;
-}
-
-.success-details p:first-child {
-  font-size: 1.3rem;
-  font-weight: 700;
-  font-family: 'Chewy', system-ui;
-  margin-bottom: 1rem;
-}
-
-/* ============================================================================
    PACK CARD PRICING STYLES
    ============================================================================ */
 
@@ -6974,13 +6910,7 @@ input {
 }
 
 /* Hover effects */
-.select-button:not(:disabled):hover .price-tag {
-  transform: rotateX(8deg) rotateY(-8deg) scale(1.05);
-  box-shadow:
-    0 12px 48px rgba(0, 0, 0, 0.4),
-    inset 0 2px 8px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
-}
+
 
 .select-button:not(:disabled):active .price-tag {
   transform: rotateX(2deg) rotateY(-2deg) scale(0.98);
@@ -7165,18 +7095,6 @@ input {
   .select-button:disabled {
     cursor: not-allowed;
     opacity: 0.6;
-  }
-
-  .button-blue:hover:not(:disabled) {
-    background: #15803d;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(22, 163, 74, 0.4);
-  }
-
-  .button-yellow:hover:not(:disabled) {
-    background: #b45309;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
   }
 
   .ribbon {

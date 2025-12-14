@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 
 interface CompletionActionsProps {
@@ -12,10 +12,10 @@ export default function CompletionActions({
   conversationId,
 }: CompletionActionsProps) {
   const router = useRouter();
-  const { clearSession } = useSecureSession();
+  const clearSession = useClearSession();
 
   const handleContinue = async () => {
-    await clearSession();
+    await clearSession.mutateAsync();
     router.push(ROUTES.YOUR_AGE);
   };
 

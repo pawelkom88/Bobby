@@ -7,7 +7,8 @@ import { useSearchParams } from 'next/navigation';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { useSession } from '@/hooks/queries/useSession';
+import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
@@ -22,14 +23,15 @@ function DialPageContent() {
     loading: creditsLoading,
     forceRefreshCredits,
   } = useCredits();
-  const { user } = useAuth();
-  const { clearSession } = useSecureSession();
+  const { user, loading: authLoading } = useAuth();
+  const clearSession = useClearSession();
   const searchParams = useSearchParams();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isRefreshingFromPayment, setIsRefreshingFromPayment] = useState(false);
   const hasRefreshedRef = useRef(false);
+  const hasClearedSessionForUserRef = useRef<string | null>(null);
   const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
 
   logger.log('DialPageContent: Component rendered/updated', {
@@ -55,8 +57,15 @@ function DialPageContent() {
   // Clear session data before starting conversation
   useEffect(() => {
     logger.log('DialPageContent: useEffect - clearSession');
-    clearSession();
-  }, [clearSession]);
+    if (authLoading || !user) return;
+    if (clearSession.isPending || clearSession.isSuccess) return;
+
+    const userId = user.uid;
+    if (hasClearedSessionForUserRef.current === userId) return;
+
+    hasClearedSessionForUserRef.current = userId;
+    clearSession.mutate();
+  }, [authLoading, clearSession, user]);
 
   // Force refresh credits when returning from successful payment
   useEffect(() => {
@@ -220,6 +229,11 @@ function DialPageContent() {
                   role="status"
                 >
                   Loading your credits...
+                </div>
+              )}
+              {checkoutError && (
+                <div className="dial-message dial-message-warning" role="alert">
+                  {checkoutError}
                 </div>
               )}
 

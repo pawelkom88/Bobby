@@ -9,7 +9,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PaidRouteGuard from '@/components/PaidRouteGuard';
 import { useUserData } from '@/context/UserDataContext';
 import { useCredits } from '@/context/CreditsContext';
-import { useSecureSession } from '@/hooks/useSecureSession';
+import { useSession } from '@/hooks/queries/useSession';
+import { useClearSession, useSetAssessment, useSetConversationId } from '@/hooks/mutations/useSessionMutations';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
 import { logger } from '@/lib/logger';
@@ -26,7 +27,10 @@ function ConversationPageContent() {
   const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
   const { getJourneyState } = useUserData();
   const { setConversationActive } = useCredits();
-  const { getSession, clearSession } = useSecureSession();
+  const { data: sessionData } = useSession();
+  const clearSession = useClearSession();
+  const setAssessment = useSetAssessment();
+  const setConversationId = useSetConversationId();
 
   // Get selected values from journey state
   const journeyState = getJourneyState();
@@ -35,22 +39,21 @@ function ConversationPageContent() {
 
   // Check if user is trying to return to a completed conversation
   useEffect(() => {
-    const checkConversationStatus = async () => {
-      const sessionData = await getSession();
+    const checkConversationStatus = () => {
       // Only redirect if conversation is complete AND assessment is already stored
       // This allows the completion flow to work properly
       if (sessionData?.conversationComplete && sessionData?.lastAssessment) {
         setIsComplete(true);
         // Clear the flag and redirect after a brief moment to show message
         setTimeout(async () => {
-          await clearSession();
+          await clearSession.mutateAsync();
           window.location.href = ROUTES.APP;
         }, 2000);
       }
     };
 
     checkConversationStatus();
-  }, [getSession, clearSession]);
+  }, [sessionData, clearSession]);
 
   // Set conversation as active when component mounts
   useEffect(() => {
@@ -119,17 +122,30 @@ function ConversationPageContent() {
       // Store assessment in secure server-side session
       // Generate unique completion ID to prevent duplicate XP awards
       const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const stored = await setAssessment(
+      const stored = await setAssessment.mutateAsync(
         {
-          assessment,
-          passed: assessment.passed,
-        },
-        completionId
+          assessment: {
+            assessment: {
+              score: assessment.score,
+              passed: assessment.passed,
+              positives: assessment.positives,
+              improvements: assessment.improvements,
+              warnings: assessment.warnings,
+              metrics: assessment.metrics,
+            },
+            passed: assessment.passed,
+            responses: conversation.map(m => ({ type: m.type, text: m.text })),
+            scores: [assessment.score],
+            feedback: assessment.improvements,
+            metadata: { score: assessment.score, passed: assessment.passed },
+          },
+          completionId,
+        }
       );
       
       // Store the actual Firestore conversation ID for linking to chat history
       if (conversationId) {
-        await setConversationId(conversationId);
+        await setConversationId.mutateAsync(conversationId);
         logger.log('Stored conversationId in session:', conversationId);
       }
 
@@ -143,22 +159,15 @@ function ConversationPageContent() {
       });
 
       // Navigate to completion
-      // CRITICAL: Clear conversationActive flag before navigation
-      // This prevents the flag from persisting after full page reload
-      setConversationActive(false);
       window.location.href = ROUTES.COMPLETION;
     } catch (error) {
       logger.error('Error assessing conversation', error);
       // Still navigate to completion even if assessment fails
-      // CRITICAL: Clear conversationActive flag before navigation
-      setConversationActive(false);
       window.location.href = ROUTES.COMPLETION;
     } finally {
       setIsProcessingAssessment(false);
     }
   };
-
-  const { setAssessment, setConversationId } = useSecureSession();
 
   const handleBack = () => {
     window.location.href = ROUTES.DIAL;
