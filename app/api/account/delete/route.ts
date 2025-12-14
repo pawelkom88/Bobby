@@ -4,6 +4,11 @@ import { verifyToken } from '@/lib/token-verifier';
 import { extractBearerToken } from '@/lib/auth-utils';
 import { clearAllSessionValues } from '@/lib/session-storage';
 import { logger } from '@/lib/logger';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 
 const auth = getAdminAuth();
 const db = getAdminDb();
@@ -14,6 +19,7 @@ interface DeleteAccountResponse {
   success: boolean;
   error?: string;
   message?: string;
+  retryAfter?: number;
 }
 
 async function verifyUserFromToken(
@@ -129,6 +135,33 @@ export async function POST(
     }
 
     const userId = userResult.userId;
+
+    // Rate limiting - strict limit for destructive operation
+    const clientIp = getClientIP(request);
+    const rateLimitIdentifier = `account-delete:${userId}:${clientIp}`;
+    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+
+    if (rateLimit.limited) {
+      logger.warn('Rate limit exceeded for account/delete endpoint', {
+        userId,
+        remaining: rateLimit.remaining,
+        resetTime: rateLimit.resetTime,
+      });
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'rate-limited',
+          message: 'Too many requests',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimit),
+        }
+      );
+    }
+
     logger.log(`User ${userId} requesting account deletion`);
 
     const deletionResults = {

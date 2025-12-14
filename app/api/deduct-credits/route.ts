@@ -24,6 +24,11 @@ import { calculateDuration } from '@/lib/duration-calculator';
 import { isEligibleForCharge } from '@/lib/charge-eligibility';
 import { logger } from '@/lib/logger';
 import { extractBearerToken } from '@/lib/auth-utils';
+import {
+  rateLimiters,
+  getClientIP,
+  createRateLimitHeaders,
+} from '@/lib/rateLimit';
 
 // Initialize Firebase Admin lazily (runtime only)
 const auth = getAdminAuth();
@@ -40,6 +45,7 @@ interface DeductCreditsResponse {
   durationSeconds?: number;
   error?: string;
   message?: string;
+  retryAfter?: number;
 }
 
 /**
@@ -258,11 +264,38 @@ export async function POST(
     }
 
     const userId = userResult.userId;
+
+    // 3. Rate limiting
+    const clientIp = getClientIP(request);
+    const rateLimitIdentifier = `deduct-credits:${userId}:${clientIp}`;
+    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+
+    if (rateLimit.limited) {
+      logger.warn('Rate limit exceeded for deduct-credits endpoint', {
+        userId,
+        remaining: rateLimit.remaining,
+        resetTime: rateLimit.resetTime,
+      });
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'rate-limited',
+          message: 'Too many requests',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimit),
+        }
+      );
+    }
+
     logger.log(
       `User ${userId} requesting credit deduction for conversation ${conversationId}`
     );
 
-    // 3. Verify user owns conversation
+    // 4. Verify user owns conversation
     try {
       await validateOwnership(userId, conversationId, getConversation);
     } catch (error: any) {
@@ -295,7 +328,7 @@ export async function POST(
       throw error;
     }
 
-    // 4. Check if already charged (idempotency)
+    // 5. Check if already charged (idempotency)
     const alreadyCharged = await isAlreadyCharged(conversationId);
     if (alreadyCharged) {
       logger.log(
@@ -313,7 +346,7 @@ export async function POST(
       );
     }
 
-    // 5. Get conversation to calculate duration
+    // 6. Get conversation to calculate duration
     const conversation = await getConversation(conversationId);
     if (!conversation) {
       logger.warn(`Conversation ${conversationId} not found`);
@@ -327,7 +360,7 @@ export async function POST(
       );
     }
 
-    // 6. Calculate duration server-side (security: client cannot manipulate)
+    // 7. Calculate duration server-side (security: client cannot manipulate)
     if (!conversation.startedAt || !conversation.endedAt) {
       logger.warn(`Conversation ${conversationId} missing timestamps`);
       return NextResponse.json(
@@ -346,7 +379,7 @@ export async function POST(
 
     logger.log(`Conversation ${conversationId} duration: ${durationSeconds}s`);
 
-    // 7. Check charge eligibility
+    // 8. Check charge eligibility
     const eligibility = isEligibleForCharge(
       durationSeconds,
       conversation.charged
@@ -368,7 +401,7 @@ export async function POST(
       );
     }
 
-    // 8. Perform atomic deduction
+    // 9. Perform atomic deduction
     const newCredits = await performDeduction(
       userId,
       conversationId,
