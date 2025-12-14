@@ -9,6 +9,7 @@ import {
   getClientIP,
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
+import { sendGoodbyeEmail } from '@/lib/mailer';
 
 const auth = getAdminAuth();
 const db = getAdminDb();
@@ -164,6 +165,17 @@ export async function POST(
 
     logger.log(`User ${userId} requesting account deletion`);
 
+    // Get user email before deletion for goodbye email
+    let userEmail: string | undefined;
+    let userName: string | undefined;
+    try {
+      const userRecord = await auth.getUser(userId);
+      userEmail = userRecord.email;
+      userName = userRecord.displayName || 'there';
+    } catch (error) {
+      logger.warn('Could not fetch user record for goodbye email', { userId });
+    }
+
     const deletionResults = {
       conversations: 0,
       purchases: 0,
@@ -221,6 +233,16 @@ export async function POST(
       logger.log(`Session data cleared for user ${userId}`);
     } catch (error) {
       logger.warn('Error clearing session data:', error);
+    }
+
+    // Send goodbye email (don't block deletion if email fails)
+    if (userEmail) {
+      try {
+        await sendGoodbyeEmail(userEmail, userName || 'there');
+        logger.info('Goodbye email sent successfully', { userId });
+      } catch (emailError) {
+        logger.error('Failed to send goodbye email', { userId, error: emailError });
+      }
     }
 
     logger.info(`Account deleted successfully for user ${userId}`, {
