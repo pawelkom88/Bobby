@@ -107,7 +107,7 @@ function LoginForm() {
     if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
   };
 
-  if (authLoading) {
+  if (authLoading || user) {
     return <LoadingSpinner text={tLoading('redirecting')} heading={tLoading('pleaseWait')} />;
   }
 

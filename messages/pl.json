@@ -96,6 +96,64 @@
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
     },
+    "carousel": {
+      "title": "Czy Twoje dziecko poradziłoby sobie z...",
+      "subtitle": "Przesuń, aby zobaczyć prawdziwe scenariusze, które dzieci mogą ćwiczyć z Bobbym",
+      "prevAriaLabel": "Poprzednie scenariusze",
+      "nextAriaLabel": "Następne scenariusze",
+      "carouselAriaLabel": "Karuzela kart scenariuszy",
+      "goToSlide": "Przejdź do slajdu {number}"
+    },
+    "scenarios": {
+      "1": {
+        "situation": "Mama zemdlała w kuchni",
+        "hook": "Czy Twoje dziecko wiedziałoby, co powiedzieć pogotowiu?",
+        "description": "Twoje dziecko wraca do domu i znajduje Cię nieprzytomną na podłodze. Bobby poprowadzi je przez sprawdzenie, czy oddychasz, podanie adresu i zachowanie spokoju do przyjazdu pomocy.",
+        "practicePoints": ["Wyraźne podanie adresu", "Sprawdzenie oddechu", "Pozostanie na linii do przyjazdu pomocy"]
+      },
+      "2": {
+        "situation": "Budzisz się i czujesz dym",
+        "hook": "Najpierw wyjść? Najpierw zadzwonić? Czy wiedzą?",
+        "description": "Jest środek nocy, a korytarz wypełnia dym. Bobby uczy ich właściwej kolejności działań i bezpiecznej ewakuacji.",
+        "practicePoints": ["Schylanie się i sprawdzanie drzwi", "Znajdowanie najbezpieczniejszej drogi ucieczki", "Dzwonienie pod 112 po wyjściu"]
+      },
+      "3": {
+        "situation": "W domu jest obcy człowiek",
+        "hook": "Czy potrafią się ukryć i szeptać o pomoc?",
+        "description": "Ktoś włamał się, gdy rodzina jest w domu. Bobby pomaga im zrozumieć, jak się ukryć, zachować ciszę i komunikować ze służbami ratunkowymi.",
+        "practicePoints": ["Znajdowanie bezpiecznej kryjówki", "Wyraźne szeptanie do operatora", "Pozostanie w ukryciu do przyjazdu policji"]
+      },
+      "4": {
+        "situation": "Dziadek upadł i nie wstaje",
+        "hook": "Czy potrafią jasno opisać, co się stało?",
+        "description": "Dziadek upadł i nie może się ruszyć. Bobby prowadzi ich przez opisanie sytuacji, sprawdzenie obrażeń i zapewnienie dziadkowi komfortu.",
+        "practicePoints": ["Opisanie upadku i objawów", "Sprawdzenie, czy dziadek jest przytomny", "Utrzymanie go w bezruchu i cieple"]
+      },
+      "5": {
+        "situation": "Dom sąsiada płonie",
+        "hook": "Czy wiedzą, co ONI powinni zrobić?",
+        "description": "Płomienie są widoczne u sąsiadów. Bobby uczy ich, jak zaalarmować własną rodzinę, wezwać pomoc i trzymać się z daleka od niebezpieczeństwa.",
+        "practicePoints": ["Alarmowanie dorosłych w domu", "Dzwonienie pod 112 z prawidłowym adresem", "Zachowanie bezpiecznej odległości"]
+      },
+      "6": {
+        "situation": "Twój młodszy brat się dławi",
+        "hook": "Każda sekunda się liczy. Czy zamarliby?",
+        "description": "Rodzeństwo dławi się jedzeniem i nie może oddychać. Bobby prowadzi ich przez rozpoznanie objawów i natychmiastowe wezwanie pomocy.",
+        "practicePoints": ["Rozpoznawanie objawów dławienia", "Natychmiastowe dzwonienie pod 112", "Wykonywanie instrukcji operatora"]
+      },
+      "7": {
+        "situation": "Dym blokuje drogę wyjścia",
+        "hook": "Czy wiedzą, jak pozostać bezpieczni do przyjazdu pomocy?",
+        "description": "Normalne wyjście jest zablokowane dymem. Bobby uczy ich, co robić, gdy nie mogą uciec i jak sygnalizować o pomoc.",
+        "practicePoints": ["Zamykanie drzwi, aby zablokować dym", "Sygnalizowanie z okna", "Pozostawanie nisko, gdzie powietrze jest czystsze"]
+      },
+      "8": {
+        "situation": "Nie czujesz się bezpiecznie w domu",
+        "hook": "Muszą wiedzieć, że można prosić o pomoc",
+        "description": "Czasami dom nie jest bezpiecznym miejscem. Bobby delikatnie wyjaśnia, że można się zwrócić o pomoc i jak porozmawiać z kimś, kto może pomóc.",
+        "practicePoints": ["Zrozumienie, że to nie ich wina", "Wiedza, do kogo zadzwonić po pomoc", "Rozmowa z zaufanym dorosłym"]
+      }
+    },
     "footer": {
       "ready": "Gotowy do rozpoczęcia?",
       "privacy": "Polityka prywatności"

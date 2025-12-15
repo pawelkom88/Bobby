@@ -185,6 +185,10 @@ function SignUpForm() {
       setErrors(prev => ({ ...prev, confirmPassword: undefined }));
   };
 
+  if (authLoading || user) {
+    return <LoadingSpinner text={tLoading('redirecting')} heading={tLoading('pleaseWait')} />;
+  }
+
   return (
     <AuthPageLayout titleId="signup-title">
       <AuthPageHeader title={t('signup.title')} titleId="signup-title" />

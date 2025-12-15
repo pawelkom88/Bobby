@@ -9,7 +9,8 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { scenarios, type Scenario } from './scenarios';
+import { useTranslations } from 'next-intl';
+import { scenarioIds, type Scenario } from './scenarios';
 import { ScenarioCard } from './ScenarioCard';
 import { ScenarioModal } from './ScenarioModal';
 
@@ -20,6 +21,7 @@ const CARDS_MOBILE = 1;
 
 export function ScenarioCarousel() {
   const router = useRouter();
+  const t = useTranslations('landing');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(
     null
@@ -32,7 +34,7 @@ export function ScenarioCarousel() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  const maxIndex = Math.max(0, scenarios.length - visibleCards);
+  const maxIndex = Math.max(0, scenarioIds.length - visibleCards);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -134,10 +136,10 @@ export function ScenarioCarousel() {
     >
       <header className="scenario-section__header">
         <h2 id="scenario-heading" className="scenario-section__title">
-          Could your child handle...
+          {t('carousel.title')}
         </h2>
         <p className="scenario-section__subtitle">
-          Swipe to see real scenarios children can practice with Bobby
+          {t('carousel.subtitle')}
         </p>
       </header>
 
@@ -147,7 +149,7 @@ export function ScenarioCarousel() {
           className="scenario-carousel__arrow scenario-carousel__arrow--prev"
           onClick={goToPrevious}
           disabled={currentIndex === 0}
-          aria-label="Previous scenarios"
+          aria-label={t('carousel.prevAriaLabel')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -166,7 +168,7 @@ export function ScenarioCarousel() {
           ref={carouselRef}
           className="scenario-carousel"
           role="region"
-          aria-label="Scenario cards carousel"
+          aria-label={t('carousel.carouselAriaLabel')}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onTouchStart={handleTouchStart}
@@ -180,21 +182,31 @@ export function ScenarioCarousel() {
               transition: prefersReducedMotion ? 'none' : 'transform 0.3s ease',
             }}
           >
-            {scenarios.map((scenario, index) => (
-              <div
-                key={scenario.id}
-                className="scenario-carousel__slide"
-                style={{ width: `${100 / visibleCards}%` }}
-              >
-                <ScenarioCard
-                  scenario={scenario}
-                  onClick={() => handleCardClick(scenario)}
-                  isActive={
-                    index >= currentIndex && index < currentIndex + visibleCards
-                  }
-                />
-              </div>
-            ))}
+            {scenarioIds.map((scenarioId, index) => {
+              const scenario: Scenario = {
+                id: scenarioId.id,
+                service: scenarioId.service,
+                situation: t(`scenarios.${scenarioId.id}.situation`),
+                hook: t(`scenarios.${scenarioId.id}.hook`),
+                description: t(`scenarios.${scenarioId.id}.description`),
+                practicePoints: t.raw(`scenarios.${scenarioId.id}.practicePoints`) as string[],
+              };
+              return (
+                <div
+                  key={scenario.id}
+                  className="scenario-carousel__slide"
+                  style={{ width: `${100 / visibleCards}%` }}
+                >
+                  <ScenarioCard
+                    scenario={scenario}
+                    onClick={() => handleCardClick(scenario)}
+                    isActive={
+                      index >= currentIndex && index < currentIndex + visibleCards
+                    }
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -203,7 +215,7 @@ export function ScenarioCarousel() {
           className="scenario-carousel__arrow scenario-carousel__arrow--next"
           onClick={goToNext}
           disabled={currentIndex >= maxIndex}
-          aria-label="Next scenarios"
+          aria-label={t('carousel.nextAriaLabel')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -228,7 +240,7 @@ export function ScenarioCarousel() {
               index === currentIndex ? 'scenario-pagination__dot--active' : ''
             }`}
             onClick={() => setCurrentIndex(index)}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={t('carousel.goToSlide', { number: index + 1 })}
             aria-current={index === currentIndex ? 'true' : undefined}
           />
         ))}

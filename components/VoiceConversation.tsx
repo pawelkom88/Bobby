@@ -20,11 +20,7 @@ import {
   DeepgramAgentConfig,
 } from '@/utils/deepgramUtils';
 import { createAudioBuffer, playAudioBuffer } from '@/utils/audioUtils';
-import {
-  getAmbulancePrompt,
-  getFirePrompt,
-  getPolicePrompt,
-} from '@/lib/prompts/prompts';
+import { getPromptByService, type Locale } from '@/lib/prompts';
 import { useLocale } from 'next-intl';
 
 interface ActiveConversationViewProps {
@@ -690,30 +686,31 @@ export default function VoiceConversation({
             }))
           : [];
 
-      const instructions =
-        situation === 'ambulance'
-          ? getAmbulancePrompt(
-              ageTierLabel,
-              CONFIG.MAX_CONVERSATION_TIME_MINUTES
-            )
-          : situation === 'fire'
-            ? getFirePrompt(ageTierLabel, CONFIG.MAX_CONVERSATION_TIME_MINUTES)
-            : getPolicePrompt(
-                ageTierLabel,
-                CONFIG.MAX_CONVERSATION_TIME_MINUTES
-              );
+      const instructions = getPromptByService(
+        situation,
+        ageTierLabel,
+        CONFIG.MAX_CONVERSATION_TIME_MINUTES,
+        currentLocale as Locale
+      );
       logger.log(
         'VoiceConversation: System prompt generated, length:',
         instructions.length
       );
 
-      // Dynamic greeting based on scenario
-      const greeting =
-        situation === 'ambulance'
-          ? "Hi, I'm Bobby from Ambulance Service. Can you tell me if the person needs help?"
-          : situation === 'fire'
-            ? "Hi, I'm Bobby from Fire and Rescue. What is the problem?"
-            : "Hi, I'm Bobby from Police. What's wrong?";
+      // Dynamic greeting based on scenario and locale
+      const greetings = {
+        en: {
+          ambulance: "Hi, I'm Bobby from Ambulance Service. Can you tell me if the person needs help?",
+          fire: "Hi, I'm Bobby from Fire and Rescue. What is the problem?",
+          police: "Hi, I'm Bobby from Police. What's wrong?",
+        },
+        pl: {
+          ambulance: "Cześć, jestem Bobby z Pogotowia Ratunkowego. Powiedz mi co się stało?",
+          fire: "Cześć, jestem Bobby ze Straży Pożarnej. Co się dzieje?",
+          police: "Cześć, jestem Bobby z Policji. Co się stało?",
+        },
+      };
+      const greeting = greetings[currentLocale as Locale]?.[situation] ?? greetings.en[situation];
 
       const config: DeepgramAgentConfig = {
         type: 'Settings',
@@ -729,7 +726,7 @@ export default function VoiceConversation({
           },
         },
         agent: {
-          language: 'en',
+          language: currentLocale === 'pl' ? 'pl' : 'en',
           context: {
             messages: conversationContext,
           },
