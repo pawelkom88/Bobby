@@ -189,8 +189,92 @@
           "answer": "Tak! Przechowujemy minimalne dane lokalnie na urządzeniu. Żadne wrażliwe informacje nie są zbierane ani przechowywane. Śledzimy tylko ukończenie scenariuszy, punkty doświadczenia i odznaki, aby nauka była zabawna."
         },
         "4": {
-          "question": "Ile rozmów treningowych jest wliczone?",
-          "answer": "Każdy kredyt daje jedną rozmowę treningową z Bobbym. Możesz wybrać różne pakiety w zależności od tego, ile praktyki potrzebuje Twoje dziecko. Wszystkie rozmowy są prowadzone i odpowiednie do wieku."
+          "question": "Czy to połączenie zadzwoni pod prawdziwy numer alarmowy?",
+          "answer": "Nie! Bobby to tylko aplikacja treningowa - NIGDY nie połączy z prawdziwymi służbami alarmowymi. To bezpieczne środowisko do nauki."
+        },
+        "5": {
+          "question": "Ile rozmów treningowych jest w pakiecie?",
+          "answer": "Jeden kredyt to jedna rozmowa treningowa z Bobby. Możesz wybrać różne pakiety w zależności od tego, ile ćwiczeń potrzebuje Twoje dziecko. Wszystkie rozmowy są prowadzone i dostosowane do wieku."
+        },
+        "6": {
+          "question": "Jak długo działa jeden kredyt?",
+          "answer": "Jeden kredyt uprawnia do jednej pełnej rozmowy z Bobby. Rozmowa powinna trwać co najmniej 30 sekund, aby zostać uznana za prawidłową sesję treningową. Jeśli rozmowa zakończy się zbyt wcześnie, kredyt nie zostanie pobrany."
+        },
+        "7": {
+          "question": "Co się stanie jeśli stracę połączenie podczas rozmowy?",
+          "answer": "Jeśli połączenie się przerwie, nie martw się! System śledzi postęp rozmowy. Połącz się ponownie w ciągu 5 minut i prawdopodobnie będziesz mógł kontynuować. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną."
+        },
+        "8": {
+          "question": "Czy mogę otrzymać zwrot pieniędzy za niewykorzystane kredyty?",
+          "answer": "Kredyty nie podlegają zwrotowi, ale nie tracą ważności! Możesz je wykorzystać w dowolnym momencie na sesje treningowe z dowolnym scenariuszem alarmowym."
+        },
+        "9": {
+          "question": "Czy kredyty tracą ważność?",
+          "answer": "Nie, Twoje kredyty nigdy nie tracą ważności. Wykorzystaj je, kiedy będziesz gotów do ćwiczeń."
+        },
+        "10": {
+          "question": "Jakie przeglądarki są obsługiwane?",
+          "answer": "Bobby działa najlepiej na nowoczesnych przeglądarkach takich jak Chrome, Firefox, Safari i Edge. Zalecamy używanie najnowszych wersji dla najlepszych wrażeń."
+        },
+        "11": {
+          "question": "Czy potrzebuję mikrofonu?",
+          "answer": "Tak, mikrofon jest wymagany do rozmów głosowych z Bobby. Upewnij się, że nadałeś pozwolenie na dostęp do mikrofonu po wyświetleniu prośby."
+        },
+        "12": {
+          "question": "Jak chronione są dane mojego dziecka?",
+          "answer": "Używamy bezpiecznego uwierzytelniania i nigdy nie przechowujemy osobistych informacji takich jak adresy czy numery telefonów. Rozmowy są wykorzystywane tylko do oceny i śledzenia postępów."
+        },
+        "13": {
+          "question": "Czy inni użytkownicy mogą widzieć rozmowy mojego dziecka?",
+          "answer": "Nie, wszystkie rozmowy są prywatne i widoczne tylko dla Twojego konta."
+        },
+        "14": {
+          "question": "Jak działa system oceniania?",
+          "answer": "Dzieci są oceniane pod kątem jasności komunikacji, podawania lokalizacji, opisywania sytuacji alarmowej i zachowania spokoju. Wyniki mieszczą się w skali 0-100, a wyższe wyniki dają więcej punktów doświadczenia (PD)."
+        },
+        "15": {
+          "question": "Czym są PD i odznaki?",
+          "answer": "PD (Punkty Doświadczenia) zdobywa się za ukończone rozmowy treningowe. Wraz z gromadzeniem PD dzieci awansują na wyższe poziomy i zdobywają odznaki za osiągnięcia takie jak 'Dobry Komunikator' czy 'Ekspert Bezpieczeństwa Pożarowego'."
+        },
+        "16": {
+          "question": "Czy możemy odtwarzać rozmowy?",
+          "answer": "Tak! Możesz przeglądać przeszłe rozmowy w sekcji 'Rozmowy', aby śledzić postępy i sprawdzać opinie."
+        },
+        "17": {
+          "question": "Jak generowane są opinie?",
+          "answer": "Nasz system AI analizuje rozmowy na podstawie kryteriów dostosowanych do wieku i dostarcza spersonalizowane opinie na temat tego, co poszło dobrze i co wymaga poprawy."
+        },
+        "18": {
+          "question": "Jakie funkcje dostępności są dostępne?",
+          "answer": "Bobby oferuje czcionki przyjazne dla dyslektyków, regulowane rozmiary tekstu, tryb wysokiego kontrastu, opcję zwolnionej mowy oraz tryb zredukowanej stymulacji sensorycznej dla dzieci z nadwrażliwością."
+        },
+        "19": {
+          "question": "Czy moje dziecko może ćwiczyć jeśli ma trudności z mową?",
+          "answer": "Tak! Oferujemy alternatywne wprowadzanie tekstu i pomoce wizualne. Tryb zwolnionej mowy pomaga w zrozumieniu."
+        },
+        "20": {
+          "question": "Czy mogę użyć konta Google do logowania?",
+          "answer": "Tak! Możesz zarejestrować się lub logować używając konta Google dla szybkiego dostępu."
+        },
+        "21": {
+          "question": "Jak zresetować hasło?",
+          "answer": "Kliknij 'Zapomniałeś hasła?' na stronie logowania, wpisz swój e-mail, a my wyślemy link do resetowania."
+        },
+        "22": {
+          "question": "Czy mogę mieć kilka dzieci na jednym koncie?",
+          "answer": "Obecnie każde konto śledzi postępy jednego użytkownika. Dla kilku dzieci stwórz osobne konta, aby śledzić indywidualne postępy."
+        },
+        "23": {
+          "question": "Jak usunąć konto?",
+          "answer": "Przejdź do Ustawienia > Konto > Usuń konto. Spowoduje to trwałe usunięcie wszystkich danych, postępów i kredytów."
+        },
+        "24": {
+          "question": "Głos nie działa - co robić?",
+          "answer": "Sprawdź czy mikrofon jest podłączony i czy przyznałeś pozwolenia. Spróbuj odświeżyć stronę lub użyć innej przeglądarki."
+        },
+        "25": {
+          "question": "Aplikacja się zawiesiła lub zablokowała.",
+          "answer": "Spróbuj odświeżyć stronę. Jeśli problemy będą się powtarzać, wyczyść pamięć podręczną przeglądarki lub skontaktuj się z pomocą techniczną."
         }
       }
     }
@@ -287,8 +371,92 @@
         "answer": "Tak! Przechowujemy minimalne dane tylko lokalnie na twoim urządzeniu. Żadne wrażliwe informacje nie są zbierane ani przechowywane. Śledzimy tylko ukończenie scenariuszy, XP i odznaki, aby nauka była zabawą."
       },
       "4": {
-        "question": "Czy ta aplikacja wymaga internetu?",
-        "answer": "Tak, aplikacja wymaga połączenia z internetem do korzystania z funkcji rozmowy głosowej z Bobbym. Jednak twój postęp jest przechowywany lokalnie na urządzeniu."
+        "question": "Czy to połączenie zadzwoni pod prawdziwy numer alarmowy?",
+        "answer": "Nie! Bobby to tylko aplikacja treningowa - NIGDY nie połączy z prawdziwymi służbami alarmowymi. To bezpieczne środowisko do nauki."
+      },
+      "5": {
+        "question": "Ile rozmów treningowych jest w pakiecie?",
+        "answer": "Jeden kredyt to jedna rozmowa treningowa z Bobby. Możesz wybrać różne pakiety w zależności od tego, ile ćwiczeń potrzebuje Twoje dziecko. Wszystkie rozmowy są prowadzone i dostosowane do wieku."
+      },
+      "6": {
+        "question": "Jak długo działa jeden kredyt?",
+        "answer": "Jeden kredyt uprawnia do jednej pełnej rozmowy z Bobby. Rozmowa powinna trwać co najmniej 30 sekund, aby zostać uznana za prawidłową sesję treningową. Jeśli rozmowa zakończy się zbyt wcześnie, kredyt nie zostanie pobrany."
+      },
+      "7": {
+        "question": "Co się stanie jeśli stracę połączenie podczas rozmowy?",
+        "answer": "Jeśli połączenie się przerwie, nie martw się! System śledzi postęp rozmowy. Połącz się ponownie w ciągu 5 minut i prawdopodobnie będziesz mógł kontynuować. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną."
+      },
+      "8": {
+        "question": "Czy mogę otrzymać zwrot pieniędzy za niewykorzystane kredyty?",
+        "answer": "Kredyty nie podlegają zwrotowi, ale nie tracą ważności! Możesz je wykorzystać w dowolnym momencie na sesje treningowe z dowolnym scenariuszem alarmowym."
+      },
+      "9": {
+        "question": "Czy kredyty tracą ważność?",
+        "answer": "Nie, Twoje kredyty nigdy nie tracą ważności. Wykorzystaj je, kiedy będziesz gotów do ćwiczeń."
+      },
+      "10": {
+        "question": "Jakie przeglądarki są obsługiwane?",
+        "answer": "Bobby działa najlepiej na nowoczesnych przeglądarkach takich jak Chrome, Firefox, Safari i Edge. Zalecamy używanie najnowszych wersji dla najlepszych wrażeń."
+      },
+      "11": {
+        "question": "Czy potrzebuję mikrofonu?",
+        "answer": "Tak, mikrofon jest wymagany do rozmów głosowych z Bobby. Upewnij się, że nadałeś pozwolenie na dostęp do mikrofonu po wyświetleniu prośby."
+      },
+      "12": {
+        "question": "Jak chronione są dane mojego dziecka?",
+        "answer": "Używamy bezpiecznego uwierzytelniania i nigdy nie przechowujemy osobistych informacji takich jak adresy czy numery telefonów. Rozmowy są wykorzystywane tylko do oceny i śledzenia postępów."
+      },
+      "13": {
+        "question": "Czy inni użytkownicy mogą widzieć rozmowy mojego dziecka?",
+        "answer": "Nie, wszystkie rozmowy są prywatne i widoczne tylko dla Twojego konta."
+      },
+      "14": {
+        "question": "Jak działa system oceniania?",
+        "answer": "Dzieci są oceniane pod kątem jasności komunikacji, podawania lokalizacji, opisywania sytuacji alarmowej i zachowania spokoju. Wyniki mieszczą się w skali 0-100, a wyższe wyniki dają więcej punktów doświadczenia (PD)."
+      },
+      "15": {
+        "question": "Czym są PD i odznaki?",
+        "answer": "PD (Punkty Doświadczenia) zdobywa się za ukończone rozmowy treningowe. Wraz z gromadzeniem PD dzieci awansują na wyższe poziomy i zdobywają odznaki za osiągnięcia takie jak 'Dobry Komunikator' czy 'Ekspert Bezpieczeństwa Pożarowego'."
+      },
+      "16": {
+        "question": "Czy możemy odtwarzać rozmowy?",
+        "answer": "Tak! Możesz przeglądać przeszłe rozmowy w sekcji 'Rozmowy', aby śledzić postępy i sprawdzać opinie."
+      },
+      "17": {
+        "question": "Jak generowane są opinie?",
+        "answer": "Nasz system AI analizuje rozmowy na podstawie kryteriów dostosowanych do wieku i dostarcza spersonalizowane opinie na temat tego, co poszło dobrze i co wymaga poprawy."
+      },
+      "18": {
+        "question": "Jakie funkcje dostępności są dostępne?",
+        "answer": "Bobby oferuje czcionki przyjazne dla dyslektyków, regulowane rozmiary tekstu, tryb wysokiego kontrastu, opcję zwolnionej mowy oraz tryb zredukowanej stymulacji sensorycznej dla dzieci z nadwrażliwością."
+      },
+      "19": {
+        "question": "Czy moje dziecko może ćwiczyć jeśli ma trudności z mową?",
+        "answer": "Tak! Oferujemy alternatywne wprowadzanie tekstu i pomoce wizualne. Tryb zwolnionej mowy pomaga w zrozumieniu."
+      },
+      "20": {
+        "question": "Czy mogę użyć konta Google do logowania?",
+        "answer": "Tak! Możesz zarejestrować się lub logować używając konta Google dla szybkiego dostępu."
+      },
+      "21": {
+        "question": "Jak zresetować hasło?",
+        "answer": "Kliknij 'Zapomniałeś hasła?' na stronie logowania, wpisz swój e-mail, a my wyślemy link do resetowania."
+      },
+      "22": {
+        "question": "Czy mogę mieć kilka dzieci na jednym koncie?",
+        "answer": "Obecnie każde konto śledzi postępy jednego użytkownika. Dla kilku dzieci stwórz osobne konta, aby śledzić indywidualne postępy."
+      },
+      "23": {
+        "question": "Jak usunąć konto?",
+        "answer": "Przejdź do Ustawienia > Konto > Usuń konto. Spowoduje to trwałe usunięcie wszystkich danych, postępów i kredytów."
+      },
+      "24": {
+        "question": "Głos nie działa - co robić?",
+        "answer": "Sprawdź czy mikrofon jest podłączony i czy przyznałeś pozwolenia. Spróbuj odświeżyć stronę lub użyć innej przeglądarki."
+      },
+      "25": {
+        "question": "Aplikacja się zawiesiła lub zablokowała.",
+        "answer": "Spróbuj odświeżyć stronę. Jeśli problemy będą się powtarzać, wyczyść pamięć podręczną przeglądarki lub skontaktuj się z pomocą techniczną."
       }
     }
   },

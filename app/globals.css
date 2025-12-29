@@ -3178,6 +3178,55 @@ a,
   }
 }
 
+.faq-category-title {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.faq-toggle-button {
+  position: relative;
+  background: transparent;
+  color: #667eea;
+  border: 3px solid #667eea;
+  padding: 14px 24px;
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-top: 2rem;
+  display: inline-block;
+  font-weight: normal;
+}
+
+.faq-toggle-button:hover {
+  transform: translateY(-2px);
+  border-color: #4c51bf;
+  color: #4c51bf;
+  box-shadow:
+    0 8px 0 #4c51bf,
+    0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.faq-toggle-button:focus-visible {
+  outline: 4px solid #fbbf24;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-toggle-button {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .faq-toggle-button {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+}
+
 .faq-contact-button {
   display: inline-flex;
   align-items: center;

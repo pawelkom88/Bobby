@@ -10,14 +10,21 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
 
-const FAQ_IDS = [1, 2, 3, 4];
+const ALL_FAQ_IDS = Array.from({ length: 25 }, (_, i) => i + 1);
+const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
 
 export default function HomePage() {
   const t = useTranslations('landing');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [showAllFAQs, setShowAllFAQs] = useState(false);
 
   const toggleQuestion = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const toggleAllFAQs = () => {
+    setShowAllFAQs(!showAllFAQs);
+    setExpandedId(null); // Close any expanded question when toggling
   };
 
   return (
@@ -74,7 +81,7 @@ export default function HomePage() {
                 <section id="faq" className="landing-faq-section">
                   <h2 className="landing-faq-title">{t('faq.title')}</h2>
                   <div className="faq-accordion" role="list">
-                    {FAQ_IDS.map(id => (
+                    {(showAllFAQs ? ALL_FAQ_IDS : INITIAL_FAQ_IDS).map(id => (
                       <div
                         key={id}
                         className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
@@ -118,6 +125,13 @@ export default function HomePage() {
                       </div>
                     ))}
                   </div>
+                  <button
+                    type="button"
+                    className="faq-toggle-button"
+                    onClick={toggleAllFAQs}
+                  >
+                    {showAllFAQs ? 'Show Less' : `Show All ${ALL_FAQ_IDS.length} Questions`}
+                  </button>
                 </section>
               </main>
 
