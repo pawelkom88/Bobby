@@ -35,7 +35,7 @@ export default function HomePage() {
                     <a href="#how-it-works">{t('nav.howItWorks')}</a>
                   </li>
                   <li>
-                    <Link href="/faq">{t('nav.faq')}</Link>
+                    <a href="#faq">{t('nav.faq')}</a>
                   </li>
                   <li>
                     <Link href="/contact">{t('nav.contact')}</Link>
@@ -71,7 +71,7 @@ export default function HomePage() {
                   />
                 </div>
                 <ScenarioCarousel />
-                <section className="landing-faq-section">
+                <section id="faq" className="landing-faq-section">
                   <h2 className="landing-faq-title">{t('faq.title')}</h2>
                   <div className="faq-accordion" role="list">
                     {FAQ_IDS.map(id => (

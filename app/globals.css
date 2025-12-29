@@ -5535,7 +5535,7 @@ a,
 /* Scenario Card */
 .scenario-card {
   width: 100%;
-  min-height: 275px;
+  height: 300px;
   background: white;
   border-radius: 16px;
   padding: 20px;
@@ -5574,7 +5574,7 @@ a,
 
 .scenario-card__service {
   font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
+  font-size: .8rem;
   font-weight: 600;
   color: var(--service-color, #3b82f6);
   text-transform: uppercase;
@@ -5604,8 +5604,7 @@ a,
 
 .scenario-card__hook {
   font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  color: #64748b;
+  font-size: 1rem;
   line-height: 1.5;
   margin: 0;
 }

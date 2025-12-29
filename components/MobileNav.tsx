@@ -51,9 +51,13 @@ export default function MobileNav() {
           >
             {t('nav.howItWorks')}
           </a>
-          <Link href="/faq" className="mobile-nav-link" onClick={closeMenu}>
+          <a
+            href="#faq"
+            className="mobile-nav-link"
+            onClick={closeMenu}
+          >
             {t('nav.faq')}
-          </Link>
+          </a>
           <Link href="/contact" className="mobile-nav-link" onClick={closeMenu}>
             {t('nav.contact')}
           </Link>

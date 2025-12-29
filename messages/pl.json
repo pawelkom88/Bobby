@@ -131,7 +131,7 @@
       },
       "3": {
         "situation": "Ktoś włamał się do domu",
-        "hook": "",
+        "hook": "Czy Twoje dziecko wie, jak ukryć się i wezwać pomoc?",
         "description": "Ktoś obcy wchodzi do domu. Bobby pokazuje dzieciom, jak znaleźć bezpieczne miejsce, zachować ciszę i wezwać pomoc.",
         "practicePoints": [
           "Znajdź bezpieczne miejsce i dobrze się ukryj",
