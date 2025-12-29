@@ -5,12 +5,16 @@ import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
+import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
+import CartoonButton from '@/components/CartoonButton';
 
-const FAQ_IDS = [1, 2, 3, 4, 5];
+const FAQ_IDS = [1, 2, 3, 4];
 
 export default function FAQPage() {
   const t = useTranslations('faq');
+  const tCommon = useTranslations('common');
+  const router = useRouter();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const toggleQuestion = (id: number) => {
@@ -91,6 +95,12 @@ export default function FAQPage() {
                 {t('contactUs')}
               </Link>
             </section>
+          </div>
+          
+          <div className="settings-back-button">
+            <CartoonButton onClick={() => router.push(ROUTES.HOME)}>
+              {tCommon('back')}
+            </CartoonButton>
           </div>
         </main>
       </PageWrapper>

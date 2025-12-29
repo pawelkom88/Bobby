@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import BottomNav from './BottomNav';
 import { ROUTES } from '@/lib/routes';
+import { useLocale } from 'next-intl';
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -11,11 +12,17 @@ interface PageWrapperProps {
 
 export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname();
+  const locale = useLocale();
 
   const showBottomNav =
+    pathname !== `/${locale}` &&
     pathname !== ROUTES.HOME &&
     pathname !== ROUTES.DIAL &&
-    pathname !== ROUTES.CONVERSATION;
+    pathname !== ROUTES.CONVERSATION &&
+    !pathname.includes('/faq') &&
+    !pathname.includes('/pytania') &&
+    !pathname.includes('/contact') &&
+    !pathname.includes('/kontakt');
 
   return (
     <div

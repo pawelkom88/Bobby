@@ -92,7 +92,9 @@
   "landing": {
     "nav": {
       "howItWorks": "How it works ?",
-      "startTraining": "Start Training Now"
+      "startTraining": "Start Training Now",
+      "faq": "FAQ",
+      "contact": "Contact"
     },
     "hero": {
       "title": "Master the 999 Call Before an Emergency Strikes.",

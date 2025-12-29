@@ -92,11 +92,13 @@
   "landing": {
     "nav": {
       "howItWorks": "Jak to działa?",
-      "startTraining": "Rozpocznij trening"
+      "startTraining": "Rozpocznij trening",
+      "faq": "FAQ",
+      "contact": "Kontakt"
     },
     "hero": {
-      "title": "Opanuj połączenie alarmowe 999 zanim nadejdzie sytuacja awaryjna.",
-      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci (w wieku 5-12 lat) jak pewnie obsługiwać połączenia ze służbami ratunkowymi. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w przyjaznym środowisku.",
+      "title": "Trening połączeń alarmowych dla dzieci.",
+      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci jak pewnie obsługiwać połączenia ze służbami ratunkowymi. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w przyjaznym środowisku.",
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
     },
@@ -247,7 +249,7 @@
     "title": "CZĘSTO ZADAWANE PYTANIA",
     "subtitle": "Znajdź odpowiedzi na najczęstsze pytania",
     "questionsTitle": "Pytania",
-    "stillHaveQuestions": "Czy wszystko jasne?",
+    "stillHaveQuestions": "Wszystko jasne?",
     "contactPrompt": "Jesteśmy tu, aby pomóc! Skontaktuj się z nami.",
     "contactUs": "Skontaktuj się z nami",
     "items": {

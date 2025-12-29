@@ -23,30 +23,31 @@ export function ScenarioModal({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
+  // Always call hooks before any early returns
+  const serviceLabel = useServiceLabel(scenario?.service || 'ambulance');
+  const serviceColor = getServiceColor(scenario?.service || 'ambulance');
 
-      if (event.key === 'Tab' && modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
 
-        if (event.shiftKey && document.activeElement === firstElement) {
-          event.preventDefault();
-          lastElement?.focus();
-        } else if (!event.shiftKey && document.activeElement === lastElement) {
-          event.preventDefault();
-          firstElement?.focus();
-        }
+    if (event.key === 'Tab' && modalRef.current) {
+      const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement?.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement?.focus();
       }
-    },
-    [onClose]
-  );
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -67,9 +68,6 @@ export function ScenarioModal({
 
   if (!isOpen || !scenario) return null;
 
-  const serviceColor = getServiceColor(scenario.service);
-  const serviceLabel = useServiceLabel(scenario.service);
-
   return (
     <div
       className="scenario-modal-overlay"
@@ -82,7 +80,7 @@ export function ScenarioModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         style={
           {
             '--service-color': serviceColor,
@@ -123,7 +121,9 @@ export function ScenarioModal({
         </h2>
 
         <section className="scenario-modal__body">
-          <h3 className="scenario-modal__section-title">{t('scenarioTitle')}</h3>
+          <h3 className="scenario-modal__section-title">
+            {t('scenarioTitle')}
+          </h3>
           <p className="scenario-modal__description">{scenario.description}</p>
 
           <h3 className="scenario-modal__section-title">

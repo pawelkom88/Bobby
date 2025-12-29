@@ -2,11 +2,15 @@
 
 import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScenarioCarousel } from './landing-page';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
+import MobileNav from '@/components/MobileNav';
+
+const FAQ_IDS = [1, 2, 3, 4];
 
 export default function HomePage() {
   const t = useTranslations('landing');
@@ -18,31 +22,28 @@ export default function HomePage() {
           <div className="landing-container">
             <div className="landing-wrapper">
               <nav className="landing-nav">
-                <ul className="nav-ul">
-                  <li>
-                    <span></span>
-                  </li>
-                  <li>
-                    <span></span>
-                  </li>
-                  <li>
-                    <a href="#how-it-works">{t('nav.howItWorks')}</a>
-                  </li>
-                </ul>
                 <Link href="/login" className="ach-button-small">
                   {t('nav.startTraining')}
                 </Link>
+                <ul className="nav-ul">
+                  <li>
+                    <a href="#how-it-works">{t('nav.howItWorks')}</a>
+                  </li>
+                  <li>
+                    <Link href="/faq">{t('nav.faq')}</Link>
+                  </li>
+                  <li>
+                    <Link href="/contact">{t('nav.contact')}</Link>
+                  </li>
+                </ul>
+                <MobileNav />
               </nav>
 
               <main className="landing-main">
                 <div className="landing-content">
                   <div className="landing-text-section">
-                    <h1 className="landing-title">
-                      {t('hero.title')}
-                    </h1>
-                    <p className="landing-subtitle">
-                      {t('hero.subtitle')}
-                    </p>
+                    <h1 className="landing-title">{t('hero.title')}</h1>
+                    <p className="landing-subtitle">{t('hero.subtitle')}</p>
                     <Link
                       href="/login"
                       className="ach-button ach-button-landing"
@@ -64,14 +65,12 @@ export default function HomePage() {
                     alt="Hero Image - smiling Bobby"
                   />
                 </div>
+                <ScenarioCarousel />
+                <section className="xxx">some section</section>
               </main>
 
-              <ScenarioCarousel />
-
               <footer className="landing-footer">
-                <span className="landing-footer-text">
-                  {t('footer.ready')}
-                </span>
+                <span className="landing-footer-text">{t('footer.ready')}</span>
                 <div className="landing-footer-right">
                   <a href="#" className="landing-footer-link">
                     {t('footer.privacy')}

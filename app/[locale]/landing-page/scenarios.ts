@@ -21,6 +21,4 @@ export const scenarioIds: ScenarioId[] = [
   { id: 4, service: 'ambulance' },
   { id: 5, service: 'fire' },
   { id: 6, service: 'ambulance' },
-  { id: 7, service: 'fire' },
-  { id: 8, service: 'police' },
 ];

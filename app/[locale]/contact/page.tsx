@@ -4,10 +4,14 @@ import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
+import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
+import CartoonButton from '@/components/CartoonButton';
 
 export default function ContactPage() {
   const t = useTranslations('contact');
+  const tCommon = useTranslations('common');
+  const router = useRouter();
 
   return (
     <ViewTransition>
@@ -65,6 +69,12 @@ export default function ContactPage() {
               <h2 id="response-time-heading">{t('responseTimeTitle')}</h2>
               <p>{t('responseTime')}</p>
             </section>
+          </div>
+          
+          <div className="settings-back-button">
+            <CartoonButton onClick={() => router.push(ROUTES.HOME)}>
+              {tCommon('back')}
+            </CartoonButton>
           </div>
         </main>
       </PageWrapper>
