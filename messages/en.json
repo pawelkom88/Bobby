@@ -177,6 +177,27 @@
     "footer": {
       "ready": "Ready to get started?",
       "privacy": "Privacy Policy"
+    },
+    "faq": {
+      "title": "FREQUENT QUESTIONS",
+      "items": {
+        "1": {
+          "question": "What is this app for?",
+          "answer": "Bobby helps kids practice calling 999 in a safe, fun way. It teaches children how to communicate clearly, stay calm, and understand when and how to call for help."
+        },
+        "2": {
+          "question": "How do the age scenarios work?",
+          "answer": "The app offers three age tiers: Ages 5-7 (very simple language and short scenarios), Ages 8-10 (more realistic conversations), and Ages 11-12 (near-realistic operator flow)."
+        },
+        "3": {
+          "question": "Is my child's data safe?",
+          "answer": "Yes! We store minimal data locally on your device only. No sensitive information is collected or stored. We only track scenario completion, XP, and badges to make learning fun."
+        },
+        "4": {
+          "question": "How many practice calls are included?",
+          "answer": "Each credit gives you one practice call with Bobby. You can choose from different packages based on how much practice your child needs. All calls are guided and age-appropriate."
+        }
+      }
     }
   },
   "yourAge": {

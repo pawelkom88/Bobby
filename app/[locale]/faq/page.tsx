@@ -34,7 +34,9 @@ export default function FAQPage() {
               className="settings-section"
               aria-labelledby="faq-intro-heading"
             >
-              <h2 id="faq-intro-heading" className="sr-only">{t('subtitle')}</h2>
+              <h2 id="faq-intro-heading" className="sr-only">
+                {t('subtitle')}
+              </h2>
               <p className="faq-subtitle-text">{t('subtitle')}</p>
             </section>
 
@@ -42,11 +44,13 @@ export default function FAQPage() {
               className="settings-section faq-accordion-section"
               aria-labelledby="faq-questions-heading"
             >
-              <h2 id="faq-questions-heading" className="sr-only">{t('questionsTitle')}</h2>
+              <h2 id="faq-questions-heading" className="sr-only">
+                {t('questionsTitle')}
+              </h2>
               <div className="faq-accordion" role="list">
                 {FAQ_IDS.map(id => (
-                  <div 
-                    key={id} 
+                  <div
+                    key={id}
                     className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
                     role="listitem"
                   >
@@ -57,17 +61,19 @@ export default function FAQPage() {
                       aria-expanded={expandedId === id}
                       aria-controls={`faq-answer-${id}`}
                     >
-                      <span className="faq-accordion-question">{t(`items.${id}.question`)}</span>
+                      <span className="faq-accordion-question">
+                        {t(`items.${id}.question`)}
+                      </span>
                       <span className="faq-accordion-icon" aria-hidden="true">
-                        <svg 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="black"
                           strokeWidth="3"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="m9 6 6 6-6 6"/>
+                          <path d="m9 6 6 6-6 6" />
                         </svg>
                       </span>
                     </button>
@@ -96,7 +102,7 @@ export default function FAQPage() {
               </Link>
             </section>
           </div>
-          
+
           <div className="settings-back-button">
             <CartoonButton onClick={() => router.push(ROUTES.HOME)}>
               {tCommon('back')}

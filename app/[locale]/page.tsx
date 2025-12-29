@@ -14,6 +14,11 @@ const FAQ_IDS = [1, 2, 3, 4];
 
 export default function HomePage() {
   const t = useTranslations('landing');
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const toggleQuestion = (id: number) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
 
   return (
     <ViewTransition>
@@ -66,7 +71,54 @@ export default function HomePage() {
                   />
                 </div>
                 <ScenarioCarousel />
-                <section className="xxx">some section</section>
+                <section className="landing-faq-section">
+                  <h2 className="landing-faq-title">{t('faq.title')}</h2>
+                  <div className="faq-accordion" role="list">
+                    {FAQ_IDS.map(id => (
+                      <div
+                        key={id}
+                        className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
+                        role="listitem"
+                      >
+                        <button
+                          type="button"
+                          className="faq-accordion-trigger"
+                          onClick={() => toggleQuestion(id)}
+                          aria-expanded={expandedId === id}
+                          aria-controls={`faq-answer-${id}`}
+                        >
+                          <span className="faq-accordion-question">
+                            {t(`faq.items.${id}.question`)}
+                          </span>
+                          <span
+                            className="faq-accordion-icon"
+                            aria-hidden="true"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="black"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="m9 6 6 6-6 6" />
+                            </svg>
+                          </span>
+                        </button>
+                        <div
+                          id={`faq-answer-${id}`}
+                          className="faq-accordion-content"
+                          role="region"
+                          aria-labelledby={`faq-question-${id}`}
+                          hidden={expandedId !== id}
+                        >
+                          <p>{t(`faq.items.${id}.answer`)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
               </main>
 
               <footer className="landing-footer">

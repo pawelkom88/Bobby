@@ -172,6 +172,27 @@
     "footer": {
       "ready": "Gotowy do rozpoczęcia nauki?",
       "privacy": "Polityka prywatności"
+    },
+    "faq": {
+      "title": "FAQ",
+      "items": {
+        "1": {
+          "question": "Do czego służy ta aplikacja?",
+          "answer": "Bobby uczy dzieci w bezpieczny i zabawny sposób dzwonienia pod 999. Uczy dzieci, jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak wzywać pomoc."
+        },
+        "2": {
+          "question": "Jak działają scenariusze wiekowe?",
+          "answer": "Aplikacja oferuje trzy poziomy wiekowe: Wiek 5-7 (bardzo prosty język i krótkie scenariusze), Wiek 8-10 (bardziej realistyczne rozmowy) i Wiek 11-12 (prawie realistyczny przepływ operatora)."
+        },
+        "3": {
+          "question": "Czy dane mojego dziecka są bezpieczne?",
+          "answer": "Tak! Przechowujemy minimalne dane lokalnie na urządzeniu. Żadne wrażliwe informacje nie są zbierane ani przechowywane. Śledzimy tylko ukończenie scenariuszy, punkty doświadczenia i odznaki, aby nauka była zabawna."
+        },
+        "4": {
+          "question": "Ile rozmów treningowych jest wliczone?",
+          "answer": "Każdy kredyt daje jedną rozmowę treningową z Bobbym. Możesz wybrać różne pakiety w zależności od tego, ile praktyki potrzebuje Twoje dziecko. Wszystkie rozmowy są prowadzone i odpowiednie do wieku."
+        }
+      }
     }
   },
   "yourAge": {
