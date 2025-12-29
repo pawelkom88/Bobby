@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import ChatBubble from './ChatBubble';
 import type { StoredConversation, Service } from '@/types';
 
@@ -11,20 +12,9 @@ interface ConversationDetailProps {
   onBack: () => void;
 }
 
-function getServiceLabel(service: Service): string {
-  switch (service) {
-    case 'ambulance':
-      return 'Ambulance';
-    case 'fire':
-      return 'Fire';
-    case 'police':
-      return 'Police';
-  }
-}
-
-function formatDate(dateString: string): string {
+function formatDate(dateString: string, locale: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -53,20 +43,35 @@ export default function ConversationDetail({
   error,
   onBack,
 }: ConversationDetailProps) {
+  const t = useTranslations('conversationDetail');
+  const tService = useTranslations('services');
+  const tCard = useTranslations('conversationCard');
+  const locale = useLocale();
+
   const handleSaveTranscript = useCallback(() => {
     if (!conversation?.messages) return;
 
     const lines = conversation.messages.map((msg) => {
-      const speaker = msg.type === 'agent' ? 'Bobby' : 'You';
-      const time = new Date(msg.timestamp).toLocaleTimeString('en-GB', {
+      const speaker =
+        msg.type === 'agent'
+          ? t('transcript.speaker.bobby')
+          : t('transcript.speaker.you');
+      const time = new Date(msg.timestamp).toLocaleTimeString(locale, {
         hour: '2-digit',
         minute: '2-digit',
       });
       return `[${time}] ${speaker}: ${msg.text}`;
     });
 
-    const header = `Conversation with Bobby - ${getServiceLabel(conversation.service)} Call\n`;
-    const date = `Date: ${formatDate(conversation.endedAt || conversation.startedAt)}\n`;
+    const header =
+      t('transcript.header', {
+        service: tService(conversation.service),
+        callSuffix: tCard('callSuffix'),
+      }) + '\n';
+    const date =
+      t('transcript.date', {
+        date: formatDate(conversation.endedAt || conversation.startedAt, locale),
+      }) + '\n';
     const separator = '─'.repeat(50) + '\n\n';
     
     const content = header + date + separator + lines.join('\n');
@@ -75,12 +80,12 @@ export default function ConversationDetail({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `bobby-conversation-${conversation.id}.txt`;
+    a.download = t('transcript.filename', { id: conversation.id });
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [conversation]);
+  }, [conversation, locale, t, tCard, tService]);
 
   if (isLoading) {
     return (
@@ -91,7 +96,7 @@ export default function ConversationDetail({
             <div className="spinner-circle" />
             <div className="spinner-circle" />
           </div>
-          <p className="loading-message">Loading conversation...</p>
+          <p className="loading-message">{t('loading')}</p>
         </div>
       </div>
     );
@@ -114,7 +119,7 @@ export default function ConversationDetail({
           </svg>
           <p>{error}</p>
           <button onClick={onBack} className="conversation-detail__back-btn">
-            Go Back
+            {t('goBack')}
           </button>
         </div>
       </div>
@@ -133,7 +138,7 @@ export default function ConversationDetail({
         <button
           onClick={onBack}
           className="conversation-detail__back-btn"
-          aria-label="Go back to conversations"
+          aria-label={t('backToConversationsAria')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -149,17 +154,17 @@ export default function ConversationDetail({
         </button>
         
         <div className="conversation-detail__header-content">
-          <h1 className="conversation-detail__title">Your Conversation</h1>
+          <h1 className="conversation-detail__title">{t('title')}</h1>
           <p className="conversation-detail__subtitle">
-            Review your call with Bobby
+            {t('subtitle')}
           </p>
         </div>
         
         <button
           onClick={handleSaveTranscript}
           className="conversation-detail__save-btn"
-          aria-label="Save transcript"
-          title="Save transcript as text file"
+          aria-label={t('saveTranscript')}
+          title={t('saveTranscriptTitle')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -178,13 +183,13 @@ export default function ConversationDetail({
       </header>
 
       <div className="conversation-detail__date">
-        {formatDate(conversation.endedAt || conversation.startedAt)}
+        {formatDate(conversation.endedAt || conversation.startedAt, locale)}
       </div>
 
       <div className="conversation-detail__messages">
         {messages.length === 0 ? (
           <div className="conversation-detail__empty">
-            <p>No messages in this conversation.</p>
+            <p>{t('empty')}</p>
           </div>
         ) : (
           messages.map((message, index) => {

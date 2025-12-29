@@ -23,12 +23,18 @@ const serverEnvSchema = z.object({
   // Stripe
   STRIPE: z.string().min(1, 'STRIPE API key is required'),
   STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
-  STRIPE_BOBBY_PRICE_ID_RESPONSED_PACK: z
+  STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK: z
     .string()
-    .min(1, 'STRIPE_BOBBY_PRICE_ID_RESPONSED_PACK is required'),
+    .min(1, 'STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK is required'),
   STRIPE_BOBBY_PRICE_ID_HERO_PACK: z
     .string()
     .min(1, 'STRIPE_BOBBY_PRICE_ID_HERO_PACK is required'),
+  STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN: z
+    .string()
+    .min(1, 'STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN is required'),
+  STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN: z
+    .string()
+    .min(1, 'STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN is required'),
 
   // Deepgram
   DEEPGRAM_API_KEY: z.string().min(1, 'DEEPGRAM_API_KEY is required'),

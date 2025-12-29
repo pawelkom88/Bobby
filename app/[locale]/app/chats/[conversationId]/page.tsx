@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, use } from 'react';
 import { ViewTransition } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -13,11 +13,12 @@ import { ROUTES } from '@/lib/routes';
 import type { StoredConversation } from '@/types';
 
 interface ConversationDetailPageProps {
-  params: { conversationId: string };
+  params: Promise<{ conversationId: string }>;
 }
 
 function ConversationDetailContent({ params }: ConversationDetailPageProps) {
-  const { conversationId } = params;
+  const paramsResolved = use(params);
+  const { conversationId } = paramsResolved;
   const { user } = useAuth();
   const [conversation, setConversation] = useState<StoredConversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);

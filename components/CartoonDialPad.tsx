@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { validateEmergencyNumber } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 
@@ -57,6 +58,7 @@ export default function CartoonDialPad({
   isLoading = false,
   buttonLabel = 'CALL',
 }: CartoonDialPadProps) {
+  const t = useTranslations('dial');
   const [input, setInput] = useState('');
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -134,7 +136,7 @@ export default function CartoonDialPad({
 
       <div>
         {/* Heading */}
-        <h1 className="dial-heading">Dial {targetNumber}</h1>
+        <h1 className="dial-heading">{t('title', { number: targetNumber })}</h1>
 
         {/* Number display */}
         <div
@@ -167,7 +169,7 @@ export default function CartoonDialPad({
               // Validate the number is correct
               if (!input) {
                 // Show error if no number dialed
-                const errorMsg = 'Please dial a number first! 📞';
+                const errorMsg = t('messages.dialNumber');
                 setErrorMessage(errorMsg);
                 setHasError(true);
                 setTimeout(() => {
@@ -179,7 +181,7 @@ export default function CartoonDialPad({
 
               if (input.length !== targetNumber.length) {
                 // Show error if incomplete number
-                const errorMsg = `Please dial all ${targetNumber.length} digits! 🔢`;
+                const errorMsg = t('messages.dialAllDigits', { count: targetNumber.length });
                 setErrorMessage(errorMsg);
                 setHasError(true);
                 setTimeout(() => {
@@ -228,7 +230,7 @@ export default function CartoonDialPad({
             className="dial-clear-btn"
             aria-label="Clear display"
           >
-            CLEAR
+            {t('buttons.clear')}
           </button>
         </div>
       </div>
@@ -241,7 +243,7 @@ export default function CartoonDialPad({
             onClick={onBack}
             aria-label="Go back to emergency selection"
           >
-            <span>← BACK</span>
+            <span>{t('buttons.back')}</span>
           </button>
         </div>
       )}

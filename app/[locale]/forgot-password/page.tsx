@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from 'next-intl';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { AuthButton } from '@/components/AuthButton';
 import { logger } from '@/lib/logger';
 import AuthPageLayout, {

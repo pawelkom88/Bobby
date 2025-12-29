@@ -231,7 +231,7 @@ export function ScenarioCarousel() {
         </button>
       </div>
 
-      <nav className="scenario-pagination" aria-label="Carousel pagination">
+      <nav className="scenario-pagination" aria-label={t('carousel.paginationAriaLabel')}>
         {Array.from({ length: maxIndex + 1 }).map((_, index) => (
           <button
             key={index}

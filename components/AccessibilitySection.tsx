@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { useUserData } from '@/context/UserDataContext';
 import type { UserSettings } from '@/types';
 import AccessibilityToggle from './AccessibilityToggle';
-import CartoonButton from './CartoonButton';
 import { useSound } from './SoundProvider';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
@@ -136,8 +135,8 @@ export default function AccessibilitySection({
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 64 64"
-              width="32"
-              height="32"
+              width="24"
+              height="20"
               role="img"
               aria-label="Musical note"
             >
@@ -185,41 +184,41 @@ export default function AccessibilitySection({
         />
 
         {/* Slowed Speech Mode Toggle */}
-        <AccessibilityToggle
-          id="slowed-speech-toggle"
-          label={t('slowedSpeech.label')}
-          icon={
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 120 100"
-              width="24"
-              height="32"
-              fill="#BAE1F5"
-              stroke="black"
-              strokeWidth="6"
-              strokeLinejoin="round"
-            >
-              <path
-                d="M20 20
-           H100
-           a10 10 0 0 1 10 10
-           V60
-           a10 10 0 0 1 -10 10
-           H50
-           L30 85
-           V70
-           H20
-           a10 10 0 0 1 -10 -10
-           V30
-           a10 10 0 0 1 10 -10
-           Z"
-              />
-            </svg>
-          }
-          checked={settings.slowedSpeech}
-          onChange={checked => handleSettingChange('slowedSpeech', checked)}
-          ariaLabel={t('slowedSpeech.aria')}
-        />
+        {/*<AccessibilityToggle*/}
+        {/*  id="slowed-speech-toggle"*/}
+        {/*  label={t('slowedSpeech.label')}*/}
+        {/*  icon={*/}
+        {/*    <svg*/}
+        {/*      xmlns="http://www.w3.org/2000/svg"*/}
+        {/*      viewBox="0 0 120 100"*/}
+        {/*      width="24"*/}
+        {/*      height="24"*/}
+        {/*      fill="#BAE1F5"*/}
+        {/*      stroke="black"*/}
+        {/*      strokeWidth="6"*/}
+        {/*      strokeLinejoin="round"*/}
+        {/*    >*/}
+        {/*      <path*/}
+        {/*        d="M20 20*/}
+        {/*   H100*/}
+        {/*   a10 10 0 0 1 10 10*/}
+        {/*   V60*/}
+        {/*   a10 10 0 0 1 -10 10*/}
+        {/*   H50*/}
+        {/*   L30 85*/}
+        {/*   V70*/}
+        {/*   H20*/}
+        {/*   a10 10 0 0 1 -10 -10*/}
+        {/*   V30*/}
+        {/*   a10 10 0 0 1 10 -10*/}
+        {/*   Z"*/}
+        {/*      />*/}
+        {/*    </svg>*/}
+        {/*  }*/}
+        {/*  checked={settings.slowedSpeech}*/}
+        {/*  onChange={checked => handleSettingChange('slowedSpeech', checked)}*/}
+        {/*  ariaLabel={t('slowedSpeech.aria')}*/}
+        {/*/>*/}
 
         {/* Reduced Sensory Mode Toggle */}
         <AccessibilityToggle
@@ -255,7 +254,27 @@ export default function AccessibilitySection({
             htmlFor="font-size-select"
             className="accessibility-setting-label"
           >
-            📏 {t('fontSize.label')}
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M3.2261 2L0.11499 14H2.18111L2.95889 11H6.04092L6.81869 14H8.88482L5.77371 2H3.2261ZM5.5224 9L4.4999 5.05609L3.47741 9H5.5224Z"
+                fill="#000000"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14 7.33682C13.5454 7.12085 13.0368 7 12.5 7C10.567 7 9.00004 8.567 9.00004 10.5C9.00004 12.433 10.567 14 12.5 14C13.0368 14 13.5454 13.8792 14 13.6632V14H16V7H14V7.33682ZM11 10.5C11 9.67157 11.6716 9 12.5 9C13.3285 9 14 9.67157 14 10.5C14 11.3284 13.3285 12 12.5 12C11.6716 12 11 11.3284 11 10.5Z"
+                fill="#000000"
+              />
+            </svg>
+            {t('fontSize.label')}
           </label>
           <select
             id="font-size-select"
@@ -277,7 +296,18 @@ export default function AccessibilitySection({
             htmlFor="color-mode-select"
             className="accessibility-setting-label"
           >
-            🎨 {t('colorMode.label')}
+            <svg
+              fill="#000000"
+              width="20"
+              height="20"
+              viewBox="0 0 32 32"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <title>contrast</title>
+              <path d="M0 16q0 3.264 1.28 6.24t3.392 5.088 5.12 3.424 6.208 1.248q3.264 0 6.24-1.248t5.088-3.424 3.392-5.088 1.28-6.24-1.28-6.208-3.392-5.12-5.088-3.392-6.24-1.28q-3.264 0-6.208 1.28t-5.12 3.392-3.392 5.12-1.28 6.208zM4 16q0-3.264 1.6-6.016t4.384-4.352 6.016-1.632 6.016 1.632 4.384 4.352 1.6 6.016-1.6 6.048-4.384 4.352-6.016 1.6-6.016-1.6-4.384-4.352-1.6-6.048zM16 26.016q2.72 0 5.024-1.344t3.648-3.648 1.344-5.024-1.344-4.992-3.648-3.648-5.024-1.344v20z"></path>
+            </svg>
+            {t('colorMode.label')}
           </label>
           <select
             id="color-mode-select"

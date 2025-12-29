@@ -5,15 +5,15 @@ const AGE_CONFIGS_PL = {
   '5–7 years old': {
     label: '5-7 lat',
     style:
-      'Bardzo łagodny i uspokajający, jak rozmowa z własnym dzieckiem. Używaj prostych słów. Powtarzaj to, co mówią, żeby pokazać, że słuchasz. Mów "świetnie" często. Dawaj JEDNĄ instrukcję naraz.',
+      'Bardzo łagodny i uspokajający, jak rozmowa z własnym dzieckiem. Używaj prostych słów. Powtarzaj to, co mówią, żeby pokazać, że słuchasz.',
     location_strategy:
-      'Zapytaj: "Jaki jest twój adres?" Jeśli nie wiedzą: "To nic. Czy możesz znaleźć dorosłego obok, żeby pomógł?" Jeśli nie ma sąsiada: "Czy widzisz jakieś litery lub numery na drzwiach?" Ostateczność: "Nie martw się, znajdziemy cię przez telefon."',
+      'Zapytaj: "Jaki jest twój adres?" Jeśli nie wiedzą: "To nic. Czy możesz zapytać kogoś dorosłego?" Jeśli taka informacja nie jest dostępna: "Nie martw się, namierzymy twój telefon."',
     safety_check:
-      'Powiedz powoli: "Musisz być teraz bardzo dzielny. Podejdź blisko do mamy. Połóż rękę płasko na jej brzuchu, w samym środku. Czy czujesz jak się unosi... i opada... unosi... i opada? Jak kiedy oddycha?"',
+      'Powiedz powoli: "Musisz być teraz bardzo dzielny. Podejdź blisko do mamy. Połóż rękę płasko na jej brzuchu, w samym środku. Czy czujesz jak się klatka piersiowa się unosi a następnie opada?"',
     neighbor_escalation:
-      'Jeśli dziecko ma problemy z instrukcjami: "Czy jest w pobliżu bezpieczny dorosły? Sąsiad, którego znasz? Możesz do niego pobiec i przyprowadzić go?"',
+      'Jeśli dziecko ma problemy z instrukcjami: "Czy jest w pobliżu ktoś dorosły?"',
     speakerphone_instruction:
-      '"Czy możesz położyć telefon na podłodze obok siebie? W ten sposób masz wolne ręce."',
+      '"Połóż telefon na głośniku obok siebie. Wtedy możesz mnie słyszeć, a ręce masz wolne."',
     forbidden:
       'Nigdy nie używaj terminów medycznych. Nigdy nie proś o nic skomplikowanego. Nigdy nie brzmiaj pospiesznie ani zaniepokojony. Nigdy nie dawaj wielu instrukcji naraz.',
   },
@@ -24,7 +24,7 @@ const AGE_CONFIGS_PL = {
     location_strategy:
       'Zapytaj: "Jaki jest twój adres - numer domu i nazwa ulicy?" Jeśli nie są pewni: "Okej, nie ma problemu. Poszukaj poczty lub listów - będzie na nich adres." Jeśli nadal niepewni: "Czy jest sąsiad, którego możesz szybko zapytać?"',
     safety_check:
-      'Powiedz: "Muszę, żebyś sprawdził czy oddychają. Włącz głośnik i połóż telefon. Teraz podejdź blisko. Patrz na klatkę piersiową i brzuch przez około 10 sekund. Czy się unoszą i opadają?"',
+      'Powiedz: "Muszę, żebyś sprawdził czy oddychają. Teraz podejdź blisko. Patrz na klatkę piersiową i brzuch przez około 10 sekund. Czy się klatka piersiowa unosi się i opada?"',
     neighbor_escalation:
       'Jeśli dziecko jest przytłoczone: "Czy jest w pobliżu jakiś dorosły, który może pomóc? Sąsiad? Możesz szybko po niego pójść."',
     speakerphone_instruction:
@@ -83,12 +83,13 @@ function getSilencePhrasePL(
 }
 
 function getBaseInstructionsPL(
+  ageTier: '5–7 years old' | '8–10 years old' | '11–12 years old',
   ageConfig: (typeof AGE_CONFIGS_PL)['5–7 years old'],
   maxTime: number,
   serviceName: string
 ) {
   const maxTurns = maxTime * 4;
-  const silencePhrases = getSilencePhrasePL(ageConfig.label as '5–7 years old' | '8–10 years old' | '11–12 years old');
+  const silencePhrases = getSilencePhrasePL(ageTier);
 
   return `
 ### TWOJA TOŻSAMOŚĆ
@@ -206,7 +207,12 @@ export function getAmbulancePromptPL(
   maxConversationTime: number
 ) {
   const age = AGE_CONFIGS_PL[ageTier];
-  const base = getBaseInstructionsPL(age, maxConversationTime, 'Pogotowie Ratunkowe');
+  const base = getBaseInstructionsPL(
+    ageTier,
+    age,
+    maxConversationTime,
+    'Pogotowie Ratunkowe'
+  );
 
   return `
 ${base}
@@ -274,7 +280,12 @@ export function getFirePromptPL(
   maxConversationTime: number
 ) {
   const age = AGE_CONFIGS_PL[ageTier];
-  const base = getBaseInstructionsPL(age, maxConversationTime, 'Straż Pożarna');
+  const base = getBaseInstructionsPL(
+    ageTier,
+    age,
+    maxConversationTime,
+    'Straż Pożarna'
+  );
 
   return `
 ${base}
@@ -349,7 +360,12 @@ export function getPolicePromptPL(
   maxConversationTime: number
 ) {
   const age = AGE_CONFIGS_PL[ageTier];
-  const base = getBaseInstructionsPL(age, maxConversationTime, 'Policja');
+  const base = getBaseInstructionsPL(
+    ageTier,
+    age,
+    maxConversationTime,
+    'Policja'
+  );
 
   return `
 ${base}

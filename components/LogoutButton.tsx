@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { logger } from '@/lib/logger';
@@ -15,6 +16,7 @@ export default function LogoutButton({
   className,
   children,
 }: LogoutButtonProps) {
+  const t = useTranslations('logoutButton');
   const { signOut } = useAuth();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -37,9 +39,11 @@ export default function LogoutButton({
       onClick={handleLogout}
       disabled={isLoggingOut}
       className={className}
-      aria-label="Sign out"
+      aria-label={t('ariaLabel')}
     >
-      <span>{children || (isLoggingOut ? 'Signing out...' : 'Sign Out')}</span>
+      <span>
+        {children || (isLoggingOut ? t('signingOut') : t('signOut'))}
+      </span>
     </button>
   );
 }

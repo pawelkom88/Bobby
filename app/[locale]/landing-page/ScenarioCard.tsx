@@ -1,7 +1,8 @@
 'use client';
 
 import type { Scenario } from './scenarios';
-import { ServiceIcon, getServiceLabel, getServiceColor } from './ServiceIcon';
+import { ServiceIcon, useServiceLabel, getServiceColor } from './ServiceIcon';
+import { useTranslations } from 'next-intl';
 
 interface ScenarioCardProps {
   scenario: Scenario;
@@ -14,15 +15,19 @@ export function ScenarioCard({
   onClick,
   isActive = false,
 }: ScenarioCardProps) {
+  const t = useTranslations('landing');
   const serviceColor = getServiceColor(scenario.service);
-  const serviceLabel = getServiceLabel(scenario.service);
+  const serviceLabel = useServiceLabel(scenario.service);
 
   return (
     <button
       type="button"
       className={`scenario-card ${isActive ? 'scenario-card--active' : ''}`}
       onClick={onClick}
-      aria-label={`${scenario.situation}. ${scenario.hook}. Click to learn more.`}
+      aria-label={t('carousel.cardAriaLabel', {
+        situation: scenario.situation,
+        hook: scenario.hook,
+      })}
       style={
         {
           '--service-color': serviceColor,

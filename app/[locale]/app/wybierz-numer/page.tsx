@@ -20,6 +20,7 @@ import {
 import { SpeculationRules } from '@/components/SpeculationRules';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
+import { formatPrice, getCurrencySymbol } from '@/lib/currency';
 
 function SelectPackagePageContent() {
   const t = useTranslations('selectPackage');
@@ -47,7 +48,10 @@ function SelectPackagePageContent() {
   }, [isServerConfirmed, hasCredits]);
 
   // Route guard: verify user has completed previous steps
+  // Skip redirect if payment was just canceled
   useEffect(() => {
+    if (canceled) return;
+    
     const journeyState = getJourneyState();
     if (!journeyState?.selectedAgeTier) {
       window.location.href = ROUTES.YOUR_AGE;
@@ -57,7 +61,7 @@ function SelectPackagePageContent() {
       window.location.href = ROUTES.CHOOSE_EMERGENCY;
       return;
     }
-  }, [getJourneyState]);
+  }, [getJourneyState, canceled]);
 
   // Clean up canceled parameter after 3 seconds
   useEffect(() => {
@@ -106,9 +110,7 @@ function SelectPackagePageContent() {
       window.location.href = data.url;
     } catch (error) {
       logger.error('Checkout error:', error);
-      setCheckoutError(
-        error instanceof Error ? error.message : t('errors.checkoutFailed')
-      );
+      setCheckoutError(t('errors.checkoutFailed'));
       setCheckoutLoading(false);
     }
   };
@@ -214,23 +216,25 @@ function PackCard({
   checkoutLoading,
 }: PackCardProps) {
   const t = useTranslations('selectPackage');
+  const locale = useLocale();
+  const isRookie = pkg.id === 'rookie';
   const isHero = pkg.id === 'hero';
 
   return (
     <>
-      <div className={`pricing-card ${isHero ? 'card-blue' : 'card-yellow'}`}>
+      <div className={`pricing-card ${isRookie ? 'card-yellow' : 'card-blue'}`}>
         <Image
           width={150}
           height={150}
-          src={`${isHero ? '/bobby-hero-pack.png' : '/bobby-rookie-pack.png'}`}
+          src={`${isRookie ? '/bobby-rookie-pack.png' : '/bobby-hero-pack.png'}`}
           alt={pkg.name}
         />
         <div className="card-content">
-          <h2 className="card-title">{pkg.name}</h2>
+          <h2 className="card-title">{t(`packs.${pkg.id}`)}</h2>
         </div>
 
         <button
-          className={`select-button ${isHero ? 'button-yellow' : 'button-blue'}`}
+          className={`select-button ${isRookie ? 'button-blue' : 'button-yellow'}`}
           onClick={() => handleSelectPackage(pkg.id)}
           disabled={checkoutLoading}
         >
@@ -244,10 +248,9 @@ function PackCard({
                 {checkoutLoading ? (
                   t('loading')
                 ) : (
-                  <>
-                    <span className="currency">{t('buyPrefix')}</span>
-                    {pkg.displayPrice.replace('£', '')}
-                  </>
+                  <span className="price">
+                    {formatPrice(pkg.prices[locale as keyof typeof pkg.prices] || pkg.prices.en, locale)}
+                  </span>
                 )}
               </div>
             </div>

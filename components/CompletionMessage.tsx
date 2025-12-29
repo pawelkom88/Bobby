@@ -44,9 +44,11 @@ interface NoXPMessageProps {
 }
 
 function NoXPMessage({ service, t }: NoXPMessageProps) {
+  const tServices = useTranslations('services');
+  const translatedService = service ? tServices(service) : '';
   return (
     <div className="completion-message">
-      <p>{t('noXP.tried', { service: service || '' })}</p>
+      <p>{t('noXP.tried', { service: translatedService })}</p>
       <p>{t('noXP.encouragement')}</p>
     </div>
   );
@@ -71,6 +73,8 @@ function SuccessMessage({
   assessment,
   t,
 }: SuccessMessageProps) {
+  const tServices = useTranslations('services');
+  const translatedService = service ? tServices(service) : '';
   const { src: imageSrc, alt: imageAlt } = assessment?.score
     ? getPerformanceImage(assessment.score, t)
     : { src: '/donotworry.png', alt: t('performance.practiceSession') };
@@ -85,7 +89,7 @@ function SuccessMessage({
         src={imageSrc}
         alt={imageAlt}
       />
-      <p>{t('success.completed', { service: service || '' })}</p>
+      <p>{t('success.completed', { service: translatedService })}</p>
 
       {leveledUp && (
         <div className="level-up-message" role="alert">

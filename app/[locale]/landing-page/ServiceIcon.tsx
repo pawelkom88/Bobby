@@ -1,6 +1,7 @@
 'use client';
 
 import type { ServiceType } from './scenarios';
+import { useTranslations } from 'next-intl';
 
 interface ServiceIconProps {
   service: ServiceType;
@@ -47,14 +48,16 @@ export function ServiceIcon({ service, className = '' }: ServiceIconProps) {
   }
 }
 
-export function getServiceLabel(service: ServiceType): string {
+export function useServiceLabel(service: ServiceType): string {
+  const t = useTranslations('services');
+
   switch (service) {
     case 'ambulance':
-      return 'Ambulance Service';
+      return t('ambulanceService');
     case 'fire':
-      return 'Fire Service';
+      return t('fireService');
     case 'police':
-      return 'Police Service';
+      return t('policeService');
   }
 }
 

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { FirebaseError } from 'firebase/app';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { logger } from '@/lib/logger';
 import { AuthButton } from '@/components/AuthButton';
 import LoadingSpinner from '@/components/LoadingSpinner';

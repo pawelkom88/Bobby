@@ -1,7 +1,11 @@
 {
   "metadata": {
     "title": "Bobby - Emergency Training for Kids",
-    "description": "Help children practice emergency calls in a safe, fun way"
+    "description": "Help children practice emergency calls in a safe, fun way",
+    "structuredData": {
+      "operatingSystem": "Web Browser",
+      "authorName": "Bobby App Team"
+    }
   },
   "common": {
     "loading": "Loading...",
@@ -49,7 +53,7 @@
       "passwordLabel": "Password",
       "confirmPasswordPlaceholder": "Confirm Password",
       "confirmPasswordLabel": "Confirm Password",
-      "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character",
+      "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*(),.?\":{}|<>)",
       "passwordStrength": "Password strength",
       "submit": "SIGN UP",
       "submitting": "CREATING ACCOUNT...",
@@ -74,12 +78,12 @@
       "passwordsMismatch": "Passwords do not match",
       "invalidCredential": "Invalid email or password. Please try again.",
       "tooManyRequests": "Too many failed attempts. Please try again later.",
-      "userDisabled": "This account has been disabled.",
+      "userDisabled": "Login failed. Please try again.",
       "loginFailed": "Login failed. Please try again.",
-      "emailInUse": "This email is already registered. Please log in instead.",
+      "emailInUse": "Unable to create account. Please try again.",
       "invalidEmail": "Invalid email address.",
       "operationNotAllowed": "Email/password accounts are not enabled. Please contact support.",
-      "weakPassword": "Password is too weak. Please use a stronger password.",
+      "weakPassword": "Unable to create account. Please try again.",
       "signupFailed": "Sign up failed. Please try again.",
       "unexpectedError": "An unexpected error occurred. Please try again.",
       "pleaseLogin": "Please log in to continue"
@@ -102,56 +106,70 @@
       "prevAriaLabel": "Previous scenarios",
       "nextAriaLabel": "Next scenarios",
       "carouselAriaLabel": "Scenario cards carousel",
-      "goToSlide": "Go to slide {number}"
+      "goToSlide": "Go to slide {number}",
+      "cardAriaLabel": "{situation}. {hook}. Click to learn more.",
+      "paginationAriaLabel": "Carousel pagination"
     },
     "scenarios": {
       "1": {
         "situation": "Mum collapsed in the kitchen",
         "hook": "Would your child know what to tell the ambulance?",
         "description": "Your child comes home to find you unresponsive on the floor. Bobby will guide them through checking if you're breathing, giving the address, and staying calm until help arrives.",
-        "practicePoints": ["Giving their address clearly", "Checking for breathing", "Staying on the line until help arrives"]
+        "practicePoints": [
+          "Giving their address clearly",
+          "Checking for breathing",
+          "Staying on the line until help arrives"
+        ]
       },
       "2": {
         "situation": "You wake up and smell smoke",
         "hook": "Get out first? Call first? Do they know?",
         "description": "It's the middle of the night and smoke fills the hallway. Bobby teaches them the right order of actions and how to escape safely.",
-        "practicePoints": ["Getting low and checking doors", "Finding the safest exit route", "Calling 999 once outside"]
+        "practicePoints": [
+          "Getting low and checking doors",
+          "Finding the safest exit route",
+          "Calling 999 once outside"
+        ]
       },
       "3": {
         "situation": "There's a stranger in the house",
         "hook": "Could they stay hidden and whisper for help?",
         "description": "Someone has broken in while the family is home. Bobby helps them understand how to hide, stay quiet, and communicate with emergency services.",
-        "practicePoints": ["Finding a safe hiding spot", "Whispering clearly to the operator", "Staying hidden until police arrive"]
+        "practicePoints": [
+          "Finding a safe hiding spot",
+          "Whispering clearly to the operator",
+          "Staying hidden until police arrive"
+        ]
       },
       "4": {
         "situation": "Grandad fell and won't get up",
         "hook": "Can they describe what happened clearly?",
         "description": "Grandad has had a fall and can't move. Bobby guides them through describing the situation, checking for injuries, and keeping Grandad comfortable.",
-        "practicePoints": ["Describing the fall and symptoms", "Checking if Grandad is conscious", "Keeping him still and warm"]
+        "practicePoints": [
+          "Describing the fall and symptoms",
+          "Checking if Grandad is conscious",
+          "Keeping him still and warm"
+        ]
       },
       "5": {
         "situation": "The neighbour's house is on fire",
         "hook": "Do they know what THEY should do?",
         "description": "Flames are visible next door. Bobby teaches them to alert their own family, call for help, and stay away from danger.",
-        "practicePoints": ["Alerting adults in their home", "Calling 999 with the correct address", "Keeping a safe distance"]
+        "practicePoints": [
+          "Alerting adults in their home",
+          "Calling 999 with the correct address",
+          "Keeping a safe distance"
+        ]
       },
       "6": {
         "situation": "Your little brother is choking",
         "hook": "Every second counts. Would they freeze?",
         "description": "A sibling is choking on food and can't breathe. Bobby walks them through recognising the signs and getting help immediately.",
-        "practicePoints": ["Recognising choking signs", "Calling 999 immediately", "Following operator instructions"]
-      },
-      "7": {
-        "situation": "Smoke is blocking the way out",
-        "hook": "Do they know how to stay safe until help comes?",
-        "description": "The normal exit is blocked by smoke. Bobby teaches them what to do when they can't escape and how to signal for help.",
-        "practicePoints": ["Closing doors to block smoke", "Signalling from a window", "Staying low where air is cleaner"]
-      },
-      "8": {
-        "situation": "You don't feel safe at home",
-        "hook": "They need to know it's okay to ask for help",
-        "description": "Sometimes home doesn't feel safe. Bobby gently explains that it's okay to reach out and how to talk to someone who can help.",
-        "practicePoints": ["Understanding it's not their fault", "Knowing who to call for help", "Speaking to a trusted adult"]
+        "practicePoints": [
+          "Recognising choking signs",
+          "Calling 999 immediately",
+          "Following operator instructions"
+        ]
       }
     },
     "footer": {
@@ -181,7 +199,11 @@
     "title": "Choose Your Pack",
     "subtitle": "Each credit = 1 practice call",
     "loading": "Loading...",
-    "buyPrefix": "Buy £",
+    "buyPrefix": "Buy {currency}",
+    "packs": {
+      "rookie": "Rookie Pack",
+      "hero": "Hero Pack"
+    },
     "messages": {
       "canceled": "Checkout was canceled. Select a pack to try again."
     },
@@ -191,17 +213,32 @@
     }
   },
   "dial": {
+    "title": "Dial {number}",
     "creditsLabel": "Credits:",
     "messages": {
       "canceled": "Payment was canceled. You can try again when you're ready!",
       "needsCredits": "You need credits to start a practice call.",
-      "loadingCredits": "Loading your credits..."
+      "loadingCredits": "Loading your credits...",
+      "dialNumber": "Please dial a number first! 📞",
+      "dialAllDigits": "Please dial all {count} digits! 🔢"
     },
     "buttons": {
       "call": "CALL",
       "loading": "LOADING...",
-      "buyAndCall": "BUY & CALL"
+      "buyAndCall": "BUY & CALL",
+      "clear": "CLEAR",
+      "back": "BACK"
     }
+  },
+  "conversation": {
+    "bobbySpeaking": "Bobby is speaking...",
+    "bobbyThinking": "Bobby is thinking...",
+    "yourTurn": "Your turn to speak!",
+    "error": "Something went wrong",
+    "processing": "Processing your conversation...",
+    "sessionError": "Session Error",
+    "sessionErrorDesc": "Something went wrong during the conversation.",
+    "endConversation": "End Conversation"
   },
   "completion": {
     "title": "Great Job!",
@@ -213,8 +250,10 @@
   },
   "faq": {
     "title": "FREQUENT QUESTIONS",
-    "subtitle": "Find answers here!",
-    "stillHaveQuestions": "Still have questions?",
+    "subtitle": "Find answers to common questions about Bobby",
+    "questionsTitle": "Questions",
+    "stillHaveQuestions": "Still Have Questions?",
+    "contactPrompt": "We're here to help! Reach out to our team.",
     "contactUs": "Contact Us",
     "items": {
       "1": {
@@ -232,10 +271,6 @@
       "4": {
         "question": "Does this app require internet?",
         "answer": "Yes, the app requires an internet connection to use the voice conversation features with Bobby. However, your progress is stored locally on your device."
-      },
-      "5": {
-        "question": "Can multiple children use the app?",
-        "answer": "Yes! You can reset progress in the Settings page to allow different children to use the app. Each child will start fresh with their own progress and badges."
       }
     }
   },
@@ -243,11 +278,13 @@
     "title": "CONTACT US",
     "subtitle": "Got a question? We're here to help!",
     "options": {
-      "chat": "CHAT WITH BOBBY'S TEAM",
-      "email": "EMAIL SUPPORT",
-      "faq": "FAQS"
+      "title": "Get in Touch",
+      "email": "Email Support",
+      "faq": "FAQs",
+      "faqDesc": "Find quick answers"
     },
-    "responseTime": "We'll get back to you within 24 hours."
+    "responseTimeTitle": "Response Time",
+    "responseTime": "We typically respond within 24 hours."
   },
   "settings": {
     "title": "SETTINGS",
@@ -490,6 +527,87 @@
     "loading": "Loading your conversations...",
     "noConversations": "No conversations yet",
     "noConversationsHint": "Complete a call with Bobby to see your conversation history here."
+  },
+  "bottomNav": {
+    "callBobby": "Call Bobby",
+    "chats": "Chats",
+    "achievements": "Achievements",
+    "settings": "Settings"
+  },
+  "paidRouteGuard": {
+    "verifyingAccess": "Verifying access..",
+    "redirecting": "Redirecting..."
+  },
+  "logoutButton": {
+    "ariaLabel": "Sign out",
+    "signOut": "Sign Out",
+    "signingOut": "Signing out..."
+  },
+  "levelProgress": {
+    "regionLabel": "Level progress",
+    "yourScore": "YOUR SCORE",
+    "level": "LEVEL {level}",
+    "progressAriaLabel": "Level {level} progress {percent}%",
+    "xpToNext": "{xp} XP to next level"
+  },
+  "scenarioModal": {
+    "closeModal": "Close modal",
+    "scenarioTitle": "The Scenario:",
+    "practiceTitle": "What they'll practice:",
+    "startPractice": "Start Practice",
+    "backToExamples": "Back to Examples"
+  },
+  "services": {
+    "ambulance": "Ambulance",
+    "fire": "Fire",
+    "police": "Police",
+    "ambulanceService": "Ambulance Service",
+    "fireService": "Fire Service",
+    "policeService": "Police Service"
+  },
+  "conversationCard": {
+    "callSuffix": "Call",
+    "messages": "messages",
+    "ageTier": {
+      "tier1": "4-6 years",
+      "tier2": "7-10 years",
+      "tier3": "11-13 years",
+      "unknown": "Unknown"
+    }
+  },
+  "conversationDetail": {
+    "loading": "Loading conversation...",
+    "goBack": "Go Back",
+    "backToConversationsAria": "Go back to conversations",
+    "title": "Your Conversation",
+    "subtitle": "Review your call with Bobby",
+    "saveTranscript": "Save transcript",
+    "saveTranscriptTitle": "Save transcript as text file",
+    "empty": "No messages in this conversation.",
+    "transcript": {
+      "speaker": {
+        "bobby": "Bobby",
+        "you": "You"
+      },
+      "header": "Conversation with Bobby - {service} {callSuffix}",
+      "date": "Date: {date}",
+      "filename": "bobby-conversation-{id}.txt"
+    }
+  },
+  "soundToggle": {
+    "regionLabel": "Sound controls",
+    "turnOff": "Turn UI sound off",
+    "turnOn": "Turn UI sound on",
+    "on": "UI Sound: On",
+    "off": "UI Sound: Off"
+  },
+  "queryBoundary": {
+    "defaultErrorTitle": "Something went wrong",
+    "tryAgain": "Try again",
+    "unknownError": "Unknown error",
+    "featureErrorTitle": "{featureName} Error",
+    "featureErrorGenericTitle": "Feature Error",
+    "retry": "Retry"
   },
   "loadingSpinner": {
     "defaultText": "Bobby is getting ready to chat!",

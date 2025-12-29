@@ -112,7 +112,7 @@ export default async function Success({
 
     if (status === 'complete') {
       const sessionEmail = customer_details?.email;
-      const credits = metadata?.credits || '0';
+      const credits = parseInt(metadata?.credits || '0', 10);
       const packType = metadata?.packType || 'credits';
       logger.log('SuccessPage: Payment complete, credits:', credits);
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/lib/routes';
@@ -13,6 +14,7 @@ interface PaidRouteGuardProps {
 }
 
 export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
+  const t = useTranslations('paidRouteGuard');
   const {
     credits,
     hasCredits,
@@ -86,7 +88,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   if (!isFullyLoaded || accessDecision === 'pending') {
     return (
       <div className="paid-route-guard-loading">
-        <LoadingSpinner text="Verifying access.." />
+        <LoadingSpinner text={t('verifyingAccess')} />
       </div>
     );
   }
@@ -95,7 +97,7 @@ export default function PaidRouteGuard({ children }: PaidRouteGuardProps) {
   if (accessDecision === 'denied') {
     return (
       <div className="paid-route-guard-loading">
-        <LoadingSpinner text="Redirecting..." />
+        <LoadingSpinner text={t('redirecting')} />
       </div>
     );
   }

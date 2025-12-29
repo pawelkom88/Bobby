@@ -6,32 +6,49 @@
  * in app/api/checkout_sessions/route.ts
  */
 
-export type PackType = 'responder' | 'hero';
+import { formatPrice } from '@/lib/currency';
+
+export type PackType = 'rookie' | 'hero';
 
 export interface DisplayPackage {
   id: PackType;
   name: string;
   credits: number;
   displayPrice: string;
+  basePrice: string; // Price without currency symbol
+  prices: {
+    en: string; // GBP price
+    pl: string; // PLN price
+  };
   description: string;
   // features: string[];
   popular?: boolean;
 }
 
 export const DISPLAY_PACKAGES: Record<PackType, DisplayPackage> = {
-  responder: {
-    id: 'responder',
-    name: 'Responder Pack',
-    credits: 2,
+  rookie: {
+    id: 'rookie',
+    name: 'Rookie Pack',
+    credits: 1,
+    basePrice: '2.99',
     displayPrice: '£2.99',
-    description: '2 practice calls',
+    prices: {
+      en: '2.99',
+      pl: '23.00'
+    },
+    description: '1 practice call',
   },
   hero: {
     id: 'hero',
     name: 'Hero Pack',
-    credits: 5,
+    credits: 2,
+    basePrice: '4.99',
     displayPrice: '£4.99',
-    description: '5 practice calls',
+    prices: {
+      en: '4.99',
+      pl: '37.00'
+    },
+    description: '2 practice calls',
     popular: true,
   },
 };

@@ -1,13 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
+import { useTranslations } from 'next-intl';
 
 const navItems = [
   {
     href: ROUTES.APP,
-    label: 'Call Bobby',
+    labelKey: 'callBobby',
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -21,7 +21,7 @@ const navItems = [
   },
   {
     href: ROUTES.CHATS,
-    label: 'Chats',
+    labelKey: 'chats',
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ const navItems = [
   },
   {
     href: ROUTES.ACHIEVEMENTS,
-    label: 'Achievements',
+    labelKey: 'achievements',
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -49,7 +49,7 @@ const navItems = [
   },
   {
     href: ROUTES.SETTINGS,
-    label: 'Settings',
+    labelKey: 'settings',
     icon: (
       <svg
         fill="none"
@@ -65,6 +65,7 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations('bottomNav');
 
   const isActive = (route: string) => {
     return pathname === route;
@@ -77,10 +78,10 @@ export default function BottomNav() {
           key={item.href}
           href={item.href}
           className={`bottom-nav-item ${isActive(item.href) ? 'active' : ''}`}
-          aria-label={item.label}
+          aria-label={t(item.labelKey)}
         >
           {item.icon}
-          <span className="bottom-nav-item-label">{item.label}</span>
+          <span className="bottom-nav-item-label">{t(item.labelKey)}</span>
         </Link>
       ))}
     </nav>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { OptimizedProviders } from '@/components/OptimizedProviders';
 import { routing } from '@/i18n/routing';
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
+  return locales.map(locale => ({ locale }));
 }
 
 export async function generateMetadata({
@@ -23,18 +23,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<Locale, string> = {
-    en: 'Bobby - Emergency Training for Kids',
-    pl: 'Bobby - Trening Alarmowy dla Dzieci',
-  };
+  const t = await getTranslations({ locale, namespace: 'metadata' });
 
-  const descriptions: Record<Locale, string> = {
-    en: 'Help children practice emergency calls in a safe, fun way',
-    pl: 'Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób',
-  };
-
-  const title = titles[locale as Locale] || titles.en;
-  const description = descriptions[locale as Locale] || descriptions.en;
+  const title = t('title');
+  const description = t('description');
 
   return {
     metadataBase: new URL(
@@ -82,6 +74,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const t = await getTranslations({ locale, namespace: 'metadata' });
 
   return (
     <html lang={locale}>
@@ -93,7 +86,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           crossOrigin=""
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito&display=swap"
           rel="stylesheet"
         />
         <Script
@@ -103,21 +96,14 @@ export default async function LocaleLayout({ children, params }: Props) {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name:
-                locale === 'pl'
-                  ? 'Bobby - Trening Alarmowy dla Dzieci'
-                  : 'Bobby - Emergency Training for Kids',
-              description:
-                locale === 'pl'
-                  ? 'Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób'
-                  : 'Help children practice emergency calls in a safe, fun way',
+              name: t('title'),
+              description: t('description'),
               applicationCategory: 'EducationalApplication',
-              operatingSystem: 'Web Browser',
-              url:
-                process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
+              operatingSystem: t('structuredData.operatingSystem'),
+              url: process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
               author: {
                 '@type': 'Organization',
-                name: 'Bobby App Team',
+                name: t('structuredData.authorName'),
               },
               offers: {
                 '@type': 'Offer',

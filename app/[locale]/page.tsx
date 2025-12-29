@@ -6,7 +6,7 @@ import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScenarioCarousel } from './landing-page';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 export default function HomePage() {
   const t = useTranslations('landing');
@@ -20,13 +20,13 @@ export default function HomePage() {
               <nav className="landing-nav">
                 <ul className="nav-ul">
                   <li>
-                    <Link href=""></Link>
+                    <span></span>
                   </li>
                   <li>
-                    <Link href=""></Link>
+                    <span></span>
                   </li>
                   <li>
-                    <Link href="#how-it-works">{t('nav.howItWorks')}</Link>
+                    <a href="#how-it-works">{t('nav.howItWorks')}</a>
                   </li>
                 </ul>
                 <Link href="/login" className="ach-button-small">
@@ -49,12 +49,12 @@ export default function HomePage() {
                     >
                       {t('hero.cta')}
                     </Link>
-                    <Link
-                      href="/#how-it-works"
+                    <a
+                      href="#how-it-works"
                       className="landing-secondary-cta-button"
                     >
                       {t('hero.secondaryCta')}
-                    </Link>
+                    </a>
                   </div>
                   <Image
                     preload

@@ -31,7 +31,14 @@ export function OptimizedProviders({ children }: ProvidersProps) {
   const pathname = usePathname();
 
   const isConversationPage =
-    pathname?.includes('/conversation') || pathname?.includes('/dial');
+    pathname
+      ? [
+          '/app/conversation',
+          '/app/dial',
+          '/aplikacja/rozmowa',
+          '/aplikacja/wybierz',
+        ].some(fragment => pathname.includes(fragment))
+      : false;
 
   return (
     <QueryClientProvider client={queryClient}>

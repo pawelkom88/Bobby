@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Scenario } from './scenarios';
-import { ServiceIcon, getServiceLabel, getServiceColor } from './ServiceIcon';
+import { ServiceIcon, useServiceLabel, getServiceColor } from './ServiceIcon';
 
 interface ScenarioModalProps {
   scenario: Scenario | null;
@@ -17,6 +18,7 @@ export function ScenarioModal({
   onClose,
   onStartPractice,
 }: ScenarioModalProps) {
+  const t = useTranslations('scenarioModal');
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -66,7 +68,7 @@ export function ScenarioModal({
   if (!isOpen || !scenario) return null;
 
   const serviceColor = getServiceColor(scenario.service);
-  const serviceLabel = getServiceLabel(scenario.service);
+  const serviceLabel = useServiceLabel(scenario.service);
 
   return (
     <div
@@ -92,7 +94,7 @@ export function ScenarioModal({
           type="button"
           className="scenario-modal__close"
           onClick={onClose}
-          aria-label="Close modal"
+          aria-label={t('closeModal')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -121,11 +123,11 @@ export function ScenarioModal({
         </h2>
 
         <section className="scenario-modal__body">
-          <h3 className="scenario-modal__section-title">The Scenario:</h3>
+          <h3 className="scenario-modal__section-title">{t('scenarioTitle')}</h3>
           <p className="scenario-modal__description">{scenario.description}</p>
 
           <h3 className="scenario-modal__section-title">
-            What they&apos;ll practice:
+            {t('practiceTitle')}
           </h3>
           <ul className="scenario-modal__list">
             {scenario.practicePoints.map((point, index) => (
@@ -142,14 +144,14 @@ export function ScenarioModal({
             className="scenario-modal__button scenario-modal__button--primary"
             onClick={() => onStartPractice(scenario)}
           >
-            Start Practice
+            {t('startPractice')}
           </button>
           <button
             type="button"
             className="scenario-modal__button scenario-modal__button--secondary"
             onClick={onClose}
           >
-            Back to Examples
+            {t('backToExamples')}
           </button>
         </footer>
       </div>

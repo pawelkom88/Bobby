@@ -8,7 +8,7 @@ import LogoutButton from '@/components/LogoutButton';
 import ResetProgressSection from '@/components/ResetProgressSection';
 import DeleteAccountSection from '@/components/DeleteAccountSection';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
 
 export default function SettingsPage() {

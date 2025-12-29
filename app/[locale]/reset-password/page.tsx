@@ -9,7 +9,7 @@ import {
   confirmPasswordReset,
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { logger } from '@/lib/logger';
 import { validatePassword } from '@/lib/validation';
 import LoadingSpinner from '@/components/LoadingSpinner';

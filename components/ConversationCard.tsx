@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import type { ConversationListItem, Service } from '@/types';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface ConversationCardProps {
   conversation: ConversationListItem;
@@ -48,17 +49,6 @@ function getServiceIcon(service: Service): React.ReactNode {
   }
 }
 
-function getServiceLabel(service: Service): string {
-  switch (service) {
-    case 'ambulance':
-      return 'Ambulance';
-    case 'fire':
-      return 'Fire';
-    case 'police':
-      return 'Police';
-  }
-}
-
 function getServiceColor(service: Service): string {
   switch (service) {
     case 'ambulance':
@@ -70,41 +60,43 @@ function getServiceColor(service: Service): string {
   }
 }
 
-function getAgeTierLabel(ageTier: number): string {
-  switch (ageTier) {
-    case 1:
-      return '4-6 years';
-    case 2:
-      return '7-10 years';
-    case 3:
-      return '11-13 years';
-    default:
-      return 'Unknown';
-  }
-}
-
-function formatDate(dateString: string): string {
+function formatDate(dateString: string, locale: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   });
 }
 
-function formatTime(dateString: string): string {
+function formatTime(dateString: string, locale: string): string {
   const date = new Date(dateString);
-  return date.toLocaleTimeString('en-GB', {
+  return date.toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });
 }
 
-export default function ConversationCard({ conversation }: ConversationCardProps) {
+export default function ConversationCard({
+  conversation,
+}: ConversationCardProps) {
+  const tService = useTranslations('services');
+  const tCard = useTranslations('conversationCard');
+  const locale = useLocale();
   const serviceColor = getServiceColor(conversation.service);
+  const endedAtOrStartedAt = conversation.endedAt || conversation.startedAt;
+
+  const ageTierKey =
+    conversation.ageTier === 1
+      ? 'tier1'
+      : conversation.ageTier === 2
+        ? 'tier2'
+        : conversation.ageTier === 3
+          ? 'tier3'
+          : 'unknown';
 
   return (
-    <Link
+    <NextLink
       href={`${ROUTES.CHATS}/${conversation.id}`}
       className="conversation-card"
       style={{ '--service-color': serviceColor } as React.CSSProperties}
@@ -112,30 +104,30 @@ export default function ConversationCard({ conversation }: ConversationCardProps
       <div className="conversation-card__icon-wrapper">
         {getServiceIcon(conversation.service)}
       </div>
-      
+
       <div className="conversation-card__content">
         <div className="conversation-card__header">
           <span className="conversation-card__service">
-            {getServiceLabel(conversation.service)} Call
+            {tService(conversation.service)}
           </span>
           <span className="conversation-card__age">
-            {getAgeTierLabel(conversation.ageTier)}
+            {tCard(`ageTier.${ageTierKey}`)}
           </span>
         </div>
-        
+
         <div className="conversation-card__meta">
           <span className="conversation-card__date">
-            {formatDate(conversation.endedAt || conversation.startedAt)}
+            {formatDate(endedAtOrStartedAt, locale)}
           </span>
           <span className="conversation-card__time">
-            {formatTime(conversation.endedAt || conversation.startedAt)}
+            {formatTime(endedAtOrStartedAt, locale)}
           </span>
           <span className="conversation-card__messages">
-            {conversation.messageCount} messages
+            {conversation.messageCount} {tCard('messages')}
           </span>
         </div>
       </div>
-      
+
       <div className="conversation-card__arrow">
         <svg
           viewBox="0 0 24 24"
@@ -149,6 +141,6 @@ export default function ConversationCard({ conversation }: ConversationCardProps
           <path d="m9 18 6-6-6-6" />
         </svg>
       </div>
-    </Link>
+    </NextLink>
   );
 }

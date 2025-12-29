@@ -21,9 +21,7 @@ export default function AppPage() {
                 <div className="welcome-card">
                   <div>
                     <h1 className="welcome-title">{t('welcomeTitle')}</h1>
-                    <p className="welcome-subtitle">
-                      {t('welcomeSubtitle')}
-                    </p>
+                    <p className="welcome-subtitle">{t('welcomeSubtitle')}</p>
                   </div>
 
                   <AnimatedImageWrapper
@@ -39,7 +37,7 @@ export default function AppPage() {
                     asLink
                     href={ROUTES.YOUR_AGE}
                   >
-                    📞 {t('callBobby')}
+                    {t('callBobby')}
                   </CartoonButton>
                 </div>
               </div>

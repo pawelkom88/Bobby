@@ -41,11 +41,11 @@ li {
 }
 
 /* ============================================================================
-   CHEWY FONT CLASS
+   Luckiest Guy FONT CLASS
    ============================================================================ */
 
-.chewy-regular {
-  font-family: 'Chewy', system-ui;
+.LuckiestGuy-regular {
+  font-family: 'Luckiest Guy', system-ui;
   font-weight: 400;
   font-style: normal;
 }
@@ -210,9 +210,9 @@ h5,
 h6,
 [class*='heading'],
 [class*='title'] {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-optical-sizing: auto;
-  font-weight: 700;
+  font-weight: 400;
   font-style: normal;
   font-variation-settings: 'wdth' 100;
   letter-spacing: 0.05em;
@@ -263,13 +263,9 @@ h6,
 
 .heading-cartoon,
 .kavoon {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-weight: 700;
 }
-
-/* ============================================================================
-   BODY TEXT STYLES - Kavoon
-   ============================================================================ */
 
 .body-text-regular {
   font-family: 'Nunito', sans-serif;
@@ -1531,7 +1527,7 @@ a,
 .question {
   font-size: 2rem;
   color: var(--btn-text-color);
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .btn-container {
@@ -1541,6 +1537,7 @@ a,
 }
 
 .cartoon-btn {
+  min-width: 300px;
   --direction: -1;
   border: 0.25rem solid var(--btn-border-color);
   padding: 0.5rem 2rem;
@@ -1550,7 +1547,7 @@ a,
   background-color: var(--btn-color);
   text-decoration: none;
   color: var(--btn-text-color);
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   outline: 0;
   position: relative;
   overflow: hidden;
@@ -1593,6 +1590,7 @@ a,
   transform: rotateY(calc(var(--rotate-angle) * var(--direction) * -1));
   z-index: 2;
   font-size: 2rem;
+  margin-top: 0.5rem;
 }
 
 .cartoon-btn:hover:not(:disabled) {
@@ -1848,6 +1846,11 @@ a,
   gap: 2rem;
 }
 
+.welcome-button a span {
+  text-align: center;
+  padding-top: .5rem  ;
+}
+
 .welcome-header {
   text-align: center;
   margin-top: 1rem;
@@ -1862,7 +1865,7 @@ a,
   margin: 1rem 0;
   text-transform: uppercase;
 
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .welcome-subtitle {
@@ -1895,7 +1898,7 @@ a,
 
 .progress-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 2rem;
   align-items: center;
   justify-items: center;
@@ -2067,10 +2070,6 @@ a,
 }
 
 @media (max-width: 768px) {
-  .progress-section {
-    grid-template-columns: 1fr;
-  }
-
   .welcome-card {
     padding: 1.5rem;
   }
@@ -2375,7 +2374,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .achievements-content {
@@ -2399,7 +2398,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2500,7 +2499,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   text-transform: uppercase;
   text-align: center;
   letter-spacing: 0.05em;
@@ -2546,7 +2545,9 @@ a,
 
 .accessibility-toggle-content {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
   gap: 5px;
   flex: 1;
 }
@@ -2732,6 +2733,8 @@ a,
   --btn-border-color: #dc2626;
   --btn-text-color: #8b0000;
   --btn-light-color: #ff8787;
+
+  min-width: 300px;
 }
 
 .reset-actions {
@@ -2796,7 +2799,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .settings-content {
@@ -2849,7 +2852,7 @@ a,
   margin: 1rem auto;
 }
 
-.reset-warning {
+.reset-warning, .select-package-message-error {
   color: #dc2626 !important;
   font-weight: 600;
   font-family: 'Nunito', sans-serif;
@@ -2857,6 +2860,19 @@ a,
   background-color: rgba(220, 38, 38, 0.1);
   border-left: 4px solid #dc2626;
   border-radius: 0.5rem;
+}
+
+.select-package-message-warning {
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  padding: 1rem;
+  background-color: rgba(245, 158, 11, 0.6);
+  border-left: 4px solid #f59e0b;
+  border-radius: 0.5rem;
+}
+
+.select-package-message-error, .select-package-message-warning {
+  margin-bottom: 2rem;
 }
 
 .reset-confirmation {
@@ -2944,6 +2960,249 @@ a,
 }
 
 /* ============================================================================
+   CONTACT PAGE STYLES
+   ============================================================================ */
+
+.contact-subtitle-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  text-align: center;
+  margin: 0;
+}
+
+.contact-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.contact-option-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(245, 250, 255, 0.95) 100%
+  );
+  border: 2px solid rgba(255, 200, 100, 0.3);
+  border-radius: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.contact-option-card:hover {
+  border-color: rgba(255, 200, 100, 0.8);
+  box-shadow: 0 4px 12px rgba(255, 200, 100, 0.25);
+  transform: translateY(-2px);
+}
+
+.contact-option-icon {
+  font-size: 2rem;
+}
+
+.contact-option-label {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.contact-option-desc {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}
+
+/* ============================================================================
+   FAQ PAGE STYLES - ACCORDION
+   ============================================================================ */
+
+.faq-subtitle-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  text-align: center;
+  margin: 0;
+}
+
+.faq-accordion-section {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Colorful pill-shaped FAQ items */
+.faq-accordion-item {
+  border-radius: 2rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+/* Color variations for FAQ items */
+.faq-accordion-item:nth-child(5n + 1) {
+  background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%);
+}
+
+.faq-accordion-item:nth-child(5n + 2) {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.faq-accordion-item:nth-child(5n + 3) {
+  background: linear-gradient(135deg, #f5a623 0%, #e69500 100%);
+}
+
+.faq-accordion-item:nth-child(5n + 4) {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.faq-accordion-item:nth-child(5n + 5) {
+  background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%);
+}
+
+.faq-accordion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.faq-accordion-item.expanded {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.faq-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1.25rem 1rem 1.25rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.faq-accordion-question {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.faq-accordion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 50%;
+  color: inherit;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Match icon color to parent background */
+.faq-accordion-item:nth-child(5n + 1) .faq-accordion-icon {
+  color: #4cae4c;
+}
+
+.faq-accordion-item:nth-child(5n + 2) .faq-accordion-icon {
+  color: #8e44ad;
+}
+
+.faq-accordion-item:nth-child(5n + 3) .faq-accordion-icon {
+  color: #e69500;
+}
+
+.faq-accordion-item:nth-child(5n + 4) .faq-accordion-icon {
+  color: #8e44ad;
+}
+
+.faq-accordion-item:nth-child(5n + 5) .faq-accordion-icon {
+  color: #4cae4c;
+}
+
+.faq-accordion-icon svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.faq-accordion-item.expanded .faq-accordion-icon svg {
+  transform: rotate(90deg);
+}
+
+/* When not expanded, arrow points right (default). When expanded, rotates to point down */
+
+.faq-accordion-content {
+  padding: 0 1.5rem 1.25rem;
+  animation: faq-slide-down 0.3s ease;
+}
+
+.faq-accordion-content[hidden] {
+  display: none;
+}
+
+.faq-accordion-content p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes faq-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.faq-contact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #ffc864 0%, #ffb347 100%);
+  color: #333;
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.75rem;
+  border: 2px solid rgba(255, 200, 100, 0.5);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 200, 100, 0.3);
+}
+
+.faq-contact-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 200, 100, 0.4);
+}
+
+/* ============================================================================
    COMPLETION SCREEN STYLES
    ============================================================================ */
 
@@ -2972,7 +3231,7 @@ a,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .completion-content {
@@ -2993,7 +3252,7 @@ a,
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -3039,7 +3298,7 @@ a,
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
   color: #92400e;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .level-up-message p,
@@ -3098,7 +3357,7 @@ a,
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .assessment-feedback ul {
@@ -3760,7 +4019,7 @@ a,
 .age-title,
 .emergency-title,
 .select-package-title {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 2.2rem;
   font-weight: bold;
   color: #333;
@@ -3774,8 +4033,8 @@ a,
 .select-package-subtitle {
   font-family: 'Nunito', sans-serif;
   font-size: 1.3rem;
-  color: black;
   font-weight: 500;
+  text-align: center;
 }
 
 .age-tiles-container,
@@ -3835,7 +4094,7 @@ a,
 
 .age-tile-label,
 .emergency-tile-label {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 1.6rem;
   font-weight: bold;
   color: white;
@@ -4917,7 +5176,7 @@ a,
 }
 
 .scenario-section__title {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 36px;
   font-weight: 700;
   color: #0f172a;
@@ -5084,7 +5343,7 @@ a,
 }
 
 .scenario-card__situation {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 22px;
   font-weight: 700;
   color: #0f172a;
@@ -5212,7 +5471,7 @@ a,
 }
 
 .scenario-modal__title {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 28px;
   font-weight: 700;
   color: #0f172a;
@@ -5290,7 +5549,7 @@ a,
   width: 100%;
   padding: 16px 24px;
   border-radius: 50px;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
@@ -5403,7 +5662,7 @@ a,
    ============================================================================ */
 
 .dial-heading {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 48px;
   font-weight: bold;
   text-align: center;
@@ -5413,7 +5672,7 @@ a,
 }
 
 .dial-display {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 36px;
   font-weight: bold;
   text-align: center;
@@ -5452,7 +5711,7 @@ a,
   width: 88px;
   height: 88px;
   font-size: 40px;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-weight: 900;
   background-color: #fff;
   border: 3px solid #333;
@@ -6032,7 +6291,7 @@ a:focus-visible {
   letter-spacing: 3px;
   width: 100%;
   margin-bottom: 20px;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   text-decoration: none;
 }
 
@@ -6103,7 +6362,7 @@ a:focus-visible {
 
 .ach-button-small {
   position: relative;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: 3px solid #4c51bf;
@@ -6198,7 +6457,7 @@ input {
   color: #2c3e50;
   margin: 30px 0;
   letter-spacing: -1px;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .login-input-group {
@@ -6483,7 +6742,7 @@ input {
   border-radius: 2rem;
   box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3);
   margin-bottom: 1.5rem;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .dial-credits-label {
@@ -6503,7 +6762,7 @@ input {
   border-radius: 1rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 1.1rem;
   max-width: 400px;
   margin-left: auto;
@@ -6536,7 +6795,7 @@ input {
   justify-content: center;
   min-height: 50vh;
   gap: 1rem;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 1.2rem;
   color: #666;
 }
@@ -6567,7 +6826,7 @@ input {
 }
 
 .success-container h1 {
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 3rem;
   color: #333;
   margin-bottom: 1rem;
@@ -6575,6 +6834,7 @@ input {
 
 .success-message {
   font-size: 1.5rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
@@ -6590,7 +6850,7 @@ input {
   color: white;
   text-decoration: none;
   border-radius: 2rem;
-  font-family: 'Chewy', system-ui;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: 1.3rem;
   box-shadow:
     0 8px 20px rgba(76, 175, 80, 0.4),
@@ -6985,7 +7245,6 @@ input {
 
 /* Hover effects */
 
-
 .select-button:not(:disabled):active .price-tag {
   transform: rotateX(2deg) rotateY(-2deg) scale(0.98);
   box-shadow:
@@ -7224,7 +7483,6 @@ input {
 .chats-page {
   width: 100%;
   max-width: 600px;
-  padding: 1rem;
 }
 
 .chats-page__title {
@@ -7333,20 +7591,19 @@ input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  gap: 1rem;
+  margin-bottom: .6rem;
 }
 
 .conversation-card__service {
   font-weight: 700;
-  color: #1f2937;
+  font-size: 1.2rem;
 }
 
 .conversation-card__age {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 1rem;
   background: #f3f4f6;
-  padding: 0.125rem 0.5rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 1rem;
 }
 
@@ -7354,14 +7611,16 @@ input {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 1rem;
+}
+
+.conversation-card__date, .conversation-card__time, .conversation-card__messages {
+  font-size: .8rem;
 }
 
 .conversation-card__meta span:not(:last-child)::after {
   content: '•';
   margin-left: 0.5rem;
-  color: #d1d5db;
 }
 
 .conversation-card__arrow {

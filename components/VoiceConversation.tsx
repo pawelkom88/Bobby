@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Activity } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUserData } from '@/context/UserDataContext';
 import { logger } from '@/lib/logger';
 import { CONFIG } from '@/lib/config';
@@ -41,6 +42,8 @@ function ActiveConversationView({
   remainingTime,
   endConversation,
 }: ActiveConversationViewProps) {
+  const t = useTranslations('conversation');
+  
   return (
     <>
       {/* Visual Feedback */}
@@ -54,10 +57,10 @@ function ActiveConversationView({
         }}
       >
         <h2 style={{ fontSize: '2rem', color: '#333' }}>
-          {visualState === 'speaking' && 'Bobby is speaking...'}
-          {visualState === 'listening' && 'Your turn to speak!'}
-          {visualState === 'processing' && 'Bobby is thinking...'}
-          {visualState === 'error' && 'Something went wrong'}
+          {visualState === 'speaking' && t('bobbySpeaking')}
+          {visualState === 'listening' && t('yourTurn')}
+          {visualState === 'processing' && t('bobbyThinking')}
+          {visualState === 'error' && t('error')}
         </h2>
 
         <VoiceAnimations state={visualState} />
@@ -916,12 +919,14 @@ export default function VoiceConversation({
 
   // Component: ConversationEndingView
   function ConversationEndingView() {
+    const t = useTranslations('conversation');
+    
     return (
       <div
         className="conversation-ending"
         style={{ textAlign: 'center', padding: '2rem' }}
       >
-        <LoadingSpinner text="Processing your conversation..." />
+        <LoadingSpinner text={t('processing')} />
       </div>
     );
   }

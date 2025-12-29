@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useUserData } from '@/context/UserDataContext';
+import { useTranslations } from 'next-intl';
 
 interface LevelProgressProps {
   showLabel?: boolean;
@@ -13,6 +14,7 @@ interface LevelProgressProps {
 export default function LevelProgress({
   showLabel = true,
 }: LevelProgressProps) {
+  const t = useTranslations('levelProgress');
   const { userData } = useUserData();
   const [progress, setProgress] = useState(0);
 
@@ -43,15 +45,19 @@ export default function LevelProgress({
   const xpToNext = Math.max(0, currentLevelEnd - xp);
 
   return (
-    <div className="level-progress" role="region" aria-label="Level progress">
+    <div
+      className="level-progress"
+      role="region"
+      aria-label={t('regionLabel')}
+    >
       {showLabel && (
         <div className="level-progress-label">
-          <span>YOUR SCORE</span>
+          <span>{t('yourScore')}</span>
         </div>
       )}
       <div className="level-progress-content">
         <div className="level-progress-header">
-          <span className="level-label">LEVEL {level}</span>
+          <span className="level-label">{t('level', { level })}</span>
           <span className="progress-percentage">{Math.round(progress)}%</span>
         </div>
         <div
@@ -60,7 +66,10 @@ export default function LevelProgress({
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`Level ${level} progress ${Math.round(progress)}%`}
+          aria-label={t('progressAriaLabel', {
+            level,
+            percent: Math.round(progress),
+          })}
         >
           <div
             className="progress-bar-fill"
@@ -72,7 +81,7 @@ export default function LevelProgress({
         </div>
         {level < 10 && showLabel && (
           <div className="xp-label" aria-live="polite">
-            {xpToNext} XP to next level
+            {t('xpToNext', { xp: xpToNext })}
           </div>
         )}
       </div>

@@ -4,65 +4,62 @@ import { stripe } from '@/lib/stripe';
 import { verifyIdToken } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
+import { getCurrencyConfig } from '@/lib/currency';
 
 function toStripeLocale(locale: string) {
-  // Stripe expects a specific Locale union.
-  // We only support our app locales here and map to Stripe equivalents.
   if (locale === 'pl') return 'pl' as const;
   if (locale === 'en') return 'en' as const;
   return undefined;
 }
 
-/**
- * Credit pack configuration - SERVER-SIDE ONLY
- * Never trust client-provided prices or credit amounts
- *
- * Each credit = 1 practice call (5 minutes max)
- */
-const CREDIT_PACKS = {
-  responder: {
-    priceId: process.env.STRIPE_BOBBY_PRICE_ID_RESPONSED_PACK!,
-    credits: 2,
-    name: 'Responder Pack',
-  },
-  hero: {
-    priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK!,
-    credits: 5,
-    name: 'Hero Pack',
-  },
-} as const;
+function getCreditPacks(locale: string) {
+  const currency = getCurrencyConfig(locale);
 
-type PackType = keyof typeof CREDIT_PACKS;
+  // Map locale to appropriate Stripe price IDs
+  if (currency.code === 'PLN') {
+    return {
+      rookie: {
+        priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN!,
+        credits: 1,
+        name: 'Pakiet Początkujący',
+      },
+      hero: {
+        priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN!,
+        credits: 2,
+        name: 'Paket Bohater',
+      },
+    };
+  }
 
-function isValidPackType(packType: string): packType is PackType {
+  // Default to GBP
+  return {
+    rookie: {
+      priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK!,
+      credits: 1,
+      name: 'Rookie Pack',
+    },
+    hero: {
+      priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK!,
+      credits: 2,
+      name: 'Hero Pack',
+    },
+  };
+}
+
+function isValidPackType(
+  packType: string,
+  locale: string
+): packType is PackType {
+  const CREDIT_PACKS = getCreditPacks(locale);
   return packType in CREDIT_PACKS;
 }
 
-/**
- * POST /api/checkout_sessions
- *
- * Creates a Stripe checkout session for purchasing credits.
- *
- * Security:
- * - Requires valid Firebase ID token in Authorization header
- * - userId is extracted from verified token (NEVER from request body)
- * - Pack configuration (price, credits) is server-side only
- *
- * Request:
- * - Headers: Authorization: Bearer <firebase_id_token>
- * - Body: { packType: 'responder' | 'hero' }
- *
- * Response:
- * - 200: { url: string } - Stripe checkout URL
- * - 400: Invalid packType
- * - 401: Missing or invalid token
- * - 500: Server error
- */
+type PackType = 'rookie' | 'hero';
+
 export async function POST(request: NextRequest) {
   const localeParam = request.nextUrl.searchParams.get('locale') || 'en';
   const stripeLocale = toStripeLocale(localeParam);
   try {
-    // 1. Extract and validate Bearer token
     const idToken = extractAndValidateToken(request, 'checkout_sessions');
 
     if (!idToken) {
@@ -72,7 +69,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Verify token with Firebase Admin SDK
     let decodedToken;
     try {
       decodedToken = await verifyIdToken(idToken);
@@ -107,7 +103,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!isValidPackType(packType)) {
+    if (!isValidPackType(packType, localeParam)) {
+      const CREDIT_PACKS = getCreditPacks(localeParam);
       return NextResponse.json(
         {
           error: `Invalid packType. Must be one of: ${Object.keys(CREDIT_PACKS).join(', ')}`,
@@ -117,6 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Get pack configuration from server-side config (NEVER trust client)
+    const CREDIT_PACKS = getCreditPacks(localeParam);
     const pack = CREDIT_PACKS[packType];
 
     // 6. Get origin for redirect URLs
@@ -141,7 +139,7 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       ...(stripeLocale ? { locale: stripeLocale } : {}),
       success_url: successUrl,
-      cancel_url: `${origin}/app/select-package?canceled=true`,
+      cancel_url: `${origin}/app/wybierz-numer?canceled=true`,
       // Store metadata for webhook processing
       metadata: {
         userId,

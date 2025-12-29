@@ -39,7 +39,7 @@ export default function ResetProgressSection() {
           ariaLabel={t('button')}
           className="cartoon-btn-danger"
         >
-          💣 {t('button')}
+          {t('button')}
         </CartoonButton>
         {confirmed && (
           <p className="reset-confirmation" role="alert">
@@ -70,4 +70,3 @@ export default function ResetProgressSection() {
     </>
   );
 }
-

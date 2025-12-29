@@ -26,7 +26,7 @@ export default function AchievementsPage() {
               >
                 <h2 id="score-heading">{t('score')}</h2>
                 <div className="achievements-card">
-                  <LevelProgress showLabel={true} />
+                  <LevelProgress showLabel={false} />
                 </div>
               </section>
 

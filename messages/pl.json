@@ -1,7 +1,11 @@
 {
   "metadata": {
     "title": "Bobby - Trening Alarmowy dla Dzieci",
-    "description": "Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób"
+    "description": "Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób",
+    "structuredData": {
+      "operatingSystem": "Przeglądarka internetowa",
+      "authorName": "Zespół Bobby"
+    }
   },
   "common": {
     "loading": "Ładowanie...",
@@ -28,8 +32,8 @@
   },
   "auth": {
     "login": {
-      "title": "Witaj ponownie w Bobby!",
-      "description": "Wprowadź swój email i hasło, aby zalogować się do konta Bobby.",
+      "title": "Witaj ponownie bohaterze!",
+      "description": "Wprowadź swój email i hasło, aby się zalogować.",
       "emailPlaceholder": "Email rodzica",
       "emailLabel": "Email rodzica",
       "passwordPlaceholder": "Hasło",
@@ -49,7 +53,7 @@
       "passwordLabel": "Hasło",
       "confirmPasswordPlaceholder": "Potwierdź hasło",
       "confirmPasswordLabel": "Potwierdź hasło",
-      "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny",
+      "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny (!@#$%^&*(),.?\":{}|<>)",
       "passwordStrength": "Siła hasła",
       "submit": "ZAREJESTRUJ SIĘ",
       "submitting": "TWORZENIE KONTA...",
@@ -74,12 +78,12 @@
       "passwordsMismatch": "Hasła nie są takie same",
       "invalidCredential": "Nieprawidłowy email lub hasło. Spróbuj ponownie.",
       "tooManyRequests": "Zbyt wiele nieudanych prób. Spróbuj ponownie później.",
-      "userDisabled": "To konto zostało zablokowane.",
+      "userDisabled": "Logowanie nie powiodło się. Spróbuj ponownie.",
       "loginFailed": "Logowanie nie powiodło się. Spróbuj ponownie.",
-      "emailInUse": "Ten email jest już zarejestrowany. Zaloguj się.",
+      "emailInUse": "Nie udało się utworzyć konta. Spróbuj ponownie.",
       "invalidEmail": "Nieprawidłowy adres email.",
-      "operationNotAllowed": "Konta email/hasło nie są włączone. Skontaktuj się z pomocą techniczną.",
-      "weakPassword": "Hasło jest za słabe. Użyj silniejszego hasła.",
+      "operationNotAllowed": "Konta email/hasło nie są aktywne. Skontaktuj się z pomocą techniczną.",
+      "weakPassword": "Nie udało się utworzyć konta. Spróbuj ponownie.",
       "signupFailed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
       "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
       "pleaseLogin": "Zaloguj się, aby kontynuować"
@@ -91,86 +95,95 @@
       "startTraining": "Rozpocznij trening"
     },
     "hero": {
-      "title": "Opanuj połączenie alarmowe 112 zanim nadejdzie sytuacja awaryjna.",
-      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci (w wieku 5-12 lat) jak pewnie obsługiwać połączenia z policją, strażą pożarną i pogotowiem. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w bezpiecznym środowisku.",
+      "title": "Opanuj połączenie alarmowe 999 zanim nadejdzie sytuacja awaryjna.",
+      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci (w wieku 5-12 lat) jak pewnie obsługiwać połączenia ze służbami ratunkowymi. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w przyjaznym środowisku.",
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
     },
     "carousel": {
       "title": "Czy Twoje dziecko poradziłoby sobie z...",
-      "subtitle": "Przesuń, aby zobaczyć prawdziwe scenariusze, które dzieci mogą ćwiczyć z Bobbym",
+      "subtitle": "Poznaj prawdziwe sytuacje, które dzieci mogą bezpiecznie ćwiczyć z Bobbym",
       "prevAriaLabel": "Poprzednie scenariusze",
       "nextAriaLabel": "Następne scenariusze",
       "carouselAriaLabel": "Karuzela kart scenariuszy",
-      "goToSlide": "Przejdź do slajdu {number}"
+      "paginationAriaLabel": "Paginacja karuzeli",
+      "goToSlide": "Przejdź do slajdu {number}",
+      "cardAriaLabel": "{situation}. {hook}. Kliknij, aby dowiedzieć się więcej."
     },
     "scenarios": {
       "1": {
         "situation": "Mama zemdlała w kuchni",
-        "hook": "Czy Twoje dziecko wiedziałoby, co powiedzieć pogotowiu?",
-        "description": "Twoje dziecko wraca do domu i znajduje Cię nieprzytomną na podłodze. Bobby poprowadzi je przez sprawdzenie, czy oddychasz, podanie adresu i zachowanie spokoju do przyjazdu pomocy.",
-        "practicePoints": ["Wyraźne podanie adresu", "Sprawdzenie oddechu", "Pozostanie na linii do przyjazdu pomocy"]
+        "hook": "Czy Twoje dziecko wiedziałoby, jak zaalarmować?",
+        "description": "Twoje dziecko wraca do domu i znajduje Cię/Ciebie nieprzytomną na podłodze.\nBobby uczy dziecko, jak sprawdzić oddech, podać adres i spokojnie czekać na pomoc.",
+        "practicePoints": [
+          "Podanie adresu",
+          "Sprawdzenie oddechu",
+          "Pozostanie na linii do momentu przyjazdu karetki"
+        ]
       },
       "2": {
-        "situation": "Budzisz się i czujesz dym",
-        "hook": "Najpierw wyjść? Najpierw zadzwonić? Czy wiedzą?",
-        "description": "Jest środek nocy, a korytarz wypełnia dym. Bobby uczy ich właściwej kolejności działań i bezpiecznej ewakuacji.",
-        "practicePoints": ["Schylanie się i sprawdzanie drzwi", "Znajdowanie najbezpieczniejszej drogi ucieczki", "Dzwonienie pod 112 po wyjściu"]
+        "situation": "Budzisz się w nocy i czujesz dym",
+        "hook": "Wyjść od razu? Zadzwonić? Co zrobić najpierw?",
+        "description": "Jest środek nocy, a korytarz zaczyna wypełniać się dymem. Bobby pokazuje dzieciom, jak krok po kroku opuścić dom i wezwać pomoc.",
+        "practicePoints": ["Jak wybrać bezpieczną drogę ucieczki"]
       },
       "3": {
-        "situation": "W domu jest obcy człowiek",
-        "hook": "Czy potrafią się ukryć i szeptać o pomoc?",
-        "description": "Ktoś włamał się, gdy rodzina jest w domu. Bobby pomaga im zrozumieć, jak się ukryć, zachować ciszę i komunikować ze służbami ratunkowymi.",
-        "practicePoints": ["Znajdowanie bezpiecznej kryjówki", "Wyraźne szeptanie do operatora", "Pozostanie w ukryciu do przyjazdu policji"]
+        "situation": "Ktoś włamał się do domu",
+        "hook": "",
+        "description": "Ktoś obcy wchodzi do domu. Bobby pokazuje dzieciom, jak znaleźć bezpieczne miejsce, zachować ciszę i wezwać pomoc.",
+        "practicePoints": [
+          "Znajdź bezpieczne miejsce i dobrze się ukryj",
+          "Porozmawiaj z operatorem, żeby intruz się nie usłyszał.",
+          "Zostań w ukryciu do przyjazdu policji"
+        ]
       },
       "4": {
         "situation": "Dziadek upadł i nie wstaje",
-        "hook": "Czy potrafią jasno opisać, co się stało?",
-        "description": "Dziadek upadł i nie może się ruszyć. Bobby prowadzi ich przez opisanie sytuacji, sprawdzenie obrażeń i zapewnienie dziadkowi komfortu.",
-        "practicePoints": ["Opisanie upadku i objawów", "Sprawdzenie, czy dziadek jest przytomny", "Utrzymanie go w bezruchu i cieple"]
+        "hook": "Ważne, żeby spokojnie powiedzieć, co się stało.",
+        "description": "Dziadek przewrócił się i nie może wstać. Bobby zapyta co się wydarzyło, zapyta rozmówce, czy dziadek jest przytomny i zasugeruje, aby pozostać przy nim do przyjazdu pomocy.",
+        "practicePoints": [
+          "Powiedz, co się stało",
+          "Sprawdź, czy dziadek reaguje na bodźce zewnątrzne",
+          "Pozostań przy dziadku do przyjazdu pomocy"
+        ]
       },
       "5": {
-        "situation": "Dom sąsiada płonie",
-        "hook": "Czy wiedzą, co ONI powinni zrobić?",
-        "description": "Płomienie są widoczne u sąsiadów. Bobby uczy ich, jak zaalarmować własną rodzinę, wezwać pomoc i trzymać się z daleka od niebezpieczeństwa.",
-        "practicePoints": ["Alarmowanie dorosłych w domu", "Dzwonienie pod 112 z prawidłowym adresem", "Zachowanie bezpiecznej odległości"]
+        "situation": "Ogień w domu obok.",
+        "hook": "Czy Twoje dziecko wie, jak powiadomić służby ratunkowe?",
+        "description": "Dziecko zauważa pożar u sąsiadów. Bobby pokazuje, co zrobić w takiej chwili: powiedzieć o tym dorosłemu, wezwać pomoc i trzymać się z daleka od niebezpieczeństwa.",
+        "practicePoints": [
+          "Dzwonienie na numer alarmowy",
+          "Zachowanie bezpiecznej odległości"
+        ]
       },
       "6": {
         "situation": "Twój młodszy brat się dławi",
-        "hook": "Każda sekunda się liczy. Czy zamarliby?",
-        "description": "Rodzeństwo dławi się jedzeniem i nie może oddychać. Bobby prowadzi ich przez rozpoznanie objawów i natychmiastowe wezwanie pomocy.",
-        "practicePoints": ["Rozpoznawanie objawów dławienia", "Natychmiastowe dzwonienie pod 112", "Wykonywanie instrukcji operatora"]
-      },
-      "7": {
-        "situation": "Dym blokuje drogę wyjścia",
-        "hook": "Czy wiedzą, jak pozostać bezpieczni do przyjazdu pomocy?",
-        "description": "Normalne wyjście jest zablokowane dymem. Bobby uczy ich, co robić, gdy nie mogą uciec i jak sygnalizować o pomoc.",
-        "practicePoints": ["Zamykanie drzwi, aby zablokować dym", "Sygnalizowanie z okna", "Pozostawanie nisko, gdzie powietrze jest czystsze"]
-      },
-      "8": {
-        "situation": "Nie czujesz się bezpiecznie w domu",
-        "hook": "Muszą wiedzieć, że można prosić o pomoc",
-        "description": "Czasami dom nie jest bezpiecznym miejscem. Bobby delikatnie wyjaśnia, że można się zwrócić o pomoc i jak porozmawiać z kimś, kto może pomóc.",
-        "practicePoints": ["Zrozumienie, że to nie ich wina", "Wiedza, do kogo zadzwonić po pomoc", "Rozmowa z zaufanym dorosłym"]
+        "hook": "Każda sekunda się liczy. Czy wiesz jak zareagować?",
+        "description": "Podczas jedzenia młodszy brat zaczyna się dławić i ma problem z oddychaniem. Bobby pomaga dziecku rozpoznać, że to sytuacja zagrożająca życiu i szybko wezwać pomoc.",
+        "practicePoints": [
+          "Rozpoznawanie objawów dławienia",
+          "Natychmiastowe wezwanie pomocy",
+          "Wykonywanie instrukcji operatora"
+        ]
       }
     },
     "footer": {
-      "ready": "Gotowy do rozpoczęcia?",
+      "ready": "Gotowy do rozpoczęcia nauki?",
       "privacy": "Polityka prywatności"
     }
   },
   "yourAge": {
-    "title": "DLA KOGO TO JEST?",
+    "title": "Stopień zaawansowania",
     "subtitle": "Wybierz grupę wiekową",
     "ages": {
-      "tier1": "WIEK 4-6",
-      "tier2": "WIEK 7-10",
-      "tier3": "WIEK 11-13"
+      "tier1": "4-6 lat",
+      "tier2": "7-10 lat",
+      "tier3": "11-13 lat"
     }
   },
   "chooseEmergency": {
-    "title": "JAKA TO SYTUACJA AWARYJNA?",
-    "subtitle": "Wybierz typ sytuacji",
+    "title": "Co się wydarzyło?",
+    "subtitle": "Wybierz sytuację",
     "services": {
       "fire": "POŻAR",
       "ambulance": "POGOTOWIE",
@@ -179,9 +192,13 @@
   },
   "selectPackage": {
     "title": "Wybierz Pakiet",
-    "subtitle": "Każdy kredyt = 1 rozmowa ćwiczebna",
+    "subtitle": "1 kredyt = 1 rozmowa",
     "loading": "Ładowanie...",
-    "buyPrefix": "Kup £",
+    "buyPrefix": "Kup {currency}",
+    "packs": {
+      "rookie": "Pakiet Początkujący",
+      "hero": "Pakiet Bohater"
+    },
     "messages": {
       "canceled": "Płatność została anulowana. Wybierz pakiet, aby spróbować ponownie."
     },
@@ -191,39 +208,56 @@
     }
   },
   "dial": {
+    "title": "Wybierz numer {number}",
     "creditsLabel": "Kredyty:",
     "messages": {
       "canceled": "Płatność została anulowana. Możesz spróbować ponownie, kiedy będziesz gotowy!",
-      "needsCredits": "Potrzebujesz kredytów, aby rozpocząć połączenie ćwiczebne.",
-      "loadingCredits": "Ładowanie twoich kredytów..."
+      "needsCredits": "Potrzebujesz kredytów, aby rozpocząć trening.",
+      "loadingCredits": "Ładowanie kredytów...",
+      "dialNumber": "Wybierz numer! 📞",
+      "dialAllDigits": "Wybierz wszystkie {count} cyfry! 🔢"
     },
     "buttons": {
       "call": "ZADZWOŃ",
       "loading": "ŁADOWANIE...",
-      "buyAndCall": "KUP I ZADZWOŃ"
+      "buyAndCall": "KUP I ZADZWOŃ",
+      "clear": "WYCZYŚĆ",
+      "back": "Wstecz"
     }
+  },
+  "conversation": {
+    "bobbySpeaking": "Bobby mówi...",
+    "bobbyThinking": "Bobby myśli...",
+    "yourTurn": "Twoja kolej, mów!",
+    "error": "Coś poszło nie tak",
+    "processing": "Przetwarzam rozmowę...",
+    "sessionError": "Błąd sesji",
+    "sessionErrorDesc": "Coś poszło nie tak podczas rozmowy.",
+    "endConversation": "Zakończ rozmowę"
   },
   "completion": {
     "title": "Świetna robota!",
-    "loading": "Ładowanie danych ukończenia...",
+    "loading": "Przetwarzanie danych...",
     "error": {
-      "title": "Nie udało się załadować danych ukończenia",
+      "title": "Nie udało się załadować rezultatu",
       "tryAgain": "Spróbuj ponownie"
     }
   },
   "faq": {
     "title": "CZĘSTO ZADAWANE PYTANIA",
-    "subtitle": "Znajdź odpowiedzi tutaj!",
-    "stillHaveQuestions": "Masz jeszcze pytania?",
+    "subtitle": "Znajdź odpowiedzi na najczęstsze pytania",
+    "questionsTitle": "Pytania",
+    "stillHaveQuestions": "Czy wszystko jasne?",
+    "contactPrompt": "Jesteśmy tu, aby pomóc! Skontaktuj się z nami.",
     "contactUs": "Skontaktuj się z nami",
     "items": {
       "1": {
-        "question": "Do czego służy ta aplikacja?",
-        "answer": "Bobby pomaga dzieciom ćwiczyć dzwonienie na 112 w bezpieczny i zabawny sposób. Uczy dzieci jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak dzwonić po pomoc."
+        "question": "Dlaczego zdecydowaliśmy się stworzyć Bobby’ego?",
+        "answer": "Bobby pomaga dzieciom ćwiczyć rozmowy z operatorem 999 w bezpieczny i zabawny sposób. Uczy dzieci jak komunikować się jasno, zachować spokój i zrozumieć, kiedy i jak prosić o pomoc."
       },
       "2": {
-        "question": "Jak działają scenariusze wiekowe?",
-        "answer": "Aplikacja oferuje trzy grupy wiekowe: 5-7 lat (bardzo prosty język i krótkie scenariusze), 8-10 lat (bardziej realistyczne rozmowy) i 11-12 lat (niemal realistyczny przebieg rozmowy z operatorem)."
+        "question": "Jak dopasowaliśmy scenariusze do wieku dziecka?",
+        "answer": "Aplikacja oferuje trzy grupy wiekowe: 5-7 lat (bardzo prosty język i krótkie scenariusze), 8-10 lat (bardziej realistyczne rozmowy) i 11-12 lat (niemal realistyczny przebieg rozmowy z operatorem). Jeśli masz sugestie dotyczące ulepszenia scenariuszy, skontaktuj się z nami."
       },
       "3": {
         "question": "Czy dane mojego dziecka są bezpieczne?",
@@ -232,10 +266,6 @@
       "4": {
         "question": "Czy ta aplikacja wymaga internetu?",
         "answer": "Tak, aplikacja wymaga połączenia z internetem do korzystania z funkcji rozmowy głosowej z Bobbym. Jednak twój postęp jest przechowywany lokalnie na urządzeniu."
-      },
-      "5": {
-        "question": "Czy kilkoro dzieci może korzystać z aplikacji?",
-        "answer": "Tak! Możesz zresetować postęp w Ustawieniach, aby pozwolić różnym dzieciom korzystać z aplikacji. Każde dziecko zacznie od nowa z własnym postępem i odznakami."
       }
     }
   },
@@ -243,11 +273,13 @@
     "title": "KONTAKT",
     "subtitle": "Masz pytanie? Jesteśmy tu, aby pomóc!",
     "options": {
-      "chat": "POROZMAWIAJ Z ZESPOŁEM BOBBY",
-      "email": "WYŚLIJ EMAIL",
-      "faq": "FAQ"
+      "title": "Skontaktuj się",
+      "email": "Email",
+      "faq": "FAQ",
+      "faqDesc": "Znajdź odpowiedź"
     },
-    "responseTime": "Odpowiemy w ciągu 24 godzin."
+    "responseTimeTitle": "Czas odpowiedzi",
+    "responseTime": "Zazwyczaj odpowiadamy w ciągu 24 godzin."
   },
   "settings": {
     "title": "USTAWIENIA",
@@ -256,7 +288,7 @@
       "description": "Wybierz preferowany język"
     },
     "accessibility": {
-      "title": "Ustawienia dostępności"
+      "title": "Opcje ułatwień"
     },
     "progress": {
       "title": "Postęp"
@@ -273,22 +305,22 @@
     }
   },
   "accessibility": {
-    "title": "Ustawienia dostępności",
+    "title": "Opcje ułatwień",
     "uiSound": {
       "label": "Dźwięki interfejsu",
       "on": "Włącz dźwięki interfejsu",
       "off": "Wyłącz dźwięki interfejsu"
     },
     "dyslexiaFont": {
-      "label": "Czcionka dla dyslektyków",
+      "label": "Użyj czcionki przyjaznej dla dyslektyków",
       "aria": "Użyj czcionki przyjaznej dla dyslektyków"
     },
     "slowedSpeech": {
-      "label": "Tryb wolniejszej mowy",
+      "label": "Zwolnij mowę dla lepszego zrozumienia",
       "aria": "Zwolnij mowę dla lepszego zrozumienia"
     },
     "reducedSensory": {
-      "label": "Tryb zmniejszonych bodźców",
+      "label": "Zmniejsz animacje i efekty wizualne",
       "aria": "Zmniejsz animacje i efekty wizualne"
     },
     "fontSize": {
@@ -300,7 +332,7 @@
       "xlarge": "Bardzo duży"
     },
     "colorMode": {
-      "label": "Tryb kolorów",
+      "label": "Kontrast kolorów",
       "aria": "Wybierz tryb kolorów dla lepszej widoczności",
       "default": "Domyślny",
       "highContrast": "Wysoki kontrast"
@@ -308,7 +340,7 @@
   },
   "deleteAccount": {
     "button": "Usuń konto",
-    "confirmMessage": "Czy na pewno chcesz usunąć swoje konto? Spowoduje to trwałe usunięcie wszystkich danych, postępów, odznak i historii rozmów. Tej czynności nie można cofnąć.",
+    "confirmMessage": "Czy na pewno chcesz usunąć konto? Spowoduje to nieodwracalne usunięcie wszystkich danych. Tej czynności nie można cofnąć.",
     "confirmButton": "Tak, jestem pewien",
     "deleting": "Usuwanie...",
     "cancel": "Anuluj",
@@ -317,10 +349,10 @@
     }
   },
   "resetProgress": {
-    "description": "Zresetuj wszystkie postępy, odznaki i historię rozmów.",
-    "button": "Resetuj postępy",
-    "success": "Postępy zostały zresetowane.",
-    "confirmMessage": "Czy na pewno chcesz zresetować wszystkie postępy? Tej czynności nie można cofnąć.",
+    "description": "Zresetuj postęp, odznaki i historię rozmów.",
+    "button": "Resetuj",
+    "success": "Reset zakończony pomyślnie.",
+    "confirmMessage": "Czy na pewno chcesz wszystko zresetować? Tej czynności nie można cofnąć.",
     "confirmButton": "Tak, zresetuj wszystko",
     "cancel": "Anuluj"
   },
@@ -350,7 +382,7 @@
   "completionMessage": {
     "title": {
       "trainingComplete": "🎉 Trening ukończony! 🎉",
-      "practiceComplete": "Sesja ćwiczeniowa zakończona",
+      "practiceComplete": "Sesja zakończona",
       "wellDone": "Świetna robota! 🎉"
     },
     "performance": {
@@ -491,6 +523,87 @@
     "noConversations": "Brak rozmów",
     "noConversationsHint": "Ukończ rozmowę z Bobby, aby zobaczyć historię rozmów."
   },
+  "bottomNav": {
+    "callBobby": "Zadzwoń",
+    "chats": "Rozmowy",
+    "achievements": "Osiągnięcia",
+    "settings": "Ustawienia"
+  },
+  "paidRouteGuard": {
+    "verifyingAccess": "Sprawdzanie dostępu..",
+    "redirecting": "Przekierowywanie..."
+  },
+  "logoutButton": {
+    "ariaLabel": "Wyloguj się",
+    "signOut": "Wyloguj się",
+    "signingOut": "Wylogowywanie..."
+  },
+  "levelProgress": {
+    "regionLabel": "Postęp poziomu",
+    "yourScore": "TWÓJ WYNIK",
+    "level": "POZIOM {level}",
+    "progressAriaLabel": "Postęp poziomu {level}: {percent}%",
+    "xpToNext": "{xp} PD do następnego poziomu"
+  },
+  "scenarioModal": {
+    "closeModal": "Zamknij okno",
+    "scenarioTitle": "Scenariusz:",
+    "practiceTitle": "Co będą ćwiczyć:",
+    "startPractice": "Rozpocznij ćwiczenie",
+    "backToExamples": "Wróć do przykładów"
+  },
+  "services": {
+    "ambulance": "POGOTOWIE",
+    "fire": "POŻAR",
+    "police": "POLICJA",
+    "ambulanceService": "Pogotowie",
+    "fireService": "Straż pożarna",
+    "policeService": "Policja"
+  },
+  "conversationCard": {
+    "callSuffix": "Rozmowa",
+    "messages": "wiadomości",
+    "ageTier": {
+      "tier1": "4-6 lat",
+      "tier2": "7-10 lat",
+      "tier3": "11-13 lat",
+      "unknown": "Nieznane"
+    }
+  },
+  "conversationDetail": {
+    "loading": "Ładowanie rozmowy...",
+    "goBack": "Wstecz",
+    "backToConversationsAria": "Wróć do listy rozmów",
+    "title": "Twoja rozmowa",
+    "subtitle": "Zobacz przebieg rozmowy z Bobbym",
+    "saveTranscript": "Zapisz transkrypt",
+    "saveTranscriptTitle": "Zapisz transkrypt jako plik tekstowy",
+    "empty": "Brak wiadomości w tej rozmowie.",
+    "transcript": {
+      "speaker": {
+        "bobby": "Bobby",
+        "you": "Ty"
+      },
+      "header": "Rozmowa z Bobbym — {service} ({callSuffix})",
+      "date": "Data: {date}",
+      "filename": "rozmowa-bobby-{id}.txt"
+    }
+  },
+  "soundToggle": {
+    "regionLabel": "Sterowanie dźwiękiem",
+    "turnOff": "Wyłącz dźwięki interfejsu",
+    "turnOn": "Włącz dźwięki interfejsu",
+    "on": "Dźwięki: włączone",
+    "off": "Dźwięki: wyłączone"
+  },
+  "queryBoundary": {
+    "defaultErrorTitle": "Coś poszło nie tak",
+    "tryAgain": "Spróbuj ponownie",
+    "unknownError": "Nieznany błąd",
+    "featureErrorTitle": "Błąd: {featureName}",
+    "featureErrorGenericTitle": "Błąd funkcji",
+    "retry": "Ponów"
+  },
   "loadingSpinner": {
     "defaultText": "Bobby przygotowuje się do rozmowy!",
     "defaultHeading": "Chwileczkę ...",
@@ -528,8 +641,8 @@
       "cta": "Spróbuj ponownie"
     },
     "complete": {
-      "title": "Płatność zakończona!",
-      "message": "Dziękujemy za zakup! Otrzymałeś {credits} kredytów.",
+      "title": "Sukces!",
+      "message": "Dziękujemy za zakup! Otrzymałeś {credits, plural, one {# kredyt} few {# kredyty} many {# kredytów} other {# kredytów}}.",
       "email": "Email z potwierdzeniem zostanie wysłany na adres {email}.",
       "emailFallback": "Ciebie",
       "cta": "Zacznij ćwiczyć!"

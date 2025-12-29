@@ -62,7 +62,7 @@ const welcomeEmailHtml = `
     <title>Welcome to Bobby, Hero!</title>
     <!--[if !mso]><!-->
     <style type="text/css">
-        @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
     </style>
     <!--<![endif]-->
     <style type="text/css">
@@ -114,7 +114,7 @@ const welcomeEmailHtml = `
                     <!-- Welcome Title -->
                     <tr>
                         <td align="center" style="padding: 0 20px 20px 20px;">
-                            <h1 style="color: #5BA8D4; font-family: 'Chewy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
+                            <h1 style="color: #5BA8D4; font-family: 'Luckiest+Guy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
                                 Welcome to<br/>Bobby, Hero!
                             </h1>
                         </td>
@@ -172,7 +172,9 @@ export async function sendGoodbyeEmail(
       .setTo(recipients)
       .setSubject('Goodbye from Bobby 👋')
       .setHtml(goodbyeEmailHtml)
-      .setText(`Goodbye, ${name}! We're sad to see you go. Your account has been deleted.`);
+      .setText(
+        `Goodbye, ${name}! We're sad to see you go. Your account has been deleted.`
+      );
 
     await mailerSend.email.send(emailParams);
 
@@ -192,7 +194,7 @@ const goodbyeEmailHtml = `
     <title>Goodbye from Bobby</title>
     <!--[if !mso]><!-->
     <style type="text/css">
-        @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
     </style>
     <!--<![endif]-->
     <style type="text/css">
@@ -244,7 +246,7 @@ const goodbyeEmailHtml = `
                     <!-- Goodbye Title -->
                     <tr>
                         <td align="center" style="padding: 0 20px 20px 20px;">
-                            <h1 style="color: #5BA8D4; font-family: 'Chewy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
+                            <h1 style="color: #5BA8D4; font-family: 'Luckiest+Guy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
                                 Goodbye, Hero!
                             </h1>
                         </td>
@@ -308,7 +310,7 @@ const passwordResetEmailHtml = (resetLink: string) => `
     <title>Reset your Bobby password</title>
     <!--[if !mso]><!-->
     <style type="text/css">
-        @import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
     </style>
     <!--<![endif]-->
     <style type="text/css">
@@ -358,7 +360,7 @@ const passwordResetEmailHtml = (resetLink: string) => `
                                 <!-- Reset Title -->
                                 <tr>
                                     <td align="center" style="padding: 0 20px 20px 20px;">
-                                        <h1 style="color: #5BA8D4; font-family: 'Chewy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
+                                        <h1 style="color: #5BA8D4; font-family: 'Luckiest+Guy', Arial, sans-serif; font-size: 48px; font-weight: bold; margin: 0; line-height: 1.2;">
                                             Password Reset
                                         </h1>
                                     </td>

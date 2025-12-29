@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 
 interface CartoonButtonProps {
   children: React.ReactNode;
@@ -35,9 +35,9 @@ export default function CartoonButton({
   return (
     <div className={`btn-container ${containerClassName}`}>
       {asLink ? (
-        <Link href={href} className={`cartoon-btn ${className}`}>
+        <NextLink href={href} className={`cartoon-btn ${className}`}>
           <span>{children}</span>
-        </Link>
+        </NextLink>
       ) : (
         <button
           type={type}

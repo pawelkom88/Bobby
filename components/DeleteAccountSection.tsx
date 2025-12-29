@@ -70,7 +70,7 @@ export default function DeleteAccountSection() {
           className="cartoon-btn-danger"
           disabled={isPending}
         >
-          🗑️ {t('button')}
+          {t('button')}
         </CartoonButton>
         {error && (
           <p className="reset-warning" role="alert">
@@ -111,4 +111,3 @@ export default function DeleteAccountSection() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import type { ReactNode } from 'react';
 
@@ -42,9 +42,9 @@ export function SuccessContent({
       {message && <p className="success-message">{message}</p>}
       {email && <p className="success-email">{email}</p>}
       {children}
-      <Link href={ctaHref} className="success-cta-button">
+      <NextLink href={ctaHref} className="success-cta-button">
         {ctaText}
-      </Link>
+      </NextLink>
     </>
   );
 }
