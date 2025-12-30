@@ -7877,11 +7877,16 @@ input {
   padding: 2rem;
   margin-bottom: 2rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 2rem;
   position: relative;
   border: 2px solid #ffc86433;
   background: white;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 .pricing-card.card-yellow {
@@ -8327,136 +8332,265 @@ input {
   border-color: transparent #8b1a1a transparent transparent;
 }
 
-@media (max-width: 680px) {
-  .pricing-card {
-    flex-direction: column;
-    text-align: center;
-    width: 100%;
-  }
-
-  .card-title {
-    font-size: 1.5rem;
-  }
-
-  .card-price {
-    font-size: 1.25rem;
-  }
-
-  .feature-list {
-    width: 100%;
-  }
-
-  .feature-item {
-    font-size: 1rem;
-  }
-
-  .select-button {
-    width: 100%;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-  }
-
-  .ribbon {
-    top: 10px;
-    right: -25px;
-    padding: 5px 25px;
-    font-size: 0.6rem;
-  }
-
-  .ribbon::before {
-    left: -10px;
-    border-width: 11px 10px 11px 0;
-  }
-
-  .ribbon::after {
-    right: -10px;
-    border-width: 11px 0 11px 10px;
-  }
-
-  .ribbon .fold-left {
-    border-width: 0 0 6px 10px;
-  }
-
-  .ribbon .fold-right {
-    border-width: 0 10px 6px 0;
-  }
-}
-
+/* Mobile responsive adjustments - already using single column layout */
 @media (max-width: 768px) {
   .pricing-card {
-    flex-direction: column;
-    text-align: center;
+    padding: 1.5rem;
   }
-
+  
   .character-box {
     width: 150px;
     height: 150px;
   }
-
+  
   .card-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
+}
 
-  .select-button {
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    border: none;
-    font-weight: bold;
+.select-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.ribbon {
+  top: 10px;
+  right: -25px;
+  padding: 5px 25px;
+  font-size: 0.6rem;
+}
+
+.ribbon::before {
+  left: -10px;
+  border-width: 11px 10px 11px 0;
+}
+
+.ribbon::after {
+  right: -10px;
+  border-width: 11px 0 11px 10px;
+}
+
+.ribbon .fold-left {
+  border-width: 0 0 6px 10px;
+}
+
+.ribbon .fold-right {
+  border-width: 0 10px 6px 0;
+}
+
+/* Note: Pricing cards now use single column layout on all screen sizes */
+
+.select-button {
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  color: white;
+}
+
+.select-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ribbon {
+  position: absolute;
+  top: 15px;
+  right: -35px;
+  text-align: center;
+  background: #c62828;
+  color: white;
+  padding: 8px 40px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  box-shadow: 0 4px 10px rgba(198, 40, 40, 0.4);
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+
+.ribbon::before,
+.ribbon::after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  top: 12px;
+  right: -32px;
+  padding: 6px 35px;
+  font-size: 0.7rem;
+  left: -12px;
+  border-width: 13px 12px 13px 0;
+}
+
+/* Package card enhancements */
+.card-subtitle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-ideal-for {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.card-price {
+  margin-bottom: 1.5rem;
+}
+
+.price-amount {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 2rem;
+  color: #333;
+  display: block;
+}
+
+.price-microcopy {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #333;
+  margin-top: 0.25rem;
+}
+
+.card-features {
+  margin-bottom: 1.5rem;
+}
+
+.features-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-item {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.feature-item::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.card-description {
+  margin-bottom: 1.5rem;
+}
+
+.desc-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.desc-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+.card-microcopy-bottom {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #333;
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* Reassurance section */
+.select-package-reassurance {
+  background: #f8f9fa;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.reassurance-title {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.reassurance-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.reassurance-point {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #555;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.reassurance-point::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .card-ideal-for {
     font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    color: white;
   }
 
-  .select-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+  .price-amount {
+    font-size: 1.75rem;
   }
 
-  .ribbon {
-    position: absolute;
-    top: 15px;
-    right: -35px;
-    text-align: center;
-    background: #c62828;
-    color: white;
-    padding: 8px 40px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    line-height: 1.3;
-    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.4);
-    transform: rotate(45deg);
-    transform-origin: center;
+  .features-list {
+    font-size: 0.9rem;
   }
 
-  .ribbon::before,
-  .ribbon::after {
-    content: '';
-    position: absolute;
-    border-style: solid;
-    top: 12px;
-    right: -32px;
-    padding: 6px 35px;
-    font-size: 0.7rem;
+  .desc-text {
+    font-size: 0.9rem;
   }
 
-  .ribbon::before {
-    left: -12px;
-    border-width: 13px 12px 13px 0;
+  .reassurance-points {
+    grid-template-columns: 1fr;
   }
 
-  .ribbon::after {
-    right: -12px;
-    border-width: 13px 0 13px 12px;
-  }
-
-  .ribbon .fold-left {
-    border-width: 0 0 8px 12px;
-  }
-
-  .ribbon .fold-right {
-    border-width: 0 12px 8px 0;
+  .select-package-reassurance {
+    padding: 1.5rem;
   }
 }
 

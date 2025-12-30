@@ -330,13 +330,59 @@
     }
   },
   "selectPackage": {
-    "title": "Choose Your Pack",
-    "subtitle": "Each credit = 1 practice call",
+    "title": "Pricing & Packs",
+    "subtitle": "Choose the right pack for your child",
     "loading": "Loading...",
     "buyPrefix": "Buy {currency}",
     "packs": {
-      "rookie": "Rookie Pack",
-      "hero": "Hero Pack"
+      "rookie": "🟢 Starter Pack",
+      "rookieSubtitle": "(Rookie Responder Pack)",
+      "hero": "🔵 Hero Pack ⭐ (Recommended)",
+      "heroSubtitle": "(Junior Hero Pack)"
+    },
+    "rookie": {
+      "idealFor": "Perfect for first practice",
+      "price": "£4.99",
+      "includes": "Includes:",
+      "features": [
+        "2 practice calls",
+        "Up to 5 minutes each",
+        "Choose a scenario: Police / Fire / Ambulance",
+        "Adjusted to your child's age",
+        "Positive feedback after each call"
+      ],
+      "bestFor": "Best for:",
+      "bestForDesc": "Parents who want to try Bobby and give their child a calm, first experience.",
+      "cta": "Buy Starter Pack"
+    },
+    "hero": {
+      "idealFor": "Best value for building confidence",
+      "price": "£7.99",
+      "includes": "Includes:",
+      "features": [
+        "5 practice calls",
+        "Up to 5 minutes each",
+        "Multiple emergency scenarios",
+        "More repetition to build confidence",
+        "Badges and rewards for progress"
+      ],
+      "whyChoose": "Why choose this pack?",
+      "whyChooseDesc": "Children learn best through repetition. This pack allows your child to practice different situations and truly feel confident.",
+      "cta": "Buy Hero Pack"
+    },
+    "reassurance": {
+      "title": "Why this works better",
+      "points": [
+        "Clearly explains what's in each pack",
+        "Answers the question: \"Is it safe?\"",
+        "Emphasizes no subscription",
+        "Positions Hero Pack as the default choice",
+        "Fits the child-friendly, warm aesthetic"
+      ]
+    },
+    "microcopy": {
+      "oneTimePurchase": "One-time purchase • No subscription",
+      "callsNeverExpire": "Calls never expire • Practice at your own pace"
     },
     "messages": {
       "canceled": "Checkout was canceled. Select a pack to try again."

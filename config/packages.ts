@@ -29,26 +29,26 @@ export const DISPLAY_PACKAGES: Record<PackType, DisplayPackage> = {
   rookie: {
     id: 'rookie',
     name: 'Rookie Pack',
-    credits: 1,
+    credits: 2,
     basePrice: '2.99',
     displayPrice: '£2.99',
     prices: {
       en: '2.99',
       pl: '23.00'
     },
-    description: '1 practice call',
+    description: '2 practice calls',
   },
   hero: {
     id: 'hero',
     name: 'Hero Pack',
-    credits: 2,
+    credits: 5,
     basePrice: '4.99',
     displayPrice: '£4.99',
     prices: {
       en: '4.99',
       pl: '37.00'
     },
-    description: '2 practice calls',
+    description: '5 practice calls',
     popular: true,
   },
 };
