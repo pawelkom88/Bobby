@@ -1,45 +1,49 @@
 'use client';
 
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { logger } from '@/lib/logger';
 
 type SoundContextValue = {
   soundEnabled: boolean;
   setSoundEnabled: (enabled: boolean) => void;
   toggleSound: () => void;
+  loadAudio: (url: string) => Promise<HTMLAudioElement>;
 };
 
 const SoundContext = createContext<SoundContextValue | undefined>(undefined);
 
+// Cache for lazy-loaded audio elements
+const audioCache = new Map<string, HTMLAudioElement>();
+
 /**
- * Preload audio files to eliminate loading delays when playing sounds
+ * Lazy load audio files on-demand to reduce initial page load
  */
-function preloadAudioFiles() {
-  if (typeof window === 'undefined') return;
+function loadAudio(url: string): Promise<HTMLAudioElement> {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('Window not available'));
+  }
 
-  // List of all MP3 files in the public/sfx directory
-  const audioFiles = [
-    '/sfx/fanfare.mp3',
-    '/sfx/bttf-dial-1.mp3',
-    '/sfx/bttf-dial-2.mp3',
-    '/sfx/bttf-dial-3.mp3',
-    '/sfx/connecting.mp3',
-    '/sfx/sound-on-off.mp3',
-  ];
+  // Return cached audio if available
+  if (audioCache.has(url)) {
+    return Promise.resolve(audioCache.get(url)!);
+  }
 
-  // Preload each audio file
-  audioFiles.forEach(url => {
-    try {
-      const audio = new Audio();
-      audio.preload = 'auto';
-      audio.src = url;
-      // Call load() to start preloading
-      audio.load();
-    } catch (error) {
-      // Silently ignore preloading errors
-      logger.warn(`Failed to preload audio: ${url}`, error);
-    }
+  // Create and load new audio element
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    audio.preload = 'auto';
+    
+    audio.addEventListener('canplaythrough', () => {
+      audioCache.set(url, audio);
+      resolve(audio);
+    }, { once: true });
+
+    audio.addEventListener('error', (e) => {
+      reject(new Error(`Failed to load audio: ${url}`));
+    }, { once: true });
+
+    audio.src = url;
+    audio.load();
   });
 }
 
@@ -53,14 +57,9 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     setSoundEnabled(prev => !prev);
   };
 
-  // Preload audio files when the component mounts
-  useEffect(() => {
-    preloadAudioFiles();
-  }, []);
-
   return (
     <SoundContext.Provider
-      value={{ soundEnabled, setSoundEnabled, toggleSound }}
+      value={{ soundEnabled, setSoundEnabled, toggleSound, loadAudio }}
     >
       {children}
     </SoundContext.Provider>

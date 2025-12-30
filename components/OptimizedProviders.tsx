@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SoundProvider } from '@/components/SoundProvider';
@@ -8,6 +8,8 @@ import { MicrophoneContextProvider } from '@/context/MicrophoneContextProvider';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserDataProvider } from '@/context/UserDataContext';
 import { CreditsProvider } from '@/context/CreditsContext';
+import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
+import { initWebVitals } from '@/lib/web-vitals';
 import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -40,8 +42,14 @@ export function OptimizedProviders({ children }: ProvidersProps) {
         ].some(fragment => pathname.includes(fragment))
       : false;
 
+  // Initialize Web Vitals monitoring
+  useEffect(() => {
+    initWebVitals();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
+      <ServiceWorkerRegistration />
       <AuthProvider>
         <CreditsProvider>
           <UserDataProvider>

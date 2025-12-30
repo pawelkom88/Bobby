@@ -189,7 +189,6 @@ export default function VoiceConversation({
   } = useMicrophone();
 
   // Refs
-  const stopConnectingSoundRef = useRef<(() => void) | null>(null);
   const hasAutoStartedRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -637,10 +636,6 @@ export default function VoiceConversation({
           setIsConnecting(false);
           setSessionActive(true);
           setIsListening(true);
-          if (stopConnectingSoundRef.current) {
-            stopConnectingSoundRef.current();
-            stopConnectingSoundRef.current = null;
-          }
         }, 2000); // Simulate connection time
       }
     } catch (err) {
@@ -648,10 +643,6 @@ export default function VoiceConversation({
       logger.error('Error starting conversation', { message });
       setError('Failed to connect to Bobby. Please try again.');
       setIsConnecting(false);
-      if (stopConnectingSoundRef.current) {
-        stopConnectingSoundRef.current();
-        stopConnectingSoundRef.current = null;
-      }
     }
   };
 
@@ -667,10 +658,6 @@ export default function VoiceConversation({
       // Connected
       setIsConnecting(false);
       setSessionActive(true);
-      if (stopConnectingSoundRef.current) {
-        stopConnectingSoundRef.current();
-        stopConnectingSoundRef.current = null;
-      }
 
       // Send Configuration
       logger.log('VoiceConversation: Generating system prompt...');
@@ -797,10 +784,6 @@ export default function VoiceConversation({
       if (isConnecting) {
         setIsConnecting(false);
         setError('Connection to voice server failed.');
-        if (stopConnectingSoundRef.current) {
-          stopConnectingSoundRef.current();
-          stopConnectingSoundRef.current = null;
-        }
       }
     }
   }, [socketState, isConnecting, socket, ageTier, situation, startMicrophone]);

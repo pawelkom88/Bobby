@@ -8,7 +8,6 @@
  */
 
 let sharedAudioContext: AudioContext | null = null;
-let connectingAudioEl: HTMLAudioElement | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') {
@@ -97,20 +96,23 @@ export async function playEndConversationSound(
 
 /**
  * Play a one-shot "fanfare" sound for successful completion.
- * Uses the fanfare.mp3 file from public/sfx directory.
+ * Uses lazy-loaded fanfare.mp3 file from public/sfx directory.
  */
 export async function playFanfareSound(enabled: boolean): Promise<void> {
   if (!enabled || typeof window === 'undefined') {
     return;
   }
 
-  // Try to play fanfare.mp3 from sfx directory
+  // Try to play fanfare.mp3 from sfx directory (lazy-loaded)
   const candidates = ['/sfx/fanfare.mp3', '/fanfare.mp3'];
 
   for (const url of candidates) {
     try {
-      const audio = new Audio(url);
-      audio.volume = 0.5; // Quiet as requested
+      // Lazy load audio on-demand
+      const audio = new Audio();
+      audio.preload = 'auto';
+      audio.src = url;
+      audio.volume = 0.5;
       await audio.play();
       return;
     } catch {

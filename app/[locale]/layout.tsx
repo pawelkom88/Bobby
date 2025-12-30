@@ -90,6 +90,11 @@ export default async function LocaleLayout({ children, params }: Props) {
           href="https://fonts.gstatic.com"
           crossOrigin=""
         />
+        <link rel="preconnect" href="https://firebase.googleapis.com" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://www.google.com" />
+        <link rel="dns-prefetch" href="https://www.gstatic.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito&display=swap"
           rel="stylesheet"
