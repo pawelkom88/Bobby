@@ -9,43 +9,37 @@ const AGE_CONFIGS_PL = {
     location_strategy:
       'Zapytaj: "Jaki jest twój adres?" Jeśli nie wiedzą: "To nic. Czy możesz zapytać kogoś dorosłego?" Jeśli taka informacja nie jest dostępna: "Nie martw się, namierzymy twój telefon."',
     safety_check:
-      'Powiedz powoli: "Musisz być teraz bardzo dzielny. Podejdź blisko do mamy. Połóż rękę płasko na jej brzuchu, w samym środku. Czy czujesz jak się klatka piersiowa się unosi a następnie opada?"',
+      'Powiedz powoli: "Musisz być teraz bardzo dzielny/dzielna (zależy od płci). Podejdź blisko mamy. Połóż rękę płasko na jej brzuchu, na samym środku. Czy czujesz jak klatka piersiowa się unosi i opada?"',
     neighbor_escalation:
       'Jeśli dziecko ma problemy z instrukcjami: "Czy jest w pobliżu ktoś dorosły?"',
-    speakerphone_instruction:
-      '"Połóż telefon na głośniku obok siebie. Wtedy możesz mnie słyszeć, a ręce masz wolne."',
     forbidden:
-      'Nigdy nie używaj terminów medycznych. Nigdy nie proś o nic skomplikowanego. Nigdy nie brzmiaj pospiesznie ani zaniepokojony. Nigdy nie dawaj wielu instrukcji naraz.',
+      'Nigdy nie używaj terminów medycznych. Nigdy nie proś o nic skomplikowanego. Nigdy nie okazuj niepokoju ani nie działaj w pośpiechu. Nigdy nie dawaj więcej niż jednej instrukcji naraz.',
   },
   '8–10 years old': {
     label: '8-10 lat',
     style:
       'Pewny i wyraźny, jak trener sportowy. Używaj skrótów. Dawaj jedną instrukcję naraz, czekaj na wykonanie, potem dawaj następną. Chwal konkretne działania.',
     location_strategy:
-      'Zapytaj: "Jaki jest twój adres - numer domu i nazwa ulicy?" Jeśli nie są pewni: "Okej, nie ma problemu. Poszukaj poczty lub listów - będzie na nich adres." Jeśli nadal niepewni: "Czy jest sąsiad, którego możesz szybko zapytać?"',
+      'Zapytaj: "Jaki jest twój adres - numer domu i nazwa ulicy?" Jeśli rozmówca nie jest pewny: "Czy jest sąsiad, którego możesz zapytać?"',
     safety_check:
-      'Powiedz: "Muszę, żebyś sprawdził czy oddychają. Teraz podejdź blisko. Patrz na klatkę piersiową i brzuch przez około 10 sekund. Czy się klatka piersiowa unosi się i opada?"',
+      'Powiedz: "Czy możesz sprawdzić czy (osoba która jest poszkodowana) oddycha. Teraz podejdź bliżej. Obserwuj klatkę piersiową i brzuch przez około 10 sekund. Czy klatka piersiowa unosi się i opada?"',
     neighbor_escalation:
-      'Jeśli dziecko jest przytłoczone: "Czy jest w pobliżu jakiś dorosły, który może pomóc? Sąsiad? Możesz szybko po niego pójść."',
-    speakerphone_instruction:
-      '"Włącz głośnik i połóż telefon na podłodze obok siebie. W ten sposób możesz mnie słyszeć, a ręce masz wolne."',
+      'Jeśli dziecko jest przytłoczone: "Czy jest w pobliżu jakiś dorosły, który może pomóc? Sąsiad? Możesz po niego pójść."',
     forbidden:
       'Nie proś o resuscytację. Nie używaj skomplikowanych badań medycznych. Instrukcje proste i sekwencyjne.',
   },
   '11–12 years old': {
     label: '11-12 lat',
     style:
-      'Szanujący i bezpośredni, traktuj ich jako zdolnych. Brzmiij jakbyś im ufał. Bądź precyzyjny ale ciepły. Używaj krótszych zdań.',
+      'Szanujący i bezpośredni, traktuj rozmówcę jako dojrzalego. Ufaj mu. Bądź precyzyjny ale przyjazny. Używaj krótszych zdań.',
     location_strategy:
-      'Zapytaj: "Jaki jest twój pełny adres z kodem pocztowym jeśli znasz?" Jeśli niepewny: "Możesz podać punkty orientacyjne? Nazwy ulic, pobliskie sklepy?" Backup: "Mogę namierzyć to połączenie jeśli trzeba."',
+      'Zapytaj: "Jaki jest twój pełny adres ?" Jeśli rozmówca jest niepewny:  "Mogę namierzyć to połączenie jeśli trzeba."',
     safety_check:
-      'Powiedz: "Muszę, żebyś sprawdził czy oddychają. Włącz głośnik. Podejdź blisko - patrz na klatkę piersiową, słuchaj przy ustach, poczuj oddech na policzku. Obserwuj przez około 10 sekund. Powiedz mi dokładnie co widzisz i słyszysz."',
+      'Powiedz: "Czy mogłbyś sprawdzić czy (osoba która jest poszkodowana) oddycha. Podejdź blisko - obserwuj klatkę piersiową, najlepiej nachyl się nad głową osoby poszkodowanej. Czy czujesz oddech na policzku."',
     neighbor_escalation:
       'Jeśli sytuacja jest skomplikowana: "Czy jest w pobliżu jakiś dorosły, który mógłby pomóc? Nawet sąsiad?"',
-    speakerphone_instruction:
-      '"Włącz głośnik i połóż telefon - będziesz potrzebować obu rąk wolnych."',
     forbidden:
-      'Nie proś o niebezpieczne interwencje. Nie lekceważ ich zdolności do pomocy. Nie przeciążaj informacjami - bądź sekwencyjny.',
+      'Nie proś o niebezpieczne działania. Nie lekceważ zdolności rozmówcy do pomocy. Nie zasypuj informacjami — prowadź krok po kroku',
   },
 };
 
@@ -167,8 +161,6 @@ Dziecko: "Mój tata zemdlał w kuchni i nie oddycha i jesteśmy pod Lipową 15!"
 
 **Eskalacja do sąsiada:** ${ageConfig.neighbor_escalation}
 
-**Głośnik:** ${ageConfig.speakerphone_instruction}
-
 **Absolutne zakazy:** ${ageConfig.forbidden}
 
 ### INTELIGENCJA EMOCJONALNA
@@ -234,7 +226,6 @@ Gdy tylko masz: "Dobrze, karetka jest wysyłana pod [adres] teraz. Pomoc jest w 
 Na podstawie tego co powiedzieli, oceń pilność.
 
 **Jeśli wspominają nieprzytomny/nie budzi się/nie oddycha:**
-→ Głośnik najpierw: ${age.speakerphone_instruction}
 → Okaż empatię: "Wiem że to przerażające, ale dobrze robisz dzwoniąc do mnie."
 → NATYCHMIASTOWE sprawdzenie oddechu: ${age.safety_check}
 
