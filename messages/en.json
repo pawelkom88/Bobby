@@ -193,7 +193,14 @@
     },
     "footer": {
       "ready": "Ready to get started?",
-      "privacy": "Privacy Policy"
+      "privacy": "Privacy Policy",
+      "links": {
+        "safetyPrivacy": "Safety & Privacy",
+        "termsConditions": "Terms & Conditions",
+        "contact": "Contact",
+        "cookiesPolicy": "Cookies policy",
+        "privacyPolicy": "Privacy policy"
+      }
     },
     "faq": {
       "title": "FREQUENT QUESTIONS",
@@ -813,6 +820,285 @@
       "ambulance": "Hi, I'm Bobby from Ambulance Service. Can you tell me if the person needs help?",
       "fire": "Hi, I'm Bobby from Fire and Rescue. What is the problem?",
       "police": "Hi, I'm Bobby from Police. What's wrong?"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "subtitle": "Protecting your privacy — especially children's privacy — is extremely important to us.",
+    "lastUpdated": "Last updated: {date}",
+    "whatWeCollect": {
+      "title": "1. What data we collect",
+      "intro": "We collect minimal data only, strictly required to operate the app. We may collect:",
+      "accountInfo": "Account information (email address) when a parent creates an account",
+      "purchaseInfo": "Purchase information (handled securely by Stripe)",
+      "usageData": {
+        "title": "Usage data such as:",
+        "practiceCalls": "number of practice calls used",
+        "sessionDates": "date and duration of practice sessions (minutes only)",
+        "durationMinutes": "date and duration of practice sessions (minutes only)"
+      },
+      "notCollect": {
+        "title": "We do NOT collect:",
+        "realNames": "real names of children (unless shared during practice)",
+        "realAddresses": "real addresses (unless shared during practice)",
+        "phoneNumbers": "phone numbers",
+        "location": "precise location data",
+        "audio": "audio recordings",
+        "transcripts": "transcripts of conversations (we store text for assessment and progress tracking)",
+        "sensitive": "any sensitive personal data"
+      }
+    },
+    "childrensData": {
+      "title": "2. Children's data",
+      "noAccounts": "Bobby is designed for children, but accounts are created and managed by parents or guardians.",
+      "noInfoRequired": "Children do not create accounts themselves",
+      "noPersonalInfo": "No personal information about children is required to use the app",
+      "conversationsStored": "Practice conversation text is stored for assessment and progress tracking. Children may share personal information during practice which will be stored as part of the conversation transcript.",
+      "noRecordings": "We do not store audio recordings, only conversation text"
+    },
+    "howWeUseData": {
+      "title": "3. How we use the data",
+      "intro": "We use data only to:",
+      "provideAccess": "provide access to purchased practice calls",
+      "trackCredits": "track remaining call credits",
+      "improvePerformance": "improve app performance and reliability",
+      "compliance": "comply with legal and accounting requirements",
+      "notUsed": {
+        "title": "We do not use data for profiling, advertising to children, or automated decision-making.",
+        "profiling": "We do not use data for profiling, advertising to children, or automated decision-making."
+      }
+    },
+    "payments": {
+      "title": "4. Payments",
+      "processedBy": "Payments are processed securely by Stripe.",
+      "noCardDetails": "We do not store credit card details.",
+      "stripePrivacy": "Stripe processes payments according to their own privacy and security standards."
+    },
+    "analytics": {
+      "title": "5. Analytics",
+      "noAnalytics": "We do not use any analytics services at this time."
+    },
+    "dataSharing": {
+      "title": "6. Data sharing",
+      "noSale": "We do not sell or share personal data with third parties, except:",
+      "exceptions": "payment processing (Stripe) and hosting and infrastructure providers strictly necessary to run the app",
+      "payment": "payment processing (Stripe)",
+      "hosting": "hosting and infrastructure providers strictly necessary to run the app",
+      "gdprCompliant": "All providers are GDPR-compliant."
+    },
+    "dataRights": {
+      "title": "7. Your Data Rights",
+      "intro": "You have the following rights regarding your personal data:",
+      "access": "Request access to your personal data",
+      "correction": "Request correction of inaccurate data",
+      "deletion": "Request deletion of your account and all associated data",
+      "portability": "Request a copy of your data in a machine-readable format",
+      "howToDelete": "To delete your account and all data, go to Settings and click the 'Delete Account' button. This action is irreversible.",
+      "whatHappens": "Upon deletion, your account, conversation history, credits, and all personal information will be permanently deleted immediately."
+    },
+    "practiceDisclaimer": {
+      "title": "8. Practice-only disclaimer",
+      "educationalTool": "Bobby is a practice and educational tool only.",
+      "notConnected": "It is not connected to real emergency services.",
+      "emergencyNumbers": "In real emergencies, always call 999 (UK) or 112 (EU)."
+    },
+    "privacyContact": {
+      "title": "9. Contact",
+      "questions": "If you have any questions about privacy or safety, contact us at: {email}"
+    }
+  },
+  "safetyPrivacy": {
+    "title": "Safety & Privacy Guide",
+    "subtitle": "Keeping your child safe while learning emergency skills",
+    "intro": "Bobby is designed to be a safe, secure environment for children to learn emergency communication skills. This guide explains how we protect your child and what you can do to help.",
+    "howWeProtect": {
+      "title": "How Bobby Protects Your Child",
+      "points": [
+        "No real emergency services - simulations only",
+        "No personal data collection beyond account information",
+        "No advertising or third-party tracking",
+        "Secure authentication with Firebase",
+        "Conversation transcripts stored privately for assessment"
+      ]
+    },
+    "parentalGuidance": {
+      "title": "Parental Supervision Tips",
+      "points": [
+        "Sit with your child during their first few sessions",
+        "Discuss what they learned after each practice call",
+        "Remind them this is practice, not real emergencies",
+        "Review their progress together in the app"
+      ]
+    },
+    "whatToTeach": {
+      "title": "Important Safety Concepts to Teach",
+      "points": [
+        "When to call 999 (UK) or 112 (EU) in real emergencies",
+        "Their full name, parents' names, and phone number",
+        "Their home address (when age-appropriate)",
+        "What constitutes an actual emergency"
+      ]
+    },
+    "bestPractices": {
+      "title": "Best Practices for Practice Sessions",
+      "points": [
+        "Practice regularly but keep sessions fun and low-pressure",
+        "Praise effort and participation, not perfection",
+        "Use different emergency scenarios to build confidence",
+        "Take breaks if your child seems anxious or overwhelmed"
+      ]
+    },
+    "privacyDetails": {
+      "title": "Privacy & Data Protection",
+      "description": "For detailed information about how we handle data, please read our:",
+      "privacyPolicy": "Privacy Policy",
+      "cookiesPolicy": "Cookies Policy"
+    },
+    "contact": {
+      "title": "Questions or Concerns?",
+      "description": "If you have questions about safety or privacy, contact us at:",
+      "email": "contact@readywithbobby.online"
+    }
+  },
+  "cookiesPolicy": {
+    "title": "Cookies Policy",
+    "subtitle": "",
+    "lastUpdated": "Last updated: {date}",
+    "intro": "This Cookies Policy explains how Bobby uses cookies.",
+    "whatAreCookies": {
+      "title": "1. What are cookies?",
+      "description": "Cookies are small text files stored on your device to help websites function properly."
+    },
+    "howWeUse": {
+      "title": "2. How Bobby uses cookies",
+      "description": "Bobby uses essential cookies only.",
+      "subTitle": "These cookies are required to:",
+      "points": [
+        "keep you logged in",
+        "maintain secure sessions",
+        "protect against misuse and fraud",
+        "ensure the app works correctly"
+      ]
+    },
+    "whatWeDontUse": {
+      "title": "3. What we do NOT use",
+      "description": "We do not use:",
+      "points": [
+        "advertising cookies",
+        "tracking cookies for children",
+        "third-party marketing cookies",
+        "social media tracking pixels"
+      ]
+    },
+    "managing": {
+      "title": "5. Managing cookies",
+      "description": "Because Bobby uses only essential cookies, cookie consent banners are not required in most EU jurisdictions. You can still control cookies through your browser settings if you wish."
+    },
+    "changes": {
+      "title": "6. Changes",
+      "description": "We may update this Cookies Policy if our use of cookies changes."
+    },
+    "contact": {
+      "title": "7. Contact",
+      "description": "If you have questions about cookies, contact us at:",
+      "email": "contact@readywithbobby.online"
+    }
+  },
+  "termsConditions": {
+    "title": "Terms & Conditions",
+    "subtitle": "Simple & suitable terms for using Bobby",
+    "lastUpdated": "Last updated: {date}",
+    "intro": "These Terms and Conditions ('Terms') govern your use of the Bobby web application ('Bobby', 'the app', 'we', 'our'). By accessing or using Bobby, you agree to these Terms.",
+    "whatBobbyIs": {
+      "title": "1. What is Bobby",
+      "description": "Bobby is an educational practice app that helps children learn how to communicate during emergency situations in a safe, simulated environment.",
+      "bulletPoints": [
+        "practice only",
+        "not connected to real emergency services",
+        "not a replacement for real emergency response"
+      ],
+      "emergencyNote": "In real emergencies, always call 999 (UK) or 112 (EU)."
+    },
+    "whoMayUse": {
+      "title": "2. Who may use the app",
+      "points": [
+        "Bobby is intended for parents or legal guardians.",
+        "Children may use the app only with parental awareness and supervision.",
+        "Accounts must be created by an adult."
+      ]
+    },
+    "practiceSessions": {
+      "title": "3. Practice sessions and call credits",
+      "description": "Bobby offers practice call packs for emergency communication training.",
+      "points": [
+        "Each practice session uses one call credit.",
+        "Each practice call is limited to a maximum duration of 5 minutes.",
+        "Unused credits do not expire.",
+        "Practice sessions are simulations only and may be ended automatically when time limits are reached.",
+        "Conversation transcripts are stored for assessment and progress tracking."
+      ]
+    },
+    "payments": {
+      "title": "4. Payments and refunds",
+      "points": [
+        "Payments are processed securely by Stripe.",
+        "Prices are clearly shown before purchase.",
+        "Due to the digital nature of the service, used practice calls are non-refundable.",
+        "Refunds for unused credits may be considered on a case-by-case basis, where required by law."
+      ]
+    },
+    "noAdvice": {
+      "title": "5. No medical, legal, or emergency advice",
+      "description": "Bobby does not provide:",
+      "points": [
+        "medical advice",
+        "legal advice",
+        "real emergency instructions"
+      ],
+      "note": "The app is designed to teach communication skills, not to diagnose, treat, or respond to emergencies."
+    },
+    "availability": {
+      "title": "6. Availability and changes",
+      "description": "We may:",
+      "points": [
+        "update or improve the app",
+        "change features or pricing",
+        "temporarily suspend service for maintenance"
+      ],
+      "note": "We aim to keep Bobby available but do not guarantee uninterrupted access."
+    },
+    "serviceTermination": {
+      "title": "7. Service termination",
+      "voluntary": {
+        "title": "Voluntary Service Termination",
+        "description": "If we decide to discontinue Bobby voluntarily, we will provide at least 30 days' notice and offer refunds for any unused credits."
+      },
+      "insolvency": {
+        "title": "Insolvency or Bankruptcy",
+        "description": "In the unlikely event of insolvency or bankruptcy, unused credits become unsecured claims in the insolvency proceedings. Refunds, if any, will be determined by the insolvency practitioner in accordance with applicable law."
+      }
+    },
+    "liability": {
+      "title": "8. Limitation of liability",
+      "description": "To the maximum extent permitted by law:",
+      "points": [
+        "Bobby is provided 'as is'",
+        "We are not liable for damages resulting from misuse of the app",
+        "Bobby should never be relied upon in real emergencies"
+      ]
+    },
+    "privacy": {
+      "title": "9. Privacy",
+      "description": "Your use of Bobby is also governed by our Privacy Policy, which explains how we handle data."
+    },
+    "governingLaw": {
+      "title": "10. Governing law",
+      "description": "These Terms are governed by the laws of the United Kingdom."
+    },
+    "contact": {
+      "title": "11. Contact",
+      "description": "For questions about these Terms, contact us at:",
+      "email": "contact@readywithbobby.online"
     }
   },
   "success": {

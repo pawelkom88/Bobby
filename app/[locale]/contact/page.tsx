@@ -26,7 +26,9 @@ export default function ContactPage() {
               className="settings-section"
               aria-labelledby="contact-intro-heading"
             >
-              <h2 id="contact-intro-heading" className="sr-only">{t('subtitle')}</h2>
+              <h2 id="contact-intro-heading" className="sr-only">
+                {t('subtitle')}
+              </h2>
               <p className="contact-subtitle-text">{t('subtitle')}</p>
             </section>
 
@@ -37,15 +39,19 @@ export default function ContactPage() {
               <h2 id="contact-options-heading">{t('options.title')}</h2>
               <div className="contact-options-grid">
                 <a
-                  href="mailto:support@bobby.app"
+                  href="mailto:contact@readywithbobby.online"
                   className="contact-option-card"
                   aria-label={t('options.email')}
                 >
                   <span className="contact-option-icon" aria-hidden="true">
                     ✉️
                   </span>
-                  <span className="contact-option-label">{t('options.email')}</span>
-                  <span className="contact-option-desc">support@bobby.app</span>
+                  <span className="contact-option-label">
+                    {t('options.email')}
+                  </span>
+                  <span className="contact-option-desc">
+                    contact@readywithbobby.online
+                  </span>
                 </a>
 
                 <Link
@@ -56,8 +62,12 @@ export default function ContactPage() {
                   <span className="contact-option-icon" aria-hidden="true">
                     ❓
                   </span>
-                  <span className="contact-option-label">{t('options.faq')}</span>
-                  <span className="contact-option-desc">{t('options.faqDesc')}</span>
+                  <span className="contact-option-label">
+                    {t('options.faq')}
+                  </span>
+                  <span className="contact-option-desc">
+                    {t('options.faqDesc')}
+                  </span>
                 </Link>
               </div>
             </section>
@@ -70,7 +80,7 @@ export default function ContactPage() {
               <p>{t('responseTime')}</p>
             </section>
           </div>
-          
+
           <div className="settings-back-button">
             <CartoonButton onClick={() => router.push(ROUTES.HOME)}>
               {tCommon('back')}

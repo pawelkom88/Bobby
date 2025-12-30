@@ -22,7 +22,11 @@ export default function PageWrapper({ children }: PageWrapperProps) {
     !pathname.includes('/faq') &&
     !pathname.includes('/pytania') &&
     !pathname.includes('/contact') &&
-    !pathname.includes('/kontakt');
+    !pathname.includes('/kontakt') &&
+    !pathname.includes('/privacy-policy') &&
+    !pathname.includes('/terms-conditions') &&
+    !pathname.includes('/cookies-policy') &&
+    !pathname.includes('/safety-privacy');
 
   return (
     <div

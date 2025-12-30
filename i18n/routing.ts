@@ -84,6 +84,22 @@ export const pathnames = {
     en: '/app/your-age',
     pl: '/aplikacja/twoj-wiek',
   },
+  '/privacy-policy': {
+    en: '/privacy-policy',
+    pl: '/polityka-prywatnosci',
+  },
+  '/cookies-policy': {
+    en: '/cookies-policy',
+    pl: '/polityka-ciasteczek',
+  },
+  '/terms-conditions': {
+    en: '/terms-conditions',
+    pl: 'regulamin',
+  },
+  '/safety-privacy': {
+    en: '/safety-privacy',
+    pl: 'bezpieczenstwo-i-prywatnosc',
+  },
 } as const satisfies Record<string, string | Record<Locale, string>>;
 
 export type AppPathname = keyof typeof pathnames;

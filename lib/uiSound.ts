@@ -40,7 +40,7 @@ export async function playEndConversationSound(
   if (!enabled || typeof window === 'undefined') {
     return;
   }
-  const envUrl = process.env.NEXT_PUBLIC_UI_SOUND_END_URL || '';
+  const envUrl = '/end.aac';
   const candidates: string[] = [];
   const pushIfNotExists = (u: string) => {
     if (u && !candidates.includes(u)) candidates.push(u);

@@ -1,10 +1,5 @@
 import type { AppPathname } from '@/i18n/routing';
 
-/**
- * Central route configuration for the application
- * Use these constants instead of hardcoded strings for navigation
- * Routes are typed to match the localized pathnames in i18n/routing.ts
- */
 export const ROUTES = {
   HOME: '/',
   APP: '/app',
@@ -23,6 +18,10 @@ export const ROUTES = {
   CHATS: '/app/chats',
   CONTACT: '/contact',
   FAQ: '/faq',
+  PRIVACY_POLICY: '/privacy-policy',
+  COOKIES_POLICY: '/cookies-policy',
+  TERMS_CONDITIONS: '/terms-conditions',
+  SAFETY_PRIVACY: '/safety-privacy',
 } as const satisfies Record<string, AppPathname>;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];

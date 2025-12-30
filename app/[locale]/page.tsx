@@ -140,12 +140,21 @@ export default function HomePage() {
               </main>
 
               <footer className="landing-footer">
-                <span className="landing-footer-text">{t('footer.ready')}</span>
-                <div className="landing-footer-right">
-                  <a href="#" className="landing-footer-link">
-                    {t('footer.privacy')}
-                  </a>
-                </div>
+                <Link href="/safety-privacy" className="landing-footer-link">
+                  {t('footer.links.safetyPrivacy')}
+                </Link>
+                <Link href="/terms-conditions" className="landing-footer-link">
+                  {t('footer.links.termsConditions')}
+                </Link>
+                <Link href="/contact" className="landing-footer-link">
+                  {t('footer.links.contact')}
+                </Link>
+                <Link href="/cookies-policy" className="landing-footer-link">
+                  {t('footer.links.cookiesPolicy')}
+                </Link>
+                <Link href="/privacy-policy" className="landing-footer-link">
+                  {t('footer.links.privacyPolicy')}
+                </Link>
               </footer>
             </div>
           </div>
