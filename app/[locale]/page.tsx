@@ -117,6 +117,8 @@ export default function HomePage() {
                     height={400}
                     src="/hero-image.webp"
                     alt="Hero Image - smiling Bobby"
+                    sizes="(max-width: 768px) 100vw, 392px"
+                    preload
                   />
                 </div>
                 <HowItWorksSection />

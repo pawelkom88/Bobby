@@ -23,8 +23,17 @@ const app =
 let analytics;
 if (typeof window !== 'undefined') {
   analytics = getAnalytics(app);
+}
 
-  // Initialize App Check with reCAPTCHA Enterprise
+// Flag to track if App Check has been initialized
+let appCheckInitialized = false;
+
+// Initialize App Check with reCAPTCHA Enterprise (deferred until needed)
+export function initializeAppCheckIfNeeded() {
+  if (typeof window === 'undefined' || appCheckInitialized) {
+    return;
+  }
+
   const reCaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY;
   if (reCaptchaSiteKey) {
     try {
@@ -32,6 +41,8 @@ if (typeof window !== 'undefined') {
         provider: new ReCaptchaEnterpriseProvider(reCaptchaSiteKey),
         isTokenAutoRefreshEnabled: true, // Automatically refresh tokens
       });
+      appCheckInitialized = true;
+      logger.log('App Check initialized on demand');
     } catch (error) {
       // App Check might already be initialized in development/testing
       logger.warn('App Check initialization warning:', error);
