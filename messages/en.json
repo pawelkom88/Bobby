@@ -98,9 +98,9 @@
     },
     "hero": {
       "title": "Master the 999 Call Before an Emergency Strikes.",
-      "subtitle": "Bobby is the interactive AI tutor that trains children (ages 5-12) to handle police, fire, and ambulance calls with confidence. Practice realistic voice simulations and learn critical safety protocols in a secure environment.",
+      "subtitle": "What would my child do if something bad happened and I wasn't nearby? With Bobby, your child can practice talking to emergency services — building skills that could save a life.",
       "cta": "Start Training Now",
-      "secondaryCta": "Watch How It Works"
+      "secondaryCta": "How It Works"
     },
     "howItWorks": {
       "title": "How It Works",
@@ -115,7 +115,7 @@
       },
       "step3": {
         "title": "Practice with Bobby",
-        "description": "Have a realistic voice conversation with Bobby, our AI emergency operator. Get instant feedback and earn points for clear communication."
+        "description": "Make practice calls with Bobby. He listens and guides your child through a safe simulation. Earn badges & confidence. Kids feel proud while learning what to say and how to stay calm."
       },
       "cta": "Start Practicing"
     },
@@ -207,96 +207,76 @@
           "answer": "The app offers three age tiers: Ages 5-7 (very simple language and short scenarios), Ages 8-10 (more realistic conversations), and Ages 11-12 (near-realistic operator flow)."
         },
         "3": {
-          "question": "Is my child's data safe?",
-          "answer": "Yes! We store minimal data locally on your device only. No sensitive information is collected or stored. We only track scenario completion, XP, and badges to make learning fun."
-        },
-        "4": {
           "question": "Will this call real emergency services?",
           "answer": "No! Bobby is a training app only - it will NEVER connect to real emergency services. It's a safe environment for practice."
         },
-        "5": {
+        "4": {
           "question": "How many practice calls are included?",
-          "answer": "Each credit gives you one practice call with Bobby. You can choose from different packages based on how much practice your child needs. All calls are guided and age-appropriate."
+          "answer": "Each credit gives you one practice call with Bobby. You can choose from different packages based on how much practice your child needs."
         },
-        "6": {
+        "5": {
           "question": "How long does one credit last?",
           "answer": "Each credit gives you one complete practice call with Bobby. The conversation should last at least 30 seconds to be considered a valid practice session. If a call ends too early, the credit won't be deducted."
         },
-        "7": {
-          "question": "What happens if I lose connection during a call?",
-          "answer": "If you get disconnected, don't worry! The system tracks your conversation progress. Reconnect within 5 minutes and you may be able to continue. If the issue persists, contact support."
-        },
-        "8": {
+        "6": {
           "question": "Can I get a refund for unused credits?",
           "answer": "Credits are non-refundable but don't expire! You can use them anytime for practice sessions with any emergency scenario."
         },
-        "9": {
+        "7": {
           "question": "Do credits expire?",
           "answer": "No, your credits never expire. Use them whenever you're ready to practice."
         },
-        "10": {
+        "8": {
           "question": "What browsers are supported?",
           "answer": "Bobby works best on modern browsers like Chrome, Firefox, Safari, and Edge. We recommend using the latest version for the best experience."
         },
-        "11": {
+        "9": {
           "question": "Do I need a microphone?",
           "answer": "Yes, a microphone is required for voice conversations with Bobby. Make sure you grant microphone permission when prompted."
         },
-        "12": {
+        "10": {
           "question": "How is my child's data protected?",
           "answer": "We use secure authentication and never store personal information like addresses or phone numbers. Conversations are used only for assessment and progress tracking."
         },
-        "13": {
+        "11": {
           "question": "Can other users see my child's conversations?",
           "answer": "No, all conversations are private and only visible to your account."
         },
-        "14": {
+        "12": {
           "question": "How does the scoring system work?",
           "answer": "Children are scored on clarity, providing location, describing the emergency, and staying calm. Scores range from 0-100, with higher scores earning more XP points."
         },
-        "15": {
+        "13": {
           "question": "What are XP and badges?",
           "answer": "XP (Experience Points) are earned by completing practice calls. As XP accumulates, children level up and earn badges for achievements like 'Clear Communicator' or 'Fire Safety Expert.'"
         },
-        "16": {
+        "14": {
           "question": "Can we replay conversations?",
           "answer": "Yes! You can review past conversations in the 'Chats' section to see progress and review feedback."
         },
-        "17": {
+        "15": {
           "question": "How is feedback generated?",
           "answer": "Our AI system analyzes conversations based on age-appropriate criteria and provides personalized feedback on what went well and areas for improvement."
         },
-        "18": {
-          "question": "What accessibility features are available?",
-          "answer": "Bobby offers dyslexia-friendly fonts, adjustable text sizes, high contrast mode, slowed speech options, and reduced sensory mode for children with sensory sensitivities."
-        },
-        "19": {
-          "question": "Can my child practice if they have speech difficulties?",
-          "answer": "Yes! We offer text-based input alternatives and visual aids. The slowed speech mode helps with comprehension."
-        },
-        "20": {
+        "16": {
           "question": "Can I use Google to sign in?",
           "answer": "Yes! You can sign up or log in using your Google account for quick access."
         },
-        "21": {
+        "17": {
           "question": "How do I reset my password?",
           "answer": "Click 'Password playing hide and seek?' on the login page, enter your email, and we'll send a reset link."
         },
-        "22": {
+        "18": {
           "question": "Can I have multiple children on one account?",
           "answer": "Currently, each account tracks progress for one user. For multiple children, create separate accounts to track individual progress."
         },
-        "23": {
+        "19": {
           "question": "How do I delete my account?",
           "answer": "Go to Settings > Account > Delete Account. This permanently removes all data, progress, and credits."
         },
-        "24": {
+        "20": {
           "question": "Voice isn't working - what should I do?",
           "answer": "Check that your microphone is connected and permissions are granted. Try refreshing the page or using a different browser."
-        },
-        "25": {
-          "question": "The app seems stuck or frozen.",
-          "answer": "Try refreshing the page. If problems persist, clear your browser cache or contact support."
         }
       }
     }

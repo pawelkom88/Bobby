@@ -11,7 +11,7 @@ import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
 import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
 
-const ALL_FAQ_IDS = Array.from({ length: 25 }, (_, i) => i + 1);
+const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
 const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
 
 export default function HomePage() {

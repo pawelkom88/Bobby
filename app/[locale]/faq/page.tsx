@@ -54,6 +54,34 @@ export default function FAQPage() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, id: number, index: number) => {
+    const allIds = Object.values(FAQ_CATEGORIES).flatMap(cat => cat.ids);
+    let targetIndex: number;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        targetIndex = (index + 1) % allIds.length;
+        document.getElementById(`faq-question-${allIds[targetIndex]}`)?.focus();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        targetIndex = (index - 1 + allIds.length) % allIds.length;
+        document.getElementById(`faq-question-${allIds[targetIndex]}`)?.focus();
+        break;
+      case 'Home':
+        e.preventDefault();
+        document.getElementById(`faq-question-${allIds[0]}`)?.focus();
+        break;
+      case 'End':
+        e.preventDefault();
+        document.getElementById(`faq-question-${allIds[allIds.length - 1]}`)?.focus();
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <ViewTransition>
       <PageWrapper>
@@ -84,46 +112,58 @@ export default function FAQPage() {
                 <div key={categoryKey} className="faq-category">
                   <h3 className="faq-category-title">{category.title}</h3>
                   <div className="faq-accordion" role="list">
-                    {category.ids.map(id => (
-                      <div
-                        key={id}
-                        className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
-                        role="listitem"
-                      >
-                        <button
-                          type="button"
-                          className="faq-accordion-trigger"
-                          onClick={() => toggleQuestion(id)}
-                          aria-expanded={expandedId === id}
-                          aria-controls={`faq-answer-${id}`}
-                        >
-                          <span className="faq-accordion-question">
-                            {t(`items.${id}.question`)}
-                          </span>
-                          <span className="faq-accordion-icon" aria-hidden="true">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="black"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="m9 6 6 6-6 6" />
-                            </svg>
-                          </span>
-                        </button>
+                    {category.ids.map((id, index) => {
+                      const globalIndex = Object.values(FAQ_CATEGORIES)
+                        .slice(0, Object.keys(FAQ_CATEGORIES).indexOf(categoryKey))
+                        .reduce((acc, cat) => acc + cat.ids.length, 0) + index;
+                      
+                      return (
                         <div
-                          id={`faq-answer-${id}`}
-                          className="faq-accordion-content"
-                          role="region"
-                          aria-labelledby={`faq-question-${id}`}
-                          hidden={expandedId !== id}
+                          key={id}
+                          className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
+                          role="listitem"
                         >
-                          <p>{t(`items.${id}.answer`)}</p>
+                          <h3 className="faq-accordion-heading">
+                            <button
+                              type="button"
+                              id={`faq-question-${id}`}
+                              className="faq-accordion-trigger"
+                              onClick={() => toggleQuestion(id)}
+                              onKeyDown={(e) => handleKeyDown(e, id, globalIndex)}
+                              aria-expanded={expandedId === id}
+                              aria-controls={`faq-answer-${id}`}
+                            >
+                              <span className="faq-accordion-question">
+                                {t(`items.${id}.question`)}
+                              </span>
+                              <span className="faq-accordion-icon" aria-hidden="true">
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                  focusable="false"
+                                >
+                                  <path d="m9 6 6 6-6 6" />
+                                </svg>
+                              </span>
+                            </button>
+                          </h3>
+                          <div
+                            id={`faq-answer-${id}`}
+                            className="faq-accordion-content"
+                            role="region"
+                            aria-labelledby={`faq-question-${id}`}
+                            hidden={expandedId !== id}
+                          >
+                            <p>{t(`items.${id}.answer`)}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ))}

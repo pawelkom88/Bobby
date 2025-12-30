@@ -98,7 +98,7 @@
     },
     "hero": {
       "title": "Trening połączeń alarmowych dla dzieci.",
-      "subtitle": "Bobby to interaktywny tutor AI, który uczy dzieci jak pewnie obsługiwać połączenia ze służbami ratunkowymi. Ćwicz realistyczne symulacje głosowe i poznaj kluczowe zasady bezpieczeństwa w przyjaznym środowisku.",
+      "subtitle": "Co zrobiłoby moje dziecko, gdyby coś złego się stało, a mnie nie było w pobliżu? Z Bobbim Twoje dziecko może ćwiczyć rozmowę ze służbami ratunkowymi — buduje umiejętności, które mogą uratować życie.",
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
     },
@@ -110,12 +110,12 @@
         "description": "Wybierz odpowiednią grupę wiekową (5-7, 7-10 lub 11-12 lat), aby otrzymać scenariusze dostosowane do wieku i odpowiedni poziom języka."
       },
       "step2": {
-        "title": "Wybierz typ alarmu",
-        "description": "Wybierz spośród scenariuszy pożaru, pogotowia ratunkowego lub policji. Każda sytuacja jest zaprojektowana, aby nauczyć konkretnych umiejętności reagowania w nagłych wypadkach."
+        "title": "Wybierz scenariusz",
+        "description": "Pożar, pogotowie ratunkowego lub policja. Każda sytuacja jest zaprojektowana, aby nauczyć konkretnych umiejętności reagowania w nagłych wypadkach."
       },
       "step3": {
         "title": "Ćwicz z Bobbym",
-        "description": "Prowadź realistyczną rozmowę głosową z Bobbym, naszym operatorem AI. Otrzymaj natychmiastową informację zwrotną i zdobądź punkty za jasną komunikację."
+        "description": "Prowadź realistyczną rozmowę głosową z Bobbym, naszym operatorem AI. Zdobądź odznaki i pewność siebie."
       },
       "cta": "Zacznij ćwiczyć"
     },
@@ -195,103 +195,83 @@
       "items": {
         "1": {
           "question": "Do czego służy ta aplikacja?",
-          "answer": "Bobby uczy dzieci w bezpieczny i zabawny sposób dzwonienia pod 999. Uczy dzieci, jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak wzywać pomoc."
+          "answer": "Bobby uczy dzieci w bezpieczny i zabawny sposób dzwonienia pod numer 999. Uczy dzieci, jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak wzywać pomoc. Jest to tylko symulacja, która nie połączy Cię z prawdziwymi służbami ratunkowymi."
         },
         "2": {
-          "question": "Jak działają scenariusze wiekowe?",
+          "question": "Jak działa podział na grupy wiekowe?",
           "answer": "Aplikacja oferuje trzy poziomy wiekowe: Wiek 5-7 (bardzo prosty język i krótkie scenariusze), Wiek 8-10 (bardziej realistyczne rozmowy) i Wiek 11-12 (prawie realistyczny przepływ operatora)."
         },
         "3": {
-          "question": "Czy dane mojego dziecka są bezpieczne?",
-          "answer": "Tak! Przechowujemy minimalne dane lokalnie na urządzeniu. Żadne wrażliwe informacje nie są zbierane ani przechowywane. Śledzimy tylko ukończenie scenariuszy, punkty doświadczenia i odznaki, aby nauka była zabawna."
-        },
-        "4": {
           "question": "Czy to połączenie zadzwoni pod prawdziwy numer alarmowy?",
           "answer": "Nie! Bobby to tylko aplikacja treningowa - NIGDY nie połączy z prawdziwymi służbami alarmowymi. To bezpieczne środowisko do nauki."
         },
-        "5": {
+        "4": {
           "question": "Ile rozmów treningowych jest w pakiecie?",
-          "answer": "Jeden kredyt to jedna rozmowa treningowa z Bobby. Możesz wybrać różne pakiety w zależności od tego, ile ćwiczeń potrzebuje Twoje dziecko. Wszystkie rozmowy są prowadzone i dostosowane do wieku."
+          "answer": "Jeden kredyt to jedna rozmowa treningowa z Bobby. Możesz wybrać różne pakiety w zależności od tego, ile ćwiczeń potrzebuje Twoje dziecko."
         },
-        "6": {
-          "question": "Jak długo działa jeden kredyt?",
+        "5": {
+          "question": "Co oznacza 'jeden kredyt'?",
           "answer": "Jeden kredyt uprawnia do jednej pełnej rozmowy z Bobby. Rozmowa powinna trwać co najmniej 30 sekund, aby zostać uznana za prawidłową sesję treningową. Jeśli rozmowa zakończy się zbyt wcześnie, kredyt nie zostanie pobrany."
         },
-        "7": {
-          "question": "Co się stanie jeśli stracę połączenie podczas rozmowy?",
-          "answer": "Jeśli połączenie się przerwie, nie martw się! System śledzi postęp rozmowy. Połącz się ponownie w ciągu 5 minut i prawdopodobnie będziesz mógł kontynuować. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną."
-        },
-        "8": {
+        "6": {
           "question": "Czy mogę otrzymać zwrot pieniędzy za niewykorzystane kredyty?",
           "answer": "Kredyty nie podlegają zwrotowi, ale nie tracą ważności! Możesz je wykorzystać w dowolnym momencie na sesje treningowe z dowolnym scenariuszem alarmowym."
         },
-        "9": {
+        "7": {
           "question": "Czy kredyty tracą ważność?",
           "answer": "Nie, Twoje kredyty nigdy nie tracą ważności. Wykorzystaj je, kiedy będziesz gotów do ćwiczeń."
         },
-        "10": {
+        "8": {
           "question": "Jakie przeglądarki są obsługiwane?",
           "answer": "Bobby działa najlepiej na nowoczesnych przeglądarkach takich jak Chrome, Firefox, Safari i Edge. Zalecamy używanie najnowszych wersji dla najlepszych wrażeń."
         },
-        "11": {
-          "question": "Czy potrzebuję mikrofonu?",
-          "answer": "Tak, mikrofon jest wymagany do rozmów głosowych z Bobby. Upewnij się, że nadałeś pozwolenie na dostęp do mikrofonu po wyświetleniu prośby."
+        "9": {
+          "question": "Czy wymagany jest dostęp do mikrofonu?",
+          "answer": "Tak, jest to niezbędne do tego, aby Bobby mógł pomóc. Upewnij się, że przyznałeś aplikacji dostęp do mikrofonu."
         },
-        "12": {
+        "10": {
           "question": "Jak chronione są dane mojego dziecka?",
           "answer": "Używamy bezpiecznego uwierzytelniania i nigdy nie przechowujemy osobistych informacji takich jak adresy czy numery telefonów. Rozmowy są wykorzystywane tylko do oceny i śledzenia postępów."
         },
-        "13": {
+        "11": {
           "question": "Czy inni użytkownicy mogą widzieć rozmowy mojego dziecka?",
           "answer": "Nie, wszystkie rozmowy są prywatne i widoczne tylko dla Twojego konta."
         },
-        "14": {
+        "12": {
           "question": "Jak działa system oceniania?",
-          "answer": "Dzieci są oceniane pod kątem jasności komunikacji, podawania lokalizacji, opisywania sytuacji alarmowej i zachowania spokoju. Wyniki mieszczą się w skali 0-100, a wyższe wyniki dają więcej punktów doświadczenia (PD)."
+          "answer": "Dzieci są oceniane pod kątem jasności komunikacji, podawania adresu miejsca zdarzenia, opisywania sytuacji alarmowej i zachowania spokoju. Wyniki mieszczą się w skali 0-100, a wyższe wyniki dają więcej punktów doświadczenia (PD)."
+        },
+        "13": {
+          "question": "Czym są PD i odznaki?",
+          "answer": "PD (Punkty Doświadczenia) zdobywa się za ukończone rozmowy treningowe. Wraz z gromadzeniem PD dzieci awansują na wyższe poziomy i zdobywają odznaki za osiągnięcia takie jak 'Dobry Komunikator'."
+        },
+        "14": {
+          "question": "Czy mam dostęp do historii rozmów?",
+          "answer": "Tak! Możesz przeglądać wszystkie rozmowy w sekcji 'Rozmowy', aby śledzić postępy i sprawdzać opinie."
         },
         "15": {
-          "question": "Czym są PD i odznaki?",
-          "answer": "PD (Punkty Doświadczenia) zdobywa się za ukończone rozmowy treningowe. Wraz z gromadzeniem PD dzieci awansują na wyższe poziomy i zdobywają odznaki za osiągnięcia takie jak 'Dobry Komunikator' czy 'Ekspert Bezpieczeństwa Pożarowego'."
-        },
-        "16": {
-          "question": "Czy możemy odtwarzać rozmowy?",
-          "answer": "Tak! Możesz przeglądać przeszłe rozmowy w sekcji 'Rozmowy', aby śledzić postępy i sprawdzać opinie."
-        },
-        "17": {
-          "question": "Jak generowane są opinie?",
+          "question": "Jak generowany jest raport z rozmowy?",
           "answer": "Nasz system AI analizuje rozmowy na podstawie kryteriów dostosowanych do wieku i dostarcza spersonalizowane opinie na temat tego, co poszło dobrze i co wymaga poprawy."
         },
-        "18": {
-          "question": "Jakie funkcje dostępności są dostępne?",
-          "answer": "Bobby oferuje czcionki przyjazne dla dyslektyków, regulowane rozmiary tekstu, tryb wysokiego kontrastu, opcję zwolnionej mowy oraz tryb zredukowanej stymulacji sensorycznej dla dzieci z nadwrażliwością."
-        },
-        "19": {
-          "question": "Czy moje dziecko może ćwiczyć jeśli ma trudności z mową?",
-          "answer": "Tak! Oferujemy alternatywne wprowadzanie tekstu i pomoce wizualne. Tryb zwolnionej mowy pomaga w zrozumieniu."
-        },
-        "20": {
+        "16": {
           "question": "Czy mogę użyć konta Google do logowania?",
           "answer": "Tak! Możesz zarejestrować się lub logować używając konta Google dla szybkiego dostępu."
         },
-        "21": {
+        "17": {
           "question": "Jak zresetować hasło?",
-          "answer": "Kliknij 'Zapomniałeś hasła?' na stronie logowania, wpisz swój e-mail, a my wyślemy link do resetowania."
+          "answer": "Kliknij 'Hasło gra w chowanego?' na stronie logowania, wpisz swój e-mail, a my wyślemy Ci link gdzie bedziesz mógł/mogła zresetować hasło."
         },
-        "22": {
+        "18": {
           "question": "Czy mogę mieć kilka dzieci na jednym koncie?",
           "answer": "Obecnie każde konto śledzi postępy jednego użytkownika. Dla kilku dzieci stwórz osobne konta, aby śledzić indywidualne postępy."
         },
-        "23": {
+        "19": {
           "question": "Jak usunąć konto?",
           "answer": "Przejdź do Ustawienia > Konto > Usuń konto. Spowoduje to trwałe usunięcie wszystkich danych, postępów i kredytów."
         },
-        "24": {
+        "20": {
           "question": "Głos nie działa - co robić?",
-          "answer": "Sprawdź czy mikrofon jest podłączony i czy przyznałeś pozwolenia. Spróbuj odświeżyć stronę lub użyć innej przeglądarki."
-        },
-        "25": {
-          "question": "Aplikacja się zawiesiła lub zablokowała.",
-          "answer": "Spróbuj odświeżyć stronę. Jeśli problemy będą się powtarzać, wyczyść pamięć podręczną przeglądarki lub skontaktuj się z pomocą techniczną."
+          "answer": "Sprawdź, czy mikrofon jest podłączony i czy przyznałeś aplikacji wymagane uprawnienia. Spróbuj odświeżyć stronę lub użyć innej przeglądarki."
         }
       }
     }
