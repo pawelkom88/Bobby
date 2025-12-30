@@ -1,13 +1,15 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./__tests__/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['lib/**/*.ts', 'app/api/**/*.ts'],
+      include: ['lib/**/*.ts', 'app/api/**/*.ts', 'components/**/*.tsx'],
       exclude: ['node_modules/', '__tests__/', '**/*.test.ts', '**/*.spec.ts'],
     },
   },

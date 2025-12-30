@@ -347,6 +347,7 @@
     }
   },
   "dial": {
+    "emergencyNumber": "999",
     "title": "Dial {number}",
     "creditsLabel": "Credits:",
     "messages": {

@@ -342,6 +342,7 @@
     }
   },
   "dial": {
+    "emergencyNumber": "112",
     "title": "Wybierz numer {number}",
     "creditsLabel": "Kredyty:",
     "messages": {

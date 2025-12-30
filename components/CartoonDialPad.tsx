@@ -14,7 +14,7 @@ interface CartoonDialPadProps {
   buttonLabel?: string;
 }
 
-const CORRECT_NUMBER = '999';
+const CORRECT_NUMBER = '999'; // Fallback for non-translated contexts
 // bttf-dial-1
 // bttf-dial-2
 // bttf-dial-3
@@ -53,12 +53,14 @@ const FUNNY_ERROR_MESSAGES = [
 
 export default function CartoonDialPad({
   onCorrectNumber,
-  targetNumber = CORRECT_NUMBER,
+  targetNumber,
   onBack,
   isLoading = false,
   buttonLabel = 'CALL',
 }: CartoonDialPadProps) {
   const t = useTranslations('dial');
+  // Use locale-specific emergency number if no targetNumber provided
+  const emergencyNumber = targetNumber || t('emergencyNumber');
   const [input, setInput] = useState('');
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -88,7 +90,7 @@ export default function CartoonDialPad({
       setInput(prev => prev.slice(0, -1));
       setHasError(false);
       setErrorMessage('');
-    } else if (digit && input.length < targetNumber.length) {
+    } else if (digit && input.length < emergencyNumber.length) {
       // Add number
       const newInput = input + digit;
       setInput(newInput);
@@ -136,7 +138,7 @@ export default function CartoonDialPad({
 
       <div>
         {/* Heading */}
-        <h1 className="dial-heading">{t('title', { number: targetNumber })}</h1>
+        <h1 className="dial-heading">{t('title', { number: emergencyNumber })}</h1>
 
         {/* Number display */}
         <div
@@ -179,9 +181,9 @@ export default function CartoonDialPad({
                 return;
               }
 
-              if (input.length !== targetNumber.length) {
+              if (input.length !== emergencyNumber.length) {
                 // Show error if incomplete number
-                const errorMsg = t('messages.dialAllDigits', { count: targetNumber.length });
+                const errorMsg = t('messages.dialAllDigits', { count: emergencyNumber.length });
                 setErrorMessage(errorMsg);
                 setHasError(true);
                 setTimeout(() => {
@@ -191,7 +193,7 @@ export default function CartoonDialPad({
                 return;
               }
 
-              if (!validateEmergencyNumber(input, targetNumber)) {
+              if (!validateEmergencyNumber(input, emergencyNumber)) {
                 // Show error if wrong number
                 const randomMessage =
                   FUNNY_ERROR_MESSAGES[
