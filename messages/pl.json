@@ -330,9 +330,9 @@
     "loading": "Ładowanie...",
     "buyPrefix": "Kup {currency}",
     "packs": {
-      "rookie": "🟢 Pakiet Początkujący",
+      "rookie": "Pakiet Początkujący",
       "rookieSubtitle": "(Rookie Responder Pack)",
-      "hero": "🔵 Pakiet Bohater ⭐ (Polecany)",
+      "hero": "Pakiet Bohater (Polecany)",
       "heroSubtitle": "(Junior Hero Pack)"
     },
     "rookie": {
@@ -365,18 +365,8 @@
       "whyChooseDesc": "Dzieci uczą się najlepiej przez powtarzanie. Ten pakiet pozwala ćwiczyć różne sytuacje i naprawdę zbudować spokój oraz pewność siebie.",
       "cta": "Kup Pakiet Bohater"
     },
-    "reassurance": {
-      "title": "Dlaczego to działa lepiej",
-      "points": [
-        "jasno tłumaczy co jest w pakiecie",
-        "odpowiada na pytanie: \"czy to bezpieczne?\"",
-        "podkreśla brak subskrypcji",
-        "wzmacnia pakiet \"Bohater\" jako domyślny wybór",
-        "pasuje do dziecięcej, ciepłej estetyki"
-      ]
-    },
     "microcopy": {
-      "oneTimePurchase": "Jednorazowy zakup • Brak subskrypcji",
+      "oneTimePurchase": "Jednorazowy zakup",
       "callsNeverExpire": "Rozmowy nie tracą ważności • Ćwicz we własnym tempie"
     },
     "messages": {

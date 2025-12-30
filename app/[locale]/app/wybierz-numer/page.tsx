@@ -20,7 +20,6 @@ import {
 import { SpeculationRules } from '@/components/SpeculationRules';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
-import { formatPrice, getCurrencySymbol } from '@/lib/currency';
 
 function SelectPackagePageContent() {
   const t = useTranslations('selectPackage');
@@ -51,7 +50,7 @@ function SelectPackagePageContent() {
   // Skip redirect if payment was just canceled
   useEffect(() => {
     if (canceled) return;
-    
+
     const journeyState = getJourneyState();
     if (!journeyState?.selectedAgeTier) {
       window.location.href = ROUTES.YOUR_AGE;
@@ -139,9 +138,7 @@ function SelectPackagePageContent() {
               {/* Header */}
               <div className="select-package-header">
                 <h1 className="select-package-title">{t('title')}</h1>
-                <p className="select-package-subtitle">
-                  {t('subtitle')}
-                </p>
+                <p className="select-package-subtitle">{t('subtitle')}</p>
               </div>
               <br />
 
@@ -175,16 +172,6 @@ function SelectPackagePageContent() {
                     checkoutLoading={checkoutLoading}
                   />
                 ))}
-              </div>
-              
-              {/* Reassurance section */}
-              <div className="select-package-reassurance">
-                <h3 className="reassurance-title">{t('reassurance.title')}</h3>
-                <ul className="reassurance-points">
-                  {(t.raw('reassurance.points') as string[]).map((point, index) => (
-                    <li key={index} className="reassurance-point">{point}</li>
-                  ))}
-                </ul>
               </div>
 
               <div className="select-package-back-button">
@@ -226,9 +213,7 @@ function PackCard({
   checkoutLoading,
 }: PackCardProps) {
   const t = useTranslations('selectPackage');
-  const locale = useLocale();
   const isRookie = pkg.id === 'rookie';
-  const isHero = pkg.id === 'hero';
 
   return (
     <>
@@ -243,24 +228,34 @@ function PackCard({
           <h2 className="card-title">{t(`packs.${pkg.id}`)}</h2>
           <p className="card-subtitle">{t(`packs.${pkg.id}Subtitle`)}</p>
           <p className="card-ideal-for">{t(`${pkg.id}.idealFor`)}</p>
-          
+
           <div className="card-price">
             <span className="price-amount">{t(`${pkg.id}.price`)}</span>
-            <div className="price-microcopy">{t('microcopy.oneTimePurchase')}</div>
+            <div className="price-microcopy">
+              {t('microcopy.oneTimePurchase')}
+            </div>
           </div>
-          
+
           <div className="card-features">
             <p className="features-title">{t(`${pkg.id}.includes`)}</p>
             <ul className="features-list">
-              {(t.raw(`${pkg.id}.features`) as string[]).map((feature, index) => (
-                <li key={index} className="feature-item">{feature}</li>
-              ))}
+              {(t.raw(`${pkg.id}.features`) as string[]).map(
+                (feature, index) => (
+                  <li key={index} className="feature-item">
+                    {feature}
+                  </li>
+                )
+              )}
             </ul>
           </div>
-          
+
           <div className="card-description">
-            <p className="desc-title">{t(`${pkg.id}.${isRookie ? 'bestFor' : 'whyChoose'}`)}</p>
-            <p className="desc-text">{t(`${pkg.id}.${isRookie ? 'bestForDesc' : 'whyChooseDesc'}`)}</p>
+            <p className="desc-title">
+              {t(`${pkg.id}.${isRookie ? 'bestFor' : 'whyChoose'}`)}
+            </p>
+            <p className="desc-text">
+              {t(`${pkg.id}.${isRookie ? 'bestForDesc' : 'whyChooseDesc'}`)}
+            </p>
           </div>
         </div>
 
@@ -285,7 +280,7 @@ function PackCard({
             </div>
           </div>
         </button>
-        
+
         <div className="card-microcopy-bottom">
           {t('microcopy.callsNeverExpire')}
         </div>

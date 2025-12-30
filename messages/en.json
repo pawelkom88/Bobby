@@ -335,9 +335,9 @@
     "loading": "Loading...",
     "buyPrefix": "Buy {currency}",
     "packs": {
-      "rookie": "🟢 Starter Pack",
+      "rookie": "Starter Pack",
       "rookieSubtitle": "(Rookie Responder Pack)",
-      "hero": "🔵 Hero Pack ⭐ (Recommended)",
+      "hero": "Hero Pack (Recommended)",
       "heroSubtitle": "(Junior Hero Pack)"
     },
     "rookie": {
@@ -370,18 +370,8 @@
       "whyChooseDesc": "Children learn best through repetition. This pack allows your child to practice different situations and truly feel confident.",
       "cta": "Buy Hero Pack"
     },
-    "reassurance": {
-      "title": "Why this works better",
-      "points": [
-        "Clearly explains what's in each pack",
-        "Answers the question: \"Is it safe?\"",
-        "Emphasizes no subscription",
-        "Positions Hero Pack as the default choice",
-        "Fits the child-friendly, warm aesthetic"
-      ]
-    },
     "microcopy": {
-      "oneTimePurchase": "One-time purchase • No subscription",
+      "oneTimePurchase": "One-time purchase",
       "callsNeverExpire": "Calls never expire • Practice at your own pace"
     },
     "messages": {
