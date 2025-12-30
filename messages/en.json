@@ -99,8 +99,27 @@
     "hero": {
       "title": "Master the 999 Call Before an Emergency Strikes.",
       "subtitle": "What would my child do if something bad happened and I wasn't nearby? With Bobby, your child can practice talking to emergency services — building skills that could save a life.",
+      "trustStrip": {
+        "ariaLabel": "Safety and privacy information",
+        "title": "Safe practice for kids — parent-led",
+        "practiceOnly": "Practice only — never connects to real emergency services",
+        "realEmergencies": "In real emergencies: call 999 (UK) or 112 (EU)",
+        "noRecordings": "No audio recordings stored and no child personal data required",
+        "parentSupervision": "Parents choose scenarios and supervise practice",
+        "noScaryContent": "Age-appropriate, calm guidance — no graphic or frightening content"
+      },
       "cta": "Start Training Now",
       "secondaryCta": "How It Works"
+    },
+    "videoDemo": {
+      "title": "See Bobby in Action",
+      "subtitle": "Watch how children practice emergency calls in a safe, supportive environment that builds confidence and life-saving skills.",
+      "videoTitle": "Bobby App Demo",
+      "fallbackText": "Video demo of Bobby app showing how children practice emergency calls",
+      "loadingText": "Loading video...",
+      "playVideo": "Play video demo",
+      "clickToPlay": "Click to watch the Bobby app in action",
+      "hideVideo": "Hide video"
     },
     "howItWorks": {
       "title": "How It Works",
@@ -204,6 +223,10 @@
     },
     "faq": {
       "title": "FREQUENT QUESTIONS",
+      "toggle": {
+        "showLess": "Show Less",
+        "showAll": "Show All {count} Questions"
+      },
       "items": {
         "1": {
           "question": "What is this app for?",

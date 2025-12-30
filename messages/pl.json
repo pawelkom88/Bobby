@@ -99,8 +99,27 @@
     "hero": {
       "title": "Trening połączeń alarmowych dla dzieci.",
       "subtitle": "Co zrobiłoby moje dziecko, gdyby coś złego się stało, a mnie nie było w pobliżu? Z Bobbim Twoje dziecko może ćwiczyć rozmowę ze służbami ratunkowymi — buduje umiejętności, które mogą uratować życie.",
+      "trustStrip": {
+        "ariaLabel": "Informacje o bezpieczeństwie i prywatności",
+        "title": "Bezpieczny trening dla dzieci — pod nadzorem rodzica",
+        "practiceOnly": "Tylko ćwiczenia — nigdy nie łączy z prawdziwymi służbami",
+        "realEmergencies": "W prawdziwym zagrożeniu: dzwoń 112",
+        "noRecordings": "Nie przechowujemy nagrań audio i nie wymagamy danych osobowych dziecka",
+        "parentSupervision": "Rodzic wybiera scenariusz i nadzoruje trening",
+        "noScaryContent": "Spokojne, dostosowane do wieku — bez drastycznych i straszących treści"
+      },
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
+    },
+    "videoDemo": {
+      "title": "Zobacz Bobbiego w akcji",
+      "subtitle": "Obejrzyj, jak dzieci ćwiczą połączenia alarmowe w bezpiecznym, wspierającym środowisku, które buduje pewność siebie i umiejętności ratujące życie.",
+      "videoTitle": "Demo aplikacji Bobby",
+      "fallbackText": "Demo aplikacji Bobby pokazujące, jak dzieci ćwiczą połączenia alarmowe",
+      "loadingText": "Ładowanie wideo...",
+      "playVideo": "Odtwórz demo wideo",
+      "clickToPlay": "Kliknij, aby obejrzeć aplikację Bobby w akcji",
+      "hideVideo": "Ukryj wideo"
     },
     "howItWorks": {
       "title": "Jak to działa",
@@ -199,10 +218,14 @@
     },
     "faq": {
       "title": "FAQ",
+      "toggle": {
+        "showLess": "Pokaż mniej",
+        "showAll": "Pokaż wszystkie pytania ({count})"
+      },
       "items": {
         "1": {
           "question": "Do czego służy ta aplikacja?",
-          "answer": "Bobby uczy dzieci w bezpieczny i zabawny sposób dzwonienia pod numer 999. Uczy dzieci, jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak wzywać pomoc. Jest to tylko symulacja, która nie połączy Cię z prawdziwymi służbami ratunkowymi."
+          "answer": "Bobby uczy dzieci w bezpieczny i zabawny sposób wzywania pomocy pod numer 112. Uczy dzieci, jak komunikować się jasno, zachować spokój i rozumieć, kiedy i jak wzywać pomoc. Jest to tylko symulacja, która nie połączy Cię z prawdziwymi służbami ratunkowymi."
         },
         "2": {
           "question": "Jak działa podział na grupy wiekowe?",
@@ -364,7 +387,7 @@
     "items": {
       "1": {
         "question": "Dlaczego zdecydowaliśmy się stworzyć Bobby’ego?",
-        "answer": "Bobby pomaga dzieciom ćwiczyć rozmowy z operatorem 999 w bezpieczny i zabawny sposób. Uczy dzieci jak komunikować się jasno, zachować spokój i zrozumieć, kiedy i jak prosić o pomoc."
+        "answer": "Bobby pomaga dzieciom ćwiczyć rozmowy z operatorem numeru 112 w bezpieczny i zabawny sposób. Uczy dzieci jak komunikować się jasno, zachować spokój i zrozumieć, kiedy i jak prosić o pomoc."
       },
       "2": {
         "question": "Jak dopasowaliśmy scenariusze do wieku dziecka?",

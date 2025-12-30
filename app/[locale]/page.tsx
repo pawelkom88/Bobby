@@ -10,9 +10,16 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
 import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
+import { VideoDemoSection } from '@/app/[locale]/landing-page/VideoDemoSection';
 
 const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
 const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
+
+const trustStripItems = Array.from({ length: 5 }, (_, i) => i + 1).map(id => ({
+  id,
+  translation: `hero.trustStrip.${['practiceOnly', 'realEmergencies', 'noRecordings', 'parentSupervision', 'noScaryContent'][id - 1]}`,
+  imageSrc: `/icon${id}.webp`,
+}));
 
 export default function HomePage() {
   const t = useTranslations('landing');
@@ -57,6 +64,41 @@ export default function HomePage() {
                   <div className="landing-text-section">
                     <h1 className="landing-title">{t('hero.title')}</h1>
                     <p className="landing-subtitle">{t('hero.subtitle')}</p>
+                    <div
+                      className="landing-trust-strip"
+                      role="note"
+                      aria-label={t('hero.trustStrip.ariaLabel')}
+                    >
+                      <div className="landing-trust-strip-title">
+                        {t('hero.trustStrip.title')}
+                      </div>
+                      <div className="landing-trust-strip-items" role="list">
+                        {trustStripItems.map(item => (
+                          <div
+                            key={item.id}
+                            className="landing-trust-strip-item"
+                            role="listitem"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                            }}
+                          >
+                            <Image
+                              src={item.imageSrc}
+                              alt={item.translation}
+                              width={48}
+                              height={48}
+                              className="landing-trust-strip-icon"
+                              aria-hidden="true"
+                            />
+                            <span className="landing-trust-strip-text">
+                              {t(item.translation)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <Link
                       href="/login"
                       className="ach-button ach-button-landing"
@@ -74,11 +116,11 @@ export default function HomePage() {
                     width={500}
                     height={400}
                     src="/hero-image.webp"
-                    // src="/bobby.png"
                     alt="Hero Image - smiling Bobby"
                   />
                 </div>
                 <HowItWorksSection />
+                <VideoDemoSection />
                 <ScenarioCarousel />
                 <section id="faq" className="landing-faq-section">
                   <h2 className="landing-faq-title">{t('faq.title')}</h2>
@@ -133,8 +175,8 @@ export default function HomePage() {
                     onClick={toggleAllFAQs}
                   >
                     {showAllFAQs
-                      ? 'Show Less'
-                      : `Show All ${ALL_FAQ_IDS.length} Questions`}
+                      ? t('faq.toggle.showLess')
+                      : t('faq.toggle.showAll', { count: ALL_FAQ_IDS.length })}
                   </button>
                 </section>
               </main>
