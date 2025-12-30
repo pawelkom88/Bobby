@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import ChatBubble from './ChatBubble';
 import type { StoredConversation, Service } from '@/types';
+import CartoonButton from '@/components/CartoonButton';
 
 interface ConversationDetailProps {
   conversation: StoredConversation | null;
@@ -29,11 +30,11 @@ function shouldShowTimestamp(
 ): boolean {
   if (index === 0) return false;
   if (!previousTimestamp) return true;
-  
+
   const current = new Date(currentTimestamp);
   const previous = new Date(previousTimestamp);
   const diffMinutes = (current.getTime() - previous.getTime()) / (1000 * 60);
-  
+
   return diffMinutes >= 1;
 }
 
@@ -51,7 +52,7 @@ export default function ConversationDetail({
   const handleSaveTranscript = useCallback(() => {
     if (!conversation?.messages) return;
 
-    const lines = conversation.messages.map((msg) => {
+    const lines = conversation.messages.map(msg => {
       const speaker =
         msg.type === 'agent'
           ? t('transcript.speaker.bobby')
@@ -70,12 +71,15 @@ export default function ConversationDetail({
       }) + '\n';
     const date =
       t('transcript.date', {
-        date: formatDate(conversation.endedAt || conversation.startedAt, locale),
+        date: formatDate(
+          conversation.endedAt || conversation.startedAt,
+          locale
+        ),
       }) + '\n';
     const separator = '─'.repeat(50) + '\n\n';
-    
+
     const content = header + date + separator + lines.join('\n');
-    
+
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -118,9 +122,9 @@ export default function ConversationDetail({
             <path d="m9 9 6 6" />
           </svg>
           <p>{error}</p>
-          <button onClick={onBack} className="conversation-detail__back-btn">
+          <CartoonButton onClick={onBack} ariaLabel={t('goBack')}>
             {t('goBack')}
-          </button>
+          </CartoonButton>
         </div>
       </div>
     );
@@ -135,31 +139,19 @@ export default function ConversationDetail({
   return (
     <div className="conversation-detail">
       <header className="conversation-detail__header">
-        <button
+        <CartoonButton
           onClick={onBack}
-          className="conversation-detail__back-btn"
-          aria-label={t('backToConversationsAria')}
+          ariaLabel={t('backToConversationsAria')}
+          containerClassName="conversation-detail__back-btn-container"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ width: '24px', height: '24px' }}
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </button>
-        
+          ←
+        </CartoonButton>
+
         <div className="conversation-detail__header-content">
           <h1 className="conversation-detail__title">{t('title')}</h1>
-          <p className="conversation-detail__subtitle">
-            {t('subtitle')}
-          </p>
+          <p className="conversation-detail__subtitle">{t('subtitle')}</p>
         </div>
-        
+
         <button
           onClick={handleSaveTranscript}
           className="conversation-detail__save-btn"
@@ -173,7 +165,7 @@ export default function ConversationDetail({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ width: '18px', height: '18px' }}
+            style={{ width: '18px', height: '8px' }}
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7,10 12,15 17,10" />
@@ -199,7 +191,7 @@ export default function ConversationDetail({
               previousMessage?.timestamp || null,
               index
             );
-            
+
             return (
               <ChatBubble
                 key={`${message.timestamp}-${index}`}
