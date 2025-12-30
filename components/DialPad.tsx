@@ -15,7 +15,7 @@ interface DialPadProps {
  */
 export default function DialPad({
   onCorrectNumber,
-  targetNumber = '999',
+  targetNumber,
   onBack,
   isLoading,
   buttonLabel,

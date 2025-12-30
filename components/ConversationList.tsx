@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl';
 import ConversationCard from './ConversationCard';
 import type { ConversationListItem } from '@/types';
+import CartoonButton from '@/components/CartoonButton';
+import { ROUTES } from '@/lib/routes';
 
 interface ConversationListProps {
   conversations: ConversationListItem[];
@@ -16,6 +18,7 @@ export default function ConversationList({
   error,
 }: ConversationListProps) {
   const t = useTranslations('conversationList');
+  const tLanding = useTranslations('landing');
   if (isLoading) {
     return (
       <div className="conversation-list conversation-list--loading">
@@ -68,9 +71,10 @@ export default function ConversationList({
             <path d="M7 13h6" />
           </svg>
           <h3>{t('noConversations')}</h3>
-          <p>
-            {t('noConversationsHint')}
-          </p>
+          <p>{t('noConversationsHint')}</p>
+          <CartoonButton asLink href={ROUTES.YOUR_AGE}>
+            {tLanding('nav.startTraining')}
+          </CartoonButton>
         </div>
       </div>
     );

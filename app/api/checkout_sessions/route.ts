@@ -6,6 +6,27 @@ import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 import { getCurrencyConfig } from '@/lib/currency';
 
+function getLocalizedInvoiceText(locale: string) {
+  if (locale === 'pl') {
+    return {
+      footer: 'Dziękujemy za wybranie Bobbiego - Twojego asystenta AI',
+      platform: 'Platforma',
+      platformValue: 'Bobby',
+      creditsPurchased: 'Kredytów',
+      descriptionPrefix: 'Bobby',
+    };
+  }
+
+  // Default to English
+  return {
+    footer: 'Thank you for choosing Bobby - Your AI Assistant',
+    platform: 'Platform',
+    platformValue: 'Bobby',
+    creditsPurchased: 'Credits Purchased',
+    descriptionPrefix: 'Bobby',
+  };
+}
+
 function toStripeLocale(locale: string) {
   if (locale === 'pl') return 'pl' as const;
   if (locale === 'en') return 'en' as const;
@@ -129,6 +150,9 @@ export async function POST(request: NextRequest) {
     logger.log('Checkout - Success URL being set:', successUrl);
     logger.log('Checkout - Origin used:', origin);
 
+    // Get localized text for invoice
+    const localizedText = getLocalizedInvoiceText(localeParam);
+
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -137,6 +161,34 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `${localizedText.descriptionPrefix} ${pack.name} - ${pack.credits} Credit${pack.credits > 1 ? 's' : ''}`,
+          metadata: {
+            userId,
+            packType,
+            credits: pack.credits.toString(),
+            platform: 'bobby-app',
+            locale: localeParam,
+          },
+          footer: localizedText.footer,
+          rendering_options: {
+            amount_tax_display: 'include_inclusive_tax',
+          },
+          // Custom fields for additional information
+          custom_fields: [
+            {
+              name: localizedText.platform,
+              value: localizedText.platformValue,
+            },
+            {
+              name: localizedText.creditsPurchased,
+              value: `${pack.credits} Credit${pack.credits > 1 ? 's' : ''}`,
+            },
+          ],
+        },
+      },
       ...(stripeLocale ? { locale: stripeLocale } : {}),
       success_url: successUrl,
       cancel_url: `${origin}/app/wybierz-numer?canceled=true`,

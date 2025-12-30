@@ -669,7 +669,7 @@
   },
   "chats": {
     "title": "Twoje Rozmowy",
-    "subtitle": "Przejrzyj historię rozmów z Bobby",
+    "subtitle": "Przejrzyj historię rozmów z Bobbim",
     "loadingError": "Nie udało się załadować rozmów. Spróbuj ponownie."
   },
   "achievements": {
@@ -776,7 +776,7 @@
   "conversationList": {
     "loading": "Ładowanie rozmów...",
     "noConversations": "Brak rozmów",
-    "noConversationsHint": "Ukończ rozmowę z Bobby, aby zobaczyć historię rozmów."
+    "noConversationsHint": "Rozpocznij swoją pierwszą rozmowę z Bobbim już dziś!"
   },
   "bottomNav": {
     "callBobby": "Zadzwoń",
@@ -826,7 +826,7 @@
     }
   },
   "conversationDetail": {
-    "loading": "Ładowanie rozmowy...",
+    "loading": "Ładowanie historii rozmów...",
     "goBack": "Wstecz",
     "backToConversationsAria": "Wróć do listy rozmów",
     "title": "Twoja rozmowa",
@@ -834,6 +834,11 @@
     "saveTranscript": "Zapisz transkrypt",
     "saveTranscriptTitle": "Zapisz transkrypt jako plik tekstowy",
     "empty": "Brak wiadomości w tej rozmowie.",
+    "errors": {
+      "notFound": "Nie znaleziono rozmów",
+      "fetchFailed": "Nie udało się pobrać rozmów",
+      "loadFailed": "Nie udało się załadować rozmów"
+    },
     "transcript": {
       "speaker": {
         "bobby": "Bobby",

@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { stripe } from '../../lib/stripe';
+import { verifyIdToken } from '../../lib/firebase-admin';
 
 /**
  * Tests for checkout session creation logic
@@ -19,10 +21,6 @@ vi.mock('@/lib/stripe', () => ({
 vi.mock('@/lib/firebase-admin', () => ({
   verifyIdToken: vi.fn(),
 }));
-
-// Import after mocks
-import { stripe } from '@/lib/stripe';
-import { verifyIdToken } from '@/lib/firebase-admin';
 
 // Credit pack configuration (mirrors server-side config)
 // Each credit = 1 practice call (5 minutes max)
@@ -132,6 +130,33 @@ describe('Checkout Sessions API Logic', () => {
         line_items: [{ price: 'price_123', quantity: 1 }],
         mode: 'payment',
         metadata: expectedMetadata,
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: 'Bobby Responder Pack - 2 Credits',
+            metadata: {
+              userId: 'user123',
+              packType: 'responder',
+              credits: '2',
+              platform: 'bobby-app',
+              locale: 'en',
+            },
+            footer: 'Thank you for choosing Bobby - Your Emergency Call Training Partner',
+            rendering_options: {
+              amount_tax_display: 'include_inclusive_tax',
+            },
+            custom_fields: [
+              {
+                name: 'Platform',
+                value: 'Bobby Emergency Training',
+              },
+              {
+                name: 'Credits Purchased',
+                value: '2 Credits',
+              },
+            ],
+          },
+        },
       } as any);
 
       expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
@@ -140,6 +165,157 @@ describe('Checkout Sessions API Logic', () => {
             userId: 'user123',
             packType: 'responder',
             credits: '2',
+          },
+          invoice_creation: {
+            enabled: true,
+            invoice_data: {
+              description: 'Bobby Responder Pack - 2 Credits',
+              metadata: {
+                userId: 'user123',
+                packType: 'responder',
+                credits: '2',
+                platform: 'bobby-app',
+                locale: 'en',
+              },
+              footer: 'Thank you for choosing Bobby - Your Emergency Call Training Partner',
+              rendering_options: {
+                amount_tax_display: 'include_inclusive_tax',
+              },
+              custom_fields: [
+                {
+                  name: 'Platform',
+                  value: 'Bobby Emergency Training',
+                },
+                {
+                  name: 'Credits Purchased',
+                  value: '2 Credits',
+                },
+              ],
+            },
+          },
+        })
+      );
+    });
+  });
+
+  describe('Invoice Creation', () => {
+    it('should enable invoice creation in checkout session', async () => {
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue({
+        url: 'https://checkout.stripe.com/session123',
+      } as any);
+
+      await stripe.checkout.sessions.create({
+        line_items: [{ price: 'price_123', quantity: 1 }],
+        mode: 'payment',
+        invoice_creation: {
+          enabled: true,
+        },
+      } as any);
+
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          invoice_creation: {
+            enabled: true,
+          },
+        })
+      );
+    });
+
+    it('should use localized text for Polish invoices', async () => {
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue({
+        url: 'https://checkout.stripe.com/session123',
+      } as any);
+
+      await stripe.checkout.sessions.create({
+        line_items: [{ price: 'price_123', quantity: 1 }],
+        mode: 'payment',
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: 'Bobby Pakiet Początkujący - 1 Credit',
+            footer: 'Dziękujemy za wybranie Bobby - Twojego Partnera Treningowego Połączeń Ratunkowych',
+            custom_fields: [
+              {
+                name: 'Platforma',
+                value: 'Bobby Trening Ratunkowe',
+              },
+              {
+                name: 'Kredytów Zakupionych',
+                value: '1 Credit',
+              },
+            ],
+          },
+        },
+      } as any);
+
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          invoice_creation: {
+            enabled: true,
+            invoice_data: {
+              description: 'Bobby Pakiet Początkujący - 1 Credit',
+              footer: 'Dziękujemy za wybranie Bobby - Twojego Partnera Treningowego Połączeń Ratunkowych',
+              custom_fields: [
+                {
+                  name: 'Platforma',
+                  value: 'Bobby Trening Ratunkowe',
+                },
+                {
+                  name: 'Kredytów Zakupionych',
+                  value: '1 Credit',
+                },
+              ],
+            },
+          },
+        })
+      );
+    });
+
+    it('should use English text for English invoices', async () => {
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue({
+        url: 'https://checkout.stripe.com/session123',
+      } as any);
+
+      await stripe.checkout.sessions.create({
+        line_items: [{ price: 'price_123', quantity: 1 }],
+        mode: 'payment',
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: 'Bobby Rookie Pack - 1 Credit',
+            footer: 'Thank you for choosing Bobby - Your Emergency Call Training Partner',
+            custom_fields: [
+              {
+                name: 'Platform',
+                value: 'Bobby Emergency Training',
+              },
+              {
+                name: 'Credits Purchased',
+                value: '1 Credit',
+              },
+            ],
+          },
+        },
+      } as any);
+
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          invoice_creation: {
+            enabled: true,
+            invoice_data: {
+              description: 'Bobby Rookie Pack - 1 Credit',
+              footer: 'Thank you for choosing Bobby - Your Emergency Call Training Partner',
+              custom_fields: [
+                {
+                  name: 'Platform',
+                  value: 'Bobby Emergency Training',
+                },
+                {
+                  name: 'Credits Purchased',
+                  value: '1 Credit',
+                },
+              ],
+            },
           },
         })
       );

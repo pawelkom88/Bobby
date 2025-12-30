@@ -839,6 +839,11 @@
     "saveTranscript": "Save transcript",
     "saveTranscriptTitle": "Save transcript as text file",
     "empty": "No messages in this conversation.",
+    "errors": {
+      "notFound": "Conversation not found",
+      "fetchFailed": "Failed to fetch conversation",
+      "loadFailed": "Failed to load conversation"
+    },
     "transcript": {
       "speaker": {
         "bobby": "Bobby",

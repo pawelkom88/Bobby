@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, use } from 'react';
 import { ViewTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -20,6 +21,7 @@ function ConversationDetailContent({ params }: ConversationDetailPageProps) {
   const paramsResolved = use(params);
   const { conversationId } = paramsResolved;
   const { user } = useAuth();
+  const t = useTranslations('conversationDetail');
   const [conversation, setConversation] = useState<StoredConversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,16 +43,16 @@ function ConversationDetailContent({ params }: ConversationDetailPageProps) {
 
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error('Conversation not found');
+            throw new Error(t('errors.notFound'));
           }
-          throw new Error('Failed to fetch conversation');
+          throw new Error(t('errors.fetchFailed'));
         }
 
         const data = await response.json();
         setConversation(data.conversation);
       } catch (err) {
         logger.error('Error fetching conversation:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load conversation');
+        setError(err instanceof Error ? err.message : t('errors.loadFailed'));
       } finally {
         setIsLoading(false);
       }
