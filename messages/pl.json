@@ -102,6 +102,23 @@
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
     },
+    "howItWorks": {
+      "title": "Jak to działa",
+      "subtitle": "Trzy proste kroki do gotowości na sytuacje alarmowe",
+      "step1": {
+        "title": "Wybierz grupę wiekową",
+        "description": "Wybierz odpowiednią grupę wiekową (5-7, 7-10 lub 11-12 lat), aby otrzymać scenariusze dostosowane do wieku i odpowiedni poziom języka."
+      },
+      "step2": {
+        "title": "Wybierz typ alarmu",
+        "description": "Wybierz spośród scenariuszy pożaru, pogotowia ratunkowego lub policji. Każda sytuacja jest zaprojektowana, aby nauczyć konkretnych umiejętności reagowania w nagłych wypadkach."
+      },
+      "step3": {
+        "title": "Ćwicz z Bobbym",
+        "description": "Prowadź realistyczną rozmowę głosową z Bobbym, naszym operatorem AI. Otrzymaj natychmiastową informację zwrotną i zdobądź punkty za jasną komunikację."
+      },
+      "cta": "Zacznij ćwiczyć"
+    },
     "carousel": {
       "title": "Czy Twoje dziecko poradziłoby sobie z...",
       "subtitle": "Poznaj prawdziwe sytuacje, które dzieci mogą bezpiecznie ćwiczyć z Bobbym",

@@ -41,9 +41,6 @@ export default function MobileNav() {
       {/* Mobile Menu */}
       <nav className={`mobile-nav-menu ${isOpen ? 'active' : ''}`}>
         <div className="mobile-nav-links">
-          <Link href="/login" className="mobile-nav-link" onClick={closeMenu}>
-            {t('nav.startTraining')}
-          </Link>
           <a
             href="#how-it-works"
             className="mobile-nav-link"
@@ -51,11 +48,7 @@ export default function MobileNav() {
           >
             {t('nav.howItWorks')}
           </a>
-          <a
-            href="#faq"
-            className="mobile-nav-link"
-            onClick={closeMenu}
-          >
+          <a href="#faq" className="mobile-nav-link" onClick={closeMenu}>
             {t('nav.faq')}
           </a>
           <Link href="/contact" className="mobile-nav-link" onClick={closeMenu}>

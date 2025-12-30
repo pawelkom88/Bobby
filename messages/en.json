@@ -102,6 +102,23 @@
       "cta": "Start Training Now",
       "secondaryCta": "Watch How It Works"
     },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Three simple steps to emergency readiness",
+      "step1": {
+        "title": "Choose Age Level",
+        "description": "Select the appropriate age group (5-7, 7-10, or 11-12) to get age-appropriate scenarios and language complexity."
+      },
+      "step2": {
+        "title": "Pick Emergency Type",
+        "description": "Choose from fire, ambulance, or police scenarios. Each situation is designed to teach specific emergency response skills."
+      },
+      "step3": {
+        "title": "Practice with Bobby",
+        "description": "Have a realistic voice conversation with Bobby, our AI emergency operator. Get instant feedback and earn points for clear communication."
+      },
+      "cta": "Start Practicing"
+    },
     "carousel": {
       "title": "Could your child handle...",
       "subtitle": "Swipe to see real scenarios children can practice with Bobby",

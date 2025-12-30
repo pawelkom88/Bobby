@@ -15,8 +15,8 @@ import { ScenarioCard } from './ScenarioCard';
 import { ScenarioModal } from './ScenarioModal';
 
 const SWIPE_THRESHOLD = 50;
-const CARDS_DESKTOP = 3;
-const CARDS_TABLET = 2;
+const CARDS_DESKTOP = 1;
+const CARDS_TABLET = 1;
 const CARDS_MOBILE = 1;
 
 export function ScenarioCarousel() {

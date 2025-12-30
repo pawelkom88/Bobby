@@ -9,6 +9,7 @@ import { ScenarioCarousel } from './landing-page';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
+import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
 
 const ALL_FAQ_IDS = Array.from({ length: 25 }, (_, i) => i + 1);
 const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
@@ -70,13 +71,14 @@ export default function HomePage() {
                     </a>
                   </div>
                   <Image
-                    preload
-                    width={350}
-                    height={275}
-                    src="/bobby.png"
+                    width={500}
+                    height={400}
+                    src="/hero-image.webp"
+                    // src="/bobby.png"
                     alt="Hero Image - smiling Bobby"
                   />
                 </div>
+                <HowItWorksSection />
                 <ScenarioCarousel />
                 <section id="faq" className="landing-faq-section">
                   <h2 className="landing-faq-title">{t('faq.title')}</h2>
@@ -130,7 +132,9 @@ export default function HomePage() {
                     className="faq-toggle-button"
                     onClick={toggleAllFAQs}
                   >
-                    {showAllFAQs ? 'Show Less' : `Show All ${ALL_FAQ_IDS.length} Questions`}
+                    {showAllFAQs
+                      ? 'Show Less'
+                      : `Show All ${ALL_FAQ_IDS.length} Questions`}
                   </button>
                 </section>
               </main>
