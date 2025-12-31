@@ -42,7 +42,7 @@ export function initializeAppCheckIfNeeded() {
         isTokenAutoRefreshEnabled: true, // Automatically refresh tokens
       });
       appCheckInitialized = true;
-      logger.log('App Check initialized on demand');
+      logger.log('App Check initialized on demand for auth routes');
     } catch (error) {
       // App Check might already be initialized in development/testing
       logger.warn('App Check initialization warning:', error);

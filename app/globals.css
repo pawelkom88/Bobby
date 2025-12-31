@@ -7704,3 +7704,41 @@ input {
     display: none;
   }
 }
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS - Content Visibility for below-the-fold content
+   ============================================================================ */
+
+.landing-video-demo-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 600px;
+}
+
+.scenario-carousel-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+.landing-faq-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+
+.landing-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
+}
+
+/* ============================================================================
+   STEP ICON CONTAINER - Fix aspect ratio issues
+   ============================================================================ */
+
+.step-icon-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.step-icon-image {
+  object-fit: contain !important;
+}

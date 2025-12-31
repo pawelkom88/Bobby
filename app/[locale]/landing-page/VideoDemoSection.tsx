@@ -49,7 +49,7 @@ export function VideoDemoSection() {
                   onError={() => setHasError(true)}
                   controls
                   playsInline
-                  preload="auto"
+                  preload="metadata"
                   poster="/bobby-demo-poster.jpg"
                   aria-label={t('videoDemo.videoTitle')}
                 >

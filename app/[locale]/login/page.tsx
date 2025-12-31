@@ -15,6 +15,7 @@ import AuthPageLayout, {
   AuthErrorMessage,
 } from '@/components/AuthPageLayout';
 import AuthInput from '@/components/AuthInput';
+import { initializeAppCheckIfNeeded } from '@/lib/firebase';
 
 function LoginForm() {
   const router = useRouter();
@@ -33,6 +34,9 @@ function LoginForm() {
   const redirectUrl = searchParams.get('redirect') || ROUTES.APP;
 
   useEffect(() => {
+    // Initialize App Check only on auth routes
+    initializeAppCheckIfNeeded();
+    
     if (!authLoading && user) {
       router.push(redirectUrl);
     }

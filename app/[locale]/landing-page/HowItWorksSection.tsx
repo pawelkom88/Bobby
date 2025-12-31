@@ -40,14 +40,16 @@ export function HowItWorksSection() {
                 <span className="step-number-text">{step.number}</span>
               </div>
               <div className="step-icon">
-                <Image
-                  width={150}
-                  height={150}
-                  src={step.icon}
-                  alt={step.title}
-                  className="step-icon-image"
-                  sizes="150px"
-                />
+                <div className="step-icon-container">
+                  <Image
+                    fill
+                    src={step.icon}
+                    alt={step.title}
+                    className="step-icon-image"
+                    sizes="150px"
+                    loading="lazy"
+                  />
+                </div>
               </div>
               <h3 className="step-title">{step.title}</h3>
               <p className="step-description">{step.description}</p>
