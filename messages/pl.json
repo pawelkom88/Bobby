@@ -1197,5 +1197,11 @@
       "message": "Nie mogliśmy zweryfikować płatności. Skontaktuj się z pomocą techniczną, jeśli zostałeś obciążony.",
       "cta": "Przejdź do ćwiczeń"
     }
+  },
+  "cookies": {
+    "title": "🍪 Zgoda na ciasteczka",
+    "description": "Używamy ciasteczek, aby Twoje doświadczenie było wspaniałe! Pomagają nam analizować ruch na stronie i personalizować treści specjalnie dla Ciebie. Klikając \"Akceptuj wszystkie ciasteczka\", zgadzasz się na ich użycie. Kliknij \"Odrzuć wszystkie\", jeśli wolisz nie udostępniać nieistotnych ciasteczek.",
+    "acceptAll": "Akceptuj wszystkie ciasteczka",
+    "rejectAll": "Odrzuć wszystkie"
   }
 }

@@ -1202,5 +1202,11 @@
       "message": "We couldn't verify your payment. Please contact support if you were charged.",
       "cta": "Go to Practice"
     }
+  },
+  "cookies": {
+    "title": "🍪 Cookie Consent",
+    "description": "We use cookies to make your experience awesome! They help us analyze site traffic and personalize content just for you. By clicking \"Accept All Cookies\", you agree to our use of cookies. Click \"Reject All\" if you prefer not to share non-essential cookies.",
+    "acceptAll": "Accept All Cookies",
+    "rejectAll": "Reject All"
   }
 }

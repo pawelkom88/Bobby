@@ -3,12 +3,14 @@
 import { ReactNode, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { CookiesProvider } from 'react-cookie';
 import { SoundProvider } from '@/components/SoundProvider';
 import { MicrophoneContextProvider } from '@/context/MicrophoneContextProvider';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserDataProvider } from '@/context/UserDataContext';
 import { CreditsProvider } from '@/context/CreditsContext';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
+import CookieBanner from '@/components/CookieBanner';
 import { initWebVitals } from '@/lib/web-vitals';
 import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
@@ -48,25 +50,28 @@ export function OptimizedProviders({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ServiceWorkerRegistration />
-      <AuthProvider>
-        <CreditsProvider>
-          <UserDataProvider>
-            <SoundProvider>
-              {isConversationPage ? (
-                <DeepgramContextProvider>
-                  <MicrophoneContextProvider>
-                    {children}
-                  </MicrophoneContextProvider>
-                </DeepgramContextProvider>
-              ) : (
-                <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
-              )}
-            </SoundProvider>
-          </UserDataProvider>
-        </CreditsProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <CookiesProvider>
+      <QueryClientProvider client={queryClient}>
+        <ServiceWorkerRegistration />
+        <AuthProvider>
+          <CreditsProvider>
+            <UserDataProvider>
+              <SoundProvider>
+                {isConversationPage ? (
+                  <DeepgramContextProvider>
+                    <MicrophoneContextProvider>
+                      {children}
+                    </MicrophoneContextProvider>
+                  </DeepgramContextProvider>
+                ) : (
+                  <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
+                )}
+              </SoundProvider>
+            </UserDataProvider>
+          </CreditsProvider>
+        </AuthProvider>
+        <CookieBanner />
+      </QueryClientProvider>
+    </CookiesProvider>
   );
 }
