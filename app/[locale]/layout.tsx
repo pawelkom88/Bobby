@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { OptimizedProviders } from '@/components/OptimizedProviders';
 import { routing } from '@/i18n/routing';
@@ -29,13 +33,11 @@ export async function generateMetadata({
   const description = t('description');
 
   return {
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com'
-    ),
+    metadataBase: new URL('http://readywithbobby.online/'),
     title,
     description,
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com'}/${locale}`,
+      canonical: 'http://readywithbobby.online/',
       languages: {
         en: '/en',
         pl: '/pl',
@@ -80,8 +82,18 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
-        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link
+          rel="icon"
+          href="/favicon-16x16.png"
+          sizes="16x16"
+          type="image/png"
+        />
+        <link
+          rel="icon"
+          href="/favicon-32x32.png"
+          sizes="32x32"
+          type="image/png"
+        />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

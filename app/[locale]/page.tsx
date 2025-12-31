@@ -91,6 +91,8 @@ export default function HomePage() {
                               height={48}
                               className="landing-trust-strip-icon"
                               aria-hidden="true"
+                              fetchPriority="high"
+                              preload
                             />
                             <span className="landing-trust-strip-text">
                               {t(item.translation)}
@@ -119,6 +121,7 @@ export default function HomePage() {
                     alt="Hero Image - smiling Bobby"
                     sizes="(max-width: 768px) 100vw, 392px"
                     preload
+                    fetchPriority="high"
                   />
                 </div>
                 <HowItWorksSection />
