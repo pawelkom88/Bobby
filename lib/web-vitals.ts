@@ -1,6 +1,10 @@
 'use client';
 
 import { logger } from '@/lib/logger';
+import { analyticsService } from './analytics';
+
+// Analytics log styling to match analytics.ts
+const analyticsLogStyle = 'color: #4285f4; font-weight: bold; font-size: 12px;';
 
 /**
  * Web Vitals monitoring utility
@@ -36,25 +40,21 @@ function getRating(name: string, value: number): 'good' | 'needs-improvement' | 
 function reportMetric(metric: WebVitalsMetric) {
   // Log to console in development
   if (process.env.NODE_ENV === 'development') {
-    logger.log(`[Web Vitals] ${metric.name}:`, {
-      value: metric.value,
-      rating: metric.rating,
-      id: metric.id,
-    });
+    console.log(
+      `%c⚡ Web Vitals [${metric.name}]:`,
+      analyticsLogStyle,
+      {
+        value: metric.value,
+        rating: metric.rating,
+        id: metric.id,
+      }
+    );
   }
 
   // Send to analytics in production
-  if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
-    // Send to Google Analytics if available
-    if (window.gtag) {
-      window.gtag('event', metric.name, {
-        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-        metric_id: metric.id,
-        metric_value: metric.value,
-        metric_delta: metric.delta,
-        metric_rating: metric.rating,
-      });
-    }
+  if (process.env.NODE_ENV === 'production') {
+    // Use AnalyticsService instead of direct gtag
+    analyticsService.trackWebVital(metric);
   }
 }
 

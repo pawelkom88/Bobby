@@ -18,6 +18,7 @@ import {
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { logger } from '@/lib/logger';
+import { analyticsService } from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -54,6 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (user) {
         logger.info('User authenticated:', { userId: user.uid });
+        // Set user ID in analytics
+        analyticsService.setUserId(user.uid);
         // Sync user data to Firestore on auth state change
         await syncUserToFirestore(user);
 
@@ -65,6 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }`;
       } else {
         logger.info('User signed out');
+        // Clear user ID from analytics
+        analyticsService.trackUserLogout();
         // Clear auth indicator cookie
         document.cookie = 'bobby_auth=; path=/; max-age=0; SameSite=Strict';
       }

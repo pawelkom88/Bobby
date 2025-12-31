@@ -11,6 +11,7 @@ import { UserDataProvider } from '@/context/UserDataContext';
 import { CreditsProvider } from '@/context/CreditsContext';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import CookieBanner from '@/components/CookieBanner';
+import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { initWebVitals } from '@/lib/web-vitals';
 import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
@@ -51,6 +52,7 @@ export function OptimizedProviders({ children }: ProvidersProps) {
 
   return (
     <CookiesProvider>
+      <AnalyticsConsent />
       <QueryClientProvider client={queryClient}>
         <ServiceWorkerRegistration />
         <AuthProvider>

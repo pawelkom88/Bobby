@@ -19,11 +19,11 @@ const firebaseConfig = {
 const app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Initialize Analytics (only in browser)
-let analytics;
-if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
-}
+// Analytics will be initialized in analytics.ts after consent
+// let analytics;
+// if (typeof window !== 'undefined') {
+//   analytics = getAnalytics(app);
+// }
 
 // Flag to track if App Check has been initialized
 let appCheckInitialized = false;

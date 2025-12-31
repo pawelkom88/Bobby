@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import { analyticsService } from '@/lib/analytics';
 
 export type ConsentStatus = 'accepted' | 'rejected' | 'pending';
 
@@ -15,13 +16,16 @@ export function useCookieConsent() {
   const [consent, setConsent] = useState<ConsentStatus>('pending');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load consent from localStorage on mount
+  // Load consent from localStorage on mount and initialize analytics
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const data: ConsentData = JSON.parse(stored);
         setConsent(data.consent);
+        
+        // Initialize analytics with stored consent
+        analyticsService.initialize(data.consent === 'accepted');
       } catch (error) {
         console.error('Failed to parse cookie consent data:', error);
         localStorage.removeItem(STORAGE_KEY);
@@ -38,6 +42,9 @@ export function useCookieConsent() {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consentData));
     setConsent('accepted');
+    
+    // Initialize analytics with consent
+    analyticsService.initialize(true);
   };
 
   const rejectCookies = () => {
@@ -48,6 +55,9 @@ export function useCookieConsent() {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consentData));
     setConsent('rejected');
+    
+    // Disable analytics
+    analyticsService.initialize(false);
 
     Object.keys(cookies).forEach(cookieName => {
       removeCookie(cookieName, { path: '/' });
