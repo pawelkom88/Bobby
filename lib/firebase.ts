@@ -2,7 +2,10 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import {
+  initializeAppCheck,
+  ReCaptchaEnterpriseProvider,
+} from 'firebase/app-check';
 import { logger } from '@/lib/logger';
 
 const firebaseConfig = {
@@ -34,7 +37,8 @@ export function initializeAppCheckIfNeeded() {
     return;
   }
 
-  const reCaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY;
+  const reCaptchaSiteKey =
+    process.env.NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY;
   if (reCaptchaSiteKey) {
     try {
       initializeAppCheck(app, {
@@ -59,4 +63,4 @@ export const db = getFirestore(app);
 // Initialize Auth
 export const auth: Auth = getAuth(app);
 
-export { app, analytics };
+export { app, getAnalytics };

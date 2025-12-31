@@ -13,6 +13,7 @@ interface UserProperties {
   subscription_tier?: string;
   account_age_days?: number;
   preferred_language?: string;
+  [key: string]: any; // Allow additional properties for flexibility
 }
 
 class AnalyticsService {
@@ -79,8 +80,8 @@ class AnalyticsService {
       }, 50);
       
       // Timeout after 5 seconds
-      setTimeout(() => {
-        clearInterval(checkInterval);
+      const timeoutId = setTimeout(() => {
+        clearInterval(checkInterval); // Clean up interval to prevent memory leak
         console.warn('%c⚠️ gtag not available after 5 seconds', 'color: #ea4335; font-weight: bold;');
         resolve();
       }, 5000);

@@ -7,7 +7,7 @@ import { analyticsService } from '@/lib/analytics';
 // Auto-track page views
 export function usePageTracking(): void {
   const pathname = usePathname();
-  const lastPathRef = useRef<string>();
+  const lastPathRef = useRef<string | null>(null);
 
   useEffect(() => {
     // Only track if path actually changed
@@ -131,7 +131,7 @@ export function useConversionTracking() {
 // Track custom events
 export function useCustomEventTracking() {
   const trackEvent = useCallback((eventName: string, params?: Record<string, any>) => {
-    analyticsService.log(eventName, params);
+    analyticsService.trackCustomEvent(eventName, params);
   }, []);
 
   return { trackEvent };

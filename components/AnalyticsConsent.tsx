@@ -6,6 +6,19 @@ import { useEffect } from 'react';
 // This component handles Google's Consent Mode v2
 // It must be rendered early in the app to set default consent
 export function AnalyticsConsent() {
+  // Don't load anything in development
+  if (process.env.NODE_ENV === 'development') {
+    return null;
+  }
+
+  const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+  
+  // Don't load if measurement ID is missing
+  if (!measurementId) {
+    console.warn('%c⚠️ Firebase Measurement ID is missing', 'color: #ea4335; font-weight: bold;');
+    return null;
+  }
+
   useEffect(() => {
     // Set default consent state (required for GDPR)
     if (typeof window !== 'undefined' && window.gtag) {
@@ -22,7 +35,7 @@ export function AnalyticsConsent() {
   return (
     <Script
       strategy="beforeInteractive"
-      src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}`}
+      src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
       onLoad={() => {
         // Initialize data layer
         window.dataLayer = window.dataLayer || [];
@@ -41,7 +54,7 @@ export function AnalyticsConsent() {
         
         // Initialize config
         window.gtag('js', new Date());
-        window.gtag('config', process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!, {
+        window.gtag('config', measurementId, {
           send_page_view: false // We'll handle page views manually
         });
       }}
