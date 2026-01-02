@@ -361,11 +361,11 @@ h6,
   background-color: var(--white);
 }
 
-.high-contrast * {
-  color: var(--black) !important;
-  background-color: var(--white) !important;
-  border-color: var(--black) !important;
-}
+/*.high-contrast * {*/
+/*  color: var(--black) !important;*/
+/*  background-color: var(--white) !important;*/
+/*  border-color: var(--black) !important;*/
+/*}*/
 
 /* High contrast mode for cartoon buttons */
 .high-contrast .cartoon-btn {
@@ -533,7 +533,11 @@ h6,
 .reduced-sensory .bottom-nav-item span {
   opacity: 1 !important;
   visibility: visible !important;
-  max-width: 200px !important;
+  max-width: 60px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .reduced-sensory .bottom-nav-item.active span {
