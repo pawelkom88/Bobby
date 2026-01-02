@@ -26,6 +26,8 @@ export default function AnimatedImageWrapper({
         width={width}
         height={height}
         className={`animated-image ${className}`}
+        preload
+        fetchPriority="high"
       />
     </div>
   );

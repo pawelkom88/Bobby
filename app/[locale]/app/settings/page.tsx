@@ -10,8 +10,9 @@ import DeleteAccountSection from '@/components/DeleteAccountSection';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Link } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
+import { SpeculationRules } from '@/components/SpeculationRules';
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const t = useTranslations('settings');
 
   return (
@@ -73,5 +74,14 @@ export default function SettingsPage() {
         </main>
       </PageWrapper>
     </ViewTransition>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <>
+      <SettingsPageContent />
+      <SpeculationRules prefetchPaths={[ROUTES.APP, ROUTES.CHATS, ROUTES.ACHIEVEMENTS]} eagerness="moderate" />
+    </>
   );
 }

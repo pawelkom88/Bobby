@@ -46,6 +46,7 @@ export default function AppPage() {
         </PageWrapper>
       </ViewTransition>
       <SpeculationRules prerenderPaths={[ROUTES.YOUR_AGE]} />
+      <SpeculationRules prefetchPaths={[ROUTES.CHATS, ROUTES.ACHIEVEMENTS, ROUTES.SETTINGS]} eagerness="moderate" />
     </>
   );
 }

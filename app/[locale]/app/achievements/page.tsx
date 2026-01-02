@@ -8,8 +8,10 @@ import BadgeDisplay from '@/components/BadgeDisplay';
 import PageWrapper from '@/components/PageWrapper';
 import TrainingHistorySection from '@/components/TrainingHistorySection';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { SpeculationRules } from '@/components/SpeculationRules';
+import { ROUTES } from '@/lib/routes';
 
-export default function AchievementsPage() {
+function AchievementsPageContent() {
   const t = useTranslations('achievements');
   return (
     <ViewTransition>
@@ -54,5 +56,14 @@ export default function AchievementsPage() {
         </PageWrapper>
       </Suspense>
     </ViewTransition>
+  );
+}
+
+export default function AchievementsPage() {
+  return (
+    <>
+      <AchievementsPageContent />
+      <SpeculationRules prefetchPaths={[ROUTES.APP, ROUTES.CHATS, ROUTES.SETTINGS]} eagerness="moderate" />
+    </>
   );
 }

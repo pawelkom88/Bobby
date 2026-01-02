@@ -10,6 +10,8 @@ import ConversationList from '@/components/ConversationList';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
 import type { ConversationListItem } from '@/types';
+import { SpeculationRules } from '@/components/SpeculationRules';
+import { ROUTES } from '@/lib/routes';
 
 function ChatsPageContent() {
   const { user } = useAuth();
@@ -82,6 +84,7 @@ export default function ChatsPage() {
   return (
     <ProtectedRoute>
       <ChatsPageContent />
+      <SpeculationRules prefetchPaths={[ROUTES.APP, ROUTES.ACHIEVEMENTS, ROUTES.SETTINGS]} eagerness="moderate" />
     </ProtectedRoute>
   );
 }
