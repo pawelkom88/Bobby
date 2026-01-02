@@ -60,7 +60,12 @@ async function verifyUserFromToken(
 
     return { userId: result.uid };
   } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.warn('Token verification error:', {
+      error: errorMessage,
+      code: error.code,
+      stack: error.stack,
+    });
     return { error: 'Invalid token', status: 401 };
   }
 }
@@ -77,7 +82,11 @@ async function getUserAssessedConversations(userId: string) {
     const userData = userDoc.data();
     return userData?.conversations || [];
   } catch (error) {
-    logger.error('Error fetching user assessed conversations:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error fetching user assessed conversations:', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw error;
   }
 }
@@ -205,7 +214,11 @@ export async function GET(
       { status: 200 }
     );
   } catch (error: unknown) {
-    logger.error('Error fetching assessed conversations:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error fetching assessed conversations:', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     return NextResponse.json(
       {

@@ -6,7 +6,6 @@ import {
   initializeAppCheck,
   ReCaptchaEnterpriseProvider,
 } from 'firebase/app-check';
-import { logger } from '@/lib/logger';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -22,21 +21,12 @@ const firebaseConfig = {
 const app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Analytics will be initialized in analytics.ts after consent
-// let analytics;
-// if (typeof window !== 'undefined') {
-//   analytics = getAnalytics(app);
-// }
+// Initialize Analytics (only in browser)
+let analytics;
+if (typeof window !== 'undefined') {
+  analytics = getAnalytics(app);
 
-// Flag to track if App Check has been initialized
-let appCheckInitialized = false;
-
-// Initialize App Check with reCAPTCHA Enterprise (deferred until needed)
-export function initializeAppCheckIfNeeded() {
-  if (typeof window === 'undefined' || appCheckInitialized) {
-    return;
-  }
-
+  // Initialize App Check with reCAPTCHA Enterprise
   const reCaptchaSiteKey =
     process.env.NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY;
   if (reCaptchaSiteKey) {
@@ -45,14 +35,12 @@ export function initializeAppCheckIfNeeded() {
         provider: new ReCaptchaEnterpriseProvider(reCaptchaSiteKey),
         isTokenAutoRefreshEnabled: true, // Automatically refresh tokens
       });
-      appCheckInitialized = true;
-      logger.log('App Check initialized on demand for auth routes');
     } catch (error) {
       // App Check might already be initialized in development/testing
-      logger.warn('App Check initialization warning:', error);
+      console.warn('App Check initialization warning:', error);
     }
   } else {
-    logger.warn(
+    console.warn(
       'reCAPTCHA Enterprise site key not found. App Check will not be initialized.'
     );
   }
@@ -63,4 +51,4 @@ export const db = getFirestore(app);
 // Initialize Auth
 export const auth: Auth = getAuth(app);
 
-export { app, getAnalytics };
+export { app, analytics };

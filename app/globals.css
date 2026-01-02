@@ -367,6 +367,30 @@ h6,
   border-color: var(--black) !important;
 }
 
+/* High contrast mode for cartoon buttons */
+.high-contrast .cartoon-btn {
+  --btn-color: var(--black) !important;
+  --btn-border-color: var(--black) !important;
+  --btn-text-color: var(--white) !important;
+  box-shadow: 0 0.5rem 0rem 0.05rem var(--black) !important;
+}
+
+.high-contrast .cartoon-btn::after {
+  background-color: var(--gray-medium) !important;
+  opacity: 0.3 !important;
+}
+
+.high-contrast .cartoon-btn-danger {
+  --btn-color: var(--black) !important;
+  --btn-border-color: var(--black) !important;
+  --btn-text-color: var(--white) !important;
+}
+
+.high-contrast .cartoon-btn-danger::after {
+  background-color: var(--gray-medium) !important;
+  opacity: 0.3 !important;
+}
+
 /* ============================================================================
    REDUCED SENSORY MODE - Comprehensive sensory reduction
    ============================================================================ */
@@ -6538,10 +6562,23 @@ input {
 /* ============================================================================
    CREDITS & PAYMENT STYLES
    ============================================================================ */
-.dial-credits-display,
+
 .dial-credits-label {
   font-size: 1.1rem;
   color: #333;
+}
+
+.dial-credits-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3);
+  margin-bottom: 1.5rem;
+  font-family: 'Luckiest Guy', system-ui;
 }
 
 .dial-credits-value {

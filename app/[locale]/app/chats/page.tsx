@@ -48,7 +48,8 @@ function ChatsPageContent() {
           setError(data.message || t('loadingError'));
         }
       } catch (err) {
-        logger.error('Error fetching conversations:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        logger.error('Error fetching conversations:', errorMessage);
         setError(t('loadingError'));
       } finally {
         setIsLoading(false);

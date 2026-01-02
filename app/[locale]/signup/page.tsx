@@ -16,7 +16,6 @@ import AuthPageLayout, {
   AuthErrorMessage,
 } from '@/components/AuthPageLayout';
 import AuthInput from '@/components/AuthInput';
-import { initializeAppCheckIfNeeded } from '@/lib/firebase';
 
 function PasswordStrengthIndicator({
   strength,
@@ -65,7 +64,6 @@ function SignUpForm() {
 
   useEffect(() => {
     // Initialize App Check only on auth routes
-    initializeAppCheckIfNeeded();
     
     if (!authLoading && user) {
       router.push(redirectUrl);
