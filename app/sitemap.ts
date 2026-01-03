@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const publicRoutes = [
     '',
+    '/parent-guide',
     '/faq',
     '/contact',
     '/privacy-policy',

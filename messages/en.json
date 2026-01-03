@@ -210,6 +210,110 @@
         ]
       }
     },
+    "beforeFirstCall": {
+      "title": "Before Your First Call",
+      "subtitle": "Setup for Success",
+      "description": "A little preparation goes a long way. Help your child get the most from Bobby.",
+      "beforeStart": {
+        "title": "Before You Start",
+        "point1": "Explain it's just practice - not a real emergency",
+        "point2": "Pick a scenario together that makes sense",
+        "point3": "Remind them: nobody's in trouble, they can take their time"
+      },
+      "duringPractice": {
+        "title": "During Practice",
+        "point1": "Let them speak in their own words - don't correct mid-call",
+        "point2": "Stay nearby for support, but let Bobby guide",
+        "point3": "Remember: confidence matters more than perfection"
+      },
+      "afterCall": {
+        "title": "After the Call",
+        "point1": "Ask \"How did that feel?\" not \"What did you get wrong?\"",
+        "point2": "Praise effort, not accuracy",
+        "point3": "Try again another day - repetition builds confidence"
+      },
+      "safetyNotice": "Important: Bobby is for practice only. In real emergencies, call 999/112 with an adult when possible.",
+      "viewGuideButton": "View Complete Parent Guide →"
+    },
+    "parentGuide": {
+      "title": "Complete Parent Preparation Guide",
+      "subtitle": "Everything you need to help your child succeed with emergency practice",
+      "backToHome": "Back to Home",
+      "gettingStarted": {
+        "title": "Getting Started",
+        "settingTone": {
+          "title": "Setting the Right Tone",
+          "text": "Tell your child: \"This is like practicing fire drills at school. Bobby helps us learn what to say if we ever need help.\""
+        }
+      },
+      "choosingScenarios": {
+        "title": "Choosing Scenarios",
+        "police": {
+          "title": "Police",
+          "description": "Someone in danger or needs urgent help"
+        },
+        "fire": {
+          "title": "Fire",
+          "description": "Smoke, fire, or unsafe situations"
+        },
+        "ambulance": {
+          "title": "Ambulance",
+          "description": "Someone hurt or unwell"
+        },
+        "note": "Start simple. Build complexity over time."
+      },
+      "practicePhrases": {
+        "title": "Practice Phrases Your Child Can Try",
+        "intro": "No script needed, but examples help:",
+        "phrase1": "My mummy fell and won't wake up",
+        "phrase2": "There's smoke in our kitchen",
+        "phrase3": "Someone's trying to get in our house",
+        "phrase4": "My brother can't breathe properly",
+        "note": "Bobby adapts to whatever they say."
+      },
+      "duringCall": {
+        "title": "During the Call",
+        "role": {
+          "title": "Your Role:",
+          "point1": "Be present but silent",
+          "point2": "Nod encouragingly",
+          "point3": "Let Bobby handle corrections",
+          "point4": "Only intervene if child becomes distressed"
+        },
+        "remember": {
+          "title": "Remember:",
+          "point1": "Pauses are normal",
+          "point2": "\"I don't know\" is a valid answer",
+          "point3": "Every child progresses differently"
+        }
+      },
+      "buildingConfidence": {
+        "title": "Building Confidence",
+        "afterCall": {
+          "title": "After Each Call:",
+          "question1": "\"What did Bobby ask you?\"",
+          "question2": "\"What was easy? What was hard?\"",
+          "question3": "\"Want to try a different scenario next time?\""
+        },
+        "successSigns": {
+          "title": "Success Signs:",
+          "sign1": "Child volunteers information without prompting",
+          "sign2": "They stay calmer during practice",
+          "sign3": "They remember key details (address, what happened)"
+        }
+      },
+      "frequencyGuide": {
+        "title": "Frequency Guide",
+        "firstWeek": "First week: 2-3 short sessions",
+        "after": "After that: Once weekly maintains skills",
+        "beforeTravel": "Before travel: Extra practice with new addresses"
+      },
+      "emergencyNumbers": {
+        "title": "Emergency Numbers by Country",
+        "comingSoon": "Coming soon: Support for other regions"
+      },
+      "startPracticeButton": "Start Practice Now"
+    },
     "footer": {
       "ready": "Ready to get started?",
       "privacy": "Privacy Policy",

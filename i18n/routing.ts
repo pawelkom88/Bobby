@@ -104,6 +104,10 @@ export const pathnames = {
     en: '/safety-privacy',
     pl: 'bezpieczenstwo-i-prywatnosc',
   },
+  '/parent-guide': {
+    en: '/parent-guide',
+    pl: '/przewodnik-rodzica',
+  },
 } as const satisfies Record<string, string | Record<Locale, string>>;
 
 export type AppPathname = keyof typeof pathnames;

@@ -16,9 +16,11 @@ export default function PageWrapper({ children }: PageWrapperProps) {
 
   const showBottomNav =
     pathname !== `/${locale}` &&
-    pathname !== ROUTES.HOME &&
-    pathname !== ROUTES.DIAL &&
-    pathname !== ROUTES.CONVERSATION &&
+    pathname !== `/${locale}${ROUTES.HOME}` &&
+    pathname !== `/${locale}${ROUTES.DIAL}` &&
+    pathname !== `/${locale}${ROUTES.CONVERSATION}` &&
+    pathname !== `/${locale}${ROUTES.COMPLETION}` &&
+    !pathname.includes('/parent-guide') &&
     !pathname.includes('/faq') &&
     !pathname.includes('/pytania') &&
     !pathname.includes('/contact') &&

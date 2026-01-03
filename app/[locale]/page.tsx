@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
 import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
+import { BeforeFirstCallSection } from '@/app/[locale]/landing-page/BeforeFirstCallSection';
 import { VideoDemoSection } from '@/app/[locale]/landing-page/VideoDemoSection';
 
 const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -125,6 +126,7 @@ export default function HomePage() {
                   />
                 </div>
                 <HowItWorksSection />
+                <BeforeFirstCallSection />
                 <VideoDemoSection />
                 <ScenarioCarousel />
                 <section id="faq" className="landing-faq-section">

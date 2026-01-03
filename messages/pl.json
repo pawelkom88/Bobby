@@ -205,6 +205,110 @@
         ]
       }
     },
+    "beforeFirstCall": {
+      "title": "Przed Pierwszą Rozmową",
+      "subtitle": "Przygotowanie do Sukcesu",
+      "description": "Trochę przygotowania daje długie efekty. Pomóż swojemu dziecku w pełni wykorzystać Bobby.",
+      "beforeStart": {
+        "title": "Przed Rozpoczęciem",
+        "point1": "Wyjaśnij, że to tylko ćwiczenia - nieprawdziwa sytuacja alarmowa",
+        "point2": "Wybierzcie razem scenariusz, który ma sens",
+        "point3": "Przypomnij: nikt nie jest w kłopocie, mogą wziąć swój czas"
+      },
+      "duringPractice": {
+        "title": "Podczas Ćwiczeń",
+        "point1": "Pozwól im mówić własnymi słowami - nie poprawiaj w trakcie rozmowy",
+        "point2": "Bądź blisko dla wsparcia, ale pozwól Bobby prowadzić",
+        "point3": "Pamiętaj: pewność się liczy bardziej niż doskonałość"
+      },
+      "afterCall": {
+        "title": "Po Rozmowie",
+        "point1": "Zapytaj \"Jak się z tym czułeś?\" a nie \"Co zrobiłeś źle?\"",
+        "point2": "Chwal wysiłek, nie dokładność",
+        "point3": "Spróbujcie ponownie innego dnia - powtórzenia budują pewność siebie"
+      },
+      "safetyNotice": "Ważne: Bobby służy tylko do ćwiczeń. W prawdziwych sytuacjach alarmowych, dzwoń pod 999/112 z dorosłym, jeśli to możliwe.",
+      "viewGuideButton": "Zobacz Kompletny Przewodnik dla Rodziców →"
+    },
+    "parentGuide": {
+      "title": "Kompletny Przewodnik Przygotowania dla Rodziców",
+      "subtitle": "Wszystko, czego potrzebujesz, aby pomóc swojemu dziecku odnieść sukces w ćwiczeniach alarmowych",
+      "backToHome": "Powrót do strony głównej",
+      "gettingStarted": {
+        "title": "Pierwsze Kroki",
+        "settingTone": {
+          "title": "Ustawienie właściwego tonu",
+          "text": "Powiedz swojemu dziecku: \"To jak ćwiczenie ewakuacji przeciwpożarowej w szkole. Bobby pomaga nam nauczyć się, co mówić, jeśli kiedykolwiek będziemy potrzebować pomocy.\""
+        }
+      },
+      "choosingScenarios": {
+        "title": "Wybieranie Scenariuszy",
+        "police": {
+          "title": "Policja",
+          "description": "Ktoś jest w niebezpieczeństwie lub potrzebuje pilnej pomocy"
+        },
+        "fire": {
+          "title": "Straż Pożarna",
+          "description": "Dym, pożar lub niebezpieczne sytuacje"
+        },
+        "ambulance": {
+          "title": "Pogotowie Ratunkowe",
+          "description": "Ktoś jest ranny lub źle się czuje"
+        },
+        "note": "Zacznij od prostych. Zwiększaj złożoność z czasem."
+      },
+      "practicePhrases": {
+        "title": "Zwroty do Ćwiczenia, Które Może Spróbować Twoje Dziecko",
+        "intro": "Nie potrzebny skrypt, ale przykłady pomagają:",
+        "phrase1": "Moja mama upadła i nie budzi się",
+        "phrase2": "W naszej kuchni jest dym",
+        "phrase3": "Ktoś próbuje dostać się do naszego domu",
+        "phrase4": "Mój brat nie może prawidłowo oddychać",
+        "note": "Bobby dostosowuje się do tego, co mówią."
+      },
+      "duringCall": {
+        "title": "Podczas Rozmowy",
+        "role": {
+          "title": "Twoja rola:",
+          "point1": "Bądź obecny, ale cicho",
+          "point2": "Kiwnij głową zachęcająco",
+          "point3": "Pozwól Bobby zająć się poprawkami",
+          "point4": "Interweniuj tylko jeśli dziecko się zdenerwuje"
+        },
+        "remember": {
+          "title": "Pamiętaj:",
+          "point1": "Pauzy są normalne",
+          "point2": "\"Nie wiem\" to prawidłowa odpowiedź",
+          "point3": "Każde dziecko postępuje inaczej"
+        }
+      },
+      "buildingConfidence": {
+        "title": "Budowanie Pewności Siebie",
+        "afterCall": {
+          "title": "Po każdej rozmowie:",
+          "question1": "\"Co pytał Bobby?\"",
+          "question2": "\"Co było łatwe? Co było trudne?\"",
+          "question3": "\"Chcesz spróbować innego scenariusza następnym razem?\""
+        },
+        "successSigns": {
+          "title": "Znaki sukcesu:",
+          "sign1": "Dziecko samo podaje informacje bez zachęty",
+          "sign2": "Są spokojniejsi podczas ćwiczeń",
+          "sign3": "Pamiętają kluczowe szczegóły (adres, co się stało)"
+        }
+      },
+      "frequencyGuide": {
+        "title": "Przewodnik Częstotliwości",
+        "firstWeek": "Pierwszy tydzień: 2-3 krótkie sesje",
+        "after": "Po tym: Raz w tygodniu utrzymuje umiejętności",
+        "beforeTravel": "Przed podróżą: Dodatkowe ćwiczenia z nowymi adresami"
+      },
+      "emergencyNumbers": {
+        "title": "Numery Alarmowe według Kraju",
+        "comingSoon": "Wkrótce: Wsparcie dla innych regionów"
+      },
+      "startPracticeButton": "Zacznij Ćwiczyć Teraz"
+    },
     "footer": {
       "ready": "Gotowy do rozpoczęcia nauki?",
       "privacy": "Polityka prywatności",
