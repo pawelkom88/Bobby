@@ -21,8 +21,6 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 
-const auth = getAdminAuth();
-
 interface ConversationDetailResponse {
   success: boolean;
   conversation?: StoredConversation;
@@ -34,7 +32,8 @@ interface ConversationDetailResponse {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
   
@@ -72,6 +71,9 @@ export async function GET(
   { params }: { params: Promise<{ conversationId: string }> }
 ): Promise<NextResponse<ConversationDetailResponse>> {
   try {
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+
     const { conversationId } = await params;
 
     if (!conversationId) {
@@ -82,7 +84,7 @@ export async function GET(
     }
 
     // 1. Verify user from token
-    const userResult = await verifyUserFromToken(request);
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(

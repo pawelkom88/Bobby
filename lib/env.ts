@@ -53,6 +53,9 @@ const serverEnvSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
+  
+  // Beta Mode
+  BETA_MODE_ENABLED: z.string().optional().transform(val => val === 'true'),
 });
 
 /**
@@ -67,6 +70,7 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().min(1).optional(),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().min(1).optional(),
   NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_BETA_MODE_ENABLED: z.string().optional().transform(val => val === 'true'),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

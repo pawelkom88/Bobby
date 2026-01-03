@@ -12,6 +12,7 @@ export const ROUTES = {
   DIAL: '/app/dial',
   CONVERSATION: '/app/conversation',
   COMPLETION: '/app/completion',
+  BETA_FEEDBACK: '/app/beta-feedback',
   SUCCESS: '/app/success',
   ACHIEVEMENTS: '/app/achievements',
   SETTINGS: '/app/settings',

@@ -26,7 +26,8 @@ export default function PageWrapper({ children }: PageWrapperProps) {
     !pathname.includes('/privacy-policy') &&
     !pathname.includes('/terms-conditions') &&
     !pathname.includes('/cookies-policy') &&
-    !pathname.includes('/safety-privacy');
+    !pathname.includes('/safety-privacy') &&
+    !pathname.includes('/beta-feedback');
 
   return (
     <div

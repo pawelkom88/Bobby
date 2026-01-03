@@ -24,6 +24,8 @@ interface CreditsContextType {
   isServerConfirmed: boolean; // NEW: Explicitly track server confirmation
   conversationActive: boolean; // NEW: Track if user is in active conversation
   setConversationActive: (active: boolean) => void; // NEW: Allow setting conversation state
+  isBetaUser: boolean; // NEW: Track if user is in beta mode
+  betaCredits: number; // NEW: Beta credit count
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -40,6 +42,8 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isServerConfirmed, setIsServerConfirmed] = useState<boolean>(false);
   const [conversationActive, setConversationActive] = useState<boolean>(false);
+  const [betaCredits, setBetaCredits] = useState<number>(0);
+  const [isBetaUser, setIsBetaUser] = useState<boolean>(false);
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const serverConfirmedRef = useRef<boolean>(false);
@@ -95,17 +99,28 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         });
 
         let userCredits = 0;
+        let userBetaCredits = 0;
+        let userIsBeta = false;
+
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
+          console.log('CreditsContext: User data:', data);
           userCredits = typeof data.credits === 'number' ? data.credits : 0;
+          userBetaCredits =
+            typeof data.betaCredits === 'number' ? data.betaCredits : 0;
+          userIsBeta =
+            data.betaUser === true &&
+            process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
         }
 
         logger.log(
-          `CreditsContext: Credits = ${userCredits} (from ${fromCache ? 'CACHE' : 'SERVER'})`
+          `CreditsContext: Credits = ${userCredits}, BetaCredits = ${userBetaCredits}, IsBeta = ${userIsBeta} (from ${fromCache ? 'CACHE' : 'SERVER'})`
         );
 
         // Always update credits with latest value
         setCredits(userCredits);
+        setBetaCredits(userBetaCredits);
+        setIsBetaUser(userIsBeta);
         setError(null);
 
         // KEY LOGIC: Only finalize loading state when we have SERVER data
@@ -212,9 +227,11 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     }
   }, [user]);
 
+  const effectiveCredits = isBetaUser ? betaCredits : credits;
+
   const value: CreditsContextType = {
     credits,
-    hasCredits: credits > 0,
+    hasCredits: effectiveCredits > 0 || conversationActive,
     loading: authLoading || loading,
     error,
     forceRefreshCredits,
@@ -222,6 +239,8 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     isServerConfirmed,
     conversationActive,
     setConversationActive,
+    isBetaUser,
+    betaCredits,
   };
 
   return (

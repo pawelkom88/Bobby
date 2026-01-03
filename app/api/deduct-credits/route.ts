@@ -30,10 +30,6 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 
-// Initialize Firebase Admin lazily (runtime only)
-const auth = getAdminAuth();
-const db = getAdminDb();
-
 interface DeductCreditsRequest {
   conversationId: string;
 }
@@ -41,11 +37,13 @@ interface DeductCreditsRequest {
 interface DeductCreditsResponse {
   success: boolean;
   newCredits?: number;
+  newBetaCredits?: number;
   charged?: boolean;
   durationSeconds?: number;
   error?: string;
   message?: string;
   retryAfter?: number;
+  isBetaUser?: boolean;
 }
 
 /**
@@ -84,7 +82,8 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
   
@@ -123,7 +122,8 @@ async function verifyUserFromToken(
  * Fetches conversation from Firestore
  */
 async function getConversation(
-  conversationId: string
+  conversationId: string,
+  db: ReturnType<typeof getAdminDb>
 ): Promise<ConversationData | null> {
   try {
     const doc = await db.collection('conversations').doc(conversationId).get();
@@ -153,7 +153,7 @@ async function getConversation(
 /**
  * Checks if conversation has already been charged
  */
-async function isAlreadyCharged(conversationId: string): Promise<boolean> {
+async function isAlreadyCharged(conversationId: string, db: ReturnType<typeof getAdminDb>): Promise<boolean> {
   try {
     const doc = await db
       .collection('creditDeductions')
@@ -167,16 +167,21 @@ async function isAlreadyCharged(conversationId: string): Promise<boolean> {
 }
 
 /**
- * Gets current user credits
+ * Gets current user credits and beta status
  */
-async function getUserCredits(userId: string): Promise<number> {
+async function getUserCredits(userId: string, db: ReturnType<typeof getAdminDb>): Promise<{ credits: number; isBeta: boolean; betaCredits: number }> {
   try {
     const doc = await db.collection('users').doc(userId).get();
     if (!doc.exists) {
       logger.warn(`User ${userId} not found`);
-      return 0;
+      return { credits: 0, isBeta: false, betaCredits: 0 };
     }
-    return doc.data()?.credits ?? 0;
+    const data = doc.data();
+    return {
+      credits: data?.credits ?? 0,
+      isBeta: data?.betaUser === true && process.env.BETA_MODE_ENABLED === 'true',
+      betaCredits: data?.betaCredits ?? 0,
+    };
   } catch (error) {
     logger.error('Error fetching user credits:', error);
     throw error;
@@ -189,8 +194,9 @@ async function getUserCredits(userId: string): Promise<number> {
 async function performDeduction(
   userId: string,
   conversationId: string,
-  durationSeconds: number
-): Promise<number> {
+  durationSeconds: number,
+  db: ReturnType<typeof getAdminDb>
+): Promise<{ newCredits: number; newBetaCredits: number }> {
   return await db.runTransaction(async transaction => {
     // 1. Get current user document
     const userRef = db.collection('users').doc(userId);
@@ -200,35 +206,69 @@ async function performDeduction(
       throw new Error('User not found');
     }
 
-    const currentCredits = userDoc.data()?.credits ?? 0;
+    const data = userDoc.data();
+    const currentCredits = data?.credits ?? 0;
+    const currentBetaCredits = data?.betaCredits ?? 0;
+    const isBeta = data?.betaUser === true && process.env.BETA_MODE_ENABLED === 'true';
 
-    // 2. Verify sufficient credits
-    if (currentCredits <= 0) {
-      throw new CreditTransactionError(
-        'payment/insufficient-credits',
-        'User has insufficient credits'
-      );
+    // 2. Verify sufficient credits (check beta first)
+    if (isBeta) {
+      if (currentBetaCredits <= 0) {
+        throw new CreditTransactionError(
+          'payment/insufficient-credits',
+          'User has insufficient beta credits'
+        );
+      }
+      // Deduct from beta credits
+      const newBetaCredits = currentBetaCredits - 1;
+      transaction.update(userRef, { betaCredits: newBetaCredits });
+      
+      // Record deduction for audit trail
+      const deductionRef = db.collection('creditDeductions').doc(conversationId);
+      transaction.set(deductionRef, {
+        conversationId,
+        userId,
+        durationSeconds,
+        creditsDeducted: 1,
+        deductedAt: new Date().toISOString(),
+        isBetaDeduction: true,
+      });
+
+      // Mark conversation as charged
+      const conversationRef = db.collection('conversations').doc(conversationId);
+      transaction.update(conversationRef, { charged: true });
+
+      return { newCredits: currentCredits, newBetaCredits };
+    } else {
+      // Regular credit deduction
+      if (currentCredits <= 0) {
+        throw new CreditTransactionError(
+          'payment/insufficient-credits',
+          'User has insufficient credits'
+        );
+      }
+
+      // 3. Deduct credit
+      const newCredits = currentCredits - 1;
+      transaction.update(userRef, { credits: newCredits });
+
+      // 4. Record deduction for audit trail
+      const deductionRef = db.collection('creditDeductions').doc(conversationId);
+      transaction.set(deductionRef, {
+        conversationId,
+        userId,
+        durationSeconds,
+        creditsDeducted: 1,
+        deductedAt: new Date().toISOString(),
+        isBetaDeduction: false,
+      });
+
+      // 5. Mark conversation as charged
+      const conversationRef = db.collection('conversations').doc(conversationId);
+      transaction.update(conversationRef, { charged: true });
+
+      return { newCredits, newBetaCredits: currentBetaCredits };
     }
-
-    // 3. Deduct credit
-    const newCredits = currentCredits - 1;
-    transaction.update(userRef, { credits: newCredits });
-
-    // 4. Record deduction for audit trail
-    const deductionRef = db.collection('creditDeductions').doc(conversationId);
-    transaction.set(deductionRef, {
-      conversationId,
-      userId,
-      durationSeconds,
-      creditsDeducted: 1,
-      deductedAt: new Date().toISOString(),
-    });
-
-    // 5. Mark conversation as charged
-    const conversationRef = db.collection('conversations').doc(conversationId);
-    transaction.update(conversationRef, { charged: true });
-
-    return newCredits;
   });
 }
 
@@ -239,6 +279,10 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<DeductCreditsResponse>> {
   try {
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
     // 1. Parse and validate request
     const body = await request.json();
     const validation = validateRequest(body);
@@ -254,7 +298,7 @@ export async function POST(
     const { conversationId } = body as DeductCreditsRequest;
 
     // 2. Verify user from token
-    const userResult = await verifyUserFromToken(request);
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -297,7 +341,7 @@ export async function POST(
 
     // 4. Verify user owns conversation
     try {
-      await validateOwnership(userId, conversationId, getConversation);
+      await validateOwnership(userId, conversationId, (id) => getConversation(id, db));
     } catch (error: any) {
       if (error instanceof OwnershipValidationError) {
         if (error.code === 'conversation/not-found') {
@@ -329,25 +373,27 @@ export async function POST(
     }
 
     // 5. Check if already charged (idempotency)
-    const alreadyCharged = await isAlreadyCharged(conversationId);
+    const alreadyCharged = await isAlreadyCharged(conversationId, db);
     if (alreadyCharged) {
       logger.log(
         `Conversation ${conversationId} already charged (idempotency)`
       );
-      const currentCredits = await getUserCredits(userId);
+      const creditInfo = await getUserCredits(userId, db);
       return NextResponse.json(
         {
           success: false,
           error: 'already-charged',
           message: 'Conversation already charged',
-          newCredits: currentCredits,
+          newCredits: creditInfo.credits,
+          newBetaCredits: creditInfo.betaCredits,
+          isBetaUser: creditInfo.isBeta,
         },
         { status: 200 }
       );
     }
 
     // 6. Get conversation to calculate duration
-    const conversation = await getConversation(conversationId);
+    const conversation = await getConversation(conversationId, db);
     if (!conversation) {
       logger.warn(`Conversation ${conversationId} not found`);
       return NextResponse.json(
@@ -389,35 +435,40 @@ export async function POST(
       logger.log(
         `Conversation ${conversationId} not eligible for charge: ${eligibility.reason}`
       );
-      const currentCredits = await getUserCredits(userId);
+      const creditInfo = await getUserCredits(userId, db);
       return NextResponse.json(
         {
           success: false,
           error: eligibility.reason,
           message: `Not eligible for charge: ${eligibility.reason}`,
-          newCredits: currentCredits,
+          newCredits: creditInfo.credits,
+          newBetaCredits: creditInfo.betaCredits,
+          isBetaUser: creditInfo.isBeta,
         },
         { status: 200 }
       );
     }
 
     // 9. Perform atomic deduction
-    const newCredits = await performDeduction(
+    const result = await performDeduction(
       userId,
       conversationId,
-      durationSeconds
+      durationSeconds,
+      db
     );
 
     logger.log(
-      `Successfully deducted 1 credit from user ${userId}. New balance: ${newCredits}`
+      `Successfully deducted 1 credit from user ${userId}. New balance: ${result.newCredits}, Beta: ${result.newBetaCredits}`
     );
 
     return NextResponse.json(
       {
         success: true,
-        newCredits,
+        newCredits: result.newCredits,
+        newBetaCredits: result.newBetaCredits,
         charged: true,
         durationSeconds,
+        isBetaUser: result.newBetaCredits < 3, // Simple check
       },
       { status: 200 }
     );

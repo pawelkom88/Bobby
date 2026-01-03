@@ -379,8 +379,9 @@
   },
   "dial": {
     "emergencyNumber": "112",
-    "title": "Wybierz numer {number}",
+    "title": "Wybierz {number}",
     "creditsLabel": "Kredyty:",
+    "betaCreditsLabel": "Kredyty Beta:",
     "messages": {
       "canceled": "Płatność została anulowana. Możesz spróbować ponownie, kiedy będziesz gotowy!",
       "needsCredits": "Potrzebujesz kredytów, aby rozpocząć trening.",
@@ -1198,10 +1199,101 @@
       "cta": "Przejdź do ćwiczeń"
     }
   },
-  "cookies": {
-    "title": "🍪 Zgoda na ciasteczka",
-    "description": "Używamy ciasteczek, aby Twoje doświadczenie było wspaniałe! Pomagają nam analizować ruch na stronie i personalizować treści specjalnie dla Ciebie. Klikając \"Akceptuj wszystkie ciasteczka\", zgadzasz się na ich użycie. Kliknij \"Odrzuć wszystkie\", jeśli wolisz nie udostępniać nieistotnych ciasteczek.",
-    "acceptAll": "Akceptuj wszystkie ciasteczka",
-    "rejectAll": "Odrzuć wszystkie"
+  "betaFeedback": {
+    "helpUsImprove": "Pomóż nam ulepszyć Bobbiego",
+    "feedbackDescription": "Twoja opinia pomaga nam uczynić Bobby bezpieczniejszym i lepszym dla dzieci na całym świecie.",
+    "ctaButton": "Podziel się opinią",
+    "ctaAriaLabel": "Przejdź do formularza opinii"
+  },
+  "betaFeedbackForm": {
+    "title": "Bobby – Opinia Rodzica",
+    "description": "Dziękujemy za wypróbowanie Bobbiego! Ten krótki formularz pomoże nam ulepszyć aplikację i uczynić ją tak bezpieczną i przydatną, jak to możliwe.",
+    "optional": "Dobrowolne",
+    "submitting": "Wysyłanie...",
+    "submit": "Wyślij opinię",
+    "section1": {
+      "title": "O Twoim dziecku",
+      "age": "Ile lat ma Twoje dziecko?",
+      "scenarios": {
+        "label": "Który scenariusz wbrałeś?",
+        "police": "Policja",
+        "fire": "Straż pożarna",
+        "ambulance": "Pogotowie",
+        "notSure": "Nie wiem / nie pamiętam"
+      }
+    },
+    "section2": {
+      "title": "Doświadczenie",
+      "ease": {
+        "label": "Czy Twoje dziecko wiedziało, co zrobić?",
+        "1": "Wcale nie",
+        "5": "Zdecydowanie tak"
+      },
+      "feelings": {
+        "label": "Jak czuło się Twoje dziecko podczas rozmowy z Bobbim?",
+        "calm": "Spokojne i pewne siebie",
+        "littleNervous": "Trochę zdenerwowane, ale w porządku",
+        "nervousThenCalmer": "Zdenerwowane tylko na początku, spokojniejsze później",
+        "overwhelmed": "Zdezorientowane lub przytłoczone"
+      },
+      "uncomfortable": "Czy coś wydawało się niejasne lub nieodpowiednie?"
+    },
+    "section3": {
+      "title": "Bezpieczeństwo i zaufanie",
+      "safety": {
+        "label": "Jako rodzic, czy aplikacja wydawała się bezpieczna i odpowiednia?",
+        "1": "Wcale nie",
+        "5": "Całkowicie bezpieczna i odpowiednia"
+      },
+      "practiceClarity": {
+        "label": "Czy było jasne, że to tylko ćwiczenia, a nie prawdziwa sytuacja awaryjna?",
+        "veryClear": "Tak, bardzo jasne",
+        "mostlyClear": "Przeważnie jasne",
+        "notClear": "Niewystarczająco jasne"
+      }
+    },
+    "section4": {
+      "title": "Wartość",
+      "usefulness": {
+        "label": "Czy uważasz, że taki rodzaj ćwiczeń jest przydatny dla dzieci?",
+        "veryUseful": "Tak, bardzo przydatny",
+        "somewhatUseful": "Dość przydatny",
+        "notVeryUseful": "Nie bardzo przydatny"
+      },
+      "useAgain": {
+        "label": "Czy użyłbyś ponownie Bobbiego ze swoim dzieckiem?",
+        "yes": "Tak",
+        "maybe": "Może",
+        "no": "Nie"
+      }
+    },
+    "section5": {
+      "nps": {
+        "label": "Czy poleciłbyś Bobbiego innemu rodzicowi?",
+        "0": "Wcale nie",
+        "10": "Zdecydowanie"
+      },
+      "openFeedback": "Pytania otwarte",
+      "likedMost": "Co podobało Ci się najbardziej w aplikacji Bobby?",
+      "improveFirst": "Co powinniśmy poprawić w pierwszej kolejności?",
+      "contact": {
+        "label": "Czy możemy skontaktować się z Tobą w celu dodatkowych pytań?",
+        "yes": "Tak (zostawię poniżej swój adres e-mail)",
+        "no": "Nie"
+      },
+      "email": "Adres e-mail"
+    },
+    "thankYou": "Dziękujemy !",
+    "successMessage": "Twoja opinia bezpośrednio pomoże nam ulepszyć aplikację.",
+    "backToApp": "Strona główna",
+    "contactOptInRequired": "Email jest wymagany",
+    "invalidEmail": "Nieprawidłowy adres email",
+    "childAgeRequired": "Proszę wybrać wiek dziecka",
+    "scenariosRequired": "Proszę wybrać co najmniej jeden scenariusz",
+    "childFeelingsRequired": "Proszę wybrać, jak czuło się Twoje dziecko",
+    "practiceClarityRequired": "Proszę wybrać, czy było jasne, że to był ćwiczenie",
+    "usefulnessRequired": "Proszę wybrać, czy takie ćwiczenia są przydatne",
+    "wouldUseAgainRequired": "Proszę wybrać, czy użyjesz Bobby ponownie",
+    "validationErrors": "Proszę poprawić następujące błędy:"
   }
 }

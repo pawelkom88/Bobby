@@ -88,9 +88,17 @@ export async function GET(request: NextRequest) {
     const userDoc = await db.collection('users').doc(userId).get();
     const userData = userDoc.data();
     const credits = userData?.credits || 0;
+    const betaCredits = userData?.betaCredits || 0;
+    const isBeta = userData?.isBeta || false;
+    const totalCredits = isBeta ? betaCredits : credits;
 
-    if (credits <= 0) {
-      logger.info('User attempted to get token without credits', { userId });
+    if (totalCredits <= 0) {
+      logger.info('User attempted to get token without credits', { 
+        userId, 
+        credits, 
+        betaCredits, 
+        isBeta 
+      });
       return NextResponse.json(
         {
           error:

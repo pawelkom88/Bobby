@@ -7,6 +7,7 @@ import LevelProgress from './LevelProgress';
 import AssessmentFeedback from './AssessmentFeedback';
 import CompletionActions from './CompletionActions';
 import CompletionMessage, { getCompletionTitle } from './CompletionMessage';
+import BetaFeedbackCTA from './BetaFeedbackCTA';
 import { useCompletionState } from '@/hooks/useCompletionState';
 import type { Service, AgeTier, PerformanceMetrics } from '@/types';
 
@@ -93,6 +94,8 @@ export default function CompletionScreen({
             <AssessmentFeedback assessment={assessment} />
           </section>
         )}
+
+        <BetaFeedbackCTA conversationId={conversationId} />
 
         <CompletionActions conversationId={conversationId} />
       </div>

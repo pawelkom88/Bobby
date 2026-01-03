@@ -22,6 +22,8 @@ function DialPageContent() {
   const tAuth = useTranslations('auth.errors');
   const {
     credits,
+    betaCredits,
+    isBetaUser,
     hasCredits,
     loading: creditsLoading,
     forceRefreshCredits,
@@ -246,8 +248,12 @@ function DialPageContent() {
                   </div>
                 ) : (
                   <div className="dial-credits-display">
-                    <span className="dial-credits-label">{t('creditsLabel')}</span>
-                    <span className="dial-credits-value">{credits}</span>
+                    <span className="dial-credits-label">
+                      {isBetaUser ? t('betaCreditsLabel') : t('creditsLabel')}
+                    </span>
+                    <span className="dial-credits-value">
+                      {isBetaUser ? betaCredits : credits}
+                    </span>
                   </div>
                 )}
               </Activity>

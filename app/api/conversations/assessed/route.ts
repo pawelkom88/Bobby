@@ -12,9 +12,6 @@ import {
 import type { Service, AgeTier, Conversation } from '@/types';
 import { FieldPath } from 'firebase-admin/firestore';
 
-const auth = getAdminAuth();
-const db = getAdminDb();
-
 interface AssessedConversation {
   id: string;
   service: Service;
@@ -35,7 +32,8 @@ interface AssessedConversationsResponse {
 }
 
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
 
@@ -70,7 +68,7 @@ async function verifyUserFromToken(
   }
 }
 
-async function getUserAssessedConversations(userId: string) {
+async function getUserAssessedConversations(userId: string, db: ReturnType<typeof getAdminDb>) {
   try {
     const userDoc = await db.collection('users').doc(userId).get();
 
@@ -95,7 +93,11 @@ export async function GET(
   request: NextRequest
 ): Promise<NextResponse<AssessedConversationsResponse>> {
   try {
-    const userResult = await verifyUserFromToken(request);
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -135,7 +137,7 @@ export async function GET(
     const limitParam = searchParams.get('limit');
     const limit = Math.min(parseInt(limitParam || '50', 10) || 50, 100);
 
-    const assessedConversations = await getUserAssessedConversations(userId);
+    const assessedConversations = await getUserAssessedConversations(userId, db);
 
     const assessmentMap = new Map();
     assessedConversations.forEach((conv: Conversation) => {

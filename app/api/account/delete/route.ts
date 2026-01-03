@@ -11,9 +11,6 @@ import {
 } from '@/lib/rateLimit';
 import { sendGoodbyeEmail } from '@/lib/mailer';
 
-const auth = getAdminAuth();
-const db = getAdminDb();
-
 const BATCH_SIZE = 500;
 
 interface DeleteAccountResponse {
@@ -24,7 +21,8 @@ interface DeleteAccountResponse {
 }
 
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
 
@@ -64,7 +62,8 @@ async function verifyUserFromToken(
 
 async function deleteUserDocumentsFromCollection(
   collectionName: string,
-  userId: string
+  userId: string,
+  db: ReturnType<typeof getAdminDb>
 ): Promise<number> {
   let deletedCount = 0;
 
@@ -102,7 +101,7 @@ async function deleteUserDocumentsFromCollection(
   }
 }
 
-async function deleteUserDocument(userId: string): Promise<void> {
+async function deleteUserDocument(userId: string, db: ReturnType<typeof getAdminDb>): Promise<void> {
   try {
     await db.collection('users').doc(userId).delete();
     logger.log(`Deleted user document for ${userId}`);
@@ -112,7 +111,7 @@ async function deleteUserDocument(userId: string): Promise<void> {
   }
 }
 
-async function deleteAuthUser(userId: string): Promise<void> {
+async function deleteAuthUser(userId: string, auth: ReturnType<typeof getAdminAuth>): Promise<void> {
   try {
     await auth.deleteUser(userId);
     logger.log(`Deleted Firebase Auth user ${userId}`);
@@ -126,7 +125,11 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<DeleteAccountResponse>> {
   try {
-    const userResult = await verifyUserFromToken(request);
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -185,18 +188,20 @@ export async function POST(
     try {
       deletionResults.conversations = await deleteUserDocumentsFromCollection(
         'conversations',
-        userId
+        userId,
+        db
       );
 
       deletionResults.purchases = await deleteUserDocumentsFromCollection(
         'purchases',
-        userId
+        userId,
+        db
       );
 
       deletionResults.creditDeductions =
-        await deleteUserDocumentsFromCollection('creditDeductions', userId);
+        await deleteUserDocumentsFromCollection('creditDeductions', userId, db);
 
-      await deleteUserDocument(userId);
+      await deleteUserDocument(userId, db);
 
       logger.log(`Firestore data deleted for user ${userId}:`, deletionResults);
     } catch (error) {
@@ -212,7 +217,7 @@ export async function POST(
     }
 
     try {
-      await deleteAuthUser(userId);
+      await deleteAuthUser(userId, auth);
     } catch (error: any) {
       logger.error('Error deleting Firebase Auth user:', error);
 

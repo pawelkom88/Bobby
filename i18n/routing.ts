@@ -56,6 +56,10 @@ export const pathnames = {
     en: '/app/completion',
     pl: '/aplikacja/podsumowanie',
   },
+  '/app/beta-feedback': {
+    en: '/app/beta-feedback',
+    pl: '/aplikacja/opinia',
+  },
   '/app/conversation': {
     en: '/app/conversation',
     pl: '/aplikacja/rozmowa',

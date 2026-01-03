@@ -386,6 +386,7 @@
     "emergencyNumber": "999",
     "title": "Dial {number}",
     "creditsLabel": "Credits:",
+    "betaCreditsLabel": "Beta Credits:",
     "messages": {
       "canceled": "Payment was canceled. You can try again when you're ready!",
       "needsCredits": "You need credits to start a practice call.",
@@ -767,10 +768,102 @@
     "alt": "Planet",
     "goHome": "Go Home"
   },
-  "badgeDisplay": {
-    "noBadges": "No badges earned yet. Keep practicing!",
-    "showMore": "Show More",
-    "showLess": "Show Less"
+  "betaFeedback": {
+    "helpUsImprove": "Help us improve Bobby",
+    "feedbackDescription": "Your feedback helps make Bobby safer and better for children everywhere.",
+    "ctaButton": "Share your feedback",
+    "ctaAriaLabel": "Go to comprehensive feedback form"
+  },
+  "betaFeedbackForm": {
+    "title": "Bobby – Parent Feedback",
+    "description": "Thank you for trying Bobby! This short form helps us improve the app and make it as safe and useful as possible for children.",
+    "optional": "Optional",
+    "submitting": "Submitting...",
+    "submit": "Submit Feedback",
+    "section1": {
+      "title": "About your child",
+      "age": "How old is your child?",
+      "scenarios": {
+        "label": "Which scenario did your child try?",
+        "police": "Police",
+        "fire": "Fire service",
+        "ambulance": "Ambulance",
+        "notSure": "Not sure / don't remember"
+      }
+    },
+    "section2": {
+      "title": "Experience",
+      "ease": {
+        "label": "How easy was it for your child to understand what to do?",
+        "1": "Very confusing",
+        "5": "Very easy"
+      },
+      "feelings": {
+        "label": "How did your child feel during the practice call?",
+        "calm": "Calm and confident",
+        "littleNervous": "A little nervous but okay",
+        "nervousThenCalmer": "Nervous at first, calmer later",
+        "overwhelmed": "Confused or overwhelmed"
+      },
+      "uncomfortable": "Did anything feel uncomfortable, unclear, or inappropriate?"
+    },
+    "section3": {
+      "title": "Safety & Trust",
+      "safety": {
+        "label": "As a parent, did the app feel safe and appropriate?",
+        "1": "Not at all",
+        "5": "Completely safe and appropriate"
+      },
+      "practiceClarity": {
+        "label": "Was it clear that this was practice only, not a real emergency?",
+        "veryClear": "Yes, very clear",
+        "mostlyClear": "Mostly clear",
+        "notClear": "Not clear enough"
+      }
+    },
+    "section4": {
+      "title": "Value",
+      "usefulness": {
+        "label": "Do you feel this kind of practice is useful for children?",
+        "veryUseful": "Yes, very useful",
+        "somewhatUseful": "Somewhat useful",
+        "notVeryUseful": "Not very useful"
+      },
+      "useAgain": {
+        "label": "Would you use Bobby again with your child?",
+        "yes": "Yes",
+        "maybe": "Maybe",
+        "no": "No"
+      }
+    },
+    "section5": {
+      "nps": {
+        "label": "Would you recommend Bobby to another parent?",
+        "0": "Not at all",
+        "10": "Definitely"
+      },
+      "openFeedback": "Open feedback",
+      "likedMost": "What did you like most about Bobby?",
+      "improveFirst": "What is the one thing we should improve first?",
+      "contact": {
+        "label": "Would you like to be contacted with follow-up questions?",
+        "yes": "Yes (I'll leave my email below)",
+        "no": "No"
+      },
+      "email": "Email address"
+    },
+    "thankYou": "Thank you for helping us improve Bobby 💙",
+    "successMessage": "Your feedback directly helps us make the app safer and better for children.",
+    "backToApp": "Back to App",
+    "contactOptInRequired": "Email is required when contact opt-in is selected",
+    "invalidEmail": "Invalid email address",
+    "childAgeRequired": "Please select your child's age",
+    "scenariosRequired": "Please select at least one scenario",
+    "childFeelingsRequired": "Please select how your child felt",
+    "practiceClarityRequired": "Please select if it was clear this was practice",
+    "usefulnessRequired": "Please select if this practice is useful",
+    "wouldUseAgainRequired": "Please select if you would use Bobby again",
+    "validationErrors": "Please fix the following errors:"
   },
   "trainingHistory": {
     "loading": "Loading training history...",

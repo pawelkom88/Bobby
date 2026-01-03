@@ -20,10 +20,6 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 
-// Initialize Firebase Admin lazily (runtime only)
-const auth = getAdminAuth();
-const db = getAdminDb();
-
 interface StartConversationRequest {
   ageTier: 1 | 2 | 3;
   service: 'fire' | 'ambulance' | 'police';
@@ -63,7 +59,8 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
   
@@ -98,7 +95,11 @@ async function verifyUserFromToken(
  */
 export async function POST(request: NextRequest): Promise<NextResponse<StartConversationResponse>> {
   try {
-    const userResult = await verifyUserFromToken(request);
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(

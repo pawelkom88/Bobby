@@ -22,10 +22,6 @@ import {
 } from '@/lib/rateLimit';
 import { ConversationMessage } from '@/types';
 
-// Initialize Firebase Admin lazily (runtime only)
-const auth = getAdminAuth();
-const db = getAdminDb();
-
 interface EndConversationRequest {
   conversationId: string;
   messages?: ConversationMessage[];
@@ -73,7 +69,8 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
  * Extracts and verifies user from token
  */
 async function verifyUserFromToken(
-  request: NextRequest
+  request: NextRequest,
+  auth: ReturnType<typeof getAdminAuth>
 ): Promise<{ userId: string } | { error: string; status: number }> {
   const tokenResult = extractBearerToken(request);
   
@@ -106,7 +103,7 @@ async function verifyUserFromToken(
 /**
  * Fetches conversation from Firestore
  */
-async function getConversation(conversationId: string) {
+async function getConversation(conversationId: string, db: ReturnType<typeof getAdminDb>) {
   try {
     const doc = await db.collection('conversations').doc(conversationId).get();
     if (!doc.exists) {
@@ -124,7 +121,11 @@ async function getConversation(conversationId: string) {
  */
 export async function POST(request: NextRequest): Promise<NextResponse<EndConversationResponse>> {
   try {
-    const userResult = await verifyUserFromToken(request);
+    // Lazy initialization - only initialize when handler is called
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
+    const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
 
     // 3. Verify user owns conversation
     try {
-      await validateOwnership(userId, conversationId, getConversation);
+      await validateOwnership(userId, conversationId, (id) => getConversation(id, db));
     } catch (error: any) {
       if (error instanceof OwnershipValidationError) {
         if (error.code === 'conversation/not-found') {
