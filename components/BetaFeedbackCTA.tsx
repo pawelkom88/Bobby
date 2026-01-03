@@ -36,7 +36,6 @@ export default function BetaFeedbackCTA({
           <p className="beta-feedback-cta-description">
             {t('feedbackDescription')}
           </p>
-          <br />
           <CartoonButton
             onClick={handleFeedbackClick}
             ariaLabel={t('ctaAriaLabel')}
