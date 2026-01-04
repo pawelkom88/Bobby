@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
     "emulator": "firebase emulators:start --import=./emulator-data --export-on-exit",
@@ -36,6 +36,8 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.2",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "@next/bundle-analyzer": "^16.0.7",
     "@testing-library/jest-dom": "^6.9.1",
@@ -46,6 +48,10 @@
     "@types/react": "^19.2.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "baseline-browser-mapping": "^2.8.32",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "jsdom": "^27.4.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
