@@ -64,6 +64,9 @@ function SignUpForm() {
 
   useEffect(() => {
     // Initialize App Check only on auth routes
+    import('@/lib/app-check').then(({ initializeAppCheckLazy }) => {
+      initializeAppCheckLazy();
+    });
     
     if (!authLoading && user) {
       router.push(redirectUrl);

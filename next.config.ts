@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    optimizeCss: true,
+  },
+  // Optimize for modern browsers
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },

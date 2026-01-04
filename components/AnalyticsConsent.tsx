@@ -34,7 +34,7 @@ export function AnalyticsConsent() {
 
   return (
     <Script
-      strategy="beforeInteractive"
+      strategy="lazyOnload"
       src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
       onLoad={() => {
         // Initialize data layer

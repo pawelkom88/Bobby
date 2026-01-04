@@ -2,10 +2,6 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import {
-  initializeAppCheck,
-  ReCaptchaEnterpriseProvider,
-} from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,25 +21,6 @@ const app =
 let analytics;
 if (typeof window !== 'undefined') {
   analytics = getAnalytics(app);
-
-  // Initialize App Check with reCAPTCHA Enterprise
-  const reCaptchaSiteKey =
-    process.env.NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY;
-  if (reCaptchaSiteKey) {
-    try {
-      initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider(reCaptchaSiteKey),
-        isTokenAutoRefreshEnabled: true, // Automatically refresh tokens
-      });
-    } catch (error) {
-      // App Check might already be initialized in development/testing
-      console.warn('App Check initialization warning:', error);
-    }
-  } else {
-    console.warn(
-      'reCAPTCHA Enterprise site key not found. App Check will not be initialized.'
-    );
-  }
 }
 
 export const db = getFirestore(app);

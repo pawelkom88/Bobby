@@ -8,6 +8,7 @@ import {
 } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { OptimizedProviders } from '@/components/OptimizedProviders';
+import { nunito, luckiestGuy } from '@/lib/fonts';
 import { routing } from '@/i18n/routing';
 import { locales, type Locale } from '@/i18n/locales';
 
@@ -104,13 +105,10 @@ export default async function LocaleLayout({ children, params }: Props) {
         />
         <link rel="preconnect" href="https://firebase.googleapis.com" />
         <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://bobby-11d45.firebaseapp.com" />
         <link rel="preconnect" href="https://www.google.com" />
         <link rel="dns-prefetch" href="https://www.gstatic.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito&display=swap"
-          rel="stylesheet"
-        />
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -136,7 +134,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           }}
         />
       </head>
-      <body>
+      <body className={`${nunito.variable} ${luckiestGuy.variable} font-sans`}>
         <NextIntlClientProvider messages={messages}>
           <OptimizedProviders>{children}</OptimizedProviders>
         </NextIntlClientProvider>
