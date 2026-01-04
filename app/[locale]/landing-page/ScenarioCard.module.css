@@ -1,0 +1,104 @@
+.card {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover {
+  border-color: var(--service-color, #3b82f6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--service-color, #3b82f6);
+  outline-offset: 2px;
+}
+
+.cardActive {
+  border-color: var(--service-color, #3b82f6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.cardImage {
+  object-fit: cover;
+  margin: 0 auto 1rem;
+  display: block;
+  width: 50%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .cardImage {
+    width: 100%;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  color: var(--service-color, #3b82f6);
+}
+
+.service {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--service-color, #3b82f6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.situation {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.divider {
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    var(--service-color, #3b82f6),
+    transparent
+  );
+  margin: 16px 0;
+  border-radius: 1px;
+}
+
+.hook {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .situation {
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

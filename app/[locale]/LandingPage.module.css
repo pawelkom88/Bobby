@@ -1,0 +1,546 @@
+/**
+ * Scoped landing page styles. Keep global styles trimmed to shared tokens.
+ */
+
+.landingContainer {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #b7e0ff 0%, #c5e7e0 40%, #f4f1d9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .landingContainer {
+    padding: 10px;
+  }
+}
+
+.landingWrapper {
+  width: 100%;
+  max-width: 920px;
+  background: #edf6fb;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.landingNav {
+  background: white;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 32px 32px 0 0;
+}
+
+.navUl {
+  display: flex;
+  gap: 30px;
+}
+
+.navUl li a {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.navUl li a:hover {
+  color: #667eea;
+}
+
+.landingMain {
+  padding: 0 0 100px;
+  position: relative;
+}
+
+.landingContent {
+  position: relative;
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 60px;
+}
+
+.heroImage {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  order: -1;
+}
+
+@media (min-width: 768px) {
+  .landingContent {
+    gap: 3rem;
+  }
+
+  .heroImage {
+    flex: 0 0 auto;
+  }
+}
+
+.landingContent::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg width='250' height='40' viewBox='0 0 250 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='25' cy='20' r='3' fill='%23667eea'/%3E%3Ccircle cx='50' cy='20' r='3' fill='%23667eea'/%3E%3Ccircle cx='75' cy='20' r='3' fill='%23764ba2'/%3E%3Ccircle cx='100' cy='20' r='4' fill='%23764ba2'/%3E%3Ccircle cx='125' cy='20' r='5' fill='%23667eea'/%3E%3Ccircle cx='150' cy='20' r='4' fill='%23764ba2'/%3E%3Ccircle cx='175' cy='20' r='3' fill='%23764ba2'/%3E%3Ccircle cx='200' cy='20' r='3' fill='%23667eea'/%3E%3Ccircle cx='225' cy='20' r='3' fill='%23667eea'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .landingMain {
+    padding: 0 0 60px;
+  }
+
+  .landingContent,
+  .landingContent::after {
+    padding-bottom: 60px;
+  }
+
+  .landingContent::after {
+    width: 150px;
+    height: 30px;
+    background-size: contain;
+  }
+}
+
+.landingTextSection {
+  flex: 1;
+  padding: 0 20px;
+  max-width: 1200px;
+  min-height: 400px;
+}
+
+.landingTitle {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 42px;
+  font-weight: normal;
+  color: #4c51bf;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  text-wrap: balance;
+  text-shadow: 2px 2px 0px #667eea;
+  min-height: 51px;
+}
+
+.landingSubtitle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  text-wrap: balance;
+  min-height: 35px;
+}
+
+.landingTrustStrip {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(102, 126, 234, 0.35);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.landingTrustStripTitle {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.landingTrustStripItems {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.landingTrustStripItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.landingTrustStripIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.landingTrustStripText {
+  font-family: 'Nunito', sans-serif;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.landingFooter {
+  background: white;
+  padding: 28px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0 0 32px 32px;
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
+}
+
+.landingFooterText {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.landingFooterRight {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.landingFooterLink {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.landingFooterLink:hover {
+  color: #334155;
+}
+
+.landingFaqSection {
+  padding: 80px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+
+.landingFaqTitle {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 42px;
+  font-weight: normal;
+  color: #4c51bf;
+  text-align: center;
+  margin-bottom: 48px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0px #667eea;
+}
+
+.faqAccordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqAccordionItem {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.faqAccordionItem:nth-child(4n + 1) {
+  background: linear-gradient(135deg, #b7e0ff 0%, #89c4ff 100%);
+}
+
+.faqAccordionItem:nth-child(4n + 2) {
+  background: linear-gradient(135deg, #c5e7e0 0%, #9dd4c8 100%);
+}
+
+.faqAccordionItem:nth-child(4n + 3) {
+  background: linear-gradient(135deg, #f4f1d9 0%, #e8e4b8 100%);
+}
+
+.faqAccordionItem:nth-child(4n + 4) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.faqAccordionItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.faqAccordionItemExpanded {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.faqAccordionTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 16px;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.faqAccordionTrigger:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.faqAccordionQuestion {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: black;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.faqAccordionItem:nth-child(4n + 4) .faqAccordionQuestion {
+  color: #fff;
+}
+
+.faqAccordionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.faqAccordionItem:nth-child(4n + 4) .faqAccordionIcon {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.faqAccordionIcon svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.faqAccordionItemExpanded .faqAccordionIcon svg {
+  transform: rotate(90deg);
+}
+
+.faqAccordionContent {
+  padding: 0 24px 24px;
+  animation: faq-slide-down 0.3s ease;
+}
+
+.faqAccordionContent[hidden] {
+  display: none;
+}
+
+.faqAccordionContent p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.faqAccordionItem:nth-child(4n + 4) .faqAccordionContent p {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes faq-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.faqToggleButton {
+  position: relative;
+  background: transparent;
+  color: #667eea;
+  border: 3px solid #667eea;
+  padding: 14px 24px;
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-top: 2rem;
+  display: inline-block;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.faqToggleButton:hover {
+  transform: translateY(-2px);
+  border-color: #4c51bf;
+  color: #4c51bf;
+  box-shadow:
+    0 8px 0 #4c51bf,
+    0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.faqToggleButton:focus-visible {
+  outline: 4px solid #fbbf24;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqToggleButton {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .faqToggleButton {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+}
+
+.landingSecondaryCtaButton {
+  position: relative;
+  background: transparent;
+  color: #667eea;
+  border: 3px solid #667eea;
+  padding: 18px 24px;
+  font-size: 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 30px;
+  font-family: var(--font-luckiest-guy), system-ui;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: all 0.15s ease;
+  outline: none;
+  width: 100%;
+  max-width: 360px;
+}
+
+.landingSecondaryCtaButton:hover {
+  transform: translateY(-2px);
+  border-color: #4c51bf;
+  box-shadow:
+    0 8px 0 #4c51bf,
+    0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.landingSecondaryCtaButton:active {
+  transform: translateY(4px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #4c51bf;
+  box-shadow:
+    0 3px 0 #4c51bf,
+    0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.landingSecondaryCtaButton:focus-visible {
+  outline: 4px solid #fbbf24;
+  outline-offset: 4px;
+}
+
+.achButtonLanding {
+  min-width: 100%;
+  width: fit-content;
+  display: inline-block;
+  padding: 18px;
+  font-size: 18px;
+  border-radius: 30px;
+  box-shadow:
+    0 4px 0 #4c51bf,
+    0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+  outline: none;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .landingSecondaryCtaButton {
+    padding: 16px 20px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .landingTitle {
+    font-size: 32px;
+    text-align: center;
+    min-height: 39px;
+  }
+
+  .landingTrustStrip {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .landingTextSection {
+    order: 2;
+    margin-bottom: 15px;
+  }
+
+  .landingContent {
+    gap: 24px;
+  }
+
+  .navUl {
+    display: none;
+  }
+
+  .landingFooter {
+    padding: 20px 24px;
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .landingFaqSection {
+    padding: 60px 20px;
+  }
+
+  .landingSecondaryCtaButton {
+    max-width: none;
+  }
+
+  .landingFaqTitle {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+
+  .faqAccordionTrigger {
+    padding: 20px;
+  }
+
+  .faqAccordionQuestion {
+    font-size: 16px;
+  }
+
+  .faqAccordionContent {
+    padding: 0 20px 20px;
+  }
+}

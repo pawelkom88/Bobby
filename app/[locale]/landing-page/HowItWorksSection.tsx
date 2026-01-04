@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import styles from './HowItWorksSection.module.css';
 
 export function HowItWorksSection() {
   const t = useTranslations('landing');
@@ -28,31 +29,31 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="how-it-works-section">
-      <div className="how-it-works-container">
-        <h2 className="how-it-works-title">{t('howItWorks.title')}</h2>
-        <p className="how-it-works-subtitle">{t('howItWorks.subtitle')}</p>
+    <section id="how-it-works" className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.title}>{t('howItWorks.title')}</h2>
+        <p className={styles.subtitle}>{t('howItWorks.subtitle')}</p>
 
-        <div className="steps-grid">
+        <div className={styles.stepsGrid}>
           {steps.map(step => (
-            <div key={step.number} className="step-card">
-              <div className="step-number">
-                <span className="step-number-text">{step.number}</span>
+            <div key={step.number} className={styles.stepCard}>
+              <div className={styles.stepNumber}>
+                <span className={styles.stepNumberText}>{step.number}</span>
               </div>
-              <div className="step-icon">
-                <div className="step-icon-container">
+              <div className={styles.stepIcon}>
+                <div className={styles.stepIconContainer}>
                   <Image
                     fill
                     src={step.icon}
                     alt={step.title}
-                    className="step-icon-image"
+                    className={styles.stepIconImage}
                     sizes="150px"
                     loading="lazy"
                   />
                 </div>
               </div>
-              <h3 className="step-title">{step.title}</h3>
-              <p className="step-description">{step.description}</p>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepDescription}>{step.description}</p>
             </div>
           ))}
         </div>

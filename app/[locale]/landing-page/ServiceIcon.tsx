@@ -9,8 +9,8 @@ interface ServiceIconProps {
 }
 
 export function ServiceIcon({ service, className = '' }: ServiceIconProps) {
-  const iconProps = {
-    className: `service-icon ${className}`,
+const iconProps = {
+  className,
     viewBox: '0 0 24 24',
     fill: 'none',
     stroke: 'currentColor',

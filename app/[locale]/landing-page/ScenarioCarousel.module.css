@@ -1,0 +1,182 @@
+.section {
+  background: #edf6fb;
+  padding: 80px 20px;
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.title {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 42px;
+  font-weight: normal;
+  color: #4c51bf;
+  margin-bottom: 16px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0px #667eea;
+}
+
+.subtitle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #475569;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.carouselContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.carousel {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  outline: none;
+  padding: 1rem 0;
+}
+
+.carousel:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 4px;
+}
+
+.carouselTrack {
+  display: flex;
+  will-change: transform;
+}
+
+.carouselSlide {
+  flex-shrink: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.arrow {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.arrow:hover:not(:disabled) {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  transform: scale(1.05);
+}
+
+.arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.arrow:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.arrow svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.paginationDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.paginationDot:hover {
+  background: #94a3b8;
+}
+
+.paginationDotActive {
+  background: #3b82f6;
+  transform: scale(1.2);
+}
+
+.paginationDot:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 60px 20px;
+  }
+
+  .title {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  .arrow {
+    display: none;
+  }
+
+  .carouselContainer {
+    gap: 0;
+  }
+
+  .carouselSlide {
+    padding: 0 4px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel,
+  .arrow,
+  .paginationDot {
+    transition: none;
+  }
+}

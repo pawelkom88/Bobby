@@ -4,6 +4,7 @@ import type { Scenario } from './scenarios';
 import { ServiceIcon, useServiceLabel, getServiceColor } from './ServiceIcon';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import styles from './ScenarioCard.module.css';
 
 interface ScenarioCardProps {
   scenario: Scenario;
@@ -37,10 +38,14 @@ export function ScenarioCard({
   const serviceColor = getServiceColor(scenario.service);
   const serviceLabel = useServiceLabel(scenario.service);
 
+  const buttonClassName = `${styles.card} ${
+    isActive ? styles.cardActive : ''
+  }`.trim();
+
   return (
     <button
       type="button"
-      className={`scenario-card ${isActive ? 'scenario-card--active' : ''}`}
+      className={buttonClassName}
       onClick={onClick}
       aria-label={t('carousel.cardAriaLabel', {
         situation: scenario.situation,
@@ -52,41 +57,39 @@ export function ScenarioCard({
         } as React.CSSProperties
       }
     >
-      <div className="scenario-card__header">
+      <div className={styles.header}>
         <ServiceIcon
           service={scenario.service}
-          className="scenario-card__icon"
+          className={styles.icon}
         />
-        <span className="scenario-card__service">{serviceLabel}</span>
+        <span className={styles.service}>{serviceLabel}</span>
       </div>
 
-      <>
-        <div className="scenario-card__image-container">
-          <Image
-            className="scenario-card__image"
-            src={getScenarioImage(scenario.id)}
-            alt={scenario.situation}
-            width={200}
-            height={200}
-            loading="lazy"
-            sizes="(max-width: 768px) 150px, 200px"
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== fallbackImage) {
-                target.src = fallbackImage;
-              }
-            }}
-          />
-        </div>
+      <div>
+        <Image
+          className={styles.cardImage}
+          src={getScenarioImage(scenario.id)}
+          alt={scenario.situation}
+          width={200}
+          height={200}
+          loading="lazy"
+          sizes="(max-width: 768px) 150px, 200px"
+          onError={e => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== fallbackImage) {
+              target.src = fallbackImage;
+            }
+          }}
+        />
+      </div>
 
-        <blockquote className="scenario-card__situation">
-          {scenario.situation}
-        </blockquote>
-      </>
+      <blockquote className={styles.situation}>
+        {scenario.situation}
+      </blockquote>
 
-      <div className="scenario-card__divider" aria-hidden="true" />
+      <div className={styles.divider} aria-hidden="true" />
 
-      <p className="scenario-card__hook">{scenario.hook}</p>
+      <p className={styles.hook}>{scenario.hook}</p>
     </button>
   );
 }

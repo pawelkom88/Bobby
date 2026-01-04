@@ -12,6 +12,7 @@ import MobileNav from '@/components/MobileNav';
 import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
 import { BeforeFirstCallSection } from '@/app/[locale]/landing-page/BeforeFirstCallSection';
 import { VideoDemoSection } from '@/app/[locale]/landing-page/VideoDemoSection';
+import styles from './LandingPage.module.css';
 
 const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
 const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
@@ -40,13 +41,13 @@ export default function HomePage() {
     <ViewTransition>
       <PageWrapper>
         <ErrorBoundary>
-          <div className="landing-container">
-            <div className="landing-wrapper">
-              <nav className="landing-nav">
+          <div className={styles.landingContainer}>
+            <div className={styles.landingWrapper}>
+              <nav className={styles.landingNav}>
                 <Link href="/login" className="ach-button-small">
                   {t('nav.startTraining')}
                 </Link>
-                <ul className="nav-ul">
+                <ul className={styles.navUl}>
                   <li>
                     <a href="#how-it-works">{t('nav.howItWorks')}</a>
                   </li>
@@ -60,42 +61,40 @@ export default function HomePage() {
                 <MobileNav />
               </nav>
 
-              <main className="landing-main">
-                <div className="landing-content">
-                  <div className="landing-text-section">
-                    <h1 className="landing-title">{t('hero.title')}</h1>
-                    <p className="landing-subtitle">{t('hero.subtitle')}</p>
+              <main className={styles.landingMain}>
+                <div className={styles.landingContent}>
+                  <div className={styles.landingTextSection}>
+                    <h1 className={styles.landingTitle}>{t('hero.title')}</h1>
+                    <p className={styles.landingSubtitle}>{t('hero.subtitle')}</p>
                     <div
-                      className="landing-trust-strip"
+                      className={styles.landingTrustStrip}
                       role="note"
                       aria-label={t('hero.trustStrip.ariaLabel')}
                     >
-                      <div className="landing-trust-strip-title">
+                      <div className={styles.landingTrustStripTitle}>
                         {t('hero.trustStrip.title')}
                       </div>
-                      <div className="landing-trust-strip-items" role="list">
+                      <div
+                        className={styles.landingTrustStripItems}
+                        role="list"
+                      >
                         {trustStripItems.map(item => (
                           <div
                             key={item.id}
-                            className="landing-trust-strip-item"
+                            className={styles.landingTrustStripItem}
                             role="listitem"
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.5rem',
-                            }}
                           >
                             <Image
                               src={item.imageSrc}
                               alt={item.translation}
                               width={48}
                               height={48}
-                              className="landing-trust-strip-icon"
+                              className={styles.landingTrustStripIcon}
                               aria-hidden="true"
                               fetchPriority="high"
                               preload
                             />
-                            <span className="landing-trust-strip-text">
+                            <span className={styles.landingTrustStripText}>
                               {t(item.translation)}
                             </span>
                           </div>
@@ -104,13 +103,13 @@ export default function HomePage() {
                     </div>
                     <Link
                       href="/login"
-                      className="ach-button ach-button-landing"
+                      className={`ach-button ${styles.achButtonLanding}`}
                     >
                       {t('hero.cta')}
                     </Link>
                     <a
                       href="#how-it-works"
-                      className="landing-secondary-cta-button"
+                      className={styles.landingSecondaryCtaButton}
                     >
                       {t('hero.secondaryCta')}
                     </a>
@@ -123,62 +122,70 @@ export default function HomePage() {
                     sizes="(max-width: 768px) 100vw, 392px"
                     preload
                     fetchPriority="high"
+                    className={styles.heroImage}
                   />
                 </div>
                 <HowItWorksSection />
                 <BeforeFirstCallSection />
                 <VideoDemoSection />
                 <ScenarioCarousel />
-                <section id="faq" className="landing-faq-section">
-                  <h2 className="landing-faq-title">{t('faq.title')}</h2>
-                  <div className="faq-accordion" role="list">
-                    {(showAllFAQs ? ALL_FAQ_IDS : INITIAL_FAQ_IDS).map(id => (
-                      <div
-                        key={id}
-                        className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
-                        role="listitem"
-                      >
-                        <button
-                          type="button"
-                          className="faq-accordion-trigger"
-                          onClick={() => toggleQuestion(id)}
-                          aria-expanded={expandedId === id}
-                          aria-controls={`faq-answer-${id}`}
-                        >
-                          <span className="faq-accordion-question">
-                            {t(`faq.items.${id}.question`)}
-                          </span>
-                          <span
-                            className="faq-accordion-icon"
-                            aria-hidden="true"
-                          >
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="black"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="m9 6 6 6-6 6" />
-                            </svg>
-                          </span>
-                        </button>
+                <section id="faq" className={styles.landingFaqSection}>
+                  <h2 className={styles.landingFaqTitle}>{t('faq.title')}</h2>
+                  <div className={styles.faqAccordion} role="list">
+                    {(showAllFAQs ? ALL_FAQ_IDS : INITIAL_FAQ_IDS).map(id => {
+                      const isExpanded = expandedId === id;
+                      const itemClassName = `${styles.faqAccordionItem} ${
+                        isExpanded ? styles.faqAccordionItemExpanded : ''
+                      }`.trim();
+
+                      return (
                         <div
-                          id={`faq-answer-${id}`}
-                          className="faq-accordion-content"
-                          role="region"
-                          aria-labelledby={`faq-question-${id}`}
-                          hidden={expandedId !== id}
+                          key={id}
+                          className={itemClassName}
+                          role="listitem"
                         >
-                          <p>{t(`faq.items.${id}.answer`)}</p>
+                          <button
+                            type="button"
+                            className={styles.faqAccordionTrigger}
+                            onClick={() => toggleQuestion(id)}
+                            aria-expanded={isExpanded}
+                            aria-controls={`faq-answer-${id}`}
+                          >
+                            <span className={styles.faqAccordionQuestion}>
+                              {t(`faq.items.${id}.question`)}
+                            </span>
+                            <span
+                              className={styles.faqAccordionIcon}
+                              aria-hidden="true"
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="black"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m9 6 6 6-6 6" />
+                              </svg>
+                            </span>
+                          </button>
+                          <div
+                            id={`faq-answer-${id}`}
+                            className={styles.faqAccordionContent}
+                            role="region"
+                            aria-labelledby={`faq-question-${id}`}
+                            hidden={!isExpanded}
+                          >
+                            <p>{t(`faq.items.${id}.answer`)}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <button
                     type="button"
-                    className="faq-toggle-button"
+                    className={styles.faqToggleButton}
                     onClick={toggleAllFAQs}
                   >
                     {showAllFAQs
@@ -188,20 +195,20 @@ export default function HomePage() {
                 </section>
               </main>
 
-              <footer className="landing-footer">
-                <Link href="/safety-privacy" className="landing-footer-link">
+              <footer className={styles.landingFooter}>
+                <Link href="/safety-privacy" className={styles.landingFooterLink}>
                   {t('footer.links.safetyPrivacy')}
                 </Link>
-                <Link href="/terms-conditions" className="landing-footer-link">
+                <Link href="/terms-conditions" className={styles.landingFooterLink}>
                   {t('footer.links.termsConditions')}
                 </Link>
-                <Link href="/contact" className="landing-footer-link">
+                <Link href="/contact" className={styles.landingFooterLink}>
                   {t('footer.links.contact')}
                 </Link>
-                <Link href="/cookies-policy" className="landing-footer-link">
+                <Link href="/cookies-policy" className={styles.landingFooterLink}>
                   {t('footer.links.cookiesPolicy')}
                 </Link>
-                <Link href="/privacy-policy" className="landing-footer-link">
+                <Link href="/privacy-policy" className={styles.landingFooterLink}>
                   {t('footer.links.privacyPolicy')}
                 </Link>
               </footer>

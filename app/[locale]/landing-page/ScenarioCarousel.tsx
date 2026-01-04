@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import { scenarioIds, type Scenario } from './scenarios';
 import { ScenarioCard } from './ScenarioCard';
 import { ScenarioModal } from './ScenarioModal';
+import styles from './ScenarioCarousel.module.css';
 
 const SWIPE_THRESHOLD = 50;
 const CARDS_DESKTOP = 1;
@@ -131,22 +132,22 @@ export function ScenarioCarousel() {
   return (
     <section
       id="how-it-works"
-      className="scenario-section"
+      className={styles.section}
       aria-labelledby="scenario-heading"
     >
-      <header className="scenario-section__header">
-        <h2 id="scenario-heading" className="scenario-section__title">
+      <header className={styles.header}>
+        <h2 id="scenario-heading" className={styles.title}>
           {t('carousel.title')}
         </h2>
-        <p className="scenario-section__subtitle">
+        <p className={styles.subtitle}>
           {t('carousel.subtitle')}
         </p>
       </header>
 
-      <div className="scenario-carousel-container">
+      <div className={styles.carouselContainer}>
         <button
           type="button"
-          className="scenario-carousel__arrow scenario-carousel__arrow--prev"
+          className={styles.arrow}
           onClick={goToPrevious}
           disabled={currentIndex === 0}
           aria-label={t('carousel.prevAriaLabel')}
@@ -166,7 +167,7 @@ export function ScenarioCarousel() {
 
         <div
           ref={carouselRef}
-          className="scenario-carousel"
+          className={styles.carousel}
           role="region"
           aria-label={t('carousel.carouselAriaLabel')}
           tabIndex={0}
@@ -176,7 +177,7 @@ export function ScenarioCarousel() {
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className="scenario-carousel__track"
+            className={styles.carouselTrack}
             style={{
               transform: `translateX(${translateX}%)`,
               transition: prefersReducedMotion ? 'none' : 'transform 0.3s ease',
@@ -194,7 +195,7 @@ export function ScenarioCarousel() {
               return (
                 <div
                   key={scenario.id}
-                  className="scenario-carousel__slide"
+                  className={styles.carouselSlide}
                   style={{ width: `${100 / visibleCards}%` }}
                 >
                   <ScenarioCard
@@ -212,7 +213,7 @@ export function ScenarioCarousel() {
 
         <button
           type="button"
-          className="scenario-carousel__arrow scenario-carousel__arrow--next"
+          className={styles.arrow}
           onClick={goToNext}
           disabled={currentIndex >= maxIndex}
           aria-label={t('carousel.nextAriaLabel')}
@@ -231,19 +232,24 @@ export function ScenarioCarousel() {
         </button>
       </div>
 
-      <nav className="scenario-pagination" aria-label={t('carousel.paginationAriaLabel')}>
-        {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            className={`scenario-pagination__dot ${
-              index === currentIndex ? 'scenario-pagination__dot--active' : ''
-            }`}
-            onClick={() => setCurrentIndex(index)}
-            aria-label={t('carousel.goToSlide', { number: index + 1 })}
-            aria-current={index === currentIndex ? 'true' : undefined}
-          />
-        ))}
+      <nav className={styles.pagination} aria-label={t('carousel.paginationAriaLabel')}>
+        {Array.from({ length: maxIndex + 1 }).map((_, index) => {
+          const isActive = index === currentIndex;
+          const dotClassName = `${styles.paginationDot} ${
+            isActive ? styles.paginationDotActive : ''
+          }`.trim();
+
+          return (
+            <button
+              key={index}
+              type="button"
+              className={dotClassName}
+              onClick={() => setCurrentIndex(index)}
+              aria-label={t('carousel.goToSlide', { number: index + 1 })}
+              aria-current={isActive ? 'true' : undefined}
+            />
+          );
+        })}
       </nav>
 
       <ScenarioModal

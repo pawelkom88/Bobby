@@ -1,50 +1,49 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Activity } from 'react';
+import styles from './VideoDemoSection.module.css';
 
 export function VideoDemoSection() {
   const t = useTranslations('landing');
   const [showVideo, setShowVideo] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Handle video playback when visibility changes
   useEffect(() => {
-    const video = document.querySelector('.landing-video-demo-video') as HTMLVideoElement;
+    const video = videoRef.current;
     if (!video) return;
 
     if (!showVideo) {
       void video.pause();
-      return;
     }
-    
-    // Optional: Autoplay when shown (uncomment if desired)
-    // void video.play();
   }, [showVideo]);
 
   return (
-    <section className="landing-video-demo-section" aria-labelledby="video-demo-title">
-      <div className="landing-video-demo-content">
-        <h2 id="video-demo-title" className="landing-video-demo-title">
+    <section className={styles.section} aria-labelledby="video-demo-title">
+      <div className={styles.content}>
+        <h2 id="video-demo-title" className={styles.title}>
           {t('videoDemo.title')}
         </h2>
-        <p className="landing-video-demo-subtitle">
+        <p className={styles.subtitle}>
           {t('videoDemo.subtitle')}
         </p>
         
-        <div className="landing-video-demo-wrapper">
+        <div className={styles.wrapper}>
           <Activity mode={showVideo ? 'visible' : 'hidden'}>
-            <div className="landing-video-demo-container">
+            <div className={styles.container}>
               {hasError ? (
-                <div className="landing-video-demo-fallback">
-                  <span className="landing-video-demo-fallback-text">
+                <div className={styles.fallback}>
+                  <span className={styles.fallbackText}>
                     {t('videoDemo.fallbackText')}
                   </span>
                 </div>
               ) : (
                 <video
-                  className="landing-video-demo-video"
+                  className={styles.video}
+                  ref={videoRef}
                   title={t('videoDemo.videoTitle')}
                   onError={() => setHasError(true)}
                   controls
@@ -62,10 +61,10 @@ export function VideoDemoSection() {
           </Activity>
           
           {!showVideo && !hasError && (
-            <div className="landing-video-demo-placeholder">
+            <div className={styles.placeholder}>
               <button
                 type="button"
-                className="landing-video-demo-play-button"
+                className={styles.playButton}
                 onClick={() => setShowVideo(true)}
                 aria-label={t('videoDemo.playVideo')}
               >
@@ -81,7 +80,7 @@ export function VideoDemoSection() {
                   <path d="M30 25L30 55L55 40L30 25Z" fill="white" />
                 </svg>
               </button>
-              <p className="landing-video-demo-placeholder-text">
+              <p className={styles.placeholderText}>
                 {t('videoDemo.clickToPlay')}
               </p>
             </div>
@@ -91,7 +90,7 @@ export function VideoDemoSection() {
         {showVideo && (
           <button
             type="button"
-            className="landing-video-demo-hide-button"
+            className={styles.hideButton}
             onClick={() => setShowVideo(false)}
           >
             {t('videoDemo.hideVideo')}

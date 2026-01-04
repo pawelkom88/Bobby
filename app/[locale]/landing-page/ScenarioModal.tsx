@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Scenario } from './scenarios';
 import { ServiceIcon, useServiceLabel, getServiceColor } from './ServiceIcon';
+import styles from './ScenarioModal.module.css';
 
 interface ScenarioModalProps {
   scenario: Scenario | null;
@@ -70,13 +71,13 @@ export function ScenarioModal({
 
   return (
     <div
-      className="scenario-modal-overlay"
+      className={styles.overlay}
       onClick={onClose}
       role="presentation"
     >
       <div
         ref={modalRef}
-        className="scenario-modal"
+        className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -90,7 +91,7 @@ export function ScenarioModal({
         <button
           ref={closeButtonRef}
           type="button"
-          className="scenario-modal__close"
+          className={styles.close}
           onClick={onClose}
           aria-label={t('closeModal')}
         >
@@ -108,47 +109,47 @@ export function ScenarioModal({
           </svg>
         </button>
 
-        <header className="scenario-modal__header">
+        <header className={styles.header}>
           <ServiceIcon
             service={scenario.service}
-            className="scenario-modal__icon"
+            className={styles.icon}
           />
-          <span className="scenario-modal__service">{serviceLabel}</span>
+          <span className={styles.service}>{serviceLabel}</span>
         </header>
 
-        <h2 id="modal-title" className="scenario-modal__title">
+        <h2 id="modal-title" className={styles.title}>
           &ldquo;{scenario.situation}&rdquo;
         </h2>
 
-        <section className="scenario-modal__body">
-          <h3 className="scenario-modal__section-title">
+        <section className={styles.body}>
+          <h3 className={styles.sectionTitle}>
             {t('scenarioTitle')}
           </h3>
-          <p className="scenario-modal__description">{scenario.description}</p>
+          <p className={styles.description}>{scenario.description}</p>
 
-          <h3 className="scenario-modal__section-title">
+          <h3 className={styles.sectionTitle}>
             {t('practiceTitle')}
           </h3>
-          <ul className="scenario-modal__list">
+          <ul className={styles.list}>
             {scenario.practicePoints.map((point, index) => (
-              <li key={index} className="scenario-modal__list-item">
+              <li key={index} className={styles.listItem}>
                 {point}
               </li>
             ))}
           </ul>
         </section>
 
-        <footer className="scenario-modal__footer">
+        <footer className={styles.footer}>
           <button
             type="button"
-            className="scenario-modal__button scenario-modal__button--primary"
+            className={`${styles.button} ${styles.primary}`}
             onClick={() => onStartPractice(scenario)}
           >
             {t('startPractice')}
           </button>
           <button
             type="button"
-            className="scenario-modal__button scenario-modal__button--secondary"
+            className={`${styles.button} ${styles.secondary}`}
             onClick={onClose}
           >
             {t('backToExamples')}
