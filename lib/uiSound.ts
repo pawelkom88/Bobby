@@ -29,42 +29,13 @@ function getAudioContext(): AudioContext | null {
 }
 
 /**
- * Play a one-shot "conversation ended" sound.
- * If NEXT_PUBLIC_UI_SOUND_END_URL is provided, it will be used.
- * Otherwise, fall back to a short descending blip.
+ * Play a one-shot "conversation ended" sound using Web Audio API.
  */
 export async function playEndConversationSound(
   enabled: boolean
 ): Promise<void> {
   if (!enabled || typeof window === 'undefined') {
     return;
-  }
-  const envUrl = '/end.aac';
-  const candidates: string[] = [];
-  const pushIfNotExists = (u: string) => {
-    if (u && !candidates.includes(u)) candidates.push(u);
-  };
-  if (envUrl) {
-    pushIfNotExists(envUrl);
-    if (envUrl.endsWith('.aac')) {
-      pushIfNotExists(envUrl.replace(/\.aac$/i, '.mp3'));
-    } else if (envUrl.endsWith('.mp3')) {
-      pushIfNotExists(envUrl.replace(/\.mp3$/i, '.aac'));
-    }
-  }
-  pushIfNotExists('/end.aac');
-  pushIfNotExists('/end.mp3');
-  pushIfNotExists('/sfx/end.aac');
-  pushIfNotExists('/sfx/end.mp3');
-  for (const url of candidates) {
-    try {
-      const el = new Audio(url);
-      el.volume = 0.3;
-      await el.play();
-      return;
-    } catch {
-      // try next
-    }
   }
 
   const ac = getAudioContext();
