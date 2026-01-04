@@ -109,10 +109,10 @@
         "ariaLabel": "Informacje o bezpieczeństwie i prywatności",
         "title": "Bezpieczny trening dla dzieci — pod nadzorem rodzica",
         "practiceOnly": "Tylko ćwiczenia — nigdy nie łączy z prawdziwymi służbami",
-        "realEmergencies": "W prawdziwym zagrożeniu: dzwoń 112",
+        "realEmergencies": "W razie prawdziwego zagrożenia: dzwoń 112",
         "noRecordings": "Nie przechowujemy nagrań audio i nie wymagamy danych osobowych dziecka",
         "parentSupervision": "Rodzic wybiera scenariusz i nadzoruje trening",
-        "noScaryContent": "Spokojne, dostosowane do wieku — bez drastycznych i straszących treści"
+        "noScaryContent": "Język dostosowany do wieku — bez drastycznych i straszących treści"
       },
       "cta": "Rozpocznij trening",
       "secondaryCta": "Zobacz jak to działa"
@@ -1388,5 +1388,11 @@
     "usefulnessRequired": "Proszę wybrać, czy takie ćwiczenia są przydatne",
     "wouldUseAgainRequired": "Proszę wybrać, czy użyjesz Bobby ponownie",
     "validationErrors": "Proszę poprawić następujące błędy:"
+  },
+  "cookies": {
+    "title": "🍪 Zgoda na ciasteczka",
+    "description": "Używamy ciasteczek, aby Twoje doświadczenie było doskonałe! Pomagają nam analizować ruch na stronie i personalizować zawartość specjalnie dla Ciebie. Klikając \"Akceptuj wszystkie ciasteczka\", zgadzasz się na ich używanie. Kliknij \"Odrzuć wszystkie\", jeśli wolisz nie udostępniać nieistotnych ciasteczek.",
+    "acceptAll": "Akceptuj wszystkie ciasteczka",
+    "rejectAll": "Odrzuć wszystkie"
   }
 }
