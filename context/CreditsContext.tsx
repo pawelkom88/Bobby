@@ -104,7 +104,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          console.log('CreditsContext: User data:', data);
+          logger.log('CreditsContext: User data:', data);
           userCredits = typeof data.credits === 'number' ? data.credits : 0;
           userBetaCredits =
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;

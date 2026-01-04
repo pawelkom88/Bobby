@@ -1,7 +1,14 @@
 'use client';
 
-import { getAnalytics, logEvent, setUserProperties, setUserId, Analytics } from 'firebase/analytics';
+import {
+  getAnalytics,
+  logEvent,
+  setUserProperties,
+  setUserId,
+  Analytics,
+} from 'firebase/analytics';
 import { app } from './firebase';
+import { logger } from '@/lib/logger';
 
 // Types for type safety
 interface EventParams {
@@ -11,7 +18,7 @@ interface EventParams {
 class LazyAnalytics {
   private analytics: Analytics | null = null;
   private isInitialized = false;
-  private pendingEvents: Array<{name: string, params: EventParams}> = [];
+  private pendingEvents: Array<{ name: string; params: EventParams }> = [];
   private hasConsent = false;
 
   constructor() {
@@ -29,7 +36,7 @@ class LazyAnalytics {
 
   // Wait for gtag to be available
   private async waitForGtag(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const checkGtag = () => {
         if (typeof window !== 'undefined' && window.gtag) {
           resolve();
@@ -45,10 +52,10 @@ class LazyAnalytics {
   private updateConsentMode(consent: string): void {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': consent,
-        'ad_storage': consent,
-        'ad_user_data': consent,
-        'ad_personalization': consent
+        analytics_storage: consent,
+        ad_storage: consent,
+        ad_user_data: consent,
+        ad_personalization: consent,
       });
     }
   }
@@ -61,20 +68,27 @@ class LazyAnalytics {
       try {
         // Wait for gtag to be available (race condition fix)
         await this.waitForGtag();
-        
+
         // Initialize Firebase Analytics
         this.analytics = getAnalytics(app);
         this.isInitialized = true;
-        
+
         // Set consent mode
         this.updateConsentMode('granted');
-        
+
         // Process any pending events
         this.processPendingEvents();
-        
-        console.log('%c✅ Analytics initialized', 'color: #34a853; font-weight: bold;');
+
+        logger.log(
+          '%c✅ Analytics initialized',
+          'color: #34a853; font-weight: bold;'
+        );
       } catch (error) {
-        console.error('%c❌ Failed to initialize analytics:', 'color: #ea4335; font-weight: bold;', error);
+        logger.error(
+          '%c❌ Failed to initialize analytics:',
+          'color: #ea4335; font-weight: bold;',
+          error
+        );
       }
     }
   }
@@ -119,7 +133,11 @@ class LazyAnalytics {
     if (process.env.NODE_ENV === 'production' && this.analytics) {
       logEvent(this.analytics, eventName, params);
     } else {
-      console.log(`%c📊 Analytics Event: ${eventName}`, 'color: #4285f4; font-weight: bold;', params);
+      logger.log(
+        `%c📊 Analytics Event: ${eventName}`,
+        'color: #4285f4; font-weight: bold;',
+        params
+      );
     }
   }
 
@@ -137,17 +155,23 @@ class LazyAnalytics {
   private validateEventName(name: string): boolean {
     const regex = /^[a-zA-Z][a-zA-Z0-9_]{0,39}$/;
     const reserved = ['firebase_', 'google_', 'ga_'];
-    
+
     if (!regex.test(name)) {
-      console.warn(`%c⚠️ Invalid event name: ${name}`, 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        `%c⚠️ Invalid event name: ${name}`,
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     if (reserved.some(prefix => name.startsWith(prefix))) {
-      console.warn(`%c⚠️ Event name cannot start with reserved prefixes: ${reserved.join(', ')}`, 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        `%c⚠️ Event name cannot start with reserved prefixes: ${reserved.join(', ')}`,
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     return true;
   }
 
@@ -155,19 +179,31 @@ class LazyAnalytics {
   private validateParams(params: EventParams): boolean {
     // Check number of parameters
     if (params && Object.keys(params).length > 25) {
-      console.warn(`%c⚠️ Too many parameters for event`, 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        `%c⚠️ Too many parameters for event`,
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
 
     // Check parameter values
     for (const [key, value] of Object.entries(params)) {
       if (typeof value === 'string' && value.length > 100) {
-        console.warn(`%c⚠️ Parameter value too long (max 100 chars): ${key}`, 'color: #ea4335; font-weight: bold;');
+        logger.warn(
+          `%c⚠️ Parameter value too long (max 100 chars): ${key}`,
+          'color: #ea4335; font-weight: bold;'
+        );
         return false;
       }
-      
-      if (typeof value === 'number' && (value < -(2**31) || value > (2**31) - 1)) {
-        console.warn(`%c⚠️ Parameter value out of range: ${key}`, 'color: #ea4335; font-weight: bold;');
+
+      if (
+        typeof value === 'number' &&
+        (value < -(2 ** 31) || value > 2 ** 31 - 1)
+      ) {
+        logger.warn(
+          `%c⚠️ Parameter value out of range: ${key}`,
+          'color: #ea4335; font-weight: bold;'
+        );
         return false;
       }
     }
@@ -178,7 +214,7 @@ class LazyAnalytics {
   // Set user ID
   setUserId(userId: string): void {
     if (!this.isInitialized || !this.analytics) return;
-    
+
     if (this.validateUserId(userId)) {
       setUserId(this.analytics, userId);
     }
@@ -187,22 +223,28 @@ class LazyAnalytics {
   // Validate user ID
   private validateUserId(userId: string): boolean {
     if (!userId || typeof userId !== 'string') {
-      console.warn('%c⚠️ User ID must be a non-empty string', 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        '%c⚠️ User ID must be a non-empty string',
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     if (userId.length > 256) {
-      console.warn('%c⚠️ User ID too long (max 256 chars)', 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        '%c⚠️ User ID too long (max 256 chars)',
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     return true;
   }
 
   // Set user properties
   setUserProperties(properties: Record<string, any>): void {
     if (!this.isInitialized || !this.analytics) return;
-    
+
     if (this.validateUserProperties(properties)) {
       setUserProperties(this.analytics, properties);
     }
@@ -211,22 +253,31 @@ class LazyAnalytics {
   // Validate user properties
   private validateUserProperties(properties: Record<string, any>): boolean {
     if (!properties || typeof properties !== 'object') {
-      console.warn('%c⚠️ User properties must be an object', 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        '%c⚠️ User properties must be an object',
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     if (Object.keys(properties).length > 25) {
-      console.warn('%c⚠️ Too many user properties (max 25)', 'color: #ea4335; font-weight: bold;');
+      logger.warn(
+        '%c⚠️ Too many user properties (max 25)',
+        'color: #ea4335; font-weight: bold;'
+      );
       return false;
     }
-    
+
     for (const [key, value] of Object.entries(properties)) {
       if (typeof value === 'string' && value.length > 100) {
-        console.warn(`%c⚠️ User property value too long (max 100 chars): ${key}`, 'color: #ea4335; font-weight: bold;');
+        logger.warn(
+          `%c⚠️ User property value too long (max 100 chars): ${key}`,
+          'color: #ea4335; font-weight: bold;'
+        );
         return false;
       }
     }
-    
+
     return true;
   }
 }
@@ -237,6 +288,9 @@ export const lazyAnalytics = new LazyAnalytics();
 // Export convenience functions
 export const grantAnalyticsConsent = () => lazyAnalytics.grantConsent();
 export const denyAnalyticsConsent = () => lazyAnalytics.denyConsent();
-export const trackEvent = (name: string, params?: EventParams) => lazyAnalytics.track(name, params);
-export const setAnalyticsUserId = (userId: string) => lazyAnalytics.setUserId(userId);
-export const setAnalyticsUserProperties = (properties: Record<string, any>) => lazyAnalytics.setUserProperties(properties);
+export const trackEvent = (name: string, params?: EventParams) =>
+  lazyAnalytics.track(name, params);
+export const setAnalyticsUserId = (userId: string) =>
+  lazyAnalytics.setUserId(userId);
+export const setAnalyticsUserProperties = (properties: Record<string, any>) =>
+  lazyAnalytics.setUserProperties(properties);

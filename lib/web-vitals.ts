@@ -28,27 +28,26 @@ const THRESHOLDS = {
   TTFB: { good: 800, poor: 1800 },
 };
 
-function getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+function getRating(
+  name: string,
+  value: number
+): 'good' | 'needs-improvement' | 'poor' {
   const threshold = THRESHOLDS[name as keyof typeof THRESHOLDS];
   if (!threshold) return 'good';
-  
+
   if (value <= threshold.good) return 'good';
   if (value <= threshold.poor) return 'needs-improvement';
   return 'poor';
 }
 
 function reportMetric(metric: WebVitalsMetric) {
-  // Log to console in development
+  // Log to logger in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(
-      `%c⚡ Web Vitals [${metric.name}]:`,
-      analyticsLogStyle,
-      {
-        value: metric.value,
-        rating: metric.rating,
-        id: metric.id,
-      }
-    );
+    logger.log(`%c⚡ Web Vitals [${metric.name}]:`, {
+      value: metric.value,
+      rating: metric.rating,
+      id: metric.id,
+    });
   }
 
   // Send to analytics in production
@@ -62,13 +61,14 @@ function reportMetric(metric: WebVitalsMetric) {
  * Measure Largest Contentful Paint (LCP)
  */
 function measureLCP() {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
+  if (typeof window === 'undefined' || !('PerformanceObserver' in window))
+    return;
 
   try {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1] as any;
-      
+
       const metric: WebVitalsMetric = {
         name: 'LCP',
         value: lastEntry.renderTime || lastEntry.loadTime,
@@ -76,7 +76,7 @@ function measureLCP() {
         delta: lastEntry.renderTime || lastEntry.loadTime,
         id: `v1-${Date.now()}-${Math.random()}`,
       };
-      
+
       reportMetric(metric);
     });
 
@@ -90,22 +90,26 @@ function measureLCP() {
  * Measure First Input Delay (FID)
  */
 function measureFID() {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
+  if (typeof window === 'undefined' || !('PerformanceObserver' in window))
+    return;
 
   try {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
-      
+
       for (const entry of entries) {
         const fidEntry = entry as any;
         const metric: WebVitalsMetric = {
           name: 'FID',
           value: fidEntry.processingStart - fidEntry.startTime,
-          rating: getRating('FID', fidEntry.processingStart - fidEntry.startTime),
+          rating: getRating(
+            'FID',
+            fidEntry.processingStart - fidEntry.startTime
+          ),
           delta: fidEntry.processingStart - fidEntry.startTime,
           id: `v1-${Date.now()}-${Math.random()}`,
         };
-        
+
         reportMetric(metric);
         break;
       }
@@ -121,18 +125,19 @@ function measureFID() {
  * Measure Cumulative Layout Shift (CLS)
  */
 function measureCLS() {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
+  if (typeof window === 'undefined' || !('PerformanceObserver' in window))
+    return;
 
   try {
     let clsValue = 0;
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         const clsEntry = entry as any;
         if (!clsEntry.hadRecentInput) {
           clsValue += clsEntry.value;
         }
       }
-      
+
       const metric: WebVitalsMetric = {
         name: 'CLS',
         value: clsValue,
@@ -140,7 +145,7 @@ function measureCLS() {
         delta: clsValue,
         id: `v1-${Date.now()}-${Math.random()}`,
       };
-      
+
       reportMetric(metric);
     });
 
@@ -168,12 +173,13 @@ function measureCLS() {
  * Measure First Contentful Paint (FCP)
  */
 function measureFCP() {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
+  if (typeof window === 'undefined' || !('PerformanceObserver' in window))
+    return;
 
   try {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       const entries = list.getEntries();
-      
+
       for (const entry of entries) {
         if (entry.name === 'first-contentful-paint') {
           const metric: WebVitalsMetric = {
@@ -183,7 +189,7 @@ function measureFCP() {
             delta: entry.startTime,
             id: `v1-${Date.now()}-${Math.random()}`,
           };
-          
+
           reportMetric(metric);
           observer.disconnect();
           break;
@@ -205,10 +211,10 @@ function measureTTFB() {
 
   try {
     const navEntry = performance.getEntriesByType('navigation')[0] as any;
-    
+
     if (navEntry) {
       const ttfb = navEntry.responseStart - navEntry.requestStart;
-      
+
       const metric: WebVitalsMetric = {
         name: 'TTFB',
         value: ttfb,
@@ -216,7 +222,7 @@ function measureTTFB() {
         delta: ttfb,
         id: `v1-${Date.now()}-${Math.random()}`,
       };
-      
+
       reportMetric(metric);
     }
   } catch (error) {

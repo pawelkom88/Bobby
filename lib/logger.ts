@@ -122,44 +122,49 @@ class Logger {
     return formatted;
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, ...data: any[]): void {
+    const dataToLog = data.length > 0 ? data : undefined;
     if (this.isDevelopment) {
-      console.debug(this.formatMessage('debug', message, data));
+      console.debug(this.formatMessage('debug', message, dataToLog));
     }
     // Don't store debug logs in production
     if (!this.isProduction) {
-      this.addLog('debug', message, data);
+      this.addLog('debug', message, dataToLog);
     }
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, ...data: any[]): void {
+    const dataToLog = data.length > 0 ? data : undefined;
     if (this.isDevelopment) {
-      console.info(this.formatMessage('info', message, data));
+      console.info(this.formatMessage('info', message, dataToLog));
     }
-    this.addLog('info', message, data);
+    this.addLog('info', message, dataToLog);
   }
 
-  log(message: string, data?: any): void {
+  log(message: string, ...data: any[]): void {
+    const dataToLog = data.length > 0 ? data : undefined;
     if (this.isDevelopment) {
-      console.log(this.formatMessage('log', message, data));
+      console.log(this.formatMessage('log', message, dataToLog));
     }
     // Don't store general logs in production
     if (!this.isProduction) {
-      this.addLog('log', message, data);
+      this.addLog('log', message, dataToLog);
     }
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, ...data: any[]): void {
+    const dataToLog = data.length > 0 ? data : undefined;
     if (this.isDevelopment) {
-      console.warn(this.formatMessage('warn', message, data));
+      console.warn(this.formatMessage('warn', message, dataToLog));
     }
-    this.addLog('warn', message, data);
+    this.addLog('warn', message, dataToLog);
   }
 
-  error(message: string, data?: any): void {
+  error(message: string, ...data: any[]): void {
+    const dataToLog = data.length > 0 ? data : undefined;
     // Always log errors to console (even in production for monitoring)
-    console.error(this.formatMessage('error', message, data));
-    this.addLog('error', message, data);
+    console.error(this.formatMessage('error', message, dataToLog));
+    this.addLog('error', message, dataToLog);
   }
 
   private addLog(level: LogLevel, message: string, data?: any): void {
