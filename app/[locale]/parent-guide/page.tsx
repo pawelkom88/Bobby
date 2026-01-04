@@ -29,34 +29,6 @@ export default function ParentGuidePage() {
               </section>
 
               <section className="guide-section">
-                <h2>{t('parentGuide.choosingScenarios.title')}</h2>
-                <div className="scenario-grid">
-                  <div className="scenario-card">
-                    <div className="scenario-icon">
-                      <Image src="/icons/police.svg" alt="Police" width={40} height={40} />
-                    </div>
-                    <h3>{t('parentGuide.choosingScenarios.police.title')}</h3>
-                    <p>{t('parentGuide.choosingScenarios.police.description')}</p>
-                  </div>
-                  <div className="scenario-card">
-                    <div className="scenario-icon">
-                      <Image src="/icons/fire.svg" alt="Fire" width={40} height={40} />
-                    </div>
-                    <h3>{t('parentGuide.choosingScenarios.fire.title')}</h3>
-                    <p>{t('parentGuide.choosingScenarios.fire.description')}</p>
-                  </div>
-                  <div className="scenario-card">
-                    <div className="scenario-icon">
-                      <Image src="/icons/ambulance.svg" alt="Ambulance" width={40} height={40} />
-                    </div>
-                    <h3>{t('parentGuide.choosingScenarios.ambulance.title')}</h3>
-                    <p>{t('parentGuide.choosingScenarios.ambulance.description')}</p>
-                  </div>
-                </div>
-                <p className="scenario-note">{t('parentGuide.choosingScenarios.note')}</p>
-              </section>
-
-              <section className="guide-section">
                 <h2>{t('parentGuide.practicePhrases.title')}</h2>
                 <p className="section-intro">{t('parentGuide.practicePhrases.intro')}</p>
                 <div className="phrases-list">

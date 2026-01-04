@@ -73,7 +73,7 @@ export function BeforeFirstCallSection() {
         <div className="guide-cta">
           <Link
             href="/parent-guide"
-            className="ach-button ach-button-secondary"
+            className="ach-button ach-button-landing"
           >
             {t('viewGuideButton')}
           </Link>

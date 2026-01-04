@@ -246,22 +246,6 @@
           "text": "Tell your child: \"This is like practicing fire drills at school. Bobby helps us learn what to say if we ever need help.\""
         }
       },
-      "choosingScenarios": {
-        "title": "Choosing Scenarios",
-        "police": {
-          "title": "Police",
-          "description": "Someone in danger or needs urgent help"
-        },
-        "fire": {
-          "title": "Fire",
-          "description": "Smoke, fire, or unsafe situations"
-        },
-        "ambulance": {
-          "title": "Ambulance",
-          "description": "Someone hurt or unwell"
-        },
-        "note": "Start simple. Build complexity over time."
-      },
       "practicePhrases": {
         "title": "Practice Phrases Your Child Can Try",
         "intro": "No script needed, but examples help:",
