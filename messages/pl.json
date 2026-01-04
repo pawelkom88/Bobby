@@ -1,4 +1,10 @@
 {
+  "badgeDisplay": {
+    "noBadges": "Brak odznak. Ćwicz dalej, aby odblokować pierwszą odznakę!",
+    "earnedBadges": "Zdobyte odznaki",
+    "viewAll": "Zobacz wszystkie odznaki",
+    "showLess": "Schowaj"
+  },
   "metadata": {
     "title": "Bobby - Trening Alarmowy dla Dzieci",
     "description": "Pomóż dzieciom ćwiczyć połączenia alarmowe w bezpieczny i zabawny sposób",
