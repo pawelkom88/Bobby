@@ -19,7 +19,7 @@
     "save": "Zapisz",
     "cancel": "Anuluj",
     "confirm": "Potwierdź",
-    "back": "← WSTECZ",
+    "back": "WSTECZ",
     "next": "Dalej",
     "home": "Strona główna",
     "settings": "Ustawienia",
@@ -644,7 +644,7 @@
     },
     "account": {
       "title": "Konto",
-      "signOut": "← Wyloguj się"
+      "signOut": "Wyloguj się"
     },
     "about": {
       "title": "O aplikacji",

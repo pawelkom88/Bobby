@@ -55,7 +55,7 @@ export default function SituationSelector({
         <h2 className="situation-selector-title">WHAT HAPPENED</h2>
         {onBack && (
           <CartoonButton onClick={onBack} ariaLabel="Go back to age selection">
-            ← Back
+            Back
           </CartoonButton>
         )}
       </div>

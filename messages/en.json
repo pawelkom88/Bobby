@@ -19,7 +19,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "back": "← BACK",
+    "back": "BACK",
     "next": "Next",
     "home": "Home",
     "settings": "Settings",
@@ -650,7 +650,7 @@
     },
     "account": {
       "title": "Account",
-      "signOut": "← Sign Out"
+      "signOut": "Sign Out"
     },
     "about": {
       "title": "About",
