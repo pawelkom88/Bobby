@@ -59,7 +59,7 @@
       "passwordLabel": "Password",
       "confirmPasswordPlaceholder": "Confirm Password",
       "confirmPasswordLabel": "Confirm Password",
-      "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*(),.?\":{}|<>)",
+      "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*(),.?\":{{}}|<>)",
       "passwordStrength": "Password strength",
       "submit": "SIGN UP",
       "submitting": "CREATING ACCOUNT...",
