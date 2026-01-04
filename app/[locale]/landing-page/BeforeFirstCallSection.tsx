@@ -17,10 +17,11 @@ export function BeforeFirstCallSection() {
           <div className="prep-card">
             <div className="prep-icon">
               <Image
-                src="/icons/before-start.svg"
+                loading="lazy"
+                src="/new-icons1.webp"
                 alt={t('beforeStart.title')}
-                width={48}
-                height={48}
+                width={120}
+                height={120}
               />
             </div>
             <h3>{t('beforeStart.title')}</h3>
@@ -32,14 +33,13 @@ export function BeforeFirstCallSection() {
           </div>
 
           <div className="prep-card">
-            <div className="prep-icon">
-              <Image
-                src="/icons/during-practice.svg"
-                alt={t('duringPractice.title')}
-                width={48}
-                height={48}
-              />
-            </div>
+            <Image
+              loading="lazy"
+              src="/new-icons2.webp"
+              alt={t('duringPractice.title')}
+              width={120}
+              height={120}
+            />
             <h3>{t('duringPractice.title')}</h3>
             <ul className="prep-list">
               <li>{t('duringPractice.point1')}</li>
@@ -51,10 +51,11 @@ export function BeforeFirstCallSection() {
           <div className="prep-card">
             <div className="prep-icon">
               <Image
-                src="/icons/after-call.svg"
+                loading="lazy"
+                src="/new-icons3.webp"
                 alt={t('afterCall.title')}
-                width={48}
-                height={48}
+                width={120}
+                height={120}
               />
             </div>
             <h3>{t('afterCall.title')}</h3>
@@ -71,10 +72,7 @@ export function BeforeFirstCallSection() {
         </div>
 
         <div className="guide-cta">
-          <Link
-            href="/parent-guide"
-            className="ach-button ach-button-landing"
-          >
+          <Link href="/parent-guide" className="ach-button ach-button-landing">
             {t('viewGuideButton')}
           </Link>
         </div>
