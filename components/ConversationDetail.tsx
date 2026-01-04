@@ -144,7 +144,17 @@ export default function ConversationDetail({
           ariaLabel={t('backToConversationsAria')}
           containerClassName="conversation-detail__back-btn-container"
         >
-          ←
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ width: '24px', height: '24px' }}
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
         </CartoonButton>
 
         <div className="conversation-detail__header-content">
