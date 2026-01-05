@@ -83,7 +83,6 @@ export default function SafetyPrivacyPage() {
                 <li>{t('whatToTeach.points.0')}</li>
                 <li>{t('whatToTeach.points.1')}</li>
                 <li>{t('whatToTeach.points.2')}</li>
-                <li>{t('whatToTeach.points.3')}</li>
               </ul>
             </section>
 

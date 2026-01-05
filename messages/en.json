@@ -366,7 +366,7 @@
         },
         "10": {
           "question": "How is my child's data protected?",
-          "answer": "We use secure authentication and never store personal information like addresses or phone numbers. Conversations are used only for assessment and progress tracking."
+          "answer": "We use secure authentication and never store personal information like addresses or phone numbers. Conversations are used only for review and progress tracking."
         },
         "11": {
           "question": "Can other users see my child's conversations?",
@@ -500,6 +500,17 @@
       "buyAndCall": "BUY & CALL",
       "clear": "CLEAR",
       "back": "BACK"
+    },
+    "parentGate": {
+      "title": "Parent Gate",
+      "description": "Before starting a practice call, please confirm:",
+      "legend": "Parent or guardian confirmations",
+      "parentGuardian": "I'm a parent/guardian (18+) and I will supervise this practice session.",
+      "practiceOnly": "I understand this is practice only and not connected to real emergency services.",
+      "noPersonalInfo": "We will not share real personal info during practice (names, addresses, phone numbers).",
+      "confirm": "START PRACTICE",
+      "cancel": "CANCEL",
+      "error": "Please confirm all three statements to continue."
     }
   },
   "conversation": {
@@ -574,7 +585,7 @@
       },
       "12": {
         "question": "How is my child's data protected?",
-        "answer": "We use secure authentication and never store personal information like addresses or phone numbers. Conversations are used only for assessment and progress tracking."
+        "answer": "We use secure authentication and never store personal information like addresses or phone numbers. Conversations are used only for review and progress tracking."
       },
       "13": {
         "question": "Can other users see my child's conversations?",
@@ -733,7 +744,7 @@
     "viewAchievements": "View Achievements",
     "viewConversation": "View Conversation"
   },
-  "assessmentFeedback": {
+  "reviewFeedback": {
     "didWell": "What you did well",
     "greatEffort": "Great effort!",
     "nextTime": "Next time try",
@@ -1107,17 +1118,18 @@
       "title": "2. What we do NOT collect",
       "subtitle": "We do not collect:",
       "audio": "audio recordings",
-      "phoneNumbers": "phone numbers (unless shared during practice)",
+      "phoneNumbers": "phone numbers (we do not request them; they may appear in transcripts if a user says them)",
       "location": "precise location tracking",
-      "advertising": "advertising profiles or behavioural tracking for children"
+      "advertising": "advertising profiles or advertising tracking"
     },
     "practiceTranscripts": {
       "title": "3. Practice-only transcripts (important)",
       "intro": "Bobby is a practice and educational tool only.",
       "explanation": "Because the app simulates emergency conversations, children may sometimes say personal details during practice.",
-      "askNotToShare": "✅ We ask you not to share real personal information (full names, real addresses, phone numbers, postcodes).",
+      "askNotToShare": "✅ We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers or common address formats). Redaction is best-effort and may not catch everything.",
       "redaction": "✅ We also try to redact obvious personal details from stored transcripts (for example: phone numbers or common address formats).",
-      "parentControl": "Parents can review transcripts inside the app and may delete them by deleting the account."
+      "redactionDisclaimer": "Redaction is best-effort and may not catch every personal detail. Parents should supervise practice sessions and avoid sharing real personal information.",
+      "retention": "Parents can review transcripts inside the app. We keep transcripts until you delete your account."
     },
     "childrensData": {
       "title": "4. Children's data",
@@ -1151,7 +1163,7 @@
       "authentication": "authentication and storage (Firebase)",
       "hosting": "hosting (Netlify)",
       "voiceProviders": "voice processing providers used during practice sessions",
-      "gdprCompliant": "All providers are expected to be GDPR-compliant."
+      "gdprCompliant": "We use reputable providers and put appropriate data protection agreements in place where required."
     },
     "dataRights": {
       "title": "9. Your data rights",
@@ -1176,53 +1188,52 @@
   "safetyPrivacy": {
     "title": "Safety & Privacy Guide",
     "subtitle": "Keeping your child safe while learning emergency skills",
-    "intro": "Bobby is designed to be a safe, secure environment for children to learn emergency communication skills. This guide explains how we protect your child and what you can do to help.",
+    "intro": "Bobby is designed to be a safe, child-friendly environment for learning what to say in an emergency. This guide explains how we protect children and how parents can get the best results.",
     "howWeProtect": {
       "title": "How Bobby Protects Your Child",
       "points": [
-        "No real emergency services - simulations only",
-        "No personal data collection beyond account information",
+        "Practice only — not connected to real emergency services",
+        "Minimal data collection (parent account, usage, and transcripts for review)",
         "No advertising or third-party tracking",
-        "Secure authentication with Firebase",
-        "Conversation transcripts stored privately for assessment"
+        "Secure login via Firebase Authentication",
+        "Text transcripts stored privately so parents can review sessions"
       ]
     },
     "parentalGuidance": {
       "title": "Parental Supervision Tips",
       "points": [
         "Sit with your child during their first few sessions",
-        "Discuss what they learned after each practice call",
         "Remind them this is practice, not real emergencies",
-        "Review their progress together in the app"
+        "Discuss what Bobby asked and what your child said",
+        "Review sessions together in the app"
       ]
     },
     "whatToTeach": {
       "title": "Important Safety Concepts to Teach",
       "points": [
         "When to call 999 (UK) or 112 (EU) in real emergencies",
-        "Their full name, parents' names, and phone number",
-        "Their home address (when age-appropriate)",
-        "What constitutes an actual emergency"
+        "Their home address (when age-appropriate) and a parent's phone number",
+        "What counts as a real emergency vs practice"
       ]
     },
     "bestPractices": {
       "title": "Best Practices for Practice Sessions",
       "points": [
-        "Practice regularly but keep sessions fun and low-pressure",
-        "Praise effort and participation, not perfection",
-        "Use different emergency scenarios to build confidence",
-        "Take breaks if your child seems anxious or overwhelmed"
+        "Keep sessions short, calm, and low-pressure",
+        "Praise effort, not perfection",
+        "Practice different scenarios over time",
+        "Take breaks if your child becomes anxious"
       ],
-      "personalInfoWarning": "**We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts.**"
+      "personalInfoWarning": "We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers or common address formats). Redaction is best-effort and may not catch everything."
     },
     "practiceAddress": {
       "title": "Practice Address (Privacy Tip)",
-      "description": "To help protect privacy, Bobby uses a practice address during training.",
+      "description": "To help protect privacy, Bobby can use a practice address during training.",
       "avoidSharing": "Please avoid sharing real names, real addresses, postcodes, or phone numbers during practice calls."
     },
     "privacyDetails": {
       "title": "Privacy & Data Protection",
-      "description": "For detailed information about how we handle data, please read our:",
+      "description": "For more details, please read our:",
       "privacyPolicy": "Privacy Policy",
       "cookiesPolicy": "Cookies Policy"
     },
@@ -1296,6 +1307,7 @@
       "points": [
         "Bobby is intended for parents or legal guardians.",
         "Children may use the app only with active parental supervision.",
+        "Parents/guardians are responsible for supervising practice sessions and ensuring real personal information is not shared during practice.",
         "Accounts must be created by an adult."
       ]
     },
@@ -1307,7 +1319,7 @@
         "Each practice call is limited to a maximum duration of 5 minutes.",
         "Unused credits do not expire.",
         "Practice sessions are simulations only and may be ended automatically when time limits are reached.",
-        "Conversation transcripts are stored for assessment and progress tracking."
+        "Conversation transcripts are stored for review and progress tracking."
       ]
     },
     "payments": {
@@ -1321,13 +1333,9 @@
     },
     "noAdvice": {
       "title": "5. No medical, legal, or emergency advice",
-      "description": "Bobby does not provide:",
-      "points": [
-        "medical advice",
-        "legal advice",
-        "real emergency instructions"
-      ],
-      "note": "The app is designed to teach communication skills, not to diagnose, treat, or respond to emergencies."
+      "description": "Bobby is an educational practice tool. It does not provide medical diagnosis, treatment, or professional advice.",
+      "safetyPrompts": "During practice sessions, Bobby may provide simple, educational safety prompts (for example: stay calm, stay still, unlock the door, or get a nearby adult). These prompts are for learning communication skills and should not be relied upon in real emergencies.",
+      "emergencyNote": "In a real emergency, always call 999 (UK) or 112 (EU)."
     },
     "availability": {
       "title": "6. Availability and changes",

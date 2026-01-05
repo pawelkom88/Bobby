@@ -91,12 +91,8 @@ export default function TermsConditionsPage() {
             >
               <h2 id="no-advice-heading" className="text-lg font-semibold mb-3">{t('noAdvice.title')}</h2>
               <p className="mb-3">{t('noAdvice.description')}</p>
-              <ul className="list-disc list-inside space-y-2 mb-3">
-                <li>{t('noAdvice.points.0')}</li>
-                <li>{t('noAdvice.points.1')}</li>
-                <li>{t('noAdvice.points.2')}</li>
-              </ul>
-              <p>{t('noAdvice.note')}</p>
+              <p className="mb-3">{t('noAdvice.safetyPrompts')}</p>
+              <p className="font-semibold text-red-600">{t('noAdvice.emergencyNote')}</p>
             </section>
 
             <section

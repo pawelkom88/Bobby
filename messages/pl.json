@@ -494,6 +494,17 @@
       "buyAndCall": "KUP I ZADZWOŃ",
       "clear": "WYCZYŚĆ",
       "back": "Wstecz"
+    },
+    "parentGate": {
+      "title": "Zgoda rodzica",
+      "description": "Przed rozpoczęciem ćwiczenia potwierdź:",
+      "legend": "Potwierdzenia rodzica lub opiekuna",
+      "parentGuardian": "Jestem rodzicem/opiekunem (18+) i będę nadzorować tę sesję ćwiczeń.",
+      "practiceOnly": "Rozumiem, że to tylko ćwiczenia i nie łączy z prawdziwymi służbami ratunkowymi.",
+      "noPersonalInfo": "Nie będziemy podawać prawdziwych danych osobowych podczas ćwiczeń (imion, adresów, numerów telefonów).",
+      "confirm": "ROZPOCZNIJ ĆWICZENIE",
+      "cancel": "ANULUJ",
+      "error": "Potwierdź wszystkie trzy oświadczenia, aby kontynuować."
     }
   },
   "conversation": {
@@ -727,7 +738,7 @@
     "viewAchievements": "Zobacz osiągnięcia",
     "viewConversation": "Zobacz rozmowę"
   },
-  "assessmentFeedback": {
+  "reviewFeedback": {
     "didWell": "Co zrobiłeś dobrze",
     "greatEffort": "Świetny wysiłek!",
     "nextTime": "Następnym razem spróbuj",
@@ -1002,9 +1013,9 @@
       "title": "2. Czego NIE zbieramy",
       "subtitle": "Nie zbieramy:",
       "audio": "nagrań audio",
-      "phoneNumbers": "numerów telefonów (chyba że zostaną podane podczas ćwiczeń)",
+      "phoneNumbers": "numerów telefonów (nie prosimy o nie, ale mogą pojawić się w transkrypcjach, jeśli użytkownik je poda)",
       "location": "precyzyjnego śledzenia lokalizacji",
-      "advertising": "profili reklamowych ani śledzenia zachowań dzieci"
+      "advertising": "profili reklamowych ani śledzenia dla reklam"
     },
     "practiceTranscripts": {
       "title": "3. Transkrypcje tylko do ćwiczeń (ważne)",
@@ -1012,6 +1023,8 @@
       "explanation": "Ponieważ aplikacja symuluje rozmowy awaryjne, dzieci mogą czasami mówić szczegóły osobiste podczas ćwiczeń.",
       "askNotToShare": "✅ Prosimy, aby nie udostępniać prawdziwych danych osobowych (pełnych imion, prawdziwych adresów, numerów telefonów, kodów pocztowych).",
       "redaction": "✅ Staramy się również redagować oczywiste dane osobowe z przechowywanych transkrypcji (na przykład: numery telefonów czy wspólne formaty adresów).",
+      "redactionDisclaimer": "Redakcja jest dokonywana najlepszymi sposobami i może nie złapać każdego szczegółu osobistego. Rodzice powinni nadzorować sesje ćwiczebne i unikać udostępniania prawdziwych danych osobowych.",
+      "retention": "Przechowujemy transkrypcje, dopóki rodzic ich nie usunie lub nie usunie swojego konta.",
       "parentControl": "Rodzice mogą przeglądać transkrypcje w aplikacji i mogą je usunąć, usuwając konto."
     },
     "childrensData": {
@@ -1071,55 +1084,54 @@
   "safetyPrivacy": {
     "title": "Przewodnik Bezpieczeństwa i Prywatności",
     "subtitle": "Zapewnienie bezpieczeństwa dziecka podczas nauki umiejętności awaryjnych",
-    "intro": "Bobby jest zaprojektowany jako bezpieczne, chronione środowisko dla dzieci do nauki umiejętności komunikacji awaryjnej. Ten przewodnik wyjaśnia, jak chronimy Twoje dziecko i co możesz zrobić, aby pomóc.",
+    "intro": "Bobby jest zaprojektowany jako bezpieczne, przyjazne dla dzieci środowisko do nauki tego, co mówić w sytuacji awaryjnej. Ten przewodnik wyjaśnia, jak chronimy dzieci i jak rodzice mogą osiągnąć najlepsze wyniki.",
     "howWeProtect": {
       "title": "Jak Bobby chroni Twoje dziecko",
       "points": [
-        "Brak prawdziwych służb awaryjnych - tylko symulacje",
-        "Brak zbierania danych osobowych poza informacjami o koncie",
-        "Brak reklam i śledzenia przez strony trzecie",
-        "Bezpieczne uwierzytelnianie z Firebase",
-        "Transkrypcje rozmów przechowywane prywatnie w celach oceny"
+        "Tylko do ćwiczeń — nie połączony z prawdziwymi służbami ratunkowymi",
+        "Minimalna zbieranie danych (konto rodzica, użytkowanie i transkrypcje do wglądu)",
+        "Brak reklam ani śledzenia przez strony trzecie",
+        "Bezpieczne logowanie przez Firebase Authentication",
+        "Transkrypcje tekstowe przechowywane prywatnie, aby rodzice mogli przeglądać sesje"
       ]
     },
     "parentalGuidance": {
       "title": "Wskazówki dotyczące nadzoru rodzicielskiego",
       "points": [
         "Siedź z dzieckiem podczas pierwszych kilku sesji",
-        "Omówiaj, czego się nauczyło po każdej rozmowie ćwiczeniowej",
         "Przypominaj, że to ćwiczenia, a nie prawdziwe sytuacje awaryjne",
-        "Przeglądajcie razem postępy w aplikacji"
+        "Omawiaj, co Bobby pytał i co Twoje dziecko mówiło",
+        "Przeglądajcie sesje razem w aplikacji"
       ]
     },
     "whatToTeach": {
       "title": "Ważne koncepcje bezpieczeństwa do nauki",
       "points": [
         "Kiedy dzwonić pod 999 (UK) lub 112 (UE) w prawdziwych sytuacjach awaryjnych",
-        "Imię i nazwisko, imiona rodziców i numer telefonu",
-        "Adres domowy (odpowiedni do wieku)",
-        "Co stanowi prawdziwą sytuację awaryjną"
+        "Ich adres domowy (odpowiedni do wieku) i numer telefonu rodzica",
+        "Co liczy się jako prawdziwa sytuacja awaryjna a co jako ćwiczenie"
       ]
     },
     "bestPractices": {
       "title": "Najlepsze praktyki dla sesji ćwiczebnych",
       "points": [
-        "Ćwicz regularnie, ale utrzymuj sesje zabawowe i bez presji",
-        "Chwal wysiłek i udział, a nie doskonałość",
-        "Używaj różnych scenariuszy awaryjnych, aby budować pewność siebie",
-        "Rób przerwy, jeśli dziecko wydaje się zestresowane lub przytłoczone"
+        "Utrzymuj sesje krótkie, spokojne i bez presji",
+        "Chwal wysiłek, a nie doskonałość",
+        "Praktykuj różne scenariusze z czasem",
+        "Rób przerwy, jeśli dziecko staje się niespokojne"
       ],
-      "personalInfoWarning": "**Prosimy, aby nie udostępniać prawdziwych danych osobowych podczas rozmów ćwiczebnych. Staramy się również redagować oczywiste dane osobowe z transkrypcji.**"
+      "personalInfoWarning": "**Prosimy, aby nie udostępniać prawdziwych danych osobowych podczas rozmów ćwiczebnych. Staramy się również redagować oczywiste dane osobowe z transkrypcji.**\n(Przykład: numery telefonów czy wspólne formaty adresów. Redakcja jest dokonywana najlepszymi sposobami i może nie złapać wszystkiego.)"
     },
     "practiceAddress": {
       "title": "Adres do ćwiczeń (Wskazówka prywatności)",
-      "description": "Aby pomóc chronić prywatność, Bobby używa adresu do ćwiczeń podczas treningu.",
+      "description": "Aby pomóc chronić prywatność, Bobby może używać adresu do ćwiczeń podczas treningu.",
       "avoidSharing": "Prosimy unikać udostępniania prawdziwych imion, prawdziwych adresów, kodów pocztowych ani numerów telefonów podczas rozmów ćwiczebnych."
     },
     "privacyDetails": {
       "title": "Prywatność i ochrona danych",
-      "description": "Szczegółowe informacje o tym, jak przetwarzamy dane, znajdziesz w naszej:",
-      "privacyPolicy": "Polityce Prywatności",
-      "cookiesPolicy": "Polityce Ciasteczek"
+      "description": "Aby uzyskać więcej szczegółów, przeczytaj nasze:",
+      "privacyPolicy": "Politykę Prywatności",
+      "cookiesPolicy": "Politykę Ciasteczek"
     },
     "contact": {
       "title": "Pytania lub wątpliwości?",
@@ -1216,13 +1228,9 @@
     },
     "noAdvice": {
       "title": "5. Brak porad medycznych, prawnych ani awaryjnych",
-      "description": "Bobby nie zapewnia:",
-      "points": [
-        "porad medycznych",
-        "porad prawnych",
-        "prawdziwych instrukcji awaryjnych"
-      ],
-      "note": "Aplikacja jest zaprojektowana do nauki umiejętności komunikacji, a nie do diagnozowania, leczenia lub reagowania na sytuacje awaryjne."
+      "description": "Bobby to edukacyjne narzędzie do ćwiczeń. Nie zapewnia diagnozy medycznej, leczenia ani profesjonalnych porad.",
+      "safetyPrompts": "Podczas sesji ćwiczebnych Bobby może podawać proste, edukacyjne wskazówki bezpieczeństwa (na przykład: zachowaj spokój, zostań w miejscu, otwórz drzwi lub wezwij pobliską dorosłą osobę). Te wskazówki służą do nauki umiejętności komunikacyjnych i nie powinny być wykorzystywane w prawdziwych sytuacjach awaryjnych.",
+      "emergencyNote": "W prawdziwej sytuacji awaryjnej, zawsze dzwoń pod 999 (UK) lub 112 (UE)."
     },
     "availability": {
       "title": "6. Dostępność i zmiany",

@@ -29,12 +29,6 @@ export default function PrivacyPolicyPage() {
                 {t('subtitle')}
               </h2>
               <p className="contact-subtitle-text">{t('subtitle')}</p>
-            </section>
-
-            <section
-              className="settings-section"
-              aria-labelledby="privacy-updated-heading"
-            >
               <p className="text-sm text-gray-600 mb-6">
                 {t('lastUpdated', { date: 'December 30, 2024' })}
               </p>
@@ -96,7 +90,10 @@ export default function PrivacyPolicyPage() {
               <p className="mb-4">{t('practiceTranscripts.explanation')}</p>
               <p className="mb-2">{t('practiceTranscripts.askNotToShare')}</p>
               <p className="mb-4">{t('practiceTranscripts.redaction')}</p>
-              <p>{t('practiceTranscripts.parentControl')}</p>
+              <p className="mb-4 font-semibold text-red-600">
+                {t('practiceTranscripts.redactionDisclaimer')}
+              </p>
+              <p className="mb-4">{t('practiceTranscripts.retention')}</p>
             </section>
 
             <section
