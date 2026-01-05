@@ -10,7 +10,7 @@ interface AssessmentFeedbackProps {
 export default function AssessmentFeedback({
   assessment,
 }: AssessmentFeedbackProps) {
-  const t = useTranslations('assessmentFeedback');
+  const t = useTranslations('reviewFeedback');
 
   return (
     <div className="completion-card assessment-feedback" aria-live="polite">
