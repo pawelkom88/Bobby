@@ -11,6 +11,7 @@ export const BetaFeedbackSchema = z
     practiceClarity: z.string().min(1, 'Practice clarity is required'),
     usefulness: z.string().min(1, 'Usefulness is required'),
     wouldUseAgain: z.string().min(1, 'Would use again is required'),
+    willingToPay: z.string().min(1, 'Willing to pay is required'),
     npsScore: z.number().min(0).max(10),
     likedMost: z.string().optional(),
     improveFirst: z.string().optional(),

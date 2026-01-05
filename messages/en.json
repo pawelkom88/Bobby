@@ -3,6 +3,7 @@
     "noBadges": "No badges earned yet. Keep practicing to unlock your first badge!",
     "earnedBadges": "Earned Badges",
     "viewAll": "View All Badges",
+    "showMore": "Show More",
     "showLess": "Show Less"
   },
   "metadata": {
@@ -928,6 +929,12 @@
         "yes": "Yes",
         "maybe": "Maybe",
         "no": "No"
+      },
+      "willingToPay": {
+        "label": "Would you pay £2.99 for 2 calls (Rookie Pack) or £4.99 for 5 calls (Hero Pack)?",
+        "yes": "Yes",
+        "maybe": "Maybe",
+        "no": "No"
       }
     },
     "section5": {
@@ -957,6 +964,7 @@
     "practiceClarityRequired": "Please select if it was clear this was practice",
     "usefulnessRequired": "Please select if this practice is useful",
     "wouldUseAgainRequired": "Please select if you would use Bobby again",
+    "willingToPayRequired": "Please select if you would pay for Bobby",
     "validationErrors": "Please fix the following errors:"
   },
   "trainingHistory": {

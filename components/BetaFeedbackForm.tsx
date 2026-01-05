@@ -26,6 +26,7 @@ interface BetaFeedbackData {
   // Section 4: Value
   usefulness: string;
   wouldUseAgain: string;
+  willingToPay: string;
 
   // Section 5: NPS and Open feedback
   npsScore: number;
@@ -55,6 +56,7 @@ export default function BetaFeedbackForm() {
     practiceClarity: '',
     usefulness: '',
     wouldUseAgain: '',
+    willingToPay: '',
     npsScore: 5,
     likedMost: '',
     improveFirst: '',
@@ -96,6 +98,7 @@ export default function BetaFeedbackForm() {
       practiceClarity: t('section3.practiceClarity.label'),
       usefulness: t('section4.usefulness.label'),
       wouldUseAgain: t('section4.useAgain.label'),
+      willingToPay: t('section4.willingToPay.label'),
       contactEmail: t('section5.email'),
     };
     return labelMap[fieldPath] || fieldPath;
@@ -160,6 +163,9 @@ export default function BetaFeedbackForm() {
             break;
           case 'Would use again is required':
             errorMessage = t('wouldUseAgainRequired');
+            break;
+          case 'Willing to pay is required':
+            errorMessage = t('willingToPayRequired');
             break;
           default:
             errorMessage = issue.message;
@@ -661,6 +667,43 @@ export default function BetaFeedbackForm() {
                   {fieldErrors.wouldUseAgain && (
                     <span className={styles['beta-feedback-error']}>
                       {fieldErrors.wouldUseAgain}
+                    </span>
+                  )}
+                </div>
+
+                <div className={styles['beta-feedback-field']} data-field="willingToPay">
+                  <label className={styles['beta-feedback-label']} id="willingToPay-label">
+                    {renderRequiredLabel('section4.willingToPay.label')}
+                  </label>
+                  <div
+                    className={styles['beta-feedback-radio-group']}
+                    role="radiogroup"
+                    aria-labelledby="willingToPay-label"
+                  >
+                    {['yes', 'maybe', 'no'].map(wtp => (
+                      <label
+                        key={wtp}
+                        className={styles['beta-feedback-radio-label']}
+                        htmlFor={`willingToPay-${wtp}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`willingToPay-${wtp}`}
+                          name="willingToPay"
+                          value={wtp}
+                          checked={formData.willingToPay === wtp}
+                          onChange={e =>
+                            handleInputChange('willingToPay', e.target.value)
+                          }
+                          aria-describedby="willingToPay-label"
+                        />
+                        <span>{t(`section4.willingToPay.${wtp}`)}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {fieldErrors.willingToPay && (
+                    <span className={styles['beta-feedback-error']}>
+                      {fieldErrors.willingToPay}
                     </span>
                   )}
                 </div>

@@ -3,6 +3,7 @@
     "noBadges": "Brak odznak. Ćwicz dalej, aby odblokować pierwszą odznakę!",
     "earnedBadges": "Zdobyte odznaki",
     "viewAll": "Zobacz wszystkie odznaki",
+    "showMore": "Pokaż więcej",
     "showLess": "Schowaj"
   },
   "metadata": {
@@ -1358,6 +1359,12 @@
         "yes": "Tak",
         "maybe": "Może",
         "no": "Nie"
+      },
+      "willingToPay": {
+        "label": "Czy zapłaciłbyś/zapłaciłabyś 23 zł za 2 rozmowy (Pakiet Rookie) czy 37 zł za 5 rozmów (Pakiet Hero)?",
+        "yes": "Tak",
+        "maybe": "Może",
+        "no": "Nie"
       }
     },
     "section5": {
@@ -1387,6 +1394,7 @@
     "practiceClarityRequired": "Proszę wybrać, czy było jasne, że to był ćwiczenie",
     "usefulnessRequired": "Proszę wybrać, czy takie ćwiczenia są przydatne",
     "wouldUseAgainRequired": "Proszę wybrać, czy użyjesz Bobby ponownie",
+    "willingToPayRequired": "Proszę wybrać, czy zapłaciłbyś za Bobby",
     "validationErrors": "Proszę poprawić następujące błędy:"
   },
   "cookies": {
