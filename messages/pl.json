@@ -62,6 +62,10 @@
       "confirmPasswordLabel": "Potwierdź hasło",
       "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny (!@#$%^&*(),.?\":()|<>)",
       "passwordStrength": "Siła hasła",
+      "termsAgreementPrefix": "Zgadzam się z",
+      "termsAgreementTerms": "Regulaminem",
+      "termsAgreementConnector": "i potwierdzam zapoznanie się z",
+      "termsAgreementPrivacy": "Polityką prywatności",
       "submit": "ZAREJESTRUJ SIĘ",
       "submitting": "TWORZENIE KONTA...",
       "loginPrompt": "Już jesteś w drużynie?",
@@ -82,6 +86,7 @@
       "passwordRequired": "Hasło jest wymagane",
       "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
       "confirmPasswordRequired": "Potwierdź swoje hasło",
+      "termsRequired": "Musisz zaakceptować regulamin i politykę prywatności.",
       "passwordsMismatch": "Hasła nie są takie same",
       "invalidCredential": "Nieprawidłowy email lub hasło. Spróbuj ponownie.",
       "tooManyRequests": "Zbyt wiele nieudanych prób. Spróbuj ponownie później.",
@@ -983,83 +988,84 @@
     "lastUpdated": "Ostatnia aktualizacja: {date}",
     "whatWeCollect": {
       "title": "1. Jakie dane zbieramy",
-      "intro": "Zbieramy minimalne dane, ściśle wymagane do działania aplikacji. Dotyczy to danych takie jak:",
-      "accountInfo": "Informacje o koncie (adres e-mail), gdy rodzic tworzy konto",
-      "purchaseInfo": "Informacje o zakupie (obsługiwane bezpiecznie przez Stripe)",
+      "intro": "Zbieramy minimalne dane, ściśle wymagane do działania aplikacji:",
+      "accountInfo": "Informacje o koncie (adres e-mail rodzica) gdy rodzic tworzy konto",
+      "purchaseInfo": "Informacje o zakupie (przetwarzane bezpiecznie przez Stripe)",
       "usageData": {
         "title": "Dane o użytkowaniu, takie jak:",
-        "practiceCalls": "liczba wykonanych rozmów",
-        "sessionDates": "data i czas trwania sesji (tylko w minutach)",
-        "durationMinutes": "data i czas trwania sesji (tylko w minutach)"
-      },
-      "notCollect": {
-        "title": "NIE zbieramy:",
-        "realNames": "prawdziwych imion dzieci (chyba że zostaną podane podczas ćwiczeń)",
-        "realAddresses": "prawdziwych adresów (chyba że zostaną podane podczas ćwiczeń)",
-        "phoneNumbers": "numerów telefonów",
-        "location": "dokładnych danych lokalizacji",
-        "audio": "nagrań audio",
-        "transcripts": "transkrypcji rozmów (przechowujemy tekst rozmów w celu oceny i śledzenia postępów)",
-        "sensitive": "jakichkolwiek wrażliwych danych osobowych"
+        "practiceCalls": "liczba wykonanych rozmów ćwiczebnych",
+        "sessionDates": "data i czas trwania sesji ćwiczebnych",
+        "transcripts": "Transkrypcje rozmów (tylko tekst) aby rodzice mogli przeglądać sesje ćwiczebne i śledzić postępy"
       }
+    },
+    "whatWeDoNotCollect": {
+      "title": "2. Czego NIE zbieramy",
+      "subtitle": "Nie zbieramy:",
+      "audio": "nagrań audio",
+      "phoneNumbers": "numerów telefonów (chyba że zostaną podane podczas ćwiczeń)",
+      "location": "precyzyjnego śledzenia lokalizacji",
+      "advertising": "profili reklamowych ani śledzenia zachowań dzieci"
+    },
+    "practiceTranscripts": {
+      "title": "3. Transkrypcje tylko do ćwiczeń (ważne)",
+      "intro": "Bobby jest wyłącznie narzędziem do ćwiczeń i edukacji.",
+      "explanation": "Ponieważ aplikacja symuluje rozmowy awaryjne, dzieci mogą czasami mówić szczegóły osobiste podczas ćwiczeń.",
+      "askNotToShare": "✅ Prosimy, aby nie udostępniać prawdziwych danych osobowych (pełnych imion, prawdziwych adresów, numerów telefonów, kodów pocztowych).",
+      "redaction": "✅ Staramy się również redagować oczywiste dane osobowe z przechowywanych transkrypcji (na przykład: numery telefonów czy wspólne formaty adresów).",
+      "parentControl": "Rodzice mogą przeglądać transkrypcje w aplikacji i mogą je usunąć, usuwając konto."
     },
     "childrensData": {
-      "title": "2. Dane dzieci",
-      "noAccounts": "Bobby jest zaprojektowany dla dzieci, ale konta są tworzone i zarządzane przez rodziców lub opiekunów.",
-      "noInfoRequired": "Dzieci nie tworzą kont samodzielnie",
-      "noPersonalInfo": "Nie są wymagane żadne dane osobowe dzieci do korzystania z aplikacji",
-      "conversationsStored": "Tekst rozmów jest przechowywany w celu oceny i śledzenia postępów. Dzieci mogą dzielić się informacjami osobistymi podczas ćwiczeń, które będą przechowywane jako część transkrypcji rozmowy.",
-      "noRecordings": "Nie przechowujemy nagrań audio, tylko tekst rozmów"
+      "title": "4. Dane dzieci",
+      "accountsManaged": "Bobby jest zaprojektowany dla dzieci, ale konta są tworzone i zarządzane przez rodziców lub opiekunów.",
+      "noAccounts": "Dzieci nie tworzą kont samodzielnie",
+      "noAudio": "Nie przechowujemy nagrań audio, tylko tekst rozmów"
     },
     "howWeUseData": {
-      "title": "3. Jak używamy danych",
+      "title": "5. Jak używamy danych",
       "intro": "Dane używamy tylko do:",
-      "provideAccess": "udzielania dostępu do zakupionych rozmów",
+      "provideAccess": "udzielania dostępu do zakupionych rozmów ćwiczebnych",
       "trackCredits": "śledzenia pozostałych kredytów rozmów",
+      "allowReview": "pozwolenia rodzicom na przeglądanie sesji ćwiczebnych",
       "improvePerformance": "poprawy wydajności i niezawodności aplikacji",
       "compliance": "zgodności z wymogami prawnymi i księgowymi",
-      "notUsed": {
-        "title": "Nie używamy danych do profilowania, reklam skierowanych do dzieci ani automatycznego podejmowania decyzji.",
-        "profiling": "Nie używamy danych do profilowania, reklam skierowanych do dzieci ani automatycznego podejmowania decyzji."
-      }
+      "notUsed": "Nie używamy danych do profilowania, reklam skierowanych do dzieci ani automatycznego podejmowania decyzji."
     },
     "payments": {
-      "title": "4. Płatności",
+      "title": "6. Płatności",
       "processedBy": "Płatności są przetwarzane bezpiecznie przez Stripe.",
-      "noCardDetails": "Nie przechowujemy danych kart kredytowych.",
-      "stripePrivacy": "Stripe przetwarza płatności zgodnie ze swoimi własnymi standardami prywatności i bezpieczeństwa."
+      "noCardDetails": "Nie przechowujemy danych kart kredytowych."
     },
     "analytics": {
-      "title": "5. Analityka",
+      "title": "7. Analityka",
       "noAnalytics": "W tej chwili nie używamy żadnych usług analitycznych."
     },
     "dataSharing": {
-      "title": "6. Udostępnianie danych",
-      "noSale": "Nie sprzedajemy ani nie udostępniamy danych osobowych stronom trzecim, z wyjątkiem:",
-      "exceptions": "przetwarzania płatności (Stripe) oraz dostawców hostingu i infrastruktury niezbędnych do działania aplikacji",
+      "title": "8. Udostępnianie danych",
+      "noSale": "Nie sprzedajemy ani nie udostępniamy danych osobowych stronom trzecim, z wyjątkiem dostawców ściśle koniecznych do działania aplikacji, takich jak:",
       "payment": "przetwarzanie płatności (Stripe)",
-      "hosting": "dostawcy hostingu i infrastruktury niezbędni do działania aplikacji",
-      "gdprCompliant": "Wszyscy dostawcy są zgodni z RODO."
+      "authentication": "uwierzytelnianie i przechowywanie (Firebase)",
+      "hosting": "hosting (Netlify)",
+      "voiceProviders": "dostawcy przetwarzania głosu używani podczas sesji ćwiczebnych",
+      "gdprCompliant": "Wszyscy dostawcy są oczekiwani do bycia zgodnymi z RODO."
     },
     "dataRights": {
-      "title": "7. Twoje prawa dotyczące danych",
-      "intro": "Masz następujące prawa dotyczące swoich danych osobowych:",
-      "access": "Dostęp do swoich danych osobowych",
-      "correction": "Poprawianie nieprawidłowych danych",
-      "deletion": "Usunięcie konta i wszystkich powiązanych danych",
-      "portability": "Kopia danych w formacie cyfrowym",
-      "howToDelete": "Aby usunąć konto i wszystkie dane, przejdź do Ustawień i kliknij przycisk 'Usuń konto'. Ta czynność jest nieodwracalna.",
-      "whatHappens": "Po usunięciu, Twoje konto, historia rozmów, kredyty i wszystkie dane osobowe zostaną trwale usunięte niezwłocznie."
+      "title": "9. Twoje prawa dotyczące danych",
+      "intro": "Możesz:",
+      "access": "żądać dostępu do swoich danych osobowych",
+      "correction": "żądać poprawienia",
+      "deletion": "żądać usunięcia",
+      "portability": "żądać kopii w formacie czytelnym dla maszyny",
+      "howToDelete": "Aby usunąć konto i wszystkie dane, przejdź do Ustawień i kliknij Usuń Konto.",
+      "whatHappens": "Ta czynność jest nieodwracalna. Po usunięciu, Twoje konto, transkrypcje, kredyty i wszystkie dane osobowe zostaną trwale usunięte."
     },
     "practiceDisclaimer": {
-      "title": "8. Wyłącznie do ćwiczeń",
-      "educationalTool": "Bobby jest wyłącznie narzędziem do ćwiczeń i edukacji.",
-      "notConnected": "Nie jest połączony z prawdziwymi służbami ratunkowymi.",
+      "title": "10. Wyłącznie do ćwiczeń",
+      "educationalTool": "Bobby jest wyłącznie do ćwiczeń. Nie jest połączony z prawdziwymi służbami ratunkowymi.",
       "emergencyNumbers": "W prawdziwych sytuacjach awaryjnych, zawsze dzwoń pod 999 (UK) lub 112 (UE)."
     },
     "privacyContact": {
-      "title": "9. Kontakt",
-      "questions": "Jeśli masz jakiekolwiek pytania dotyczące prywatności lub bezpieczeństwa, skontaktuj się z nami pod adresem: {email}"
+      "title": "Kontakt",
+      "questions": "Jeśli masz jakiekolwiek pytania dotyczące tej Polityki Prywatności, skontaktuj się z nami pod adresem: {email}"
     }
   },
   "safetyPrivacy": {
@@ -1101,7 +1107,13 @@
         "Chwal wysiłek i udział, a nie doskonałość",
         "Używaj różnych scenariuszy awaryjnych, aby budować pewność siebie",
         "Rób przerwy, jeśli dziecko wydaje się zestresowane lub przytłoczone"
-      ]
+      ],
+      "personalInfoWarning": "**Prosimy, aby nie udostępniać prawdziwych danych osobowych podczas rozmów ćwiczebnych. Staramy się również redagować oczywiste dane osobowe z transkrypcji.**"
+    },
+    "practiceAddress": {
+      "title": "Adres do ćwiczeń (Wskazówka prywatności)",
+      "description": "Aby pomóc chronić prywatność, Bobby używa adresu do ćwiczeń podczas treningu.",
+      "avoidSharing": "Prosimy unikać udostępniania prawdziwych imion, prawdziwych adresów, kodów pocztowych ani numerów telefonów podczas rozmów ćwiczebnych."
     },
     "privacyDetails": {
       "title": "Prywatność i ochrona danych",
@@ -1178,7 +1190,7 @@
       "title": "2. Kto może korzystać z aplikacji",
       "points": [
         "Bobby jest przeznaczony dla rodziców lub opiekunów prawnych.",
-        "Dzieci mogą korzystać z aplikacji tylko za wiedzą i pod nadzorem rodziców.",
+        "Dzieci mogą korzystać z aplikacji tylko pod aktywnym nadzorem rodziców.",
         "Konta muszą być tworzone przez dorosłych."
       ]
     },

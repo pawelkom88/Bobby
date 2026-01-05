@@ -58,21 +58,45 @@ export default function PrivacyPolicyPage() {
                 <ul className="list-circle list-inside ml-6 space-y-1">
                   <li>{t('whatWeCollect.usageData.practiceCalls')}</li>
                   <li>{t('whatWeCollect.usageData.sessionDates')}</li>
-                  <li>{t('whatWeCollect.usageData.durationMinutes')}</li>
+                  <li>{t('whatWeCollect.usageData.transcripts')}</li>
                 </ul>
               </ul>
-              <p className="font-semibold text-red-600">
-                {t('whatWeCollect.notCollect.title')}
-              </p>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="what-we-do-not-collect-heading"
+            >
+              <h2
+                id="what-we-do-not-collect-heading"
+                className="text-lg font-semibold mb-3"
+              >
+                {t('whatWeDoNotCollect.title')}
+              </h2>
+              <p className="mb-3">{t('whatWeDoNotCollect.subtitle')}</p>
               <ul className="list-disc list-inside space-y-2">
-                <li>{t('whatWeCollect.notCollect.realNames')}</li>
-                <li>{t('whatWeCollect.notCollect.realAddresses')}</li>
-                <li>{t('whatWeCollect.notCollect.phoneNumbers')}</li>
-                <li>{t('whatWeCollect.notCollect.location')}</li>
-                <li>{t('whatWeCollect.notCollect.audio')}</li>
-                <li>{t('whatWeCollect.notCollect.transcripts')}</li>
-                <li>{t('whatWeCollect.notCollect.sensitive')}</li>
+                <li>{t('whatWeDoNotCollect.audio')}</li>
+                <li>{t('whatWeDoNotCollect.phoneNumbers')}</li>
+                <li>{t('whatWeDoNotCollect.location')}</li>
+                <li>{t('whatWeDoNotCollect.advertising')}</li>
               </ul>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="practice-transcripts-heading"
+            >
+              <h2
+                id="practice-transcripts-heading"
+                className="text-lg font-semibold mb-3"
+              >
+                {t('practiceTranscripts.title')}
+              </h2>
+              <p className="mb-2">{t('practiceTranscripts.intro')}</p>
+              <p className="mb-4">{t('practiceTranscripts.explanation')}</p>
+              <p className="mb-2">{t('practiceTranscripts.askNotToShare')}</p>
+              <p className="mb-4">{t('practiceTranscripts.redaction')}</p>
+              <p>{t('practiceTranscripts.parentControl')}</p>
             </section>
 
             <section
@@ -85,9 +109,9 @@ export default function PrivacyPolicyPage() {
               >
                 {t('childrensData.title')}
               </h2>
+              <p className="mb-2">{t('childrensData.accountsManaged')}</p>
               <p className="mb-2">{t('childrensData.noAccounts')}</p>
-              <p className="mb-2">{t('childrensData.noInfoRequired')}</p>
-              <p>{t('childrensData.noRecordings')}</p>
+              <p>{t('childrensData.noAudio')}</p>
             </section>
 
             <section
@@ -104,11 +128,11 @@ export default function PrivacyPolicyPage() {
               <ul className="list-disc list-inside space-y-2 mb-4">
                 <li>{t('howWeUseData.provideAccess')}</li>
                 <li>{t('howWeUseData.trackCredits')}</li>
+                <li>{t('howWeUseData.allowReview')}</li>
                 <li>{t('howWeUseData.improvePerformance')}</li>
                 <li>{t('howWeUseData.compliance')}</li>
               </ul>
-              <p className="font-semibold">{t('howWeUseData.notUsed.title')}</p>
-              <p>{t('howWeUseData.notUsed.profiling')}</p>
+              <p>{t('howWeUseData.notUsed')}</p>
             </section>
 
             <section
@@ -119,8 +143,7 @@ export default function PrivacyPolicyPage() {
                 {t('payments.title')}
               </h2>
               <p className="mb-2">{t('payments.processedBy')}</p>
-              <p className="mb-2">{t('payments.noCardDetails')}</p>
-              <p>{t('payments.stripePrivacy')}</p>
+              <p>{t('payments.noCardDetails')}</p>
             </section>
 
             <section
@@ -146,10 +169,11 @@ export default function PrivacyPolicyPage() {
                 {t('dataSharing.title')}
               </h2>
               <p className="mb-3">{t('dataSharing.noSale')}</p>
-              <p className="mb-2">{t('dataSharing.exceptions')}</p>
               <ul className="list-disc list-inside space-y-2 mb-4">
                 <li>{t('dataSharing.payment')}</li>
+                <li>{t('dataSharing.authentication')}</li>
                 <li>{t('dataSharing.hosting')}</li>
+                <li>{t('dataSharing.voiceProviders')}</li>
               </ul>
               <p>{t('dataSharing.gdprCompliant')}</p>
             </section>
@@ -186,7 +210,6 @@ export default function PrivacyPolicyPage() {
                 {t('practiceDisclaimer.title')}
               </h2>
               <p className="mb-2">{t('practiceDisclaimer.educationalTool')}</p>
-              <p className="mb-2">{t('practiceDisclaimer.notConnected')}</p>
               <p className="font-semibold text-red-600">
                 {t('practiceDisclaimer.emergencyNumbers')}
               </p>

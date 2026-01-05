@@ -62,6 +62,10 @@
       "confirmPasswordLabel": "Confirm Password",
       "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*(),.?\":()|<>)",
       "passwordStrength": "Password strength",
+      "termsAgreementPrefix": "I agree to the",
+      "termsAgreementTerms": "Terms & Conditions",
+      "termsAgreementConnector": "and acknowledge the",
+      "termsAgreementPrivacy": "Privacy Policy",
       "submit": "SIGN UP",
       "submitting": "CREATING ACCOUNT...",
       "loginPrompt": "Already part of the team?",
@@ -82,6 +86,7 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "confirmPasswordRequired": "Please confirm your password",
+      "termsRequired": "Please agree to the Terms & Conditions and acknowledge the Privacy Policy.",
       "passwordsMismatch": "Passwords do not match",
       "invalidCredential": "Invalid email or password. Please try again.",
       "tooManyRequests": "Too many failed attempts. Please try again later.",
@@ -1088,83 +1093,84 @@
     "lastUpdated": "Last updated: {date}",
     "whatWeCollect": {
       "title": "1. What data we collect",
-      "intro": "We collect minimal data only, strictly required to operate the app. We may collect:",
-      "accountInfo": "Account information (email address) when a parent creates an account",
-      "purchaseInfo": "Purchase information (handled securely by Stripe)",
+      "intro": "We collect minimal data only, strictly required to operate the app:",
+      "accountInfo": "Account information (parent email address) when a parent creates an account",
+      "purchaseInfo": "Purchase information (processed securely by Stripe)",
       "usageData": {
-        "title": "Usage data such as:",
+        "title": "Usage data, such as:",
         "practiceCalls": "number of practice calls used",
-        "sessionDates": "date and duration of practice sessions (minutes only)",
-        "durationMinutes": "date and duration of practice sessions (minutes only)"
-      },
-      "notCollect": {
-        "title": "We do NOT collect:",
-        "realNames": "real names of children (unless shared during practice)",
-        "realAddresses": "real addresses (unless shared during practice)",
-        "phoneNumbers": "phone numbers",
-        "location": "precise location data",
-        "audio": "audio recordings",
-        "transcripts": "transcripts of conversations (we store text for assessment and progress tracking)",
-        "sensitive": "any sensitive personal data"
+        "sessionDates": "date and duration of practice sessions",
+        "transcripts": "Conversation transcripts (text only) so parents can review practice sessions and track progress"
       }
     },
+    "whatWeDoNotCollect": {
+      "title": "2. What we do NOT collect",
+      "subtitle": "We do not collect:",
+      "audio": "audio recordings",
+      "phoneNumbers": "phone numbers (unless shared during practice)",
+      "location": "precise location tracking",
+      "advertising": "advertising profiles or behavioural tracking for children"
+    },
+    "practiceTranscripts": {
+      "title": "3. Practice-only transcripts (important)",
+      "intro": "Bobby is a practice and educational tool only.",
+      "explanation": "Because the app simulates emergency conversations, children may sometimes say personal details during practice.",
+      "askNotToShare": "✅ We ask you not to share real personal information (full names, real addresses, phone numbers, postcodes).",
+      "redaction": "✅ We also try to redact obvious personal details from stored transcripts (for example: phone numbers or common address formats).",
+      "parentControl": "Parents can review transcripts inside the app and may delete them by deleting the account."
+    },
     "childrensData": {
-      "title": "2. Children's data",
-      "noAccounts": "Bobby is designed for children, but accounts are created and managed by parents or guardians.",
-      "noInfoRequired": "Children do not create accounts themselves",
-      "noPersonalInfo": "No personal information about children is required to use the app",
-      "conversationsStored": "Practice conversation text is stored for assessment and progress tracking. Children may share personal information during practice which will be stored as part of the conversation transcript.",
-      "noRecordings": "We do not store audio recordings, only conversation text"
+      "title": "4. Children's data",
+      "accountsManaged": "Bobby is designed for children, but accounts are created and managed by parents or guardians.",
+      "noAccounts": "Children do not create accounts themselves",
+      "noAudio": "We do not store audio recordings, only conversation text"
     },
     "howWeUseData": {
-      "title": "3. How we use the data",
+      "title": "5. How we use the data",
       "intro": "We use data only to:",
       "provideAccess": "provide access to purchased practice calls",
       "trackCredits": "track remaining call credits",
+      "allowReview": "allow parents to review practice sessions",
       "improvePerformance": "improve app performance and reliability",
       "compliance": "comply with legal and accounting requirements",
-      "notUsed": {
-        "title": "We do not use data for profiling, advertising to children, or automated decision-making.",
-        "profiling": "We do not use data for profiling, advertising to children, or automated decision-making."
-      }
+      "notUsed": "We do not use data for profiling, advertising to children, or automated decision-making."
     },
     "payments": {
-      "title": "4. Payments",
+      "title": "6. Payments",
       "processedBy": "Payments are processed securely by Stripe.",
-      "noCardDetails": "We do not store credit card details.",
-      "stripePrivacy": "Stripe processes payments according to their own privacy and security standards."
+      "noCardDetails": "We do not store credit card details."
     },
     "analytics": {
-      "title": "5. Analytics",
+      "title": "7. Analytics",
       "noAnalytics": "We do not use any analytics services at this time."
     },
     "dataSharing": {
-      "title": "6. Data sharing",
-      "noSale": "We do not sell or share personal data with third parties, except:",
-      "exceptions": "payment processing (Stripe) and hosting and infrastructure providers strictly necessary to run the app",
+      "title": "8. Data sharing",
+      "noSale": "We do not sell or share personal data with third parties, except providers strictly necessary to run the app, such as:",
       "payment": "payment processing (Stripe)",
-      "hosting": "hosting and infrastructure providers strictly necessary to run the app",
-      "gdprCompliant": "All providers are GDPR-compliant."
+      "authentication": "authentication and storage (Firebase)",
+      "hosting": "hosting (Netlify)",
+      "voiceProviders": "voice processing providers used during practice sessions",
+      "gdprCompliant": "All providers are expected to be GDPR-compliant."
     },
     "dataRights": {
-      "title": "7. Your Data Rights",
-      "intro": "You have the following rights regarding your personal data:",
-      "access": "Request access to your personal data",
-      "correction": "Request correction of inaccurate data",
-      "deletion": "Request deletion of your account and all associated data",
-      "portability": "Request a copy of your data in a machine-readable format",
-      "howToDelete": "To delete your account and all data, go to Settings and click the 'Delete Account' button. This action is irreversible.",
-      "whatHappens": "Upon deletion, your account, conversation history, credits, and all personal information will be permanently deleted immediately."
+      "title": "9. Your data rights",
+      "intro": "You may:",
+      "access": "request access to your personal data",
+      "correction": "request correction",
+      "deletion": "request deletion",
+      "portability": "request a copy in a machine-readable format",
+      "howToDelete": "To delete your account and all data, go to Settings and click Delete Account.",
+      "whatHappens": "This action is irreversible. Upon deletion, your account, transcripts, credits, and all personal information will be permanently deleted."
     },
     "practiceDisclaimer": {
-      "title": "8. Practice-only disclaimer",
-      "educationalTool": "Bobby is a practice and educational tool only.",
-      "notConnected": "It is not connected to real emergency services.",
+      "title": "10. Practice-only disclaimer",
+      "educationalTool": "Bobby is practice only. It is not connected to real emergency services.",
       "emergencyNumbers": "In real emergencies, always call 999 (UK) or 112 (EU)."
     },
     "privacyContact": {
-      "title": "9. Contact",
-      "questions": "If you have any questions about privacy or safety, contact us at: {email}"
+      "title": "Contact",
+      "questions": "If you have any questions about this Privacy Policy, please contact us at: {email}"
     }
   },
   "safetyPrivacy": {
@@ -1206,7 +1212,13 @@
         "Praise effort and participation, not perfection",
         "Use different emergency scenarios to build confidence",
         "Take breaks if your child seems anxious or overwhelmed"
-      ]
+      ],
+      "personalInfoWarning": "**We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts.**"
+    },
+    "practiceAddress": {
+      "title": "Practice Address (Privacy Tip)",
+      "description": "To help protect privacy, Bobby uses a practice address during training.",
+      "avoidSharing": "Please avoid sharing real names, real addresses, postcodes, or phone numbers during practice calls."
     },
     "privacyDetails": {
       "title": "Privacy & Data Protection",
@@ -1283,7 +1295,7 @@
       "title": "2. Who may use the app",
       "points": [
         "Bobby is intended for parents or legal guardians.",
-        "Children may use the app only with parental awareness and supervision.",
+        "Children may use the app only with active parental supervision.",
         "Accounts must be created by an adult."
       ]
     },

@@ -103,6 +103,25 @@ export default function SafetyPrivacyPage() {
                 <li>{t('bestPractices.points.2')}</li>
                 <li>{t('bestPractices.points.3')}</li>
               </ul>
+              <p className="mt-4 font-semibold text-red-600">
+                {t('bestPractices.personalInfoWarning')}
+              </p>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="practice-address-heading"
+            >
+              <h2
+                id="practice-address-heading"
+                className="settings-section-heading"
+              >
+                {t('practiceAddress.title')}
+              </h2>
+              <p className="mb-2">{t('practiceAddress.description')}</p>
+              <p className="font-semibold text-red-600">
+                {t('practiceAddress.avoidSharing')}
+              </p>
             </section>
 
             <section
