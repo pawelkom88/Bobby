@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import PageWrapper from './PageWrapper';
 import CartoonButton from './CartoonButton';
 import { BetaFeedbackSchema } from '@/lib/schemas/beta-feedback';
+import styles from './BetaFeedbackForm.module.css';
 
 interface BetaFeedbackData {
   // Section 1: About your child
@@ -80,7 +81,7 @@ export default function BetaFeedbackForm() {
   const renderRequiredLabel = (labelKey: string) => (
     <>
       {t(labelKey)}
-      <span className="required-asterisk" aria-label="required">
+      <span className={styles['required-asterisk']} aria-label="required">
         *
       </span>
     </>
@@ -259,10 +260,10 @@ export default function BetaFeedbackForm() {
   if (isSubmitted) {
     return (
       <PageWrapper>
-        <div className="beta-feedback-success">
-          <div className="beta-feedback-success-content">
-            <h1 className="beta-feedback-success-title">{t('thankYou')}</h1>
-            <p className="beta-feedback-success-message">
+        <div className={styles['beta-feedback-success']}>
+          <div className={styles['beta-feedback-success-content']}>
+            <h1 className={styles['beta-feedback-success-title']}>{t('thankYou')}</h1>
+            <p className={styles['beta-feedback-success-message']}>
               {t('successMessage')}
             </p>
             <CartoonButton
@@ -279,53 +280,53 @@ export default function BetaFeedbackForm() {
 
   return (
     <PageWrapper>
-      <div className="beta-feedback-form-container">
-        <header className="beta-feedback-header">
-          <h1 className="beta-feedback-title">{t('title')}</h1>
-          <p className="beta-feedback-description">{t('description')}</p>
+      <div className={styles['beta-feedback-form-container']}>
+        <header className={styles['beta-feedback-header']}>
+          <h1 className={styles['beta-feedback-title']}>{t('title')}</h1>
+          <p className={styles['beta-feedback-description']}>{t('description')}</p>
         </header>
 
         {Object.keys(fieldErrors).length > 0 && (
           <div className="reset-warning" role="alert" aria-live="polite">
-            <h3 className="beta-feedback-error-summary-title">
+            <h3 className={styles['beta-feedback-error-summary-title']}>
               {t('validationErrors')}
             </h3>
-            <ol className="beta-feedback-error-list">
+            <ol className={styles['beta-feedback-error-list']}>
               {Object.entries(fieldErrors).map(([fieldPath, error], index) => (
                 <li key={fieldPath}>
-                  <span className="beta-feedback-error-number">
+                  <span className={styles['beta-feedback-error-number']}>
                     {index + 1}.
                   </span>
                   <strong>{getFieldLabel(fieldPath)}</strong>
-                  <p className="beta-feedback-error-paragraph">{error}</p>
+                  <p className={styles['beta-feedback-error-paragraph']}>{error}</p>
                 </li>
               ))}
             </ol>
           </div>
         )}
         {Object.keys(fieldErrors).length > 0 && <br />}
-        <section className="beta-feedback-section">
-          <div className="beta-feedback-card">
-            <form onSubmit={handleSubmit} className="beta-feedback-form">
+        <section className={styles['beta-feedback-section']}>
+          <div className={styles['beta-feedback-card']}>
+            <form onSubmit={handleSubmit} className={styles['beta-feedback-form']}>
               {/* Section 1: About your child */}
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section1.title')}
                 </h2>
 
-                <div className="beta-feedback-field" data-field="childAge">
-                  <label className="beta-feedback-label" id="childAge-label">
+                <div className={styles['beta-feedback-field']} data-field="childAge">
+                  <label className={styles['beta-feedback-label']} id="childAge-label">
                     {renderRequiredLabel('section1.age')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="childAge-label"
                   >
                     {['5–6', '7–8', '9–10', '11–12'].map(age => (
                       <label
                         key={age}
-                        className="beta-feedback-radio-label"
+                        className={styles['beta-feedback-radio-label']}
                         htmlFor={`childAge-${age}`}
                       >
                         <input
@@ -344,18 +345,18 @@ export default function BetaFeedbackForm() {
                     ))}
                   </div>
                   {fieldErrors.childAge && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.childAge}
                     </span>
                   )}
                 </div>
 
-                <div className="beta-feedback-field" data-field="scenarios">
-                  <label className="beta-feedback-label" id="scenarios-label">
+                <div className={styles['beta-feedback-field']} data-field="scenarios">
+                  <label className={styles['beta-feedback-label']} id="scenarios-label">
                     {renderRequiredLabel('section1.scenarios.label')}
                   </label>
                   <div
-                    className="beta-feedback-checkbox-group"
+                    className={styles['beta-feedback-checkbox-group']}
                     role="group"
                     aria-labelledby="scenarios-label"
                   >
@@ -363,7 +364,7 @@ export default function BetaFeedbackForm() {
                       scenario => (
                         <label
                           key={scenario}
-                          className="beta-feedback-checkbox-label"
+                          className={styles['beta-feedback-checkbox-label']}
                           htmlFor={`scenario-${scenario}`}
                         >
                           <input
@@ -380,7 +381,7 @@ export default function BetaFeedbackForm() {
                     )}
                   </div>
                   {fieldErrors.scenarios && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.scenarios}
                     </span>
                   )}
@@ -388,24 +389,24 @@ export default function BetaFeedbackForm() {
               </section>
 
               {/* Section 2: Experience */}
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section2.title')}
                 </h2>
 
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" id="ease-label">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} id="ease-label">
                     {t('section2.ease.label')}
                   </label>
                   <div
-                    className="beta-feedback-scale"
+                    className={styles['beta-feedback-scale']}
                     role="radiogroup"
                     aria-labelledby="ease-label"
                   >
                     {[1, 2, 3, 4, 5].map(num => (
                       <label
                         key={num}
-                        className="beta-feedback-scale-option"
+                        className={styles['beta-feedback-scale-option']}
                         htmlFor={`ease-${num}`}
                       >
                         <input
@@ -426,18 +427,18 @@ export default function BetaFeedbackForm() {
                       </label>
                     ))}
                   </div>
-                  <div className="beta-feedback-scale-labels">
+                  <div className={styles['beta-feedback-scale-labels']}>
                     <span>{t('section2.ease.1')}</span>
                     <span>{t('section2.ease.5')}</span>
                   </div>
                 </div>
 
-                <div className="beta-feedback-field" data-field="childFeelings">
-                  <label className="beta-feedback-label" id="feelings-label">
+                <div className={styles['beta-feedback-field']} data-field="childFeelings">
+                  <label className={styles['beta-feedback-label']} id="feelings-label">
                     {renderRequiredLabel('section2.feelings.label')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="feelings-label"
                   >
@@ -449,7 +450,7 @@ export default function BetaFeedbackForm() {
                     ].map(feeling => (
                       <label
                         key={feeling}
-                        className="beta-feedback-radio-label"
+                        className={styles['beta-feedback-radio-label']}
                         htmlFor={`feeling-${feeling}`}
                       >
                         <input
@@ -468,22 +469,22 @@ export default function BetaFeedbackForm() {
                     ))}
                   </div>
                   {fieldErrors.childFeelings && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.childFeelings}
                     </span>
                   )}
                 </div>
 
-                <div className="beta-feedback-field">
+                <div className={styles['beta-feedback-field']}>
                   <label
-                    className="beta-feedback-label"
+                    className={styles['beta-feedback-label']}
                     htmlFor="uncomfortable"
                   >
                     {t('section2.uncomfortable')}
                   </label>
                   <textarea
                     id="uncomfortable"
-                    className="beta-feedback-textarea"
+                    className={styles['beta-feedback-textarea']}
                     value={formData.uncomfortable}
                     onChange={e =>
                       handleInputChange('uncomfortable', e.target.value)
@@ -494,24 +495,24 @@ export default function BetaFeedbackForm() {
               </section>
 
               {/* Section 3: Safety & Trust */}
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section3.title')}
                 </h2>
 
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" id="safety-label">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} id="safety-label">
                     {t('section3.safety.label')}
                   </label>
                   <div
-                    className="beta-feedback-scale"
+                    className={styles['beta-feedback-scale']}
                     role="radiogroup"
                     aria-labelledby="safety-label"
                   >
                     {[1, 2, 3, 4, 5].map(num => (
                       <label
                         key={num}
-                        className="beta-feedback-scale-option"
+                        className={styles['beta-feedback-scale-option']}
                         htmlFor={`safety-${num}`}
                       >
                         <input
@@ -532,31 +533,31 @@ export default function BetaFeedbackForm() {
                       </label>
                     ))}
                   </div>
-                  <div className="beta-feedback-scale-labels">
+                  <div className={styles['beta-feedback-scale-labels']}>
                     <span>{t('section3.safety.1')}</span>
                     <span>{t('section3.safety.5')}</span>
                   </div>
                 </div>
 
                 <div
-                  className="beta-feedback-field"
+                  className={styles['beta-feedback-field']}
                   data-field="practiceClarity"
                 >
                   <label
-                    className="beta-feedback-label"
+                    className={styles['beta-feedback-label']}
                     id="practiceClarity-label"
                   >
                     {renderRequiredLabel('section3.practiceClarity.label')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="practiceClarity-label"
                   >
                     {['veryClear', 'mostlyClear', 'notClear'].map(clarity => (
                       <label
                         key={clarity}
-                        className="beta-feedback-radio-label"
+                        className={styles['beta-feedback-radio-label']}
                         htmlFor={`practiceClarity-${clarity}`}
                       >
                         <input
@@ -575,7 +576,7 @@ export default function BetaFeedbackForm() {
                     ))}
                   </div>
                   {fieldErrors.practiceClarity && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.practiceClarity}
                     </span>
                   )}
@@ -583,17 +584,17 @@ export default function BetaFeedbackForm() {
               </section>
 
               {/* Section 4: Value */}
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section4.title')}
                 </h2>
 
-                <div className="beta-feedback-field" data-field="usefulness">
-                  <label className="beta-feedback-label" id="usefulness-label">
+                <div className={styles['beta-feedback-field']} data-field="usefulness">
+                  <label className={styles['beta-feedback-label']} id="usefulness-label">
                     {renderRequiredLabel('section4.usefulness.label')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="usefulness-label"
                   >
@@ -601,7 +602,7 @@ export default function BetaFeedbackForm() {
                       usefulness => (
                         <label
                           key={usefulness}
-                          className="beta-feedback-radio-label"
+                          className={styles['beta-feedback-radio-label']}
                           htmlFor={`usefulness-${usefulness}`}
                         >
                           <input
@@ -621,25 +622,25 @@ export default function BetaFeedbackForm() {
                     )}
                   </div>
                   {fieldErrors.usefulness && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.usefulness}
                     </span>
                   )}
                 </div>
 
-                <div className="beta-feedback-field" data-field="wouldUseAgain">
-                  <label className="beta-feedback-label" id="useAgain-label">
+                <div className={styles['beta-feedback-field']} data-field="wouldUseAgain">
+                  <label className={styles['beta-feedback-label']} id="useAgain-label">
                     {renderRequiredLabel('section4.useAgain.label')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="useAgain-label"
                   >
                     {['yes', 'maybe', 'no'].map(useAgain => (
                       <label
                         key={useAgain}
-                        className="beta-feedback-radio-label"
+                        className={styles['beta-feedback-radio-label']}
                         htmlFor={`useAgain-${useAgain}`}
                       >
                         <input
@@ -658,30 +659,30 @@ export default function BetaFeedbackForm() {
                     ))}
                   </div>
                   {fieldErrors.wouldUseAgain && (
-                    <span className="beta-feedback-error">
+                    <span className={styles['beta-feedback-error']}>
                       {fieldErrors.wouldUseAgain}
                     </span>
                   )}
                 </div>
               </section>
 
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section5.nps.label')}
                 </h2>
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" id="nps-label">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} id="nps-label">
                     {t('section5.nps.label')}
                   </label>
                   <div
-                    className="beta-feedback-nps-scale"
+                    className={styles['beta-feedback-nps-scale']}
                     role="radiogroup"
                     aria-labelledby="nps-label"
                   >
                     {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                       <label
                         key={num}
-                        className="beta-feedback-nps-option"
+                        className={styles['beta-feedback-nps-option']}
                         htmlFor={`nps-${num}`}
                       >
                         <input
@@ -702,7 +703,7 @@ export default function BetaFeedbackForm() {
                       </label>
                     ))}
                   </div>
-                  <div className="beta-feedback-nps-labels">
+                  <div className={styles['beta-feedback-nps-labels']}>
                     <span>{t('section5.nps.0')}</span>
                     <span>{t('section5.nps.10')}</span>
                   </div>
@@ -710,18 +711,18 @@ export default function BetaFeedbackForm() {
               </section>
 
               {/* Open feedback */}
-              <section className="beta-feedback-section">
-                <h2 className="beta-feedback-section-title">
+              <section className={styles['beta-feedback-section']}>
+                <h2 className={styles['beta-feedback-section-title']}>
                   {t('section5.openFeedback')}
                 </h2>
 
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" htmlFor="likedMost">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} htmlFor="likedMost">
                     {t('section5.likedMost')}
                   </label>
                   <textarea
                     id="likedMost"
-                    className="beta-feedback-textarea"
+                    className={styles['beta-feedback-textarea']}
                     value={formData.likedMost}
                     onChange={e =>
                       handleInputChange('likedMost', e.target.value)
@@ -730,13 +731,13 @@ export default function BetaFeedbackForm() {
                   />
                 </div>
 
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" htmlFor="improveFirst">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} htmlFor="improveFirst">
                     {t('section5.improveFirst')}
                   </label>
                   <textarea
                     id="improveFirst"
-                    className="beta-feedback-textarea"
+                    className={styles['beta-feedback-textarea']}
                     value={formData.improveFirst}
                     onChange={e =>
                       handleInputChange('improveFirst', e.target.value)
@@ -745,17 +746,17 @@ export default function BetaFeedbackForm() {
                   />
                 </div>
 
-                <div className="beta-feedback-field">
-                  <label className="beta-feedback-label" id="contact-label">
+                <div className={styles['beta-feedback-field']}>
+                  <label className={styles['beta-feedback-label']} id="contact-label">
                     {t('section5.contact.label')}
                   </label>
                   <div
-                    className="beta-feedback-radio-group"
+                    className={styles['beta-feedback-radio-group']}
                     role="radiogroup"
                     aria-labelledby="contact-label"
                   >
                     <label
-                      className="beta-feedback-radio-label"
+                      className={styles['beta-feedback-radio-label']}
                       htmlFor="contact-yes"
                     >
                       <input
@@ -769,7 +770,7 @@ export default function BetaFeedbackForm() {
                       <span>{t('section5.contact.yes')}</span>
                     </label>
                     <label
-                      className="beta-feedback-radio-label"
+                      className={styles['beta-feedback-radio-label']}
                       htmlFor="contact-no"
                     >
                       <input
@@ -789,11 +790,11 @@ export default function BetaFeedbackForm() {
 
                 {formData.contactOptIn && (
                   <div
-                    className="beta-feedback-field"
+                    className={styles['beta-feedback-field']}
                     data-field="contactEmail"
                   >
                     <label
-                      className="beta-feedback-label"
+                      className={styles['beta-feedback-label']}
                       htmlFor="contactEmail"
                     >
                       {t('section5.email')}
@@ -801,7 +802,7 @@ export default function BetaFeedbackForm() {
                     <input
                       type="text"
                       id="contactEmail"
-                      className="beta-feedback-input"
+                      className={styles['beta-feedback-input']}
                       value={formData.contactEmail}
                       onChange={e =>
                         handleInputChange('contactEmail', e.target.value)
@@ -809,7 +810,7 @@ export default function BetaFeedbackForm() {
                       placeholder={t('optional')}
                     />
                     {fieldErrors.contactEmail && (
-                      <span className="beta-feedback-error">
+                      <span className={styles['beta-feedback-error']}>
                         {fieldErrors.contactEmail}
                       </span>
                     )}
@@ -817,7 +818,7 @@ export default function BetaFeedbackForm() {
                 )}
               </section>
 
-              <div className="beta-feedback-submit">
+              <div className={styles['beta-feedback-submit']}>
                 <CartoonButton type="submit" disabled={isSubmitting}>
                   {isSubmitting ? t('submitting') : t('submit')}
                 </CartoonButton>

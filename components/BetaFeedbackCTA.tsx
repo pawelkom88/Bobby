@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useCredits } from '@/context/CreditsContext';
 import { ROUTES } from '@/lib/routes';
 import CartoonButton from './CartoonButton';
+import styles from './BetaFeedbackCTA.module.css';
 
 interface BetaFeedbackCTAProps {
   conversationId?: string | null;
@@ -29,17 +30,21 @@ export default function BetaFeedbackCTA({
   };
 
   return (
-    <section className="completion-section beta-feedback-cta-section">
-      <div className="beta-feedback-cta-card">
-        <div className="beta-feedback-cta-content">
-          <h2 className="beta-feedback-cta-title">{t('helpUsImprove')}</h2>
-          <p className="beta-feedback-cta-description">
+    <section
+      className={`completion-section ${styles['beta-feedback-cta-section']}`}
+    >
+      <div className={styles['beta-feedback-cta-card']}>
+        <div className={styles['beta-feedback-cta-content']}>
+          <h2 className={styles['beta-feedback-cta-title']}>
+            {t('helpUsImprove')}
+          </h2>
+          <p className={styles['beta-feedback-cta-description']}>
             {t('feedbackDescription')}
           </p>
           <CartoonButton
             onClick={handleFeedbackClick}
             ariaLabel={t('ctaAriaLabel')}
-            className="beta-feedback-cta-button cartoon-btn-danger"
+            className={`${styles['beta-feedback-cta-button']} cartoon-btn-danger`}
           >
             {t('ctaButton')}
           </CartoonButton>

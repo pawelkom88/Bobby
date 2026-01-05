@@ -83,21 +83,43 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 4. Verify user has credits
+    // 4. Verify user has credits based on mode
     const db = getAdminDb();
     const userDoc = await db.collection('users').doc(userId).get();
     const userData = userDoc.data();
-    const credits = userData?.credits || 0;
-    const betaCredits = userData?.betaCredits || 0;
-    const isBeta = userData?.isBeta || false;
-    const totalCredits = isBeta ? betaCredits : credits;
+    
+    // Check if beta mode is enabled globally
+    const isBetaModeEnabled = process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
+    
+    let totalCredits = 0;
+    
+    if (isBetaModeEnabled) {
+      // Beta mode: Only use beta credits, ignore real credits
+      const betaCredits = userData?.betaCredits || 0;
+      totalCredits = betaCredits;
+      
+      logger.info('Beta mode: Using beta credits only', { 
+        userId, 
+        betaCredits,
+        totalCredits 
+      });
+    } else {
+      // Paid mode: Only use real credits, ignore beta credits
+      const credits = userData?.credits || 0;
+      totalCredits = credits;
+      
+      logger.info('Paid mode: Using real credits only', { 
+        userId, 
+        credits,
+        totalCredits 
+      });
+    }
 
     if (totalCredits <= 0) {
-      logger.info('User attempted to get token without credits', { 
+      logger.info('User attempted to get token without sufficient credits', { 
         userId, 
-        credits, 
-        betaCredits, 
-        isBeta 
+        totalCredits,
+        isBetaModeEnabled
       });
       return NextResponse.json(
         {
