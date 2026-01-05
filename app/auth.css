@@ -250,6 +250,18 @@
   outline-offset: 4px;
 }
 
+.ach-button-small {
+  padding: 10px 18px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  border-radius: 9999px;
+  width: auto;
+  min-width: 150px;
+  justify-content: center;
+  text-align: center;
+  margin: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ach-button {
     transition: none;

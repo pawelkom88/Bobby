@@ -36,6 +36,15 @@
   border-radius: 32px 32px 0 0;
 }
 
+.navCta {
+  width: auto;
+  min-width: 140px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
 .navUl {
   display: flex;
   gap: 30px;
@@ -51,6 +60,16 @@
 
 .navUl li a:hover {
   color: #667eea;
+}
+
+@media (max-width: 768px) {
+  .navUl {
+    display: none;
+  }
+
+  .landingNav {
+    padding: 20px;
+  }
 }
 
 .landingMain {

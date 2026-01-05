@@ -1,0 +1,104 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-color: var(--service-color, #e5e7eb);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--service-color, #fbbf24);
+  outline-offset: 2px;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--service-color) 15%, white);
+  color: var(--service-color);
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.service {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.age {
+  font-size: 1rem;
+  background: #f3f4f6;
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.meta span {
+  font-size: 0.8rem;
+}
+
+.date,
+.time,
+.messages {
+  font-size: 0.8rem;
+}
+
+.meta span:not(:last-child)::after {
+  content: '•';
+  margin-left: 0.5rem;
+}
+
+.arrow {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 0.75rem;
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+  }
+}

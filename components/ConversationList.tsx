@@ -5,6 +5,7 @@ import ConversationCard from './ConversationCard';
 import type { ConversationListItem } from '@/types';
 import CartoonButton from '@/components/CartoonButton';
 import { ROUTES } from '@/lib/routes';
+import styles from './ConversationList.module.css';
 
 interface ConversationListProps {
   conversations: ConversationListItem[];
@@ -21,14 +22,14 @@ export default function ConversationList({
   const tLanding = useTranslations('landing');
   if (isLoading) {
     return (
-      <div className="conversation-list conversation-list--loading">
-        <div className="loading-container">
-          <div className="loading-spinner">
-            <div className="spinner-circle" />
-            <div className="spinner-circle" />
-            <div className="spinner-circle" />
+      <div className={`${styles.list} ${styles.loadingState}`}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}>
+            <div className={styles.spinnerCircle} />
+            <div className={styles.spinnerCircle} />
+            <div className={styles.spinnerCircle} />
           </div>
-          <p className="loading-message">{t('loading')}</p>
+          <p className={styles.loadingMessage}>{t('loading')}</p>
         </div>
       </div>
     );
@@ -36,8 +37,8 @@ export default function ConversationList({
 
   if (error) {
     return (
-      <div className="conversation-list conversation-list--error">
-        <div className="conversation-list__error">
+      <div className={`${styles.list} ${styles.errorState}`}>
+        <div className={styles.errorMessage}>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -57,21 +58,21 @@ export default function ConversationList({
 
   if (conversations.length === 0) {
     return (
-      <div className="conversation-list conversation-list--empty">
-        <div className="conversation-list__empty">
+      <div className={`${styles.list} ${styles.emptyState}`}>
+        <div className={styles.emptyStateContent}>
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="#9560ED"
             strokeWidth="2"
-            style={{ width: '64px', height: '64px', color: '#9ca3af' }}
+            style={{ width: '64px', height: '64px' }}
           >
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
             <path d="M7 9h10" />
             <path d="M7 13h6" />
           </svg>
-          <h3>{t('noConversations')}</h3>
-          <p>{t('noConversationsHint')}</p>
+          <h3 className={styles.emptyTitle}>{t('noConversations')}</h3>
+          <p className={styles.emptyDescription}>{t('noConversationsHint')}</p>
           <CartoonButton asLink href={ROUTES.YOUR_AGE}>
             {tLanding('nav.startTraining')}
           </CartoonButton>
@@ -81,7 +82,7 @@ export default function ConversationList({
   }
 
   return (
-    <div className="conversation-list">
+    <div className={styles.list}>
       {conversations.map(conversation => (
         <ConversationCard key={conversation.id} conversation={conversation} />
       ))}

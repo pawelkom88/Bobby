@@ -44,7 +44,10 @@ export default function HomePage() {
           <div className={styles.landingContainer}>
             <div className={styles.landingWrapper}>
               <nav className={styles.landingNav}>
-                <Link href="/login" className="ach-button-small">
+                <Link
+                  href="/login"
+                  className={`ach-button ach-button-small ${styles.navCta}`}
+                >
                   {t('nav.startTraining')}
                 </Link>
                 <ul className={styles.navUl}>

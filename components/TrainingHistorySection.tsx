@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
+import listStyles from './ConversationList.module.css';
 
 interface AssessedConversation {
   id: string;
@@ -68,14 +69,14 @@ export default function TrainingHistorySection() {
 
   if (isLoading) {
     return (
-      <div className="conversation-list conversation-list--loading">
-        <div className="loading-container">
-          <div className="loading-spinner">
-            <div className="spinner-circle" />
-            <div className="spinner-circle" />
-            <div className="spinner-circle" />
+      <div className={`${listStyles.list} ${listStyles.loadingState}`}>
+        <div className={listStyles.loadingContainer}>
+          <div className={listStyles.loadingSpinner}>
+            <div className={listStyles.spinnerCircle} />
+            <div className={listStyles.spinnerCircle} />
+            <div className={listStyles.spinnerCircle} />
           </div>
-          <p className="loading-message">{t('loading')}</p>
+          <p className={listStyles.loadingMessage}>{t('loading')}</p>
         </div>
       </div>
     );
@@ -83,8 +84,8 @@ export default function TrainingHistorySection() {
 
   if (error) {
     return (
-      <div className="conversation-list conversation-list--error">
-        <div className="error-message">
+      <div className={`${listStyles.list} ${listStyles.errorState}`}>
+        <div className={listStyles.errorMessage}>
           <p>{error}</p>
         </div>
       </div>
@@ -93,23 +94,23 @@ export default function TrainingHistorySection() {
 
   if (assessedConversations.length === 0) {
     return (
-      <p className="no-history">
+      <p className={listStyles.noHistory}>
         {t('noHistory')}
       </p>
     );
   }
 
   return (
-    <ul className="conversation-list" role="list">
+    <ul className={listStyles.list} role="list">
       {assessedConversations.slice(0, 10).map(conv => (
-        <li key={conv.id} className="conversation-item" role="listitem">
-          <div className="conversation-service">
+        <li key={conv.id} className={listStyles.historyItem} role="listitem">
+          <div className={listStyles.historyService}>
             {conv.service.toUpperCase()}
           </div>
-          <div className="conversation-date">
+          <div className={listStyles.historyDate}>
             {new Date(conv.endedAt || conv.startedAt).toLocaleDateString()}
           </div>
-          <div className="conversation-xp">+{conv.xpEarned} XP</div>
+          <div className={listStyles.historyXp}>+{conv.xpEarned} XP</div>
         </li>
       ))}
     </ul>

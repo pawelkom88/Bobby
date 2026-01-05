@@ -4,6 +4,7 @@ import NextLink from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import type { ConversationListItem, Service } from '@/types';
 import { useLocale, useTranslations } from 'next-intl';
+import styles from './ConversationCard.module.css';
 
 interface ConversationCardProps {
   conversation: ConversationListItem;
@@ -98,37 +99,37 @@ export default function ConversationCard({
   return (
     <NextLink
       href={`${ROUTES.CHATS}/${conversation.id}`}
-      className="conversation-card"
+      className={styles.card}
       style={{ '--service-color': serviceColor } as React.CSSProperties}
     >
-      <div className="conversation-card__icon-wrapper">
+      <div className={styles.iconWrapper}>
         {getServiceIcon(conversation.service)}
       </div>
 
-      <div className="conversation-card__content">
-        <div className="conversation-card__header">
-          <span className="conversation-card__service">
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <span className={styles.service}>
             {tService(conversation.service)}
           </span>
-          <span className="conversation-card__age">
+          <span className={styles.age}>
             {tCard(`ageTier.${ageTierKey}`)}
           </span>
         </div>
 
-        <div className="conversation-card__meta">
-          <span className="conversation-card__date">
+        <div className={styles.meta}>
+          <span className={styles.date}>
             {formatDate(endedAtOrStartedAt, locale)}
           </span>
-          <span className="conversation-card__time">
+          <span className={styles.time}>
             {formatTime(endedAtOrStartedAt, locale)}
           </span>
-          <span className="conversation-card__messages">
+          <span className={styles.messages}>
             {conversation.messageCount} {tCard('messages')}
           </span>
         </div>
       </div>
 
-      <div className="conversation-card__arrow">
+      <div className={styles.arrow}>
         <svg
           viewBox="0 0 24 24"
           fill="none"

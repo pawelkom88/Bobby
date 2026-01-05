@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
 import type { ConversationListItem } from '@/types';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import { ROUTES } from '@/lib/routes';
+import styles from './ChatsPage.module.css';
 
 function ChatsPageContent() {
   const { user } = useAuth();
@@ -64,9 +65,9 @@ function ChatsPageContent() {
       <PageWrapper>
         <ErrorBoundary>
           <main className="app-page" role="main">
-            <div className="chats-page">
-              <h1 className="chats-page__title">{t('title')}</h1>
-              <p className="chats-page__subtitle">{t('subtitle')}</p>
+            <div className={styles.page}>
+              <h1 className={styles.title}>{t('title')}</h1>
+              <p className={styles.subtitle}>{t('subtitle')}</p>
               
               <ConversationList
                 conversations={conversations}
