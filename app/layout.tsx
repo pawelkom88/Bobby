@@ -1,4 +1,5 @@
 import './globals.css';
+import './auth.css';
 
 export default function RootLayout({
   children,

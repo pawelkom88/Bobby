@@ -426,7 +426,7 @@
   padding: 18px 24px;
   font-size: 22px;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -438,7 +438,7 @@
   transition: all 0.15s ease;
   outline: none;
   width: 100%;
-  max-width: 360px;
+  max-width: none;
 }
 
 .landingSecondaryCtaButton:hover {
