@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useSession } from '@/hooks/queries/useSession';
+import ParentGateModal from '@/components/ParentGateModal';
 import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
@@ -16,6 +16,32 @@ import { useAuth } from '@/context/AuthContext';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { logger } from '@/lib/logger';
+
+const PARENT_GATE_SESSION_KEY = 'bobby_parent_gate_ack';
+
+const getParentGateDateKey = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const hasParentGateAcknowledgement = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.sessionStorage.getItem(PARENT_GATE_SESSION_KEY) ===
+    getParentGateDateKey()
+  );
+};
+
+const setParentGateAcknowledgement = (): void => {
+  if (typeof window === 'undefined') return;
+  window.sessionStorage.setItem(
+    PARENT_GATE_SESSION_KEY,
+    getParentGateDateKey()
+  );
+};
 
 function DialPageContent() {
   const t = useTranslations('dial');
@@ -38,6 +64,7 @@ function DialPageContent() {
   const hasRefreshedRef = useRef(false);
   const hasClearedSessionForUserRef = useRef<string | null>(null);
   const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
+  const [showParentGate, setShowParentGate] = useState(false);
 
   logger.log('DialPageContent: Component rendered/updated', {
     credits,
@@ -130,10 +157,18 @@ function DialPageContent() {
   const handleCorrectNumber = async () => {
     logger.log('handleCorrectNumber called - user should have credits');
 
+    const startPractice = () => {
+      if (hasParentGateAcknowledgement()) {
+        window.location.href = ROUTES.CONVERSATION;
+      } else {
+        setShowParentGate(true);
+      }
+    };
+
     // If we've already verified credits, proceed directly
     if (hasVerifiedCredits && hasCredits) {
       logger.log('Credits already verified, navigating to conversation');
-      window.location.href = ROUTES.CONVERSATION;
+      startPractice();
       return;
     }
 
@@ -159,7 +194,7 @@ function DialPageContent() {
     // If user has credits, navigate to conversation and mark as verified
     logger.log('User has credits, navigating to conversation');
     setHasVerifiedCredits(true);
-    window.location.href = ROUTES.CONVERSATION;
+    startPractice();
   };
 
   const handleCheckoutNeeded = async () => {
@@ -209,6 +244,16 @@ function DialPageContent() {
     window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
 
+  const handleParentGateConfirm = () => {
+    setParentGateAcknowledgement();
+    setShowParentGate(false);
+    window.location.href = ROUTES.CONVERSATION;
+  };
+
+  const handleParentGateCancel = () => {
+    setShowParentGate(false);
+  };
+
   const isLoading = creditsLoading || isRefreshingFromPayment;
 
   return (
@@ -216,7 +261,7 @@ function DialPageContent() {
       <ViewTransition>
         <PageWrapper>
           <ErrorBoundary>
-            <main className="app-page" role="main">
+            <main className="app-page" role="main" aria-hidden={showParentGate}>
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
                   {t('messages.canceled')}
@@ -265,10 +310,19 @@ function DialPageContent() {
                 onBack={handleBack}
                 isLoading={checkoutLoading || isLoading}
                 buttonLabel={
-                  hasCredits ? t('buttons.call') : isLoading ? t('buttons.loading') : t('buttons.buyAndCall')
+                  hasCredits
+                    ? t('buttons.call')
+                    : isLoading
+                      ? t('buttons.loading')
+                      : t('buttons.buyAndCall')
                 }
               />
             </main>
+            <ParentGateModal
+              isOpen={showParentGate}
+              onConfirm={handleParentGateConfirm}
+              onCancel={handleParentGateCancel}
+            />
           </ErrorBoundary>
         </PageWrapper>
       </ViewTransition>

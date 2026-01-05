@@ -58,13 +58,25 @@ export default function CookiesPolicyPage() {
                 {t('howWeUse.title')}
               </h2>
               <p className="mb-3">{t('howWeUse.description')}</p>
-              <p className="mb-3">{t('howWeUse.subTitle')}</p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>{t('howWeUse.points.0')}</li>
-                <li>{t('howWeUse.points.1')}</li>
-                <li>{t('howWeUse.points.2')}</li>
-                <li>{t('howWeUse.points.3')}</li>
-              </ul>
+              
+              {/* Essential Cookies */}
+              <div className="mb-4">
+                <h3 className="font-semibold mb-2">{t('howWeUse.essentialTitle')}</h3>
+                <p className="mb-2">{t('howWeUse.essentialDescription')}</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>{t('howWeUse.essentialPoints.0')}</li>
+                  <li>{t('howWeUse.essentialPoints.1')}</li>
+                  <li>{t('howWeUse.essentialPoints.2')}</li>
+                  <li>{t('howWeUse.essentialPoints.3')}</li>
+                </ul>
+              </div>
+              
+              {/* Analytics Cookies */}
+              <div>
+                <h3 className="font-semibold mb-2">{t('howWeUse.analyticsTitle')}</h3>
+                <p className="mb-2">{t('howWeUse.analyticsDescription')}</p>
+                <p className="text-sm text-gray-600 italic">{t('howWeUse.analyticsNote')}</p>
+              </div>
             </section>
 
             <section
@@ -109,7 +121,8 @@ export default function CookiesPolicyPage() {
               <h2 id="managing-heading" className="text-lg font-semibold mb-3">
                 {t('managing.title')}
               </h2>
-              <p>{t('managing.description')}</p>
+              <p className="mb-3">{t('managing.description')}</p>
+              <p className="text-sm text-gray-600">{t('managing.browserNote')}</p>
             </section>
 
             <section

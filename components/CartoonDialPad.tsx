@@ -220,7 +220,7 @@ export default function CartoonDialPad({
             disabled={input.length === 0 || isLoading}
             aria-label="Make call to Bobby"
           >
-            {isLoading ? 'Loading...' : buttonLabel}
+            <span>{isLoading ? 'Loading...' : buttonLabel}</span>
           </button>
           <button
             onClick={() => {
@@ -232,7 +232,7 @@ export default function CartoonDialPad({
             className="dial-clear-btn"
             aria-label="Clear display"
           >
-            {t('buttons.clear')}
+            <span>{t('buttons.clear')}</span>
           </button>
         </div>
       </div>

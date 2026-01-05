@@ -4499,30 +4499,52 @@ a,
 }
 
 .dial-call-btn {
+  --btn-color: #4ade80;
+  --btn-border-color: #16a34a;
+  --btn-text-color: #14532d;
+  --btn-light-color: #86efac;
+
   padding: 1rem 2rem;
   font-size: 1.4rem;
-  font-weight: bold;
-  background-color: #4caf50;
-  border: none;
-  border-radius: 8px;
+  font-weight: 900;
+  background-color: var(--btn-color);
+  border: 0.25rem solid var(--btn-border-color);
+  border-radius: 0.75rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0.2rem 0.5rem 0 0.05rem var(--btn-text-color);
   transition: all 0.15s ease;
-  color: #fff;
+  color: var(--btn-text-color);
   position: relative;
+  overflow: hidden;
   transform: translateY(0);
+  top: 0;
+}
+
+.dial-call-btn::after {
+  content: '';
+  position: absolute;
+  height: 80%;
+  width: 99%;
+  background-color: var(--btn-light-color);
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
 }
 
 .dial-call-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0.2rem 0.7rem 0 0.05rem var(--btn-text-color);
 }
 
 .dial-call-btn:active,
 .dial-call-btn.pressed {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 1px 4px rgba(76, 175, 80, 0.2);
-  background-color: #45a049;
+  transform: translateY(0);
+  top: 0.2rem;
+  box-shadow: 0.1rem 0.2rem 0 0.05rem var(--btn-text-color);
 }
 
 .dial-call-btn:disabled {
@@ -4531,30 +4553,231 @@ a,
 }
 
 .dial-clear-btn {
+  --btn-color: #fca5a5;
+  --btn-border-color: #ef4444;
+  --btn-text-color: #7f1d1d;
+  --btn-light-color: #fecaca;
+
   padding: 1rem 2rem;
   font-size: 1.4rem;
-  font-weight: bold;
-  background-color: #f44336;
-  border: none;
-  border-radius: 8px;
+  font-weight: 900;
+  background-color: var(--btn-color);
+  border: 0.25rem solid var(--btn-border-color);
+  border-radius: 0.75rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+  box-shadow: 0.2rem 0.5rem 0 0.05rem var(--btn-text-color);
   transition: all 0.15s ease;
-  color: #fff;
+  color: var(--btn-text-color);
   position: relative;
+  overflow: hidden;
   transform: translateY(0);
+  top: 0;
+}
+
+.dial-clear-btn::after {
+  content: '';
+  position: absolute;
+  height: 80%;
+  width: 99%;
+  background-color: var(--btn-light-color);
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
 }
 
 .dial-clear-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0.2rem 0.7rem 0 0.05rem var(--btn-text-color);
 }
 
 .dial-clear-btn:active,
 .dial-clear-btn.pressed {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 1px 4px rgba(244, 67, 54, 0.2);
-  background-color: #da190b;
+  transform: translateY(0);
+  top: 0.2rem;
+  box-shadow: 0.1rem 0.2rem 0 0.05rem var(--btn-text-color);
+}
+
+.dial-call-btn,
+.dial-clear-btn {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.dial-call-btn span,
+.dial-clear-btn span {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================================
+   PARENT GATE MODAL
+   ============================================================================ */
+
+.parent-gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1200;
+}
+
+.parent-gate-modal {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #ffffff 0%, #fef9e7 100%);
+  border: 4px solid #333;
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  padding: 2rem;
+  position: relative;
+}
+
+.parent-gate-modal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 10% 10%,
+    rgba(255, 222, 89, 0.25) 0%,
+    transparent 40%
+  );
+  pointer-events: none;
+}
+
+.parent-gate-header {
+  position: relative;
+  z-index: 1;
+}
+
+.parent-gate-title {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 2.2rem;
+  text-align: center;
+  margin: 0 0 0.5rem;
+  color: #333;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.parent-gate-description {
+  font-family: var(--font-nunito), sans-serif;
+  text-align: center;
+  margin: 0 0 1.5rem;
+  color: #4a4a5e;
+}
+
+.parent-gate-form {
+  position: relative;
+  z-index: 1;
+}
+
+.parent-gate-fieldset {
+  border: 2px solid #e0e0e8;
+  border-radius: 20px;
+  padding: 1rem;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.parent-gate-fieldset-error {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+}
+
+.parent-gate-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.parent-gate-checkbox-label:hover {
+  background-color: var(--bg-yellow-light);
+}
+
+.parent-gate-checkbox-label:focus-within {
+  background-color: var(--bg-yellow-light);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.parent-gate-checkbox {
+  margin-top: 2px;
+  width: 20px;
+  height: 20px;
+  accent-color: #4a90e2;
+  flex-shrink: 0;
+}
+
+.parent-gate-checkbox-label span {
+  font-family: var(--font-nunito), sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #2c3e50;
+}
+
+.parent-gate-error {
+  margin-top: 0.75rem;
+  text-align: center;
+  color: #e53e3e;
+  font-family: var(--font-nunito), sans-serif;
+  font-size: 0.95rem;
+}
+
+.parent-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.parent-gate-actions .cartoon-btn {
+  min-width: 200px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+}
+
+.parent-gate-actions .cartoon-btn span {
+  font-size: 1.4rem;
+}
+
+.parent-gate-confirm {
+  --btn-color: #4ade80;
+  --btn-border-color: #16a34a;
+  --btn-text-color: #14532d;
+  --btn-light-color: #86efac;
+}
+
+.parent-gate-cancel {
+  --btn-color: #fca5a5;
+  --btn-border-color: #ef4444;
+  --btn-text-color: #7f1d1d;
+  --btn-light-color: #fecaca;
+}
+
+@media (max-width: 640px) {
+  .parent-gate-modal {
+    padding: 1.5rem;
+  }
+
+  .parent-gate-title {
+    font-size: 1.8rem;
+  }
+
+  .parent-gate-actions .cartoon-btn {
+    min-width: 100%;
+  }
 }
 
 /* ============================================================================
