@@ -134,10 +134,6 @@ function ConversationPageContent() {
               metrics: assessment.metrics,
             },
             passed: assessment.passed,
-            responses: conversation.map(m => ({ type: m.type, text: m.text })),
-            scores: [assessment.score],
-            feedback: assessment.improvements,
-            metadata: { score: assessment.score, passed: assessment.passed },
           },
           completionId,
         }
