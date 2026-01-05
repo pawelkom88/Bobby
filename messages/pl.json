@@ -59,7 +59,7 @@
       "passwordLabel": "Hasło",
       "confirmPasswordPlaceholder": "Potwierdź hasło",
       "confirmPasswordLabel": "Potwierdź hasło",
-      "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny (!@#$%^&*(),.?\":{{}}|<>)",
+      "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny (!@#$%^&*(),.?\":()|<>)",
       "passwordStrength": "Siła hasła",
       "submit": "ZAREJESTRUJ SIĘ",
       "submitting": "TWORZENIE KONTA...",
