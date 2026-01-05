@@ -1247,42 +1247,47 @@
     "title": "Cookies Policy",
     "subtitle": "",
     "lastUpdated": "Last updated: {date}",
-    "intro": "This Cookies Policy explains how Bobby uses cookies.",
+    "intro": "This Cookies Policy explains how Ready with Bobby ('Bobby', 'we', 'our') uses cookies and similar technologies on our website and web app.",
     "whatAreCookies": {
       "title": "1. What are cookies?",
-      "description": "Cookies are small text files stored on your device to help websites function properly."
+      "description": "Cookies are small text files stored on your device. They help websites work properly, remember preferences, and (if you allow) measure usage."
     },
     "howWeUse": {
-      "title": "2. How Bobby uses cookies",
-      "description": "Bobby uses essential cookies only.",
-      "subTitle": "These cookies are required to:",
-      "points": [
+      "title": "2. Cookies we use",
+      "description": "We use two types of cookies:",
+      "essentialTitle": "A) Essential cookies (always on)",
+      "essentialDescription": "These cookies are required for the app to function and cannot be switched off in our systems. They are used to:",
+      "essentialPoints": [
         "keep you logged in",
         "maintain secure sessions",
         "protect against misuse and fraud",
         "ensure the app works correctly"
-      ]
+      ],
+      "analyticsTitle": "B) Analytics cookies (optional)",
+      "analyticsDescription": "If you choose to accept analytics cookies, we use Google Analytics to understand how the website is used (for example: which pages are visited and how users navigate the site). This helps us improve the app and landing page.",
+      "analyticsNote": "We only enable Google Analytics after you give consent. We do not use analytics for advertising."
     },
     "whatWeDontUse": {
       "title": "3. What we do NOT use",
       "description": "We do not use:",
       "points": [
         "advertising cookies",
-        "tracking cookies for children",
         "third-party marketing cookies",
-        "social media tracking pixels"
+        "social media tracking pixels",
+        "analytics unless you have given consent"
       ]
     },
     "managing": {
-      "title": "5. Managing cookies",
-      "description": "Because Bobby uses only essential cookies, cookie consent banners are not required in most EU jurisdictions. You can still control cookies through your browser settings if you wish."
+      "title": "4. Managing your cookie choices",
+      "description": "You can change your cookie choices at any time by using the cookie settings link on the site or by clearing cookies in your browser.",
+      "browserNote": "You can also control cookies through your browser settings. Please note that disabling essential cookies may prevent the app from working correctly."
     },
     "changes": {
-      "title": "6. Changes",
-      "description": "We may update this Cookies Policy if our use of cookies changes."
+      "title": "5. Changes",
+      "description": "We may update this Cookies Policy if our use of cookies changes. When we do, we will update the 'Last updated' date."
     },
     "contact": {
-      "title": "7. Contact",
+      "title": "Contact",
       "description": "If you have questions about cookies, contact us at:",
       "email": "contact@readywithbobby.online"
     }

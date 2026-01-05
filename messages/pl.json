@@ -1141,44 +1141,49 @@
   },
   "cookiesPolicy": {
     "title": "Polityka ciasteczek",
-    "subtitle": "Krótka, przejrzysta, zgodna z RODO",
+    "subtitle": "",
     "lastUpdated": "Ostatnia aktualizacja: {date}",
-    "intro": "Ta Polityka Ciasteczek wyjaśnia, jak Bobby używa ciasteczek.",
+    "intro": "Ta Polityka Ciasteczek wyjaśnia, jak Ready with Bobby ('Bobby', 'my', 'nasz') używa ciasteczek i podobnych technologii na naszej stronie internetowej i w aplikacji web.",
     "whatAreCookies": {
       "title": "1. Czym są ciasteczka?",
-      "description": "Ciasteczka to małe pliki tekstowe przechowywane na Twoim urządzeniu, które pomagają stronom internetowym działać poprawnie."
+      "description": "Ciasteczka to małe pliki tekstowe przechowywane na Twoim urządzeniu. Pomagają stronom internetowym działać poprawnie, zapamiętywać preferencje i (jeśli zezwolisz) mierzyć użytkowanie."
     },
     "howWeUse": {
-      "title": "2. Jak Bobby używa ciasteczek",
-      "description": "Bobby używa tylko niezbędnych ciasteczek.",
-      "subTitle": "Te ciasteczka są wymagane, aby:",
-      "points": [
-        "utrzymać Cię zalogowanym",
-        "utrzymywać bezpieczne sesje",
-        "chronić przed nadużyciami i oszustwami",
-        "zapewnić poprawne działanie aplikacji"
-      ]
+      "title": "2. Jakich ciasteczek używamy",
+      "description": "Używamy dwóch typów ciasteczek:",
+      "essentialTitle": "A) Ciasteczka niezbędne (zawsze włączone)",
+      "essentialDescription": "Te ciasteczka są wymagane do działania aplikacji i nie mogą być wyłączone w naszych systemach. Są używane do:",
+      "essentialPoints": [
+        "utrzymania Cię zalogowanym",
+        "utrzymywania bezpiecznych sesji",
+        "ochrony przed nadużyciami i oszustwami",
+        "zapewnienia poprawnego działania aplikacji"
+      ],
+      "analyticsTitle": "B) Ciasteczka analityczne (opcjonalne)",
+      "analyticsDescription": "Jeśli zdecydujesz się zaakceptować ciasteczka analityczne, używamy Google Analytics, aby zrozumieć, jak strona internetowa jest używana (na przykład: które strony są odwiedzane i jak użytkownicy nawigują po stronie). Pomaga nam to ulepszać aplikację i stronę główną.",
+      "analyticsNote": "Włączamy Google Analytics dopiero po Twojej zgodzie. Nie używamy analityki do reklam."
     },
     "whatWeDontUse": {
       "title": "3. Czego NIE używamy",
       "description": "Nie używamy:",
       "points": [
         "ciasteczek reklamowych",
-        "ciasteczek śledzących dla dzieci",
         "ciasteczek marketingowych od stron trzecich",
-        "pikseli śledzących mediów społecznościowych"
+        "pikseli śledzących mediów społecznościowych",
+        "analityki, chyba że wyraziłeś zgodę"
       ]
     },
     "managing": {
-      "title": "5. Zarządzanie ciasteczkami",
-      "description": "Ponieważ Bobby używa tylko niezbędnych ciasteczek, banery zgody na ciasteczka nie są wymagane w większości jurysdykcji UE. Nadal możesz kontrolować ciasteczka poprzez ustawienia przeglądarki, jeśli chcesz."
+      "title": "4. Zarządzanie wyborem ciasteczek",
+      "description": "Możesz zmienić swoje wybory dotyczące ciasteczek w dowolnym momencie, używając linku ustawień ciasteczek na stronie lub czyszcząc ciasteczka w przeglądarce.",
+      "browserNote": "Możesz również kontrolować ciasteczka poprzez ustawienia przeglądarki. Pamiętaj, że wyłączenie ciasteczek niezbędnych może zapobiec poprawnemu działaniu aplikacji."
     },
     "changes": {
-      "title": "6. Zmiany",
-      "description": "Możemy zaktualizować tę Politykę Ciasteczek, jeśli nasze wykorzystanie ciasteczek ulegnie zmianie."
+      "title": "5. Zmiany",
+      "description": "Możemy zaktualizować tę Politykę Ciasteczek, jeśli nasze wykorzystanie ciasteczek ulegnie zmianie. Gdy to zrobimy, zaktualizujemy datę 'Ostatniej aktualizacji'."
     },
     "contact": {
-      "title": "7. Kontakt",
+      "title": "Kontakt",
       "description": "W przypadku pytań dotyczących ciasteczek, skontaktuj się z nami pod adresem:",
       "email": "contact@readywithbobby.online"
     }
