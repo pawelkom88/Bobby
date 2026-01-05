@@ -68,7 +68,9 @@ export default function HomePage() {
                 <div className={styles.landingContent}>
                   <div className={styles.landingTextSection}>
                     <h1 className={styles.landingTitle}>{t('hero.title')}</h1>
-                    <p className={styles.landingSubtitle}>{t('hero.subtitle')}</p>
+                    <p className={styles.landingSubtitle}>
+                      {t('hero.subtitle')}
+                    </p>
                     <div
                       className={styles.landingTrustStrip}
                       role="note"
@@ -81,27 +83,30 @@ export default function HomePage() {
                         className={styles.landingTrustStripItems}
                         role="list"
                       >
-                        {trustStripItems.map(item => (
-                          <div
-                            key={item.id}
-                            className={styles.landingTrustStripItem}
-                            role="listitem"
-                          >
-                            <Image
-                              src={item.imageSrc}
-                              alt={item.translation}
-                              width={48}
-                              height={48}
-                              className={styles.landingTrustStripIcon}
-                              aria-hidden="true"
-                              fetchPriority="high"
-                              preload
-                            />
-                            <span className={styles.landingTrustStripText}>
-                              {t(item.translation)}
-                            </span>
-                          </div>
-                        ))}
+                        {trustStripItems.map(item => {
+                          const firstTwoImages = item.id <= 2;
+                          return (
+                            <ul
+                              key={item.id}
+                              className={styles.landingTrustStripItem}
+                            >
+                              <li className={styles.landingTrustStripIcon}>
+                                <Image
+                                  src={item.imageSrc}
+                                  alt={item.translation}
+                                  width={firstTwoImages ? 40 : 55}
+                                  height={48}
+                                  aria-hidden="true"
+                                  fetchPriority="high"
+                                  preload
+                                />
+                                <span className={styles.landingTrustStripText}>
+                                  {t(item.translation)}
+                                </span>
+                              </li>
+                            </ul>
+                          );
+                        })}
                       </div>
                     </div>
                     <Link
@@ -142,11 +147,7 @@ export default function HomePage() {
                       }`.trim();
 
                       return (
-                        <div
-                          key={id}
-                          className={itemClassName}
-                          role="listitem"
-                        >
+                        <div key={id} className={itemClassName} role="listitem">
                           <button
                             type="button"
                             className={styles.faqAccordionTrigger}
@@ -199,19 +200,31 @@ export default function HomePage() {
               </main>
 
               <footer className={styles.landingFooter}>
-                <Link href="/safety-privacy" className={styles.landingFooterLink}>
+                <Link
+                  href="/safety-privacy"
+                  className={styles.landingFooterLink}
+                >
                   {t('footer.links.safetyPrivacy')}
                 </Link>
-                <Link href="/terms-conditions" className={styles.landingFooterLink}>
+                <Link
+                  href="/terms-conditions"
+                  className={styles.landingFooterLink}
+                >
                   {t('footer.links.termsConditions')}
                 </Link>
                 <Link href="/contact" className={styles.landingFooterLink}>
                   {t('footer.links.contact')}
                 </Link>
-                <Link href="/cookies-policy" className={styles.landingFooterLink}>
+                <Link
+                  href="/cookies-policy"
+                  className={styles.landingFooterLink}
+                >
                   {t('footer.links.cookiesPolicy')}
                 </Link>
-                <Link href="/privacy-policy" className={styles.landingFooterLink}>
+                <Link
+                  href="/privacy-policy"
+                  className={styles.landingFooterLink}
+                >
                   {t('footer.links.privacyPolicy')}
                 </Link>
               </footer>
