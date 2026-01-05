@@ -49,6 +49,7 @@ function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<
     'weak' | 'fair' | 'good' | 'strong' | null
   >(null);
@@ -56,6 +57,7 @@ function SignUpForm() {
     email?: string;
     password?: string;
     confirmPassword?: string;
+    terms?: string;
     general?: string;
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,6 +75,7 @@ function SignUpForm() {
       email?: string;
       password?: string;
       confirmPassword?: string;
+      terms?: string;
     } = {};
 
     const emailValidation = validateEmail(email);
@@ -93,6 +96,10 @@ function SignUpForm() {
       newErrors.confirmPassword = t('errors.confirmPasswordRequired');
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = t('errors.passwordsMismatch');
+    }
+
+    if (!acceptedTerms) {
+      newErrors.terms = t('errors.termsRequired');
     }
 
     setErrors(newErrors);
@@ -185,6 +192,11 @@ function SignUpForm() {
       setErrors(prev => ({ ...prev, confirmPassword: undefined }));
   };
 
+  const handleTermsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAcceptedTerms(e.target.checked);
+    if (errors.terms) setErrors(prev => ({ ...prev, terms: undefined }));
+  };
+
   if (authLoading || user) {
     return <LoadingSpinner text={tLoading('redirecting')} heading={tLoading('pleaseWait')} />;
   }
@@ -250,6 +262,48 @@ function SignUpForm() {
           icon="lock"
           autoComplete="new-password"
         />
+
+        <div className="login-terms-group">
+          <div
+            className={`login-terms-container ${errors.terms ? 'login-input-error' : ''}`}
+          >
+            <input
+              id="signup-terms"
+              type="checkbox"
+              className="login-terms-checkbox"
+              checked={acceptedTerms}
+              onChange={handleTermsChange}
+              required
+              aria-required="true"
+              aria-invalid={!!errors.terms}
+              aria-describedby={errors.terms ? 'terms-error' : undefined}
+            />
+            <label htmlFor="signup-terms" className="login-terms-text">
+              {t('signup.termsAgreementPrefix')}{' '}
+              <Link
+                href={ROUTES.TERMS_CONDITIONS}
+                className="login-terms-link"
+                onClick={event => event.stopPropagation()}
+              >
+                {t('signup.termsAgreementTerms')}
+              </Link>{' '}
+              {t('signup.termsAgreementConnector')}{' '}
+              <Link
+                href={ROUTES.PRIVACY_POLICY}
+                className="login-terms-link"
+                onClick={event => event.stopPropagation()}
+              >
+                {t('signup.termsAgreementPrivacy')}
+              </Link>
+              .
+            </label>
+          </div>
+          {errors.terms && (
+            <div id="terms-error" className="login-error-message" role="alert">
+              {errors.terms}
+            </div>
+          )}
+        </div>
 
         <AuthButton
           type="submit"
