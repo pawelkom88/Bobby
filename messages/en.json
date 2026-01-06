@@ -432,6 +432,12 @@
   "selectPackage": {
     "title": "Pricing & Packs",
     "subtitle": "Choose the right pack for your child",
+    "storySummary": {
+      "title": "Your current selections",
+      "ageLabel": "Age",
+      "scenarioLabel": "Scenario",
+      "changeSelection": "Change selections"
+    },
     "loading": "Loading...",
     "buyPrefix": "Buy {currency}",
     "packs": {

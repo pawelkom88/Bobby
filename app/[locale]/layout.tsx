@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
+import { headers } from 'next/headers';
 import {
   getMessages,
   getTranslations,
@@ -11,6 +11,7 @@ import { OptimizedProviders } from '@/components/OptimizedProviders';
 import { nunito, luckiestGuy } from '@/lib/fonts';
 import { routing } from '@/i18n/routing';
 import { locales, type Locale } from '@/i18n/locales';
+import CspNonceDebugger from '@/components/CspNonceDebugger';
 
 type Props = {
   children: React.ReactNode;
@@ -69,6 +70,7 @@ export async function generateMetadata({
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
+  const nonce = (await headers()).get('x-csp-nonce') ?? undefined;
 
   if (!routing.locales.includes(locale as any)) {
     notFound();
@@ -82,6 +84,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale}>
       <head>
+        {nonce ? <meta name="csp-nonce" content={nonce} /> : null}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="icon"
@@ -109,35 +112,40 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="preconnect" href="https://www.google.com" />
         <link rel="dns-prefetch" href="https://www.gstatic.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <Script
-          id="structured-data"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: t('title'),
-              description: t('description'),
-              applicationCategory: 'EducationalApplication',
-              operatingSystem: t('structuredData.operatingSystem'),
-              url: process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
-              author: {
-                '@type': 'Organization',
-                name: t('structuredData.authorName'),
-              },
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: locale === 'pl' ? 'PLN' : 'GBP',
-              },
-            }),
-          }}
-        />
+        {nonce ? (
+          <script
+            id="structured-data"
+            type="application/ld+json"
+            nonce={nonce}
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'SoftwareApplication',
+                name: t('title'),
+                description: t('description'),
+                applicationCategory: 'EducationalApplication',
+                operatingSystem: t('structuredData.operatingSystem'),
+                url: process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
+                author: {
+                  '@type': 'Organization',
+                  name: t('structuredData.authorName'),
+                },
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: locale === 'pl' ? 'PLN' : 'GBP',
+                },
+              }),
+            }}
+          />
+        ) : null}
       </head>
       <body className={`${nunito.variable} ${luckiestGuy.variable} font-sans`}>
         <NextIntlClientProvider messages={messages}>
           <OptimizedProviders>{children}</OptimizedProviders>
         </NextIntlClientProvider>
+        <CspNonceDebugger />
       </body>
     </html>
   );

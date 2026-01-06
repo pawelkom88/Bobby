@@ -13,6 +13,8 @@ import { useClearSession } from '@/hooks/mutations/useSessionMutations';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
+import { useUserData } from '@/context/UserDataContext';
+import { persistDialStoryContext } from '@/lib/dialStoryContext';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { logger } from '@/lib/logger';
@@ -57,6 +59,8 @@ function DialPageContent() {
   const { user, loading: authLoading } = useAuth();
   const clearSession = useClearSession();
   const searchParams = useSearchParams();
+  const { getJourneyState } = useUserData();
+  const journeyState = getJourneyState();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -209,6 +213,14 @@ function DialPageContent() {
     setCheckoutLoading(true);
     setIsProcessingCheckout(true);
     setCheckoutError(null);
+
+    const storyContext = journeyState;
+    if (storyContext?.selectedAgeTier || storyContext?.selectedService) {
+      persistDialStoryContext({
+        ageTier: storyContext.selectedAgeTier,
+        service: storyContext.selectedService,
+      });
+    }
 
     window.location.href = `${ROUTES.SELECT_PACKAGE}?needsCredits=true`;
   };

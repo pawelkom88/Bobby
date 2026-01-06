@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAssessmentData, setCompletionId } from '@/lib/session-storage';
 import { verifyIdToken } from '@/lib/firebase-admin';
-import type { AssessmentData } from '@/lib/session-storage';
+import type { AssessmentData } from '@/schemas/session.schema';
 import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 import {

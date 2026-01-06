@@ -7,6 +7,8 @@
  * state-changing API endpoints.
  */
 
+import 'server-only';
+
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
@@ -144,4 +146,3 @@ export async function getClientCSRFToken(): Promise<string> {
   // Generate new token if none exists
   return generateCSRFToken();
 }
-

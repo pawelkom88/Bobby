@@ -15,6 +15,7 @@ export function SpeculationRules({
   eagerness = 'eager',
 }: SpeculationRulesProps) {
   const [isSupported, setIsSupported] = useState(false);
+  const [nonce, setNonce] = useState<string | null>(null);
 
   useEffect(() => {
     setIsSupported(
@@ -22,6 +23,8 @@ export function SpeculationRules({
         HTMLScriptElement.supports &&
         HTMLScriptElement.supports('speculationrules')
     );
+    const meta = document.querySelector('meta[name="csp-nonce"]');
+    setNonce(meta?.getAttribute('content') ?? null);
   }, []);
 
   const rules = {
@@ -37,6 +40,7 @@ export function SpeculationRules({
 
   if (
     !isSupported ||
+    !nonce ||
     (prerenderPaths.length === 0 && prefetchPaths.length === 0)
   ) {
     return null;
@@ -44,6 +48,7 @@ export function SpeculationRules({
 
   return (
     <Script
+      nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(rules),
       }}

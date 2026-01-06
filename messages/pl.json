@@ -426,6 +426,12 @@
   "selectPackage": {
     "title": "Pakiety i ceny",
     "subtitle": "Wybierz pakiet dla swojego dziecka",
+    "storySummary": {
+      "title": "Twoje aktualne wybory",
+      "ageLabel": "Wiek",
+      "scenarioLabel": "Scenariusz",
+      "changeSelection": "Zmień wybór"
+    },
     "loading": "Ładowanie...",
     "buyPrefix": "Kup {currency}",
     "packs": {

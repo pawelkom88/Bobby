@@ -20,8 +20,6 @@ interface ClientProvidersProps {
 
 export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
-    <DeepgramContextProvider>
-      {children}
-    </DeepgramContextProvider>
+    <DeepgramContextProvider>{children}</DeepgramContextProvider>
   );
 }

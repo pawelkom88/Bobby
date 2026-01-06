@@ -74,11 +74,10 @@ function getSilencePhrases(
       'Are you still there?',
       "It's okay, I'm right here with you.",
       'Can you tell me what happened?',
-      "I'm waiting for you to talk to me.",
+      'Talk to me.',
       "Don't worry, take your time.",
       'Are you okay?',
       "Tell me when you're ready.",
-      'I can hear you breathing. Take your time.',
     ],
     '8–10 years old': [
       'Are you still there?',

@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend';
 import { logger } from '@/lib/logger';
 

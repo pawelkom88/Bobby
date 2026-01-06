@@ -3,6 +3,8 @@
  * Verifies Firebase ID tokens and extracts user information
  */
 
+import 'server-only';
+
 import { DecodedIdToken } from 'firebase-admin/auth';
 
 export interface TokenVerificationResult {

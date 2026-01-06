@@ -10,9 +10,12 @@
  * Data is encrypted with a server-side secret and stored in httpOnly cookies.
  */
 
+import 'server-only';
+
 import { cookies } from 'next/headers';
 import { encrypt, decrypt } from './encryption';
 import { logger } from '@/lib/logger';
+import type { AssessmentData, SessionData } from '@/schemas/session.schema';
 
 const SESSION_COOKIE_PREFIX = 'bobby_session_';
 const SESSION_COOKIE_OPTIONS = {
@@ -23,30 +26,9 @@ const SESSION_COOKIE_OPTIONS = {
   maxAge: 60 * 60, // 1 hour
 };
 
-export interface AssessmentData {
-  assessment: {
-    score: number;
-    passed: boolean;
-    positives: string[];
-    improvements: string[];
-    warnings: string[];
-    metrics: {
-      userTurns: number;
-      durationSeconds: number;
-    };
-  };
-  passed: boolean;
-}
-
-export interface SessionData {
-  userId?: string; // NEW: Store userId for validation
-  lastAssessment?: AssessmentData;
-  completionId?: string;
-  processedCompletionId?: string;
-  conversationComplete?: boolean;
-  completedAt?: number; // NEW: Timestamp when conversation completed
-  expiresAt?: number; // NEW: 24-hour expiration timestamp
-  conversationId?: string; // NEW: Store actual Firestore conversation ID
+interface SessionStorageData extends SessionData {
+  userId?: string; // Store userId for validation
+  completedAt?: number; // Timestamp when conversation completed
 }
 
 /**
@@ -114,7 +96,7 @@ export async function clearAllSessionValues(): Promise<void> {
 /**
  * Get all session data
  */
-export async function getAllSessionData(): Promise<SessionData> {
+export async function getAllSessionData(): Promise<SessionStorageData> {
   const userId = await getSessionValue<string>('userId');
   const lastAssessment =
     await getSessionValue<AssessmentData>('lastAssessment');

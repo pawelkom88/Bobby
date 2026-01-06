@@ -3788,6 +3788,57 @@ a,
   text-align: center;
 }
 
+.select-package-story-summary {
+  margin: 1.5rem 0 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.select-package-story-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.select-package-story-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.select-package-story-pill {
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0d0d0f;
+  box-shadow: 0 4px 12px rgba(13, 13, 15, 0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.select-package-story-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(13, 13, 15, 0.12);
+}
+
+.select-package-story-link {
+  margin-top: 0.4rem;
+  border: none;
+  background: transparent;
+  color: #0d0d0f;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
 .age-tiles-container,
 .emergency-tiles-container {
   display: flex;

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useCallback } from 'react';
-import type { AssessmentData, SessionData } from '@/lib/session-storage';
+import type { AssessmentData, SessionData } from '@/schemas/session.schema';
 import { logger } from '@/lib/logger';
 
 /**

@@ -5,6 +5,8 @@
  * Security: CWE-1188 - Ensures proper initialization of resources
  */
 
+import 'server-only';
+
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 

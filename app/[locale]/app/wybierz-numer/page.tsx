@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { ViewTransition } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -19,10 +19,18 @@ import {
 import { SpeculationRules } from '@/components/SpeculationRules';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
+import { useUserData } from '@/context/UserDataContext';
+import {
+  DialStoryContext,
+  getDialStoryContext,
+  clearDialStoryContext,
+} from '@/lib/dialStoryContext';
 
 function SelectPackagePageContent() {
   const t = useTranslations('selectPackage');
   const tCommon = useTranslations('common');
+  const tAge = useTranslations('yourAge');
+  const tEmergency = useTranslations('chooseEmergency');
   const locale = useLocale();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -36,6 +44,13 @@ function SelectPackagePageContent() {
   const searchParams = useSearchParams();
 
   const canceled = searchParams.get('canceled') === 'true';
+  const needsCredits = searchParams.get('needsCredits') === 'true';
+  const { getJourneyState } = useUserData();
+  const journeyState = getJourneyState();
+  const router = useRouter();
+  const [storyContext, setStoryContext] = useState<DialStoryContext | null>(
+    null
+  );
 
   // Redirect when credits are CONFIRMED from server and user has credits
   useEffect(() => {
@@ -56,6 +71,42 @@ function SelectPackagePageContent() {
 
     return () => clearTimeout(timeout);
   }, [canceled]);
+
+  useEffect(() => {
+    if (!needsCredits) {
+      setStoryContext(null);
+      clearDialStoryContext();
+      return;
+    }
+
+    const stored = getDialStoryContext();
+    setStoryContext(stored);
+  }, [needsCredits]);
+
+  const fallbackStory =
+    journeyState &&
+    (journeyState.selectedAgeTier || journeyState.selectedService)
+      ? {
+          ageTier: journeyState.selectedAgeTier,
+          service: journeyState.selectedService,
+        }
+      : null;
+
+  const storyForDisplay = storyContext ?? fallbackStory;
+  const shouldShowStorySummary =
+    needsCredits &&
+    !!storyForDisplay &&
+    (storyForDisplay.ageTier !== undefined || storyForDisplay.service !== undefined);
+
+  const ageLabel = storyForDisplay?.ageTier
+    ? tAge(`ages.tier${storyForDisplay.ageTier}`)
+    : null;
+  const scenarioLabel = storyForDisplay?.service
+    ? tEmergency(`services.${storyForDisplay.service}`)
+    : null;
+  const handleChangeStory = () => {
+    router.push(ROUTES.YOUR_AGE);
+  };
 
   const handleSelectPackage = async (packType: PackType) => {
     if (!user) {
@@ -122,6 +173,38 @@ function SelectPackagePageContent() {
                 <h1 className="select-package-title">{t('title')}</h1>
                 <p className="select-package-subtitle">{t('subtitle')}</p>
               </div>
+
+              {shouldShowStorySummary && (
+                <section
+                  className="select-package-story-summary"
+                  aria-live="polite"
+                >
+                  <p className="select-package-story-title">
+                    {t('storySummary.title')}
+                  </p>
+                  <div className="select-package-story-pills">
+                    {ageLabel && (
+                      <span className="select-package-story-pill">
+                        {t('storySummary.ageLabel')}: {ageLabel}
+                      </span>
+                    )}
+                    {scenarioLabel && (
+                      <span className="select-package-story-pill">
+                        {t('storySummary.scenarioLabel')}:{' '}
+                        {scenarioLabel}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="select-package-story-link"
+                    onClick={handleChangeStory}
+                  >
+                    {t('storySummary.changeSelection')}
+                  </button>
+                </section>
+              )}
+
               <br />
 
               {/* Canceled message */}

@@ -10,6 +10,8 @@
  * - Distributed rate limiting for serverless environments
  */
 
+import 'server-only';
+
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { isUpstashConfigured } from './env';
@@ -154,12 +156,15 @@ class InMemoryRateLimiter implements IRateLimiter {
 
 class UpstashRateLimiter implements IRateLimiter {
   private ratelimit: Ratelimit;
+  private failOpen: boolean;
 
   constructor(
     maxRequests: number = 100,
     windowMs: number = 15 * 60 * 1000,
-    prefix: string = 'ratelimit'
+    prefix: string = 'ratelimit',
+    failOpen: boolean = true
   ) {
+    this.failOpen = failOpen;
     const redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL!,
       token: process.env.UPSTASH_REDIS_REST_TOKEN!,
@@ -185,9 +190,20 @@ class UpstashRateLimiter implements IRateLimiter {
         resetTime: result.reset,
       };
     } catch (error) {
-      logger.error('Upstash rate limit error, failing open', { error });
+      const failureMode = this.failOpen ? 'open' : 'closed';
+      logger.error(`Upstash rate limit error, failing ${failureMode}`, {
+        error,
+      });
+
+      if (!this.failOpen) {
+        return {
+          limited: true,
+          remaining: 0,
+          resetTime: Date.now() + 60000,
+        };
+      }
+
       // Fail open to prevent blocking legitimate users
-      // Consider failing closed in high-security scenarios
       return {
         limited: false,
         remaining: 1,
@@ -312,9 +328,11 @@ const limiterCache = new Map<string, IRateLimiter>();
 export function createRateLimiter(
   maxRequests: number,
   windowMs: number,
-  prefix: string = 'default'
+  prefix: string = 'default',
+  options?: { failOpen?: boolean }
 ): IRateLimiter {
-  const cacheKey = `${prefix}:${maxRequests}:${windowMs}`;
+  const failOpen = options?.failOpen ?? true;
+  const cacheKey = `${prefix}:${maxRequests}:${windowMs}:${failOpen}`;
 
   // Return cached instance if exists
   if (limiterCache.has(cacheKey)) {
@@ -325,7 +343,7 @@ export function createRateLimiter(
 
   if (isUpstashConfigured()) {
     logger.debug(`Creating Upstash rate limiter: ${prefix}`);
-    limiter = new UpstashRateLimiter(maxRequests, windowMs, prefix);
+    limiter = new UpstashRateLimiter(maxRequests, windowMs, prefix, failOpen);
   } else {
     logger.debug(`Creating in-memory rate limiter: ${prefix}`);
     limiter = new InMemoryRateLimiter(maxRequests, windowMs);
@@ -369,7 +387,7 @@ export const rateLimiters = {
   api: createRateLimiter(100, 15 * 60 * 1000, 'api'),
 
   // Strict: 10 per minute (for sensitive operations)
-  strict: createRateLimiter(10, 60 * 1000, 'strict'),
+  strict: createRateLimiter(10, 60 * 1000, 'strict', { failOpen: false }),
 
   // Password reset: 3 per hour per email (prevents email bombing)
   passwordReset: createRateLimiter(3, 60 * 60 * 1000, 'password_reset'),

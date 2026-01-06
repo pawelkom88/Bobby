@@ -5,6 +5,8 @@
  * This ensures session data is encrypted at rest
  */
 
+import 'server-only';
+
 import {
   createCipheriv,
   createDecipheriv,
