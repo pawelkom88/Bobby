@@ -22,8 +22,10 @@ export function BeforeFirstCallSection() {
                 loading="lazy"
                 src="/new-icons1.webp"
                 alt={t('beforeStart.title')}
-                width={120}
-                height={120}
+                width={774}
+                height={808}
+                sizes="120px"
+                className={styles.prepIconImage}
               />
             </div>
             <h3>{t('beforeStart.title')}</h3>
@@ -40,8 +42,10 @@ export function BeforeFirstCallSection() {
                 loading="lazy"
                 src="/new-icons2.webp"
                 alt={t('duringPractice.title')}
-                width={120}
-                height={120}
+                width={774}
+                height={792}
+                sizes="120px"
+                className={styles.prepIconImage}
               />
             </div>
             <h3>{t('duringPractice.title')}</h3>
@@ -58,8 +62,10 @@ export function BeforeFirstCallSection() {
                 loading="lazy"
                 src="/new-icons3.webp"
                 alt={t('afterCall.title')}
-                width={120}
-                height={120}
+                width={774}
+                height={746}
+                sizes="120px"
+                className={styles.prepIconImage}
               />
             </div>
             <h3>{t('afterCall.title')}</h3>

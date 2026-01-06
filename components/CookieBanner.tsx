@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCookieConsent } from '@/hooks/useCookieConsent';
 
@@ -6,16 +6,34 @@ interface CookieBannerProps {
   className?: string;
 }
 
+const BANNER_DELAY_MS = 3500;
+
 export default function CookieBanner({ className = '' }: CookieBannerProps) {
   const { consent, isLoading, acceptCookies, rejectCookies, hasConsented } = useCookieConsent();
   const t = useTranslations('cookies');
   const bannerRef = useRef<HTMLDivElement>(null);
   const acceptButtonRef = useRef<HTMLButtonElement>(null);
   const rejectButtonRef = useRef<HTMLButtonElement>(null);
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    if (isLoading || hasConsented) {
+      setShowBanner(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowBanner(true);
+    }, BANNER_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [hasConsented, isLoading]);
 
   // Focus trap within banner
   useEffect(() => {
-    if (!hasConsented && !isLoading && bannerRef.current) {
+    if (showBanner && !hasConsented && !isLoading && bannerRef.current) {
       // Focus the accept button when banner appears
       acceptButtonRef.current?.focus();
       
@@ -55,10 +73,10 @@ export default function CookieBanner({ className = '' }: CookieBannerProps) {
         document.removeEventListener('keydown', handleTabKey);
       };
     }
-  }, [hasConsented, isLoading, rejectCookies]);
+  }, [hasConsented, isLoading, rejectCookies, showBanner]);
 
   // Don't render anything while loading or if consent has been given
-  if (isLoading || hasConsented) {
+  if (isLoading || hasConsented || !showBanner) {
     return null;
   }
 

@@ -1,8 +1,7 @@
 'use client';
 
-import { ViewTransition } from 'react';
+import { ViewTransition, useState, type CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScenarioCarousel } from './landing-page';
@@ -17,11 +16,44 @@ import styles from './LandingPage.module.css';
 const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
 const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
 
-const trustStripItems = Array.from({ length: 5 }, (_, i) => i + 1).map(id => ({
-  id,
-  translation: `hero.trustStrip.${['practiceOnly', 'realEmergencies', 'noRecordings', 'parentSupervision', 'noScaryContent'][id - 1]}`,
-  imageSrc: `/icon${id}.webp`,
-}));
+const trustStripItems = [
+  {
+    id: 1,
+    translation: 'hero.trustStrip.practiceOnly',
+    imageSrc: '/icon1.webp',
+    width: 400,
+    height: 441,
+    iconScale: 1.12,
+  },
+  {
+    id: 2,
+    translation: 'hero.trustStrip.realEmergencies',
+    imageSrc: '/icon2.webp',
+    width: 400,
+    height: 393,
+  },
+  {
+    id: 3,
+    translation: 'hero.trustStrip.noRecordings',
+    imageSrc: '/icon3.webp',
+    width: 400,
+    height: 305,
+  },
+  {
+    id: 4,
+    translation: 'hero.trustStrip.parentSupervision',
+    imageSrc: '/icon4.webp',
+    width: 400,
+    height: 350,
+  },
+  {
+    id: 5,
+    translation: 'hero.trustStrip.noScaryContent',
+    imageSrc: '/icon5.webp',
+    width: 400,
+    height: 338,
+  },
+];
 
 export default function HomePage() {
   const t = useTranslations('landing');
@@ -79,35 +111,38 @@ export default function HomePage() {
                       <div className={styles.landingTrustStripTitle}>
                         {t('hero.trustStrip.title')}
                       </div>
-                      <div
-                        className={styles.landingTrustStripItems}
-                        role="list"
-                      >
-                        {trustStripItems.map(item => {
-                          const firstTwoImages = item.id <= 2;
-                          return (
-                            <ul
-                              key={item.id}
-                              className={styles.landingTrustStripItem}
+                      <ul className={styles.landingTrustStripItems}>
+                        {trustStripItems.map(item => (
+                          <li
+                            key={item.id}
+                            className={styles.landingTrustStripItem}
+                          >
+                            <span
+                              className={styles.landingTrustStripIcon}
+                              style={
+                                {
+                                  '--icon-scale': item.iconScale ?? 1,
+                                } as CSSProperties
+                              }
                             >
-                              <li className={styles.landingTrustStripIcon}>
-                                <Image
-                                  src={item.imageSrc}
-                                  alt={item.translation}
-                                  width={firstTwoImages ? 40 : 55}
-                                  height={48}
-                                  aria-hidden="true"
-                                  fetchPriority="high"
-                                  preload
-                                />
-                                <span className={styles.landingTrustStripText}>
-                                  {t(item.translation)}
-                                </span>
-                              </li>
-                            </ul>
-                          );
-                        })}
-                      </div>
+                              <Image
+                                src={item.imageSrc}
+                                alt=""
+                                width={item.width}
+                                height={item.height}
+                                sizes="64px"
+                                className={styles.landingTrustStripIconImage}
+                                aria-hidden="true"
+                                fetchPriority="high"
+                                preload
+                              />
+                            </span>
+                            <span className={styles.landingTrustStripText}>
+                              {t(item.translation)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                     <Link
                       href="/login"

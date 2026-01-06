@@ -186,12 +186,16 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .landingTrustStripItem {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0;
 }
 
 .landingTrustStripIcon {
@@ -199,8 +203,19 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  gap: 10px;
+  width: 64px;
+  height: 48px;
+  flex: 0 0 64px;
   margin-top: 1px;
+}
+
+.landingTrustStripIconImage {
+  height: 48px;
+  width: auto;
+  max-width: 64px;
+  display: block;
+  transform: scale(var(--icon-scale, 1));
+  transform-origin: center;
 }
 
 .landingTrustStripText {

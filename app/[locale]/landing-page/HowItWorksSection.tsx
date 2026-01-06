@@ -12,19 +12,31 @@ export function HowItWorksSection() {
       number: 1,
       title: t('howItWorks.step1.title'),
       description: t('howItWorks.step1.description'),
-      icon: '/how-it-works-3.webp',
+      icon: {
+        src: '/how-it-works-3.webp',
+        width: 600,
+        height: 609,
+      },
     },
     {
       number: 2,
       title: t('howItWorks.step2.title'),
       description: t('howItWorks.step2.description'),
-      icon: '/how-it-works-2.webp',
+      icon: {
+        src: '/how-it-works-2.webp',
+        width: 600,
+        height: 571,
+      },
     },
     {
       number: 3,
       title: t('howItWorks.step3.title'),
       description: t('howItWorks.step3.description'),
-      icon: '/how-it-works-4.webp',
+      icon: {
+        src: '/how-it-works-4.webp',
+        width: 600,
+        height: 567,
+      },
     },
   ];
 
@@ -43,11 +55,12 @@ export function HowItWorksSection() {
               <div className={styles.stepIcon}>
                 <div className={styles.stepIconContainer}>
                   <Image
-                    fill
-                    src={step.icon}
+                    src={step.icon.src}
+                    width={step.icon.width}
+                    height={step.icon.height}
                     alt={step.title}
                     className={styles.stepIconImage}
-                    sizes="150px"
+                    sizes="120px"
                     loading="lazy"
                   />
                 </div>

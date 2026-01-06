@@ -6232,6 +6232,7 @@ a:focus-visible {
   transform: translateY(0) scale(1);
   opacity: 1;
   transition: all 500ms ease-in-out;
+  animation: cookie-banner-fade-in 700ms ease both;
 }
 
 .cookie-banner-hidden {
@@ -6263,6 +6264,17 @@ a:focus-visible {
   font-weight: bold;
   color: var(--primary-purple, #667eea);
   margin-bottom: 12px;
+}
+
+@keyframes cookie-banner-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .cookie-banner-description {
@@ -6378,5 +6390,6 @@ a:focus-visible {
   .cookie-banner,
   .cookie-banner-button {
     transition: none;
+    animation: none;
   }
 }
