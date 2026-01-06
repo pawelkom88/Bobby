@@ -3530,6 +3530,76 @@ a,
 }
 
 /* ============================================================================
+   PRACTICE ADDRESS CARD
+   ============================================================================ */
+
+.practice-address-card {
+  width: min(90vw, 540px);
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 18px;
+  border: 3px solid #f59e0b;
+  background: linear-gradient(135deg, #fff7e6 0%, #ffffff 100%);
+  box-shadow:
+    0 12px 24px rgba(245, 158, 11, 0.15),
+    0 0 0 1px rgba(245, 158, 11, 0.15);
+  text-align: center;
+}
+
+.practice-address-label {
+  font-family: var(--font-luckiest-guy), system-ui;
+  font-size: 1.1rem;
+  color: #d97706;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
+}
+
+.practice-address-value {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 0.35rem;
+}
+
+.practice-address-hint {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.practice-address-card--highlight {
+  animation: practice-address-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes practice-address-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 12px 24px rgba(245, 158, 11, 0.2),
+      0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow:
+      0 16px 32px rgba(245, 158, 11, 0.25),
+      0 0 0 12px rgba(245, 158, 11, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 12px 24px rgba(245, 158, 11, 0.2),
+      0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .practice-address-card--highlight {
+    animation: none;
+  }
+}
+
+/* ============================================================================
    TIMER DISPLAY - Minimized with Expandable Tooltip
    ============================================================================ */
 @keyframes timer-expand {
@@ -5263,7 +5333,7 @@ a:focus-visible {
     transform 0.2s,
     box-shadow 0.2s;
   position: relative;
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  /*border: 3px solid rgba(255, 255, 255, 0.8);*/
   font-weight: 700;
   letter-spacing: 0.05em;
 }
@@ -5290,6 +5360,13 @@ a:focus-visible {
 /* ============================================================================
    PACK CARD PRICING STYLES
    ============================================================================ */
+
+.select-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
 
 .pricing-card {
   min-width: 300px;

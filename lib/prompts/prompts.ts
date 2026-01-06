@@ -11,7 +11,7 @@ const AGE_CONFIGS = {
     location_strategy:
       'Ask: "What\'s your address?" If they don\'t know, say: "That\'s okay. Can you find a grown-up next door to help?" If no neighbor: "Can you see any letters or numbers on your door or post?" Last resort: "Don\'t worry, we can find you from the phone."',
     safety_check:
-      'Say slowly: "I need you to be really brave now. Get close to mummy. Put your hand flat on her tummy, right in the middle. Can you feel it going up... and down... up... and down? Like when she breathes?" If unclear: "Is she making any sounds? Any snoring or funny noises?"',
+      'Say slowly: "I need you to be really brave now. Get close to mummy. Put your hand flat on her tummy, right in the middle. Can you feel it going up and down? Like when she breathes?" If unclear: "Is she making any sounds? Any snoring or funny noises?"',
     neighbor_escalation:
       'If child struggles with instructions: "Is there a safe grown-up nearby? A neighbor you know? Can you run to get them and bring them back?"',
     speakerphone_instruction:

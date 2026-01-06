@@ -515,7 +515,9 @@
     "processing": "Przetwarzam rozmowę...",
     "sessionError": "Błąd sesji",
     "sessionErrorDesc": "Coś poszło nie tak podczas rozmowy.",
-    "endConversation": "Zakończ rozmowę"
+    "endConversation": "Zakończ rozmowę",
+    "practiceAddressLabel": "Adres do ćwiczeń",
+    "practiceAddressHint": "Użyj go, gdy Bobby poprosi o adres."
   },
   "completion": {
     "title": "Świetna robota!",

@@ -521,7 +521,9 @@
     "processing": "Processing your conversation...",
     "sessionError": "Session Error",
     "sessionErrorDesc": "Something went wrong during the conversation.",
-    "endConversation": "End Conversation"
+    "endConversation": "End Conversation",
+    "practiceAddressLabel": "Practice address",
+    "practiceAddressHint": "Use this when Bobby asks for the address."
   },
   "completion": {
     "title": "Great Job!",

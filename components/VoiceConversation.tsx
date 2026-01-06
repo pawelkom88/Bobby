@@ -16,6 +16,12 @@ import CartoonTimer from './CartoonTimer';
 import { useDeepgram } from '@/context/DeepgramContextProvider';
 import { useMicrophone } from '@/context/MicrophoneContextProvider';
 import {
+  buildPracticeAddressPrompt,
+  isPracticeAddressPrompt,
+  pickPracticeAddress,
+  type PracticeAddress,
+} from '@/lib/practice-addresses';
+import {
   sendMicToSocket,
   sendSocketMessage,
   DeepgramAgentConfig,
@@ -31,6 +37,9 @@ interface ActiveConversationViewProps {
   sessionActive: boolean;
   remainingTime: number;
   endConversation: () => void;
+  practiceAddress?: PracticeAddress;
+  showPracticeAddress: boolean;
+  highlightPracticeAddress: boolean;
 }
 
 // Component: ActiveConversationView
@@ -41,6 +50,9 @@ function ActiveConversationView({
   sessionActive,
   remainingTime,
   endConversation,
+  practiceAddress,
+  showPracticeAddress,
+  highlightPracticeAddress,
 }: ActiveConversationViewProps) {
   const t = useTranslations('conversation');
   
@@ -64,6 +76,22 @@ function ActiveConversationView({
         </h2>
 
         <VoiceAnimations state={visualState} />
+
+        {practiceAddress && showPracticeAddress && (
+          <div
+            className={`practice-address-card ${highlightPracticeAddress ? 'practice-address-card--highlight' : ''}`}
+            role="status"
+            aria-live="polite"
+          >
+            <div className="practice-address-label">
+              {t('practiceAddressLabel')}
+            </div>
+            <div className="practice-address-value">{practiceAddress.line}</div>
+            <div className="practice-address-hint">
+              {t('practiceAddressHint')}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Subtitles (Agent only) */}
@@ -175,6 +203,9 @@ export default function VoiceConversation({
   const [remainingTime, setRemainingTime] = useState(
     CONFIG.MAX_CONVERSATION_TIME_MINUTES * 60
   );
+  const [showPracticeAddress, setShowPracticeAddress] = useState(false);
+  const [highlightPracticeAddress, setHighlightPracticeAddress] = useState(false);
+  const hasShownPracticeAddressRef = useRef(false);
 
   // Deepgram & Microphone Hooks
   const { socket, socketState, connectToDeepgram, disconnectFromDeepgram } =
@@ -197,6 +228,32 @@ export default function VoiceConversation({
   const { getSettings } = useUserData();
   const settings = getSettings();
   const { soundEnabled } = useSound();
+  const currentLocale = useLocale();
+  const locale = (currentLocale === 'pl' ? 'pl' : 'en') as Locale;
+
+  const [practiceAddress] = useState<PracticeAddress>(() => {
+    if (typeof window === 'undefined') {
+      return pickPracticeAddress(ageTier, locale);
+    }
+
+    const storageKey = `bobby_practice_address_${locale}_${ageTier}`;
+    const stored = window.sessionStorage.getItem(storageKey);
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as PracticeAddress;
+        if (parsed?.line) {
+          return parsed;
+        }
+      } catch (error) {
+        logger.warn('Failed to parse stored practice address', error);
+      }
+    }
+
+    const selected = pickPracticeAddress(ageTier, locale);
+    window.sessionStorage.setItem(storageKey, JSON.stringify(selected));
+    return selected;
+  });
 
   // Derived visual state
   const visualState:
@@ -218,6 +275,28 @@ export default function VoiceConversation({
   // Silence detection
   const silenceThreshold = useRef(0.05); // Audio level threshold for silence (reduce false positives)
   const silenceDuration = useRef(8000); // 8 seconds
+
+  useEffect(() => {
+    if (!practiceAddress || hasShownPracticeAddressRef.current) return;
+
+    const lastAgentMessage = [...conversation]
+      .reverse()
+      .find(message => message.type === 'agent');
+
+    if (!lastAgentMessage) return;
+
+    if (isPracticeAddressPrompt(lastAgentMessage.text, locale)) {
+      hasShownPracticeAddressRef.current = true;
+      setShowPracticeAddress(true);
+      setHighlightPracticeAddress(true);
+
+      const timer = window.setTimeout(() => {
+        setHighlightPracticeAddress(false);
+      }, 6500);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [conversation, practiceAddress, locale]);
   const lastAudioTime = useRef(Date.now());
   const silenceCheckInterval = useRef<NodeJS.Timeout | null>(null);
   const silenceTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -646,8 +725,6 @@ export default function VoiceConversation({
     }
   };
 
-  const currentLocale = useLocale();
-
   // When socket opens, send configuration
   useEffect(() => {
     logger.log(
@@ -680,11 +757,17 @@ export default function VoiceConversation({
         situation,
         ageTierLabel,
         CONFIG.MAX_CONVERSATION_TIME_MINUTES,
-        currentLocale as Locale
+        locale
       );
+      const practicePrompt = buildPracticeAddressPrompt(
+        ageTier,
+        locale,
+        practiceAddress.line
+      );
+      const fullPrompt = `${instructions}\n${practicePrompt}`;
       logger.log(
         'VoiceConversation: System prompt generated, length:',
-        instructions.length
+        fullPrompt.length
       );
 
       // Dynamic greeting based on scenario and locale
@@ -733,7 +816,7 @@ export default function VoiceConversation({
               temperature: 0.4,
               // model: "gpt-4o-mini",
             },
-            prompt: instructions,
+            prompt: fullPrompt,
           },
           // type: "UpdateSpeak",
           speak: {
@@ -958,6 +1041,9 @@ export default function VoiceConversation({
           sessionActive={sessionActive}
           remainingTime={remainingTime}
           endConversation={endConversation}
+          practiceAddress={practiceAddress}
+          showPracticeAddress={showPracticeAddress}
+          highlightPracticeAddress={highlightPracticeAddress}
         />
       )}
       {!conversationEnded && !sessionActive && (
