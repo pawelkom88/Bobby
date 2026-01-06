@@ -15,6 +15,7 @@ import { verifyToken } from '@/lib/token-verifier';
 import { validateOwnership, OwnershipValidationError } from '@/lib/ownership-validator';
 import { logger } from '@/lib/logger';
 import { extractBearerToken } from '@/lib/auth-utils';
+import { redactConversation } from '@/lib/redaction';
 import {
   rateLimiters,
   getClientIP,
@@ -240,7 +241,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
     };
 
     if (messages && messages.length > 0) {
-      updateData.messages = messages.map(msg => ({
+      const redactedMessages = redactConversation(messages);
+      updateData.messages = redactedMessages.map(msg => ({
         type: msg.type,
         text: msg.text,
         timestamp: msg.timestamp || now,

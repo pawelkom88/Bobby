@@ -10,7 +10,6 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import CartoonButton from '@/components/CartoonButton';
 import { useAuth } from '@/context/AuthContext';
 import { useCredits } from '@/context/CreditsContext';
-import { useUserData } from '@/context/UserDataContext';
 import { ROUTES } from '@/lib/routes';
 import {
   DISPLAY_PACKAGES,
@@ -34,7 +33,6 @@ function SelectPackagePageContent() {
     loading: creditsLoading,
     isServerConfirmed,
   } = useCredits();
-  const { getJourneyState } = useUserData();
   const searchParams = useSearchParams();
 
   const canceled = searchParams.get('canceled') === 'true';
@@ -45,22 +43,6 @@ function SelectPackagePageContent() {
       window.location.href = ROUTES.DIAL;
     }
   }, [isServerConfirmed, hasCredits]);
-
-  // Route guard: verify user has completed previous steps
-  // Skip redirect if payment was just canceled
-  useEffect(() => {
-    if (canceled) return;
-
-    const journeyState = getJourneyState();
-    if (!journeyState?.selectedAgeTier) {
-      window.location.href = ROUTES.YOUR_AGE;
-      return;
-    }
-    if (!journeyState?.selectedService) {
-      window.location.href = ROUTES.CHOOSE_EMERGENCY;
-      return;
-    }
-  }, [getJourneyState, canceled]);
 
   // Clean up canceled parameter after 3 seconds
   useEffect(() => {

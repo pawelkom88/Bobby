@@ -1024,7 +1024,7 @@
       "intro": "Bobby jest wyłącznie narzędziem do ćwiczeń i edukacji.",
       "explanation": "Ponieważ aplikacja symuluje rozmowy awaryjne, dzieci mogą czasami mówić szczegóły osobiste podczas ćwiczeń.",
       "askNotToShare": "✅ Prosimy, aby nie udostępniać prawdziwych danych osobowych (pełnych imion, prawdziwych adresów, numerów telefonów, kodów pocztowych).",
-      "redaction": "✅ Staramy się również redagować oczywiste dane osobowe z przechowywanych transkrypcji (na przykład: numery telefonów czy wspólne formaty adresów).",
+      "redaction": "✅ Staramy się również redagować oczywiste dane osobowe z przechowywanych transkrypcji (na przykład: numery telefonów, adresy e-mail lub kody pocztowe).",
       "redactionDisclaimer": "Redakcja jest dokonywana najlepszymi sposobami i może nie złapać każdego szczegółu osobistego. Rodzice powinni nadzorować sesje ćwiczebne i unikać udostępniania prawdziwych danych osobowych.",
       "retention": "Przechowujemy transkrypcje, dopóki rodzic ich nie usunie lub nie usunie swojego konta.",
       "parentControl": "Rodzice mogą przeglądać transkrypcje w aplikacji i mogą je usunąć, usuwając konto."
@@ -1122,7 +1122,7 @@
         "Praktykuj różne scenariusze z czasem",
         "Rób przerwy, jeśli dziecko staje się niespokojne"
       ],
-      "personalInfoWarning": "**Prosimy, aby nie udostępniać prawdziwych danych osobowych podczas rozmów ćwiczebnych. Staramy się również redagować oczywiste dane osobowe z transkrypcji.**\n(Przykład: numery telefonów czy wspólne formaty adresów. Redakcja jest dokonywana najlepszymi sposobami i może nie złapać wszystkiego.)"
+      "personalInfoWarning": "**Prosimy, aby nie udostępniać prawdziwych danych osobowych podczas rozmów ćwiczebnych. Staramy się również redagować oczywiste dane osobowe z transkrypcji.**\n(Przykład: numery telefonów, adresy e-mail lub kody pocztowe. Redakcja jest dokonywana najlepszymi sposobami i może nie złapać wszystkiego.)"
     },
     "practiceAddress": {
       "title": "Adres do ćwiczeń (Wskazówka prywatności)",

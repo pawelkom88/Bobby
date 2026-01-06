@@ -1128,8 +1128,8 @@
       "title": "3. Practice-only transcripts (important)",
       "intro": "Bobby is a practice and educational tool only.",
       "explanation": "Because the app simulates emergency conversations, children may sometimes say personal details during practice.",
-      "askNotToShare": "✅ We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers or common address formats). Redaction is best-effort and may not catch everything.",
-      "redaction": "✅ We also try to redact obvious personal details from stored transcripts (for example: phone numbers or common address formats).",
+      "askNotToShare": "✅ We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers, email addresses, or postcodes). Redaction is best-effort and may not catch everything.",
+      "redaction": "✅ We also try to redact obvious personal details from stored transcripts (for example: phone numbers, email addresses, or postcodes).",
       "redactionDisclaimer": "Redaction is best-effort and may not catch every personal detail. Parents should supervise practice sessions and avoid sharing real personal information.",
       "retention": "Parents can review transcripts inside the app. We keep transcripts until you delete your account."
     },
@@ -1226,7 +1226,7 @@
         "Practice different scenarios over time",
         "Take breaks if your child becomes anxious"
       ],
-      "personalInfoWarning": "We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers or common address formats). Redaction is best-effort and may not catch everything."
+      "personalInfoWarning": "We ask you not to share real personal information during practice calls. We also try to redact obvious personal details from transcripts (e.g., phone numbers, email addresses, or postcodes). Redaction is best-effort and may not catch everything."
     },
     "practiceAddress": {
       "title": "Practice Address (Privacy Tip)",

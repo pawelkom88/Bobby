@@ -15,6 +15,7 @@ import { useCreditDeduction } from '@/hooks/useCreditDeduction';
 import { useAuth } from '@/context/AuthContext';
 import { useSetConversationComplete } from '@/hooks/mutations/useSessionMutations';
 import { logger } from '@/lib/logger';
+import { redactConversation } from '@/lib/redaction';
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 
 interface CreditDeductionIntegrationProps {
@@ -77,6 +78,7 @@ export default function CreditDeductionIntegration({
    */
   const handleConversationComplete = useCallback(
     async (conversation: ConversationMessage[]) => {
+      const redactedConversation = redactConversation(conversation);
       try {
         logger.log('Conversation completed, processing credit deduction');
 
@@ -93,7 +95,10 @@ export default function CreditDeductionIntegration({
 
         // 1. End the conversation (set endedAt timestamp and save messages)
         if (state.conversationId) {
-          const endSuccess = await endConversation(state.conversationId, conversation);
+          const endSuccess = await endConversation(
+            state.conversationId,
+            redactedConversation
+          );
 
           if (!endSuccess) {
             logger.warn('Failed to end conversation, but continuing with deduction');
@@ -112,7 +117,7 @@ export default function CreditDeductionIntegration({
 
         // 3. Call the original onComplete callback
         if (onComplete) {
-          onComplete(conversation, state.conversationId || '');
+          onComplete(redactedConversation, state.conversationId || '');
         }
       } catch (error) {
         logger.error('Error processing conversation completion:', error);
@@ -121,7 +126,7 @@ export default function CreditDeductionIntegration({
 
         // Still call onComplete even if deduction fails
         if (onComplete) {
-          onComplete(conversation, state.conversationId || '');
+          onComplete(redactedConversation, state.conversationId || '');
         }
       }
     },

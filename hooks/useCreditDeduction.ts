@@ -3,7 +3,7 @@
  * Handles conversation start, end, and credit deduction
  */
 
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { logger } from '@/lib/logger';
 import type { ConversationMessage } from '@/types';
@@ -41,6 +41,51 @@ export interface DeductCreditsResponse {
   message?: string;
 }
 
+const ACTIVE_CONVERSATION_KEY = 'bobby_active_conversation_id';
+
+function getConversationStorageKey(userId?: string | null): string | null {
+  if (!userId) {
+    return null;
+  }
+  return `${ACTIVE_CONVERSATION_KEY}:${userId}`;
+}
+
+function getStoredConversationId(userId?: string | null): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const key = getConversationStorageKey(userId);
+  if (!key) {
+    return null;
+  }
+  return window.sessionStorage.getItem(key);
+}
+
+function setStoredConversationId(
+  userId: string,
+  conversationId: string
+): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  const key = getConversationStorageKey(userId);
+  if (!key) {
+    return;
+  }
+  window.sessionStorage.setItem(key, conversationId);
+}
+
+function clearStoredConversationId(userId?: string | null): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  const key = getConversationStorageKey(userId);
+  if (!key) {
+    return;
+  }
+  window.sessionStorage.removeItem(key);
+}
+
 /**
  * Hook for managing credit deduction flow
  */
@@ -53,6 +98,20 @@ export function useCreditDeduction() {
     newCredits: null,
     charged: false,
   });
+
+  // Restore active conversation ID for this session if it exists
+  useEffect(() => {
+    if (!user?.uid || state.conversationId) {
+      return;
+    }
+    const storedConversationId = getStoredConversationId(user.uid);
+    if (storedConversationId) {
+      setState((prev) => ({
+        ...prev,
+        conversationId: storedConversationId,
+      }));
+    }
+  }, [user?.uid, state.conversationId]);
 
   /**
    * Get Firebase ID token
@@ -83,6 +142,21 @@ export function useCreditDeduction() {
           error: 'User not authenticated',
         }));
         return null;
+      }
+
+      if (state.conversationId) {
+        return state.conversationId;
+      }
+
+      const storedConversationId = getStoredConversationId(user.uid);
+      if (storedConversationId) {
+        setState((prev) => ({
+          ...prev,
+          conversationId: storedConversationId,
+          isLoading: false,
+          error: null,
+        }));
+        return storedConversationId;
       }
 
       setState((prev) => ({
@@ -117,6 +191,7 @@ export function useCreditDeduction() {
         const data = (await response.json()) as StartConversationResponse;
 
         logger.log(`Conversation started: ${data.conversationId}`);
+        setStoredConversationId(user.uid, data.conversationId);
 
         setState((prev) => ({
           ...prev,
@@ -139,7 +214,7 @@ export function useCreditDeduction() {
         return null;
       }
     },
-    [user, getToken]
+    [user, getToken, state.conversationId]
   );
 
   /**
@@ -187,6 +262,7 @@ export function useCreditDeduction() {
         const data = (await response.json()) as EndConversationResponse;
 
         logger.log(`Conversation ended: ${data.conversationId}`);
+        clearStoredConversationId(user.uid);
 
         setState((prev) => ({
           ...prev,
@@ -307,6 +383,7 @@ export function useCreditDeduction() {
    * Reset state
    */
   const reset = useCallback(() => {
+    clearStoredConversationId(user?.uid);
     setState({
       conversationId: null,
       isLoading: false,
@@ -314,7 +391,7 @@ export function useCreditDeduction() {
       newCredits: null,
       charged: false,
     });
-  }, []);
+  }, [user?.uid]);
 
   return {
     state,

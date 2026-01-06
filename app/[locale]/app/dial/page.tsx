@@ -197,8 +197,8 @@ function DialPageContent() {
     startPractice();
   };
 
-  const handleCheckoutNeeded = async () => {
-    logger.log('No credits available, starting checkout process');
+  const handleCheckoutNeeded = () => {
+    logger.log('No credits available, redirecting to package selection');
 
     if (!user) {
       logger.error('No user found when trying to checkout');
@@ -210,34 +210,7 @@ function DialPageContent() {
     setIsProcessingCheckout(true);
     setCheckoutError(null);
 
-    try {
-      const idToken = await user.getIdToken(true);
-
-      const response = await fetch('/api/checkout_sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ packType: 'responder' }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const { url } = await response.json();
-      logger.log('Redirecting to Stripe checkout:', url);
-      window.location.href = url;
-    } catch (error) {
-      logger.error('Checkout error occurred');
-      setCheckoutError(
-        error instanceof Error ? error.message : 'Failed to start checkout'
-      );
-      setCheckoutLoading(false);
-      setIsProcessingCheckout(false);
-    }
+    window.location.href = `${ROUTES.SELECT_PACKAGE}?needsCredits=true`;
   };
 
   const handleBack = () => {

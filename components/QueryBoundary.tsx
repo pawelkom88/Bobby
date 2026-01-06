@@ -5,6 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Suspense } from 'react';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 interface QueryBoundaryProps {
   children: React.ReactNode;
@@ -82,7 +83,10 @@ export function QueryBoundary({
           }
           onError={(error, errorInfo) => {
             // Log error based on boundary level
-            console.error(`QueryBoundary [${level}] Error:`, error, errorInfo);
+            logger.error(`QueryBoundary [${level}] Error:`, {
+              error,
+              errorInfo,
+            });
           }}
         >
           <Suspense fallback={loadingFallback}>

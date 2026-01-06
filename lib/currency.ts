@@ -3,6 +3,8 @@
  * Provides dynamic currency support based on locale or environment
  */
 
+import { logger } from '@/lib/logger';
+
 export interface CurrencyConfig {
   symbol: string;
   code: string;
@@ -38,7 +40,9 @@ export function getCurrencyConfig(locale?: string): CurrencyConfig {
         locale: currency.locale || 'en-GB'
       };
     } catch (e) {
-      console.warn('Invalid NEXT_PUBLIC_CURRENCY format, falling back to default');
+      logger.warn(
+        'Invalid NEXT_PUBLIC_CURRENCY format, falling back to default'
+      );
     }
   }
 

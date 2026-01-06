@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import PageWrapper from './PageWrapper';
 import CartoonButton from './CartoonButton';
 import { BetaFeedbackSchema } from '@/lib/schemas/beta-feedback';
+import { logger } from '@/lib/logger';
 import styles from './BetaFeedbackForm.module.css';
 
 interface BetaFeedbackData {
@@ -256,7 +257,7 @@ export default function BetaFeedbackForm() {
 
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      logger.error('Error submitting feedback:', error);
       // Handle error - could show a message
     } finally {
       setIsSubmitting(false);

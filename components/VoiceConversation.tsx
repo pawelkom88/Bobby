@@ -168,34 +168,8 @@ export default function VoiceConversation({
   const [isProcessing, setIsProcessing] = useState(false); // Thinking
   const [isSpeaking, setIsSpeaking] = useState(false); // Agent Speaking
 
-  const [conversation, setConversation] = useState<ConversationMessage[]>(
-    () => {
-      // Clear old debug data on component mount
-      if (typeof window !== 'undefined') {
-        try {
-          const timestamp = localStorage.getItem(
-            'debug_conversation_timestamp'
-          );
-          if (timestamp) {
-            const age = Date.now() - parseInt(timestamp);
-            if (age > 60000) {
-              // 1 minute
-              localStorage.removeItem('debug_conversation');
-              localStorage.removeItem('debug_conversation_timestamp');
-              logger.log('🔍 Cleared old debug conversation data (>1 min old)');
-            }
-          }
-          // Always clear on new conversation start
-          localStorage.removeItem('debug_conversation');
-          localStorage.removeItem('debug_conversation_timestamp');
-          logger.log('🔍 Starting fresh conversation - cleared debug data');
-        } catch (e) {
-          logger.error('Failed to clear debug conversation data:', e);
-        }
-      }
-      return [];
-    }
-  );
+  const [conversation, setConversation] = useState<ConversationMessage[]>([]);
+  const conversationRef = useRef<ConversationMessage[]>([]);
   const [sessionActive, setSessionActive] = useState(false);
   const [conversationEnded, setConversationEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -594,23 +568,7 @@ export default function VoiceConversation({
                   '🔍 User messages:',
                   updated.filter(m => m.type === 'user').length
                 );
-
-                // Store in localStorage for debugging
-                try {
-                  localStorage.setItem(
-                    'debug_conversation',
-                    JSON.stringify(updated)
-                  );
-                  localStorage.setItem(
-                    'debug_conversation_timestamp',
-                    Date.now().toString()
-                  );
-                } catch (e) {
-                  logger.error(
-                    'Failed to store conversation in localStorage:',
-                    e
-                  );
-                }
+                conversationRef.current = updated;
 
                 return updated;
               });
@@ -878,10 +836,6 @@ export default function VoiceConversation({
         'color: green; font-size: 24px; font-weight: bold; background: lightgreen; padding: 10px;'
       );
 
-      // DEBUG: Check localStorage for conversation
-      const storedConversation = localStorage.getItem('debug_conversation');
-      logger.log('🔍 Stored conversation in localStorage:', storedConversation);
-
       // DEBUG: Log conversation state before ending
       logger.log(
         '🔍 ENDING CONVERSATION - Total messages:',
@@ -897,22 +851,10 @@ export default function VoiceConversation({
       );
       logger.log('🔍 Full conversation:', conversation);
 
-      // CRITICAL FIX: If conversation state is empty but localStorage has data, use localStorage
-      let finalConversation = conversation;
-      if (conversation.length === 0 && storedConversation) {
-        try {
-          const parsed = JSON.parse(storedConversation);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            logger.log(
-              '🔍 ⚠️ USING LOCALSTORAGE CONVERSATION (state was empty):',
-              parsed.length
-            );
-            finalConversation = parsed;
-          }
-        } catch (e) {
-          logger.error('Failed to parse stored conversation:', e);
-        }
-      }
+      const finalConversation =
+        conversationRef.current.length > 0
+          ? conversationRef.current
+          : conversation;
 
       disconnectFromDeepgram();
 

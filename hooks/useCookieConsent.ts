@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { analyticsService } from '@/lib/analytics';
+import { logger } from '@/lib/logger';
 
 export type ConsentStatus = 'accepted' | 'rejected' | 'pending';
 
@@ -27,7 +28,7 @@ export function useCookieConsent() {
         // Initialize analytics with stored consent
         analyticsService.initialize(data.consent === 'accepted');
       } catch (error) {
-        console.error('Failed to parse cookie consent data:', error);
+        logger.error('Failed to parse cookie consent data:', error);
         localStorage.removeItem(STORAGE_KEY);
       }
     }

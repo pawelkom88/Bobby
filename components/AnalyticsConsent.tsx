@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 // This component handles Google's Consent Mode v2
 // It must be rendered early in the app to set default consent
@@ -15,7 +16,7 @@ export function AnalyticsConsent() {
   
   // Don't load if measurement ID is missing
   if (!measurementId) {
-    console.warn('%c⚠️ Firebase Measurement ID is missing', 'color: #ea4335; font-weight: bold;');
+    logger.warn('Firebase Measurement ID is missing');
     return null;
   }
 

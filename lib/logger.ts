@@ -57,7 +57,6 @@ class Logger {
   private logs: LogEntry[] = [];
   private maxLogs = 100;
   private isDevelopment = process.env.NODE_ENV === 'development';
-  private isProduction = process.env.NODE_ENV === 'production';
 
   /**
    * Sanitize data to remove sensitive information
@@ -124,45 +123,45 @@ class Logger {
 
   debug(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    if (this.isDevelopment) {
-      console.debug(this.formatMessage('debug', message, dataToLog));
+    if (!this.isDevelopment) {
+      return;
     }
-    // Don't store debug logs in production
-    if (!this.isProduction) {
-      this.addLog('debug', message, dataToLog);
-    }
+    console.debug(this.formatMessage('debug', message, dataToLog));
+    this.addLog('debug', message, dataToLog);
   }
 
   info(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    if (this.isDevelopment) {
-      console.info(this.formatMessage('info', message, dataToLog));
+    if (!this.isDevelopment) {
+      return;
     }
+    console.info(this.formatMessage('info', message, dataToLog));
     this.addLog('info', message, dataToLog);
   }
 
   log(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    if (this.isDevelopment) {
-      console.log(this.formatMessage('log', message, dataToLog));
+    if (!this.isDevelopment) {
+      return;
     }
-    // Don't store general logs in production
-    if (!this.isProduction) {
-      this.addLog('log', message, dataToLog);
-    }
+    console.log(this.formatMessage('log', message, dataToLog));
+    this.addLog('log', message, dataToLog);
   }
 
   warn(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    if (this.isDevelopment) {
-      console.warn(this.formatMessage('warn', message, dataToLog));
+    if (!this.isDevelopment) {
+      return;
     }
+    console.warn(this.formatMessage('warn', message, dataToLog));
     this.addLog('warn', message, dataToLog);
   }
 
   error(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    // Always log errors to console (even in production for monitoring)
+    if (!this.isDevelopment) {
+      return;
+    }
     console.error(this.formatMessage('error', message, dataToLog));
     this.addLog('error', message, dataToLog);
   }
@@ -211,11 +210,7 @@ class Logger {
   }
 
   exportLogs(): string {
-    // Only export important logs in production
-    const logsToExport = this.isProduction
-      ? this.getImportantLogs()
-      : this.logs;
-    return JSON.stringify(logsToExport, null, 2);
+    return JSON.stringify(this.logs, null, 2);
   }
 }
 

@@ -1,5 +1,6 @@
 import type { AgeTier, Service, ConversationMessage } from '@/types';
 import { logger } from '@/lib/logger';
+import { redactConversation } from '@/lib/redaction';
 
 export interface ConversationAssessment {
   score: number;
@@ -350,8 +351,9 @@ export async function assessWithGemini(
   conversation: ConversationMessage[],
   { ageTier, situation }: AssessmentOptions = {}
 ): Promise<ConversationAssessment> {
+  const redactedConversation = redactConversation(conversation);
   // Fall back to rule-based assessment directly
-  return assessConversation(conversation, { ageTier, situation });
+  return assessConversation(redactedConversation, { ageTier, situation });
 }
 
 /**
