@@ -114,8 +114,6 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const nonce = generateCspNonce();
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-csp-nonce', nonce);
-  const requestWithNonce = new NextRequest(request, { headers: requestHeaders });
   const connectSrc = [
     "'self'",
     'https://*.deepgram.com',
@@ -133,6 +131,28 @@ export async function proxy(request: NextRequest) {
   if (process.env.NODE_ENV !== 'production') {
     connectSrc.push('http://localhost:3000', 'ws://localhost:3000');
   }
+
+  const cspDirectives = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/ https://apis.google.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
+    "img-src 'self' data: https: blob:",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    `connect-src ${connectSrc.join(' ')}`,
+    'frame-src https://js.stripe.com https://checkout.stripe.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.recaptcha.net https://*.firebaseapp.com',
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    ...(process.env.NODE_ENV === 'production'
+      ? ['upgrade-insecure-requests']
+      : []),
+  ];
+  const cspHeaderValue = cspDirectives.join('; ');
+
+  requestHeaders.set('x-csp-nonce', nonce);
+  requestHeaders.set('content-security-policy', cspHeaderValue);
+  const requestWithNonce = new NextRequest(request, { headers: requestHeaders });
 
   // Skip middleware for API routes and static files
   if (
@@ -169,24 +189,7 @@ export async function proxy(request: NextRequest) {
     );
 
     // Content Security Policy
-    const cspDirectives = [
-      "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/ https://apis.google.com`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
-      "img-src 'self' data: https: blob:",
-      "font-src 'self' data: https://fonts.gstatic.com",
-      `connect-src ${connectSrc.join(' ')}`,
-      'frame-src https://js.stripe.com https://checkout.stripe.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.recaptcha.net https://*.firebaseapp.com',
-      "frame-ancestors 'none'",
-      "form-action 'self'",
-      "base-uri 'self'",
-      "object-src 'none'",
-      ...(process.env.NODE_ENV === 'production'
-        ? ['upgrade-insecure-requests']
-        : []),
-    ];
-
-    response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+    response.headers.set('Content-Security-Policy', cspHeaderValue);
 
     // HTTPS Only (HSTS)
     if (process.env.NODE_ENV === 'production') {
@@ -221,35 +224,7 @@ export async function proxy(request: NextRequest) {
 
   // Content Security Policy
   // Note: Inline scripts are protected via per-request nonce; styles still allow unsafe-inline.
-  const cspDirectives = [
-    "default-src 'self'",
-    // Scripts: self + Stripe + Google Analytics + reCAPTCHA Enterprise + Google APIs + nonce
-    `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/ https://apis.google.com`,
-    // Styles: self + unsafe-inline (required for styled-jsx and inline styles) + Stripe CDN
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://b.stripecdn.com",
-    // Images: self + data URIs + HTTPS
-    "img-src 'self' data: https: blob:",
-    // Fonts: self + data URIs
-    "font-src 'self' data: https://fonts.gstatic.com",
-    // Connections: self + required services + reCAPTCHA Enterprise
-    `connect-src ${connectSrc.join(' ')}`,
-    // Frames: Stripe checkout + reCAPTCHA Enterprise + Firebase
-    'frame-src https://js.stripe.com https://checkout.stripe.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.recaptcha.net https://*.firebaseapp.com',
-    // Frame ancestors: none (prevent clickjacking)
-    "frame-ancestors 'none'",
-    // Form actions: self only
-    "form-action 'self'",
-    // Base URI: self only
-    "base-uri 'self'",
-    // Object sources: none
-    "object-src 'none'",
-    // Upgrade insecure requests in production
-    ...(process.env.NODE_ENV === 'production'
-      ? ['upgrade-insecure-requests']
-      : []),
-  ];
-
-  response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+  response.headers.set('Content-Security-Policy', cspHeaderValue);
 
   // HTTPS Only (HSTS)
   if (process.env.NODE_ENV === 'production') {
