@@ -23,32 +23,24 @@ export const runtime = 'nodejs';
  * - checkout.session.expired: Logs for monitoring (optional)
  */
 export async function POST(request: NextRequest) {
-  // Direct console.log to ensure visibility in Netlify logs
-  console.log('[WEBHOOK] ====== Stripe webhook received ======');
-  console.log('[WEBHOOK] Request URL:', request.url);
-  console.log('[WEBHOOK] Request method:', request.method);
-  console.log('[WEBHOOK] Content-Type:', request.headers.get('content-type'));
-
   logger.log('[webhook] Stripe webhook received');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is NOT configured in env vars!');
+    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is NOT configured');
     return NextResponse.json(
       { error: 'Webhook secret not configured' },
       { status: 500 }
     );
   }
-  console.log('[WEBHOOK] Webhook secret found, length:', webhookSecret.length);
 
   // 1. Get raw body for signature verification
-  // Clone the request to ensure we can read the body
   let body: string;
   try {
     body = await request.text();
-    console.log('[WEBHOOK] Body read successfully');
+    logger.log('[webhook] Body read successfully, length:', body.length);
   } catch (bodyError: any) {
-    console.error('[WEBHOOK] Failed to read body:', bodyError.message);
+    logger.error('[webhook] Failed to read body:', bodyError.message);
     return NextResponse.json(
       { error: 'Failed to read request body' },
       { status: 400 }
@@ -57,15 +49,8 @@ export async function POST(request: NextRequest) {
 
   const signature = request.headers.get('stripe-signature');
 
-  console.log('[WEBHOOK] Body length:', body.length);
-  console.log('[WEBHOOK] Body empty?:', body.length === 0);
-  console.log('[WEBHOOK] Body first 200 chars:', body.substring(0, 200));
-  console.log('[WEBHOOK] Signature present?:', !!signature);
-  console.log('[WEBHOOK] Signature:', signature?.substring(0, 80) + '...');
-  console.log('[WEBHOOK] Secret starts with:', webhookSecret?.substring(0, 15) + '...');
-
   if (!signature) {
-    logger.error('Missing stripe-signature header');
+    logger.error('[webhook] Missing stripe-signature header');
     return NextResponse.json(
       { error: 'Missing stripe-signature header' },
       { status: 400 }
@@ -74,7 +59,7 @@ export async function POST(request: NextRequest) {
 
   // Check if body is empty
   if (!body || body.length === 0) {
-    console.error('[WEBHOOK] ERROR: Empty body received!');
+    logger.error('[webhook] Empty body received');
     return NextResponse.json(
       { error: 'Empty request body' },
       { status: 400 }
@@ -85,14 +70,9 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    console.log('[WEBHOOK] Signature verification SUCCESS');
+    logger.log('[webhook] Signature verification successful');
   } catch (err: any) {
-    // Log detailed error server-side only
-    console.error('[WEBHOOK] Signature verification FAILED:', err.message);
-    console.error('[WEBHOOK] Error type:', err.type);
-    console.error('[WEBHOOK] Full error:', JSON.stringify(err, null, 2));
-    logger.error('Webhook signature verification failed:', err);
-    // Return generic error to client (CWE-209)
+    logger.error('[webhook] Signature verification failed:', err.message);
     return NextResponse.json(
       { error: 'Webhook signature verification failed' },
       { status: 400 }
@@ -136,12 +116,8 @@ export async function POST(request: NextRequest) {
  * Adds credits to user account with idempotency check
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  console.log('[WEBHOOK] handleCheckoutCompleted for session:', session.id);
-  console.log('[WEBHOOK] Payment status:', session.payment_status);
-  console.log('[WEBHOOK] Metadata:', JSON.stringify(session.metadata));
-  logger.log('[webhook] handleCheckoutCompleted called for session:', session.id);
+  logger.log('[webhook] handleCheckoutCompleted for session:', session.id);
   logger.log('[webhook] Payment status:', session.payment_status);
-  logger.log('[webhook] Session metadata:', JSON.stringify(session.metadata));
 
   // Only process paid sessions
   if (session.payment_status !== 'paid') {

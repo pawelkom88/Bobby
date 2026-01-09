@@ -176,9 +176,7 @@ export function useCreditDeduction() {
           service,
         });
 
-        console.log('[useCreditDeduction] Sending request to /api/conversation/start');
-        console.log('[useCreditDeduction] Body:', requestBody);
-        console.log('[useCreditDeduction] ageTier:', ageTier, 'service:', service);
+        logger.log('[useCreditDeduction] Starting conversation');
 
         const response = await fetch('/api/conversation/start', {
           method: 'POST',

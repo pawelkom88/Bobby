@@ -141,21 +141,27 @@ class Logger {
 
   log(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    // Always log (visible in production for debugging)
+    if (!this.isDevelopment) {
+      return;
+    }
     console.log(this.formatMessage('log', message, dataToLog));
     this.addLog('log', message, dataToLog);
   }
 
   warn(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    // Always log warnings (visible in production)
+    if (!this.isDevelopment) {
+      return;
+    }
     console.warn(this.formatMessage('warn', message, dataToLog));
     this.addLog('warn', message, dataToLog);
   }
 
   error(message: string, ...data: any[]): void {
     const dataToLog = data.length > 0 ? data : undefined;
-    // Always log errors (visible in production)
+    if (!this.isDevelopment) {
+      return;
+    }
     console.error(this.formatMessage('error', message, dataToLog));
     this.addLog('error', message, dataToLog);
   }

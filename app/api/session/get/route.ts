@@ -69,10 +69,7 @@ export async function GET(request: NextRequest) {
 
     // Get all session data
     const sessionData = await getAllSessionData();
-
-    console.log('[SESSION/GET] Session data retrieved:', JSON.stringify(sessionData));
-    logger.log('[session/get] conversationComplete:', sessionData.conversationComplete);
-    logger.log('[session/get] userId:', sessionData.userId);
+    logger.log('[session/get] Session data retrieved successfully');
 
     return NextResponse.json({ success: true, data: sessionData });
   } catch (error) {
