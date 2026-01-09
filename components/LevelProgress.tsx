@@ -1,11 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useUserData } from '@/context/UserDataContext';
 import { useTranslations } from 'next-intl';
 
 interface LevelProgressProps {
   showLabel?: boolean;
+}
+
+// Level ranges (XP thresholds for each level) - constant, no need to recreate
+const LEVEL_RANGES = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+
+/**
+ * Calculate progress percentage within current level.
+ * This is derived state - calculated directly during render, no useEffect needed!
+ */
+function calculateProgress(level: number, xp: number): number {
+  if (level >= 10) {
+    return 100;
+  }
+
+  const currentLevelStart = LEVEL_RANGES[level - 1] || 0;
+  const currentLevelEnd = LEVEL_RANGES[level] || 2700;
+  const levelRange = currentLevelEnd - currentLevelStart;
+  const xpInLevel = xp - currentLevelStart;
+  const percentage = levelRange > 0 ? (xpInLevel / levelRange) * 100 : 0;
+
+  return Math.min(100, Math.max(0, percentage));
 }
 
 /**
@@ -16,32 +36,15 @@ export default function LevelProgress({
 }: LevelProgressProps) {
   const t = useTranslations('levelProgress');
   const { userData } = useUserData();
-  const [progress, setProgress] = useState(0);
 
   const level = userData.level;
   const xp = userData.totalXP;
 
-  useEffect(() => {
-    // Calculate progress percentage
-    if (level >= 10) {
-      setProgress(100);
-    } else {
-      // Get XP range for current level
-      const levelRanges = [
-        0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
-      ];
-      const currentLevelStart = levelRanges[level - 1] || 0;
-      const currentLevelEnd = levelRanges[level] || 2700;
-      const levelRange = currentLevelEnd - currentLevelStart;
-      const xpInLevel = xp - currentLevelStart;
-      const percentage = levelRange > 0 ? (xpInLevel / levelRange) * 100 : 0;
-      setProgress(Math.min(100, Math.max(0, percentage)));
-    }
-  }, [level, xp]);
+  // Calculate progress directly during render - no useState/useEffect needed!
+  const progress = calculateProgress(level, xp);
 
   // Calculate XP to next level
-  const levelRanges = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
-  const currentLevelEnd = levelRanges[level] || 2700;
+  const currentLevelEnd = LEVEL_RANGES[level] || 2700;
   const xpToNext = Math.max(0, currentLevelEnd - xp);
 
   return (

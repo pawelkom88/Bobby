@@ -37,6 +37,10 @@ export function ScenarioCarousel() {
 
   const maxIndex = Math.max(0, scenarioIds.length - visibleCards);
 
+  // Derive effective index - clamp to valid range during render
+  // This replaces the useEffect that was updating state when maxIndex changed
+  const effectiveIndex = Math.min(currentIndex, maxIndex);
+
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
@@ -65,12 +69,6 @@ export function ScenarioCarousel() {
     window.addEventListener('resize', updateVisibleCards);
     return () => window.removeEventListener('resize', updateVisibleCards);
   }, []);
-
-  useEffect(() => {
-    if (currentIndex > maxIndex) {
-      setCurrentIndex(maxIndex);
-    }
-  }, [currentIndex, maxIndex]);
 
   const goToPrevious = useCallback(() => {
     setCurrentIndex(prev => Math.max(0, prev - 1));
@@ -127,7 +125,7 @@ export function ScenarioCarousel() {
     router.push(`/app/dial?scenario=${scenario.id}`);
   };
 
-  const translateX = -(currentIndex * (100 / visibleCards));
+  const translateX = -(effectiveIndex * (100 / visibleCards));
 
   return (
     <section
@@ -149,7 +147,7 @@ export function ScenarioCarousel() {
           type="button"
           className={styles.arrow}
           onClick={goToPrevious}
-          disabled={currentIndex === 0}
+          disabled={effectiveIndex === 0}
           aria-label={t('carousel.prevAriaLabel')}
         >
           <svg
@@ -202,7 +200,7 @@ export function ScenarioCarousel() {
                     scenario={scenario}
                     onClick={() => handleCardClick(scenario)}
                     isActive={
-                      index >= currentIndex && index < currentIndex + visibleCards
+                      index >= effectiveIndex && index < effectiveIndex + visibleCards
                     }
                   />
                 </div>
@@ -215,7 +213,7 @@ export function ScenarioCarousel() {
           type="button"
           className={styles.arrow}
           onClick={goToNext}
-          disabled={currentIndex >= maxIndex}
+          disabled={effectiveIndex >= maxIndex}
           aria-label={t('carousel.nextAriaLabel')}
         >
           <svg
@@ -234,7 +232,7 @@ export function ScenarioCarousel() {
 
       <nav className={styles.pagination} aria-label={t('carousel.paginationAriaLabel')}>
         {Array.from({ length: maxIndex + 1 }).map((_, index) => {
-          const isActive = index === currentIndex;
+          const isActive = index === effectiveIndex;
           const dotClassName = `${styles.paginationDot} ${
             isActive ? styles.paginationDotActive : ''
           }`.trim();

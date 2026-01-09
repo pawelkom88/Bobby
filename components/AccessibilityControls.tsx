@@ -26,6 +26,7 @@ export default function AccessibilityControls({
   useEffect(() => {
     const currentSettings = getSettings();
     setSettings(currentSettings);
+    applySettingsToDocument(currentSettings);
   }, []);
 
   const handleSettingChange = (
@@ -83,10 +84,6 @@ export default function AccessibilityControls({
       root.classList.remove('reduced-sensory');
     }
   };
-
-  useEffect(() => {
-    applySettingsToDocument(settings);
-  }, [settings]);
 
   return (
     <div

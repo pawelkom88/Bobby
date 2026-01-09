@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { getAllAgeTiers } from '@/lib/ageTiers';
-import { useAuth } from '@/context/AuthContext';
 import { useUserData } from '@/context/UserDataContext';
-import { useClearSession } from '@/hooks/mutations/useSessionMutations';
+import { useSessionClear } from '@/hooks/useSessionClear';
 import type { AgeTier } from '@/types';
 import { ROUTES } from '@/lib/routes';
 import { logger } from '@/lib/logger';
@@ -21,21 +20,9 @@ export default function YourAgePage() {
   const t = useTranslations('yourAge');
   const tCommon = useTranslations('common');
   const { setSelectedAgeTier } = useUserData();
-  const clearSession = useClearSession();
-  const { user, loading } = useAuth();
-  const hasClearedSessionForUserRef = useRef<string | null>(null);
 
   // Clear session data when starting a new conversation flow
-  useEffect(() => {
-    if (loading || !user) return;
-    if (clearSession.isPending || clearSession.isSuccess) return;
-
-    const userId = user.uid;
-    if (hasClearedSessionForUserRef.current === userId) return;
-
-    hasClearedSessionForUserRef.current = userId;
-    clearSession.mutate();
-  }, [clearSession, user, loading]);
+  useSessionClear();
 
   const handleSelectAge = async (ageTier: AgeTier) => {
     try {
