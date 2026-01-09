@@ -24,6 +24,7 @@ const SALT = 'bobby-session-salt'; // In production, use a random salt stored se
  */
 function getEncryptionKey(): Buffer {
   if (!ENCRYPTION_KEY) {
+    logger.error('[encryption] SESSION_ENCRYPTION_KEY is NOT SET!');
     throw new Error('SESSION_ENCRYPTION_KEY environment variable is not set');
   }
 

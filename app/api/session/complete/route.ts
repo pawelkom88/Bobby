@@ -30,16 +30,19 @@ import { extractAndValidateToken } from '@/lib/auth-utils';
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
+  logger.log('[session/complete] Request received');
   try {
     // 1. Extract and validate Bearer token
     const idToken = extractAndValidateToken(request, 'session/complete');
-    
+
     if (!idToken) {
+      logger.error('[session/complete] No token provided');
       return NextResponse.json(
         { error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
     }
+    logger.log('[session/complete] Token extracted');
 
     // 2. Verify token with Firebase Admin SDK
     let decodedToken;
@@ -99,6 +102,7 @@ export async function POST(request: NextRequest) {
     const { complete } = body;
 
     if (typeof complete !== 'boolean') {
+      logger.error('[session/complete] Invalid complete value:', typeof complete);
       return NextResponse.json(
         { error: 'complete must be a boolean' },
         { status: 400 }
@@ -106,9 +110,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Mark conversation as complete with 24-hour expiration
-    await setConversationComplete(userId, complete);
-
-    logger.log(`Conversation marked as ${complete ? 'complete' : 'incomplete'} by user ${userId}`);
+    logger.log('[session/complete] Calling setConversationComplete...');
+    try {
+      await setConversationComplete(userId, complete);
+      logger.log(`[session/complete] Success - marked as ${complete ? 'complete' : 'incomplete'} for user ${userId}`);
+    } catch (storageError) {
+      logger.error('[session/complete] setConversationComplete failed:', storageError);
+      throw storageError;
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

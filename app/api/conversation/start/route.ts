@@ -94,14 +94,19 @@ async function verifyUserFromToken(
  * Main handler
  */
 export async function POST(request: NextRequest): Promise<NextResponse<StartConversationResponse>> {
+  logger.log('[conversation/start] Request received');
   try {
     // Lazy initialization - only initialize when handler is called
+    logger.log('[conversation/start] Initializing Firebase Admin...');
     const auth = getAdminAuth();
     const db = getAdminDb();
+    logger.log('[conversation/start] Firebase Admin initialized');
 
+    logger.log('[conversation/start] Verifying token...');
     const userResult = await verifyUserFromToken(request, auth);
 
     if ('error' in userResult) {
+      logger.error('[conversation/start] Token verification failed:', userResult.error);
       return NextResponse.json(
         {
           conversationId: '',
@@ -115,6 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
     }
 
     const userId = userResult.userId;
+    logger.log('[conversation/start] Token verified for user:', userId);
 
     const clientIp = getClientIP(request);
     const rateLimitIdentifier = `conversation-start:${userId}:${clientIp}`;
