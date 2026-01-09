@@ -25,6 +25,10 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   // Direct console.log to ensure visibility in Netlify logs
   console.log('[WEBHOOK] ====== Stripe webhook received ======');
+  console.log('[WEBHOOK] Request URL:', request.url);
+  console.log('[WEBHOOK] Request method:', request.method);
+  console.log('[WEBHOOK] Content-Type:', request.headers.get('content-type'));
+
   logger.log('[webhook] Stripe webhook received');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -35,21 +39,44 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-  logger.log('[webhook] Webhook secret found, processing...');
+  console.log('[WEBHOOK] Webhook secret found, length:', webhookSecret.length);
 
   // 1. Get raw body for signature verification
-  const body = await request.text();
+  // Clone the request to ensure we can read the body
+  let body: string;
+  try {
+    body = await request.text();
+    console.log('[WEBHOOK] Body read successfully');
+  } catch (bodyError: any) {
+    console.error('[WEBHOOK] Failed to read body:', bodyError.message);
+    return NextResponse.json(
+      { error: 'Failed to read request body' },
+      { status: 400 }
+    );
+  }
+
   const signature = request.headers.get('stripe-signature');
 
   console.log('[WEBHOOK] Body length:', body.length);
-  console.log('[WEBHOOK] Body first 100 chars:', body.substring(0, 100));
-  console.log('[WEBHOOK] Signature:', signature?.substring(0, 50) + '...');
-  console.log('[WEBHOOK] Secret starts with:', webhookSecret?.substring(0, 10) + '...');
+  console.log('[WEBHOOK] Body empty?:', body.length === 0);
+  console.log('[WEBHOOK] Body first 200 chars:', body.substring(0, 200));
+  console.log('[WEBHOOK] Signature present?:', !!signature);
+  console.log('[WEBHOOK] Signature:', signature?.substring(0, 80) + '...');
+  console.log('[WEBHOOK] Secret starts with:', webhookSecret?.substring(0, 15) + '...');
 
   if (!signature) {
     logger.error('Missing stripe-signature header');
     return NextResponse.json(
       { error: 'Missing stripe-signature header' },
+      { status: 400 }
+    );
+  }
+
+  // Check if body is empty
+  if (!body || body.length === 0) {
+    console.error('[WEBHOOK] ERROR: Empty body received!');
+    return NextResponse.json(
+      { error: 'Empty request body' },
       { status: 400 }
     );
   }
@@ -63,6 +90,7 @@ export async function POST(request: NextRequest) {
     // Log detailed error server-side only
     console.error('[WEBHOOK] Signature verification FAILED:', err.message);
     console.error('[WEBHOOK] Error type:', err.type);
+    console.error('[WEBHOOK] Full error:', JSON.stringify(err, null, 2));
     logger.error('Webhook signature verification failed:', err);
     // Return generic error to client (CWE-209)
     return NextResponse.json(
