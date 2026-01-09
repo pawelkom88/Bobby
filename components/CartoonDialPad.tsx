@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { validateEmergencyNumber } from '@/lib/validation';
+import { isValidEmergencyNumber } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 
 interface CartoonDialPadProps {
@@ -14,10 +14,9 @@ interface CartoonDialPadProps {
   buttonLabel?: string;
 }
 
-const CORRECT_NUMBER = '999'; // Fallback for non-translated contexts
-// bttf-dial-1
-// bttf-dial-2
-// bttf-dial-3
+// Maximum digits allowed (lets kids type more to ensure they get it right)
+const MAX_INPUT_LENGTH = 6;
+
 const DIAL_SOUNDS = [
   '/sfx/bttf-dial-1.mp3',
   '/sfx/bttf-dial-2.mp3',
@@ -25,7 +24,7 @@ const DIAL_SOUNDS = [
 ];
 
 // Sound mapping for each key (1-9, *, 0, #)
-const KEY_SOUNDS = {
+const KEY_SOUNDS: Record<string, string> = {
   '1': DIAL_SOUNDS[0],
   '2': DIAL_SOUNDS[1],
   '3': DIAL_SOUNDS[2],
@@ -39,6 +38,14 @@ const KEY_SOUNDS = {
   '0': DIAL_SOUNDS[1],
   '#': DIAL_SOUNDS[2],
 };
+
+// Phone keypad layout (standard phone layout)
+const KEYPAD_BUTTONS = [
+  ['1', '2', '3'],
+  ['4', '5', '6'],
+  ['7', '8', '9'],
+  ['*', '0', '#'],
+];
 
 const FUNNY_ERROR_MESSAGES = [
   "Oops! That's not quite right!",
@@ -90,8 +97,8 @@ export default function CartoonDialPad({
       setInput(prev => prev.slice(0, -1));
       setHasError(false);
       setErrorMessage('');
-    } else if (digit && input.length < emergencyNumber.length) {
-      // Add number
+    } else if (digit && input.length < MAX_INPUT_LENGTH) {
+      // Add number (allow more digits than emergency number length)
       const newInput = input + digit;
       setInput(newInput);
       setHasError(false);
@@ -99,7 +106,6 @@ export default function CartoonDialPad({
 
       // Play sound
       playKeySound(digit);
-      // No auto-trigger - user must click CALL button
     }
   };
 
@@ -120,12 +126,6 @@ export default function CartoonDialPad({
       window.removeEventListener('keydown', handleKeyPress as EventListener);
     };
   }, [input]);
-
-  const buttons = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
-    ['7', '0', '9'],
-  ];
 
   return (
     <div className="dial-container">
@@ -148,17 +148,17 @@ export default function CartoonDialPad({
         >
           {input || '___'}
         </div>
-        {/* Number Grid */}
-        {buttons.map((row, rowIndex) => (
+        {/* Number Grid - Standard phone keypad layout */}
+        {KEYPAD_BUTTONS.map((row, rowIndex) => (
           <div key={rowIndex} className="dial-keyboard-row">
-            {row.map(num => (
+            {row.map(key => (
               <button
-                key={num}
-                onClick={() => handleNumberClick(num)}
-                className="dial-key"
-                aria-label={`Number ${num}`}
+                key={key}
+                onClick={() => handleNumberClick(key)}
+                className={`dial-key ${key === '*' || key === '#' ? 'dial-key-symbol' : ''}`}
+                aria-label={key === '*' ? 'Star' : key === '#' ? 'Hash' : `Number ${key}`}
               >
-                {num}
+                {key}
               </button>
             ))}
           </div>
@@ -170,7 +170,6 @@ export default function CartoonDialPad({
             onClick={() => {
               // Validate the number is correct
               if (!input) {
-                // Show error if no number dialed
                 const errorMsg = t('messages.dialNumber');
                 setErrorMessage(errorMsg);
                 setHasError(true);
@@ -181,20 +180,8 @@ export default function CartoonDialPad({
                 return;
               }
 
-              if (input.length !== emergencyNumber.length) {
-                // Show error if incomplete number
-                const errorMsg = t('messages.dialAllDigits', { count: emergencyNumber.length });
-                setErrorMessage(errorMsg);
-                setHasError(true);
-                setTimeout(() => {
-                  setHasError(false);
-                  setErrorMessage('');
-                }, 2500);
-                return;
-              }
-
-              if (!validateEmergencyNumber(input, emergencyNumber)) {
-                // Show error if wrong number
+              // Check if input is a valid emergency number (999 or 112 for UK)
+              if (!isValidEmergencyNumber(input, emergencyNumber)) {
                 const randomMessage =
                   FUNNY_ERROR_MESSAGES[
                     Math.floor(Math.random() * FUNNY_ERROR_MESSAGES.length)

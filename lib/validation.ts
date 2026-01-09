@@ -49,13 +49,56 @@ export function sanitizeText(text: string): string {
 }
 
 /**
- * Validate emergency number input
+ * Valid emergency numbers by locale
+ * UK accepts both 999 and 112 (EU standard)
+ * Poland uses 112
+ */
+const VALID_EMERGENCY_NUMBERS: Record<string, string[]> = {
+  '999': ['999', '112'],  // UK - accepts both 999 and 112
+  '112': ['112'],         // EU/Poland - only 112
+};
+
+/**
+ * Validate emergency number input (exact match)
+ * @deprecated Use isValidEmergencyNumber for more flexible validation
  */
 export function validateEmergencyNumber(
   input: string,
   targetNumber: string = '999'
 ): boolean {
   return input === targetNumber;
+}
+
+/**
+ * Check if input is a valid emergency number
+ * Supports multiple valid numbers per locale (e.g., UK accepts 999 and 112)
+ * Also handles cases where user types extra digits (e.g., 9999 still connects to 999)
+ */
+export function isValidEmergencyNumber(
+  input: string,
+  targetNumber: string = '999'
+): boolean {
+  const validNumbers = VALID_EMERGENCY_NUMBERS[targetNumber] || [targetNumber];
+
+  // Check if input exactly matches any valid number
+  if (validNumbers.includes(input)) {
+    return true;
+  }
+
+  // Check if input starts with a valid number followed by same digit
+  // e.g., 9999 or 99999 should still work for 999
+  for (const validNum of validNumbers) {
+    if (input.startsWith(validNum)) {
+      // Check if remaining digits are all the same as the last digit of the valid number
+      const remaining = input.slice(validNum.length);
+      const lastDigit = validNum[validNum.length - 1];
+      if (remaining.split('').every(d => d === lastDigit)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 /**

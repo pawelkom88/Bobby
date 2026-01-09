@@ -5423,6 +5423,31 @@ a:focus-visible {
   cursor: pointer;
 }
 
+/* Container for pricing cards - side by side on desktop */
+.select-package-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Side by side on desktop */
+@media (min-width: 769px) {
+  .select-package-cards-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .select-package-cards-container .pricing-card {
+    flex: 1;
+    max-width: 420px;
+    margin-bottom: 0;
+  }
+}
+
 .pricing-card {
   min-width: 300px;
   border-radius: 2rem;

@@ -283,6 +283,8 @@ function SignUpForm() {
               <Link
                 href={ROUTES.TERMS_CONDITIONS}
                 className="login-terms-link"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={event => event.stopPropagation()}
               >
                 {t('signup.termsAgreementTerms')}
@@ -291,6 +293,8 @@ function SignUpForm() {
               <Link
                 href={ROUTES.PRIVACY_POLICY}
                 className="login-terms-link"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={event => event.stopPropagation()}
               >
                 {t('signup.termsAgreementPrivacy')}
