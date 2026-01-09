@@ -20,6 +20,8 @@ import { logger } from '@/lib/logger';
  * - checkout.session.expired: Logs for monitoring (optional)
  */
 export async function POST(request: NextRequest) {
+  // Direct console.log to ensure visibility in Netlify logs
+  console.log('[WEBHOOK] ====== Stripe webhook received ======');
   logger.log('[webhook] Stripe webhook received');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -95,6 +97,9 @@ export async function POST(request: NextRequest) {
  * Adds credits to user account with idempotency check
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  console.log('[WEBHOOK] handleCheckoutCompleted for session:', session.id);
+  console.log('[WEBHOOK] Payment status:', session.payment_status);
+  console.log('[WEBHOOK] Metadata:', JSON.stringify(session.metadata));
   logger.log('[webhook] handleCheckoutCompleted called for session:', session.id);
   logger.log('[webhook] Payment status:', session.payment_status);
   logger.log('[webhook] Session metadata:', JSON.stringify(session.metadata));

@@ -145,8 +145,28 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
 
     let body: unknown;
     try {
-      body = await request.json();
-    } catch {
+      const rawBody = await request.text();
+      logger.log('[conversation/start] Raw body received:', rawBody);
+      logger.log('[conversation/start] Content-Type:', request.headers.get('content-type'));
+
+      if (!rawBody || rawBody.trim() === '') {
+        logger.error('[conversation/start] Empty body received');
+        return NextResponse.json(
+          {
+            conversationId: '',
+            startedAt: '',
+            status: 'error',
+            error: 'invalid-request',
+            message: 'Empty request body',
+          },
+          { status: 400 }
+        );
+      }
+
+      body = JSON.parse(rawBody);
+      logger.log('[conversation/start] Parsed body:', body);
+    } catch (parseError) {
+      logger.error('[conversation/start] JSON parse error:', parseError);
       return NextResponse.json(
         {
           conversationId: '',
