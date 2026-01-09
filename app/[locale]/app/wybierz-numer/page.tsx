@@ -120,14 +120,16 @@ function SelectPackagePageContent() {
     try {
       const idToken = await user.getIdToken(true);
 
-      const response = await fetch(`/api/checkout_sessions?locale=${locale}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ packType }),
-      });
+      // Use query param for packType - Netlify strips POST bodies
+      const response = await fetch(
+        `/api/checkout_sessions?locale=${locale}&packType=${packType}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

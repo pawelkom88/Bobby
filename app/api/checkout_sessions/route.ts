@@ -85,22 +85,15 @@ export async function POST(request: NextRequest) {
   const localeParam = request.nextUrl.searchParams.get('locale') || 'en';
   const stripeLocale = toStripeLocale(localeParam);
 
-  // DEBUG: Collect request info for troubleshooting
-  const debug = {
-    runtime: 'nodejs',
-    contentType: request.headers.get('content-type'),
-    contentLength: request.headers.get('content-length'),
-    method: request.method,
-    hasBody: request.body !== null,
-    timestamp: new Date().toISOString(),
-  };
+  // Get packType from query params (Netlify strips POST bodies)
+  const packType = request.nextUrl.searchParams.get('packType');
 
   try {
     const idToken = extractAndValidateToken(request, 'checkout_sessions');
 
     if (!idToken) {
       return NextResponse.json(
-        { error: 'Invalid or missing authorization token', debug },
+        { error: 'Invalid or missing authorization token' },
         { status: 401 }
       );
     }
@@ -110,74 +103,17 @@ export async function POST(request: NextRequest) {
       decodedToken = await verifyIdToken(idToken);
     } catch (error) {
       return NextResponse.json(
-        {
-          error: 'Invalid or expired token',
-          debug: {
-            ...debug,
-            tokenError: error instanceof Error ? error.message : String(error),
-          },
-        },
+        { error: 'Invalid or expired token' },
         { status: 401 }
       );
     }
 
-    // 3. Extract userId from verified token (NEVER from request body)
+    // Extract userId from verified token (NEVER from request body)
     const userId = decodedToken.uid;
-
-    // 4. Parse and validate request body - with detailed debugging
-    let body;
-    let rawBody: string | undefined;
-
-    try {
-      rawBody = await request.text();
-    } catch (textError) {
-      return NextResponse.json(
-        {
-          error: 'Failed to read request body',
-          debug: {
-            ...debug,
-            textError: textError instanceof Error ? textError.message : String(textError),
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!rawBody || rawBody.length === 0) {
-      return NextResponse.json(
-        {
-          error: 'Request body is empty',
-          debug: {
-            ...debug,
-            rawBodyLength: 0,
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    try {
-      body = JSON.parse(rawBody);
-    } catch (parseError) {
-      return NextResponse.json(
-        {
-          error: 'Invalid JSON body',
-          debug: {
-            ...debug,
-            rawBodyLength: rawBody.length,
-            rawBodyPreview: rawBody.slice(0, 100),
-            parseError: parseError instanceof Error ? parseError.message : String(parseError),
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    const { packType } = body;
 
     if (!packType || typeof packType !== 'string') {
       return NextResponse.json(
-        { error: 'Missing packType in request body' },
+        { error: 'Missing packType query parameter' },
         { status: 400 }
       );
     }
@@ -196,17 +132,17 @@ export async function POST(request: NextRequest) {
     const CREDIT_PACKS = getCreditPacks(localeParam);
     const pack = CREDIT_PACKS[packType];
 
-    // 6. Get origin for redirect URLs
+    // 6. Get origin for redirect URLs (use forwarded headers for Netlify/proxies)
     const headersList = await headers();
-    const origin =
-      headersList.get('origin') ||
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      'http://localhost:3000';
+    const proto = headersList.get('x-forwarded-proto') ?? 'https';
+    const host =
+      headersList.get('x-forwarded-host') ?? headersList.get('host');
+    const origin = host
+      ? `${proto}://${host}`
+      : process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
     // 7. Create Stripe checkout session
     const successUrl = `${origin}/app/success?session_id={CHECKOUT_SESSION_ID}&test=1`;
-    logger.log('Checkout - Success URL being set:', successUrl);
-    logger.log('Checkout - Origin used:', origin);
 
     // Get localized text for invoice
     const localizedText = getLocalizedInvoiceText(localeParam);
