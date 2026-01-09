@@ -51,6 +51,7 @@ export function useSecureSession() {
       try {
         const response = await fetch('/api/session/assessment', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: authHeader,
@@ -85,6 +86,7 @@ export function useSecureSession() {
     try {
       const response = await fetch('/api/session/get', {
         method: 'GET',
+        credentials: 'include',
         headers: {
           Authorization: authHeader,
         },
@@ -115,6 +117,7 @@ export function useSecureSession() {
     try {
       const response = await fetch('/api/session/clear', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           Authorization: authHeader,
         },
@@ -153,6 +156,7 @@ export function useSecureSession() {
       try {
         const response = await fetch('/api/session/complete', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: authHeader,
@@ -188,6 +192,7 @@ export function useSecureSession() {
       try {
         const response = await fetch('/api/session/conversation-id', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: authHeader,
