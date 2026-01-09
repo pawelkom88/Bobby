@@ -9,6 +9,9 @@ import {
 } from '@/lib/rateLimit';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 
+// Force Node.js runtime - Netlify Edge doesn't forward POST bodies correctly
+export const runtime = 'nodejs';
+
 /**
  * POST /api/session/complete
  *

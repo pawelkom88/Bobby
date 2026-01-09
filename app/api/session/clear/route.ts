@@ -9,6 +9,9 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 
+// Force Node.js runtime - Netlify Edge doesn't forward POST bodies correctly
+export const runtime = 'nodejs';
+
 /**
  * POST /api/session/clear
  *
