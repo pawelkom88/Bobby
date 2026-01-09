@@ -1,114 +1,40 @@
 import { defineRouting } from 'next-intl/routing';
 import { createNavigation } from 'next-intl/navigation';
-import { locales, defaultLocale, type Locale } from './locales';
+import { locales, defaultLocale } from './locales';
 
 /**
- * Localized pathnames for SEO
- * Maps internal routes to locale-specific URLs
+ * Pathnames configuration
+ * TODO: Re-enable localized pathnames when Polish locale is ready
+ * For now, using simple string paths (English only)
  */
 export const pathnames = {
   '/': '/',
-  '/contact': {
-    en: '/contact',
-    pl: '/kontakt',
-  },
-  '/faq': {
-    en: '/faq',
-    pl: '/pytania',
-  },
-  '/login': {
-    en: '/login',
-    pl: '/logowanie',
-  },
-  '/signup': {
-    en: '/signup',
-    pl: '/rejestracja',
-  },
-  '/forgot-password': {
-    en: '/forgot-password',
-    pl: '/zapomniane-haslo',
-  },
-  '/reset-password': {
-    en: '/reset-password',
-    pl: '/resetuj-haslo',
-  },
-  '/app': {
-    en: '/app',
-    pl: '/aplikacja',
-  },
-  '/app/achievements': {
-    en: '/app/achievements',
-    pl: '/aplikacja/osiagniecia',
-  },
-  '/app/chats': {
-    en: '/app/chats',
-    pl: '/aplikacja/rozmowy',
-  },
-  '/app/chats/[conversationId]': {
-    en: '/app/chats/[conversationId]',
-    pl: '/aplikacja/rozmowy/[conversationId]',
-  },
-  '/app/choose-emergency': {
-    en: '/app/choose-emergency',
-    pl: '/aplikacja/wybierz-sytuacje',
-  },
-  '/app/completion': {
-    en: '/app/completion',
-    pl: '/aplikacja/podsumowanie',
-  },
-  '/app/beta-feedback': {
-    en: '/app/beta-feedback',
-    pl: '/aplikacja/opinia',
-  },
-  '/app/conversation': {
-    en: '/app/conversation',
-    pl: '/aplikacja/rozmowa',
-  },
-  '/app/dial': {
-    en: '/app/dial',
-    pl: '/aplikacja/wybierz-numer',
-  },
-  '/app/preview': {
-    en: '/app/preview',
-    pl: '/aplikacja/podglad',
-  },
-  '/app/wybierz-numer': {
-    en: '/app/select-package',
-    pl: '/aplikacja/wybierz-pakiet',
-  },
-  '/app/settings': {
-    en: '/app/settings',
-    pl: '/aplikacja/ustawienia',
-  },
-  '/app/success': {
-    en: '/app/success',
-    pl: '/aplikacja/sukces',
-  },
-  '/app/your-age': {
-    en: '/app/your-age',
-    pl: '/aplikacja/twoj-wiek',
-  },
-  '/privacy-policy': {
-    en: '/privacy-policy',
-    pl: '/polityka-prywatnosci',
-  },
-  '/cookies-policy': {
-    en: '/cookies-policy',
-    pl: '/polityka-ciasteczek',
-  },
-  '/terms-conditions': {
-    en: '/terms-conditions',
-    pl: 'regulamin',
-  },
-  '/safety-privacy': {
-    en: '/safety-privacy',
-    pl: 'bezpieczenstwo-i-prywatnosc',
-  },
-  '/parent-guide': {
-    en: '/parent-guide',
-    pl: '/przewodnik-rodzica',
-  },
-} as const satisfies Record<string, string | Record<Locale, string>>;
+  '/contact': '/contact',
+  '/faq': '/faq',
+  '/login': '/login',
+  '/signup': '/signup',
+  '/forgot-password': '/forgot-password',
+  '/reset-password': '/reset-password',
+  '/app': '/app',
+  '/app/achievements': '/app/achievements',
+  '/app/chats': '/app/chats',
+  '/app/chats/[conversationId]': '/app/chats/[conversationId]',
+  '/app/choose-emergency': '/app/choose-emergency',
+  '/app/completion': '/app/completion',
+  '/app/beta-feedback': '/app/beta-feedback',
+  '/app/conversation': '/app/conversation',
+  '/app/dial': '/app/dial',
+  '/app/preview': '/app/preview',
+  '/app/select-package': '/app/select-package',
+  '/app/settings': '/app/settings',
+  '/app/success': '/app/success',
+  '/app/your-age': '/app/your-age',
+  '/privacy-policy': '/privacy-policy',
+  '/cookies-policy': '/cookies-policy',
+  '/terms-conditions': '/terms-conditions',
+  '/safety-privacy': '/safety-privacy',
+  '/parent-guide': '/parent-guide',
+} as const;
 
 export type AppPathname = keyof typeof pathnames;
 

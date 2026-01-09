@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
       },
       ...(stripeLocale ? { locale: stripeLocale } : {}),
       success_url: successUrl,
-      cancel_url: `${origin}/app/wybierz-numer?canceled=true`,
+      cancel_url: `${origin}/app/select-package?canceled=true`,
       // Store metadata for webhook processing
       metadata: {
         userId,

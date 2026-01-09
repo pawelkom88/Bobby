@@ -12,6 +12,11 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Hide language switcher when only one locale is available
+  if (locales.length <= 1) {
+    return null;
+  }
+
   const switchLocale = (newLocale: Locale) => {
     if (newLocale === locale) return;
 
@@ -51,6 +56,11 @@ export function LanguageSwitcher() {
 }
 
 export function LanguageSwitcherCompact() {
+  // Hide language switcher when only one locale is available
+  if (locales.length <= 1) {
+    return null;
+  }
+
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -67,7 +77,10 @@ export function LanguageSwitcherCompact() {
     router.push(newPath);
   };
 
-  const nextLocale = locale === 'en' ? 'pl' : 'en';
+  // Get next locale in the list
+  const currentIndex = locales.indexOf(locale);
+  const nextIndex = (currentIndex + 1) % locales.length;
+  const nextLocale = locales[nextIndex];
 
   return (
     <button

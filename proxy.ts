@@ -16,24 +16,18 @@ import { routing } from './i18n/routing';
 const intlMiddleware = createIntlMiddleware(routing);
 
 // i18n Configuration
-const LOCALES = ['en', 'pl'] as const;
+// TODO: Re-enable Polish locale when translations are complete
+const LOCALES = ['en'] as const;
 const DEFAULT_LOCALE = 'en';
 const LOCALE_COOKIE = 'NEXT_LOCALE';
 
 // Routes that are always public (without locale prefix)
-// Include both English and Polish versions for localized pathnames
 const PUBLIC_ROUTES = [
   '/',
-  // English routes
   '/login',
   '/signup',
   '/reset-password',
   '/app/success',
-  // Polish routes (localized pathnames)
-  '/logowanie',
-  '/rejestracja',
-  '/resetuj-haslo',
-  '/aplikacja/sukces',
 ];
 
 /**
