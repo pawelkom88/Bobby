@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./__tests__/setup.ts'],
+    exclude: ['node_modules/**', '.mcp/**', '.netlify/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -16,6 +17,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname),
+      // Mock server-only module for tests (Next.js server-only boundary)
+      'server-only': path.resolve(__dirname, '__tests__/mocks/server-only.ts'),
     },
   },
 });
