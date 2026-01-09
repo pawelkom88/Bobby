@@ -173,6 +173,7 @@ export function useCreditDeduction() {
 
         const response = await fetch('/api/conversation/start', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -244,6 +245,7 @@ export function useCreditDeduction() {
 
         const response = await fetch('/api/conversation/end', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -314,6 +316,7 @@ export function useCreditDeduction() {
 
         const response = await fetch('/api/deduct-credits', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

@@ -13,6 +13,7 @@ export const getAuthToken = async (firebaseIdToken: string) => {
       firebaseIdToken.substring(0, 20) + '...'
     );
     const response = await fetch('/api/authenticate', {
+      credentials: 'include',
       headers: {
         Authorization: `Bearer ${firebaseIdToken}`,
       },
