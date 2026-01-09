@@ -107,19 +107,6 @@ UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
 
-## 🧪 Testing
-
-```bash
-# Run unit tests
-pnpm test
-
-# Run integration tests
-pnpm test:e2e
-
-# Run tests with coverage
-pnpm test:coverage
-```
-
 ## 📚 Project Structure
 
 ```
