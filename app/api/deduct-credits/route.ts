@@ -179,7 +179,7 @@ async function getUserCredits(userId: string, db: ReturnType<typeof getAdminDb>)
     const data = doc.data();
     return {
       credits: data?.credits ?? 0,
-      isBeta: data?.betaUser === true && process.env.BETA_MODE_ENABLED === 'true',
+      isBeta: data?.betaUser === true && process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true',
       betaCredits: data?.betaCredits ?? 0,
     };
   } catch (error) {
@@ -209,7 +209,7 @@ async function performDeduction(
     const data = userDoc.data();
     const currentCredits = data?.credits ?? 0;
     const currentBetaCredits = data?.betaCredits ?? 0;
-    const isBeta = data?.betaUser === true && process.env.BETA_MODE_ENABLED === 'true';
+    const isBeta = data?.betaUser === true && process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
 
     // 2. Verify sufficient credits (check beta first)
     if (isBeta) {
@@ -468,7 +468,7 @@ export async function POST(
         newBetaCredits: result.newBetaCredits,
         charged: true,
         durationSeconds,
-        isBetaUser: result.newBetaCredits < 3, // Simple check
+        isBetaUser: process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true',
       },
       { status: 200 }
     );

@@ -56,8 +56,6 @@ const serverEnvSchema = z.object({
     .default('development'),
   NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
   
-  // Beta Mode
-  BETA_MODE_ENABLED: z.string().optional().transform(val => val === 'true'),
 });
 
 /**
