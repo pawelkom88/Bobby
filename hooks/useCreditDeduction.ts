@@ -171,6 +171,15 @@ export function useCreditDeduction() {
           throw new Error('Failed to get authentication token');
         }
 
+        const requestBody = JSON.stringify({
+          ageTier,
+          service,
+        });
+
+        console.log('[useCreditDeduction] Sending request to /api/conversation/start');
+        console.log('[useCreditDeduction] Body:', requestBody);
+        console.log('[useCreditDeduction] ageTier:', ageTier, 'service:', service);
+
         const response = await fetch('/api/conversation/start', {
           method: 'POST',
           credentials: 'include',
@@ -178,10 +187,7 @@ export function useCreditDeduction() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            ageTier,
-            service,
-          }),
+          body: requestBody,
         });
 
         if (!response.ok) {
