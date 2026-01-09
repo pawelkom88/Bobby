@@ -11,7 +11,8 @@
     "test": "vitest run",
     "emulator": "firebase emulators:start --import=./emulator-data --export-on-exit",
     "emulator:kill": "pkill -f 'firebase emulators' || echo 'No emulator processes found'",
-    "emulator:clean": "pnpm run emulator:kill && firebase emulators:start --only firestore,auth --import=./emulator-data"
+    "emulator:clean": "pnpm run emulator:kill && firebase emulators:start --only firestore,auth --import=./emulator-data",
+    "seed:beta": "tsx scripts/seed-beta-users.ts"
   },
   "dependencies": {
     "@deepgram/sdk": "^4.11.2",
@@ -56,6 +57,7 @@
     "jsdom": "^27.4.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
     "vitest": "^1.5.0"
