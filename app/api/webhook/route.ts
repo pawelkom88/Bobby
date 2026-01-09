@@ -20,15 +20,17 @@ import { logger } from '@/lib/logger';
  * - checkout.session.expired: Logs for monitoring (optional)
  */
 export async function POST(request: NextRequest) {
+  logger.log('[webhook] Stripe webhook received');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    logger.error('STRIPE_WEBHOOK_SECRET is not configured');
+    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is NOT configured in env vars!');
     return NextResponse.json(
       { error: 'Webhook secret not configured' },
       { status: 500 }
     );
   }
+  logger.log('[webhook] Webhook secret found, processing...');
 
   // 1. Get raw body for signature verification
   const body = await request.text();
@@ -93,9 +95,13 @@ export async function POST(request: NextRequest) {
  * Adds credits to user account with idempotency check
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  logger.log('[webhook] handleCheckoutCompleted called for session:', session.id);
+  logger.log('[webhook] Payment status:', session.payment_status);
+  logger.log('[webhook] Session metadata:', JSON.stringify(session.metadata));
+
   // Only process paid sessions
   if (session.payment_status !== 'paid') {
-    logger.log('Session not paid, skipping:', session.id);
+    logger.log('[webhook] Session not paid, skipping:', session.id);
     return;
   }
 
@@ -103,9 +109,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const { userId, packType, credits: creditsStr } = session.metadata || {};
 
   if (!userId || !packType || !creditsStr) {
-    logger.error('Missing metadata in session:', session.id);
+    logger.error('[webhook] Missing metadata in session:', session.id, { userId, packType, creditsStr });
     throw new Error('Missing required metadata in checkout session');
   }
+  logger.log('[webhook] Metadata extracted - userId:', userId, 'packType:', packType, 'credits:', creditsStr);
 
   const credits = parseInt(creditsStr, 10);
   if (isNaN(credits) || credits <= 0) {
@@ -163,7 +170,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
 
     logger.log(
-      `Added ${credits} credits to user ${userId} (session: ${session.id})`
+      `[webhook] SUCCESS: Added ${credits} credits to user ${userId} (session: ${session.id})`
     );
   });
+  logger.log('[webhook] Transaction completed successfully');
 }
