@@ -59,7 +59,7 @@ Built with modern, scalable technologies:
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (recommended) or npm
 - Firebase project setup
 
@@ -121,7 +121,7 @@ bobby/
 
 ## 🤝 Support
 
-- 📧 Email: support@bobby.app
+- 📧 Email: contact@readywithbobby.online
 - 🐛 Bug Reports: [GitHub Issues](https://github.com/yourusername/bobby/issues)
 
 ## 🙏 Acknowledgments
@@ -135,9 +135,9 @@ bobby/
 **⚠️ Important**: Bobby is a training tool and should be used as a supplement to, not a replacement for, proper emergency education. In case of a real emergency, always dial your local emergency number.
 
 <div align="center">
-  
+
 **Made with ❤️ for children everywhere**
 
-[![Website](https://img.shields.io/badge/website-bobby.app-blue)](https://bobby.app)
+[![Website](https://img.shields.io/badge/website-bobby.app-blue)](http://readywithbobby.online/)
 
 </div>
