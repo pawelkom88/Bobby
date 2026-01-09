@@ -5,6 +5,9 @@ import { FieldValue } from 'firebase-admin/firestore';
 import Stripe from 'stripe';
 import { logger } from '@/lib/logger';
 
+// Force Node.js runtime for proper body handling with Stripe webhooks
+export const runtime = 'nodejs';
+
 /**
  * POST /api/webhook
  *
@@ -38,6 +41,11 @@ export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
+  console.log('[WEBHOOK] Body length:', body.length);
+  console.log('[WEBHOOK] Body first 100 chars:', body.substring(0, 100));
+  console.log('[WEBHOOK] Signature:', signature?.substring(0, 50) + '...');
+  console.log('[WEBHOOK] Secret starts with:', webhookSecret?.substring(0, 10) + '...');
+
   if (!signature) {
     logger.error('Missing stripe-signature header');
     return NextResponse.json(
@@ -50,8 +58,11 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
+    console.log('[WEBHOOK] Signature verification SUCCESS');
+  } catch (err: any) {
     // Log detailed error server-side only
+    console.error('[WEBHOOK] Signature verification FAILED:', err.message);
+    console.error('[WEBHOOK] Error type:', err.type);
     logger.error('Webhook signature verification failed:', err);
     // Return generic error to client (CWE-209)
     return NextResponse.json(
