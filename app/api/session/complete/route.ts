@@ -110,11 +110,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Mark conversation as complete with 24-hour expiration
+    console.log('[SESSION/COMPLETE] Setting conversation complete for user:', userId, 'complete:', complete);
     logger.log('[session/complete] Calling setConversationComplete...');
     try {
       await setConversationComplete(userId, complete);
+      console.log('[SESSION/COMPLETE] SUCCESS - Cookie set for user:', userId);
       logger.log(`[session/complete] Success - marked as ${complete ? 'complete' : 'incomplete'} for user ${userId}`);
     } catch (storageError) {
+      console.error('[SESSION/COMPLETE] FAILED:', storageError);
       logger.error('[session/complete] setConversationComplete failed:', storageError);
       throw storageError;
     }
