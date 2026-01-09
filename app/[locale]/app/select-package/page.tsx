@@ -21,7 +21,6 @@ import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { useUserData } from '@/context/UserDataContext';
 import {
-  DialStoryContext,
   getDialStoryContext,
   clearDialStoryContext,
 } from '@/lib/dialStoryContext';
@@ -48,9 +47,9 @@ function SelectPackagePageContent() {
   const { getJourneyState } = useUserData();
   const journeyState = getJourneyState();
   const router = useRouter();
-  const [storyContext, setStoryContext] = useState<DialStoryContext | null>(
-    null
-  );
+
+  // Derive storyContext during render - no need for useState + useEffect
+  const storyContext = needsCredits ? getDialStoryContext() : null;
 
   // Redirect when credits are CONFIRMED from server and user has credits
   useEffect(() => {
@@ -72,15 +71,11 @@ function SelectPackagePageContent() {
     return () => clearTimeout(timeout);
   }, [canceled]);
 
+  // Clear story context from storage when needsCredits is false (side effect only)
   useEffect(() => {
     if (!needsCredits) {
-      setStoryContext(null);
       clearDialStoryContext();
-      return;
     }
-
-    const stored = getDialStoryContext();
-    setStoryContext(stored);
   }, [needsCredits]);
 
   const fallbackStory =

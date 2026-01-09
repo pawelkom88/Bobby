@@ -9,7 +9,7 @@ import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ParentGateModal from '@/components/ParentGateModal';
-import { useClearSession } from '@/hooks/mutations/useSessionMutations';
+import { useSessionClear } from '@/hooks/useSessionClear';
 import { ROUTES } from '@/lib/routes';
 import { useCredits } from '@/context/CreditsContext';
 import { useAuth } from '@/context/AuthContext';
@@ -57,7 +57,6 @@ function DialPageContent() {
     forceRefreshCredits,
   } = useCredits();
   const { user, loading: authLoading } = useAuth();
-  const clearSession = useClearSession();
   const searchParams = useSearchParams();
   const { getJourneyState } = useUserData();
   const journeyState = getJourneyState();
@@ -66,9 +65,11 @@ function DialPageContent() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isRefreshingFromPayment, setIsRefreshingFromPayment] = useState(false);
   const hasRefreshedRef = useRef(false);
-  const hasClearedSessionForUserRef = useRef<string | null>(null);
   const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
   const [showParentGate, setShowParentGate] = useState(false);
+
+  // Clear session data before starting conversation
+  useSessionClear();
 
   logger.log('DialPageContent: Component rendered/updated', {
     credits,
@@ -89,19 +90,6 @@ function DialPageContent() {
     needsCredits,
     fromSuccess,
   });
-
-  // Clear session data before starting conversation
-  useEffect(() => {
-    logger.log('DialPageContent: useEffect - clearSession');
-    if (authLoading || !user) return;
-    if (clearSession.isPending || clearSession.isSuccess) return;
-
-    const userId = user.uid;
-    if (hasClearedSessionForUserRef.current === userId) return;
-
-    hasClearedSessionForUserRef.current = userId;
-    clearSession.mutate();
-  }, [authLoading, clearSession, user]);
 
   // Force refresh credits when returning from successful payment
   useEffect(() => {

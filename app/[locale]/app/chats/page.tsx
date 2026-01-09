@@ -1,64 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ConversationList from '@/components/ConversationList';
-import { useAuth } from '@/context/AuthContext';
-import { logger } from '@/lib/logger';
-import type { ConversationListItem } from '@/types';
+import { useConversations } from '@/hooks/queries/useConversations';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import { ROUTES } from '@/lib/routes';
 import styles from './ChatsPage.module.css';
 
 function ChatsPageContent() {
-  const { user } = useAuth();
   const t = useTranslations('chats');
-  const [conversations, setConversations] = useState<ConversationListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: conversations = [],
+    isLoading,
+    error,
+  } = useConversations();
 
-  useEffect(() => {
-    async function fetchConversations() {
-      if (!user) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const token = await user.getIdToken();
-        const response = await fetch('/api/conversations', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(t('loadingError'));
-        }
-
-        const data = await response.json();
-        
-        // Check if API call was successful
-        if (data.success) {
-          setConversations(data.conversations || []);
-        } else {
-          setError(data.message || t('loadingError'));
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        logger.error('Error fetching conversations:', errorMessage);
-        setError(t('loadingError'));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchConversations();
-  }, [user]);
+  // Convert Error object to string for ConversationList
+  const errorMessage = error ? t('loadingError') : null;
 
   return (
     <ViewTransition>
@@ -68,11 +30,11 @@ function ChatsPageContent() {
             <div className={styles.page}>
               <h1 className={styles.title}>{t('title')}</h1>
               <p className={styles.subtitle}>{t('subtitle')}</p>
-              
+
               <ConversationList
                 conversations={conversations}
                 isLoading={isLoading}
-                error={error}
+                error={errorMessage}
               />
             </div>
           </main>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ViewTransition } from 'react';
@@ -8,8 +8,7 @@ import { useTranslations } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 import { useUserData } from '@/context/UserDataContext';
-import { useAuth } from '@/context/AuthContext';
-import { useClearSession } from '@/hooks/mutations/useSessionMutations';
+import { useSessionClear } from '@/hooks/useSessionClear';
 import { ROUTES } from '@/lib/routes';
 import { Service } from '@/types';
 import { logger } from '@/lib/logger';
@@ -46,21 +45,9 @@ export default function ChooseEmergencyPage() {
   const t = useTranslations('chooseEmergency');
   const tCommon = useTranslations('common');
   const { setSelectedService } = useUserData();
-  const clearSession = useClearSession();
-  const { user, loading } = useAuth();
-  const hasClearedSessionForUserRef = useRef<string | null>(null);
 
   // Clear session data when in conversation setup flow
-  useEffect(() => {
-    if (loading || !user) return;
-    if (clearSession.isPending || clearSession.isSuccess) return;
-
-    const userId = user.uid;
-    if (hasClearedSessionForUserRef.current === userId) return;
-
-    hasClearedSessionForUserRef.current = userId;
-    clearSession.mutate();
-  }, [clearSession, user, loading]);
+  useSessionClear();
 
   const handleSelectService = async (service: Service) => {
     try {
