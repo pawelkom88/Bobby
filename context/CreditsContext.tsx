@@ -112,10 +112,10 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
           userBetaCredits =
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;
           
-          // Check if beta mode is enabled globally
-          isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
-          
-          // Determine effective credits based on mode
+          // Check if user is a beta user (user-level flag, not global env)
+          isBetaMode = data.betaUser === true;
+
+          // Determine effective credits based on user's beta status
           effectiveCredits = isBetaMode ? userBetaCredits : userCredits;
         }
 
@@ -208,7 +208,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
             typeof data.credits === 'number' ? data.credits : 0;
           const userBetaCredits =
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;
-          const isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
+          const isBetaMode = data.betaUser === true;
           const effective = isBetaMode ? userBetaCredits : userCredits;
           
           logger.log(`CreditsContext: Server returned credits: ${userCredits}, betaCredits: ${userBetaCredits}, mode: ${isBetaMode ? 'BETA' : 'PAID'}, effective: ${effective}`);

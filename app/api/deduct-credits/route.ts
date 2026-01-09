@@ -179,7 +179,7 @@ async function getUserCredits(userId: string, db: ReturnType<typeof getAdminDb>)
     const data = doc.data();
     return {
       credits: data?.credits ?? 0,
-      isBeta: data?.betaUser === true && process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true',
+      isBeta: data?.betaUser === true,
       betaCredits: data?.betaCredits ?? 0,
     };
   } catch (error) {
@@ -196,7 +196,7 @@ async function performDeduction(
   conversationId: string,
   durationSeconds: number,
   db: ReturnType<typeof getAdminDb>
-): Promise<{ newCredits: number; newBetaCredits: number }> {
+): Promise<{ newCredits: number; newBetaCredits: number; isBeta: boolean }> {
   return await db.runTransaction(async transaction => {
     // 1. Get current user document
     const userRef = db.collection('users').doc(userId);
@@ -209,7 +209,7 @@ async function performDeduction(
     const data = userDoc.data();
     const currentCredits = data?.credits ?? 0;
     const currentBetaCredits = data?.betaCredits ?? 0;
-    const isBeta = data?.betaUser === true && process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
+    const isBeta = data?.betaUser === true;
 
     // 2. Verify sufficient credits (check beta first)
     if (isBeta) {
@@ -238,7 +238,7 @@ async function performDeduction(
       const conversationRef = db.collection('conversations').doc(conversationId);
       transaction.update(conversationRef, { charged: true });
 
-      return { newCredits: currentCredits, newBetaCredits };
+      return { newCredits: currentCredits, newBetaCredits, isBeta: true };
     } else {
       // Regular credit deduction
       if (currentCredits <= 0) {
@@ -267,7 +267,7 @@ async function performDeduction(
       const conversationRef = db.collection('conversations').doc(conversationId);
       transaction.update(conversationRef, { charged: true });
 
-      return { newCredits, newBetaCredits: currentBetaCredits };
+      return { newCredits, newBetaCredits: currentBetaCredits, isBeta: false };
     }
   });
 }
@@ -468,7 +468,7 @@ export async function POST(
         newBetaCredits: result.newBetaCredits,
         charged: true,
         durationSeconds,
-        isBetaUser: process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true',
+        isBetaUser: result.isBeta,
       },
       { status: 200 }
     );

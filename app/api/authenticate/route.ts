@@ -88,38 +88,38 @@ export async function GET(request: NextRequest) {
     const userDoc = await db.collection('users').doc(userId).get();
     const userData = userDoc.data();
     
-    // Check if beta mode is enabled globally
-    const isBetaModeEnabled = process.env.NEXT_PUBLIC_BETA_MODE_ENABLED === 'true';
-    
+    // Check if user is a beta user (user-level flag)
+    const isBetaUser = userData?.betaUser === true;
+
     let totalCredits = 0;
-    
-    if (isBetaModeEnabled) {
-      // Beta mode: Only use beta credits, ignore real credits
+
+    if (isBetaUser) {
+      // Beta user: Use beta credits
       const betaCredits = userData?.betaCredits || 0;
       totalCredits = betaCredits;
-      
-      logger.info('Beta mode: Using beta credits only', { 
-        userId, 
+
+      logger.info('Beta user: Using beta credits', {
+        userId,
         betaCredits,
-        totalCredits 
+        totalCredits,
       });
     } else {
-      // Paid mode: Only use real credits, ignore beta credits
+      // Regular user: Use paid credits
       const credits = userData?.credits || 0;
       totalCredits = credits;
-      
-      logger.info('Paid mode: Using real credits only', { 
-        userId, 
+
+      logger.info('Regular user: Using paid credits', {
+        userId,
         credits,
-        totalCredits 
+        totalCredits,
       });
     }
 
     if (totalCredits <= 0) {
-      logger.info('User attempted to get token without sufficient credits', { 
-        userId, 
+      logger.info('User attempted to get token without sufficient credits', {
+        userId,
         totalCredits,
-        isBetaModeEnabled
+        isBetaUser,
       });
       return NextResponse.json(
         {
