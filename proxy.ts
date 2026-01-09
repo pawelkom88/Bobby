@@ -112,6 +112,18 @@ function isPublicRoute(pathname: string): boolean {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Skip middleware EARLY for API routes and static files
+  // This prevents any body consumption or request modification
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
   const nonce = generateCspNonce();
   const requestHeaders = new Headers(request.headers);
   const connectSrc = [
@@ -153,16 +165,6 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set('x-csp-nonce', nonce);
   requestHeaders.set('content-security-policy', cspHeaderValue);
   const requestWithNonce = new NextRequest(request, { headers: requestHeaders });
-
-  // Skip middleware for API routes and static files
-  if (
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    pathname.includes('.')
-  ) {
-    return NextResponse.next();
-  }
 
   // Use next-intl middleware for locale handling
   // This properly sets the locale context for useTranslations hook
