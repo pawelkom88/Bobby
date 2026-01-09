@@ -1,7 +1,7 @@
 /**
  * POST /api/conversation/start
  * Creates a conversation record with server-side timestamp
- * 
+ *
  * Security:
  * - Requires valid Firebase ID token
  * - Server-side timestamp (client cannot manipulate)
@@ -19,6 +19,9 @@ import {
   getClientIP,
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
+
+// Force Node.js runtime for proper body handling
+export const runtime = 'nodejs';
 
 interface StartConversationRequest {
   ageTier: 1 | 2 | 3;
@@ -146,10 +149,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
     let body: unknown;
     try {
       const rawBody = await request.text();
+      // Direct console.log for Netlify visibility
+      console.log('[CONV/START] Raw body length:', rawBody?.length ?? 0);
+      console.log('[CONV/START] Raw body:', rawBody?.substring(0, 200));
+      console.log('[CONV/START] Content-Type:', request.headers.get('content-type'));
       logger.log('[conversation/start] Raw body received:', rawBody);
       logger.log('[conversation/start] Content-Type:', request.headers.get('content-type'));
 
       if (!rawBody || rawBody.trim() === '') {
+        console.error('[CONV/START] ERROR: Empty body received!');
         logger.error('[conversation/start] Empty body received');
         return NextResponse.json(
           {
@@ -164,8 +172,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
       }
 
       body = JSON.parse(rawBody);
+      console.log('[CONV/START] Parsed body:', JSON.stringify(body));
       logger.log('[conversation/start] Parsed body:', body);
-    } catch (parseError) {
+    } catch (parseError: any) {
+      console.error('[CONV/START] JSON parse error:', parseError?.message);
       logger.error('[conversation/start] JSON parse error:', parseError);
       return NextResponse.json(
         {
