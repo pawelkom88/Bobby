@@ -1,7 +1,9 @@
 'use client';
 
-import { ViewTransition, useState, type CSSProperties } from 'react';
+import { ViewTransition, useState, useEffect, type CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScenarioCarousel } from './landing-page';
@@ -56,6 +58,16 @@ const trustStripItems = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Redirect authenticated users to /app
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/app');
+    }
+  }, [user, loading, router]);
+
   const t = useTranslations('landing');
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showAllFAQs, setShowAllFAQs] = useState(false);

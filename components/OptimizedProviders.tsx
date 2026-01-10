@@ -13,6 +13,7 @@ import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import React from 'react';
+import { AuthProvider } from '@/context/AuthContext';
 
 // Lazy load analytics to prevent Firebase from loading on landing page
 const LazyAnalyticsInitializer = dynamic(
@@ -55,13 +56,15 @@ export function OptimizedProviders({ children }: ProvidersProps) {
       <AnalyticsConsent />
       <LazyAnalyticsInitializer />
       <QueryClientProvider client={queryClient}>
-        <ServiceWorkerRegistration />
-        <SoundProvider>
-          <MicrophoneContextProvider>
-            {children}
-          </MicrophoneContextProvider>
-        </SoundProvider>
-        <CookieBanner />
+        <AuthProvider>
+          <ServiceWorkerRegistration />
+          <SoundProvider>
+            <MicrophoneContextProvider>
+              {children}
+            </MicrophoneContextProvider>
+          </SoundProvider>
+          <CookieBanner />
+        </AuthProvider>
       </QueryClientProvider>
     </CookiesProvider>
   );
