@@ -2,14 +2,31 @@
 # Format: rule_id	action	description
 # Actions: IGNORE, WARN, FAIL
 #
-# Common rules to tune based on your application needs:
-# 10038	WARN	Content Security Policy (CSP) Header Not Set
-# 10063	WARN	Permissions Policy Header Not Set
-# 90033	WARN	Loosely Scoped Cookie
+# Reference: https://www.zaproxy.org/docs/alerts/
 
-# Example: Ignore informational alerts
+# Informational alerts - safe to ignore
+10027	IGNORE	Information Disclosure - Suspicious Comments
+10109	IGNORE	Modern Web Application
+10112	IGNORE	Session Management Response Identified
+
+# Cookie alerts - handled by application, may flag on third-party cookies
+10010	WARN	Cookie No HttpOnly Flag
+10011	WARN	Cookie Without Secure Flag
+
+# Cache control - intentional for static assets
+10015	IGNORE	Re-examine Cache-control Directives
 10049	IGNORE	Storable and Cacheable Content
 10050	IGNORE	Retrieved from Cache
 
-# Cookie without Secure flag (if HSTS is enforced, this is lower risk)
-10011	WARN	Cookie Without Secure Flag
+# Headers now set in netlify.toml - may still flag during scan propagation
+10021	WARN	X-Content-Type-Options Header Missing
+10035	WARN	Strict-Transport-Security Header Not Set
+10037	WARN	Server Leaks Information via X-Powered-By
+10038	WARN	Content Security Policy (CSP) Header Not Set
+10063	WARN	Permissions Policy Header Not Set
+
+# CSP wildcards - needed for legitimate third-party services
+10055	WARN	CSP Wildcard Directive
+
+# Spectre - mitigated at browser level, low practical risk
+90004	IGNORE	Insufficient Site Isolation Against Spectre Vulnerability
