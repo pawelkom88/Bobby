@@ -1,0 +1,15 @@
+# ZAP Baseline Scan Rules Configuration
+# Format: rule_id	action	description
+# Actions: IGNORE, WARN, FAIL
+#
+# Common rules to tune based on your application needs:
+# 10038	WARN	Content Security Policy (CSP) Header Not Set
+# 10063	WARN	Permissions Policy Header Not Set
+# 90033	WARN	Loosely Scoped Cookie
+
+# Example: Ignore informational alerts
+10049	IGNORE	Storable and Cacheable Content
+10050	IGNORE	Retrieved from Cache
+
+# Cookie without Secure flag (if HSTS is enforced, this is lower risk)
+10011	WARN	Cookie Without Secure Flag

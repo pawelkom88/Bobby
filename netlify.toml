@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NODE_ENV = "production"
 
 # Ensure POST bodies are not processed/cached
 [[headers]]

@@ -7,6 +7,9 @@ const baseConfig =
 export default [
   ...baseConfig,
   {
+    ignores: ['.mcp/**'],
+  },
+  {
     plugins: {
       'react-compiler': reactCompiler,
     },
