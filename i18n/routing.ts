@@ -34,6 +34,8 @@ export const pathnames = {
   '/terms-conditions': '/terms-conditions',
   '/safety-privacy': '/safety-privacy',
   '/parent-guide': '/parent-guide',
+  '/blog': '/blog',
+  '/blog/[slug]': '/blog/[slug]',
 } as const;
 
 export type AppPathname = keyof typeof pathnames;

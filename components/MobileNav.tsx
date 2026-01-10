@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
 
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,20 +50,23 @@ export default function MobileNav() {
           <a href="#faq" className="mobile-nav-link" onClick={closeMenu}>
             {t('nav.faq')}
           </a>
+          <Link href="/blog" className="mobile-nav-link" onClick={closeMenu}>
+            {t('nav.blog')}
+          </Link>
           <Link href="/contact" className="mobile-nav-link" onClick={closeMenu}>
             {t('nav.contact')}
           </Link>
         </div>
 
-        <div className="mobile-nav-footer">
-          <Link
-            href="/login"
-            className="ach-button-small mobile-nav-cta"
-            onClick={closeMenu}
-          >
-            {t('nav.startTraining')}
-          </Link>
-        </div>
+        {/*<div className="mobile-nav-footer">*/}
+        {/*  <Link*/}
+        {/*    href="/login"*/}
+        {/*    className="ach-button-small mobile-nav-cta"*/}
+        {/*    onClick={closeMenu}*/}
+        {/*  >*/}
+        {/*    {t('nav.startTraining')}*/}
+        {/*  </Link>*/}
+        {/*</div>*/}
       </nav>
     </>
   );

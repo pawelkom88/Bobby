@@ -102,6 +102,9 @@ export default function HomePage() {
                     <a href="#faq">{t('nav.faq')}</a>
                   </li>
                   <li>
+                    <Link href="/blog">{t('nav.blog')}</Link>
+                  </li>
+                  <li>
                     <Link href="/contact">{t('nav.contact')}</Link>
                   </li>
                 </ul>

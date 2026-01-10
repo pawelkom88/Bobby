@@ -23,6 +23,7 @@ export const ROUTES = {
   COOKIES_POLICY: '/cookies-policy',
   TERMS_CONDITIONS: '/terms-conditions',
   SAFETY_PRIVACY: '/safety-privacy',
+  BLOG: '/blog',
 } as const satisfies Record<string, AppPathname>;
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];

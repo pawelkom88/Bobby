@@ -1,0 +1,374 @@
+/* Container matching landing page */
+.blogContainer {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #b7e0ff 0%, #c5e7e0 40%, #f4f1d9 100%);
+  padding: 40px 20px;
+}
+
+/* Hero section */
+.heroSection {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.heroImage {
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.pageTitle {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: #2d5a8c;
+  margin: 0 0 16px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Card grid */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Card styling matching brand */
+.card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 20%, #f4fbff 0%, #dbeafe 60%);
+  border-bottom: 1px solid rgba(45, 90, 140, 0.08);
+}
+
+.image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.02);
+}
+
+.content {
+  padding: 24px;
+}
+
+.title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 1.5rem;
+  color: #2d5a8c;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.excerpt {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.date {
+  font-weight: 500;
+}
+
+.readTime {
+  background: #f0f8ff;
+  color: #2d5a8c;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Back link */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #2d5a8c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #1a3a5c;
+}
+
+.heroCallout {
+  margin: 32px auto;
+  max-width: 640px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 18px 45px rgba(45, 90, 140, 0.18);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(45, 90, 140, 0.12);
+}
+
+.heroQuote {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3a50;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+}
+
+.heroBadges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.heroBadges li {
+  background: linear-gradient(135deg, #ffeec1, #f0f7ff);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 600;
+  color: #1f2a44;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Article page styles */
+.articleContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.articleHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.articleTitle {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #2d5a8c;
+  margin: 0 0 16px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.articleMeta {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 32px;
+}
+
+.articleImage {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.articleContent {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.articleContent p {
+  margin-bottom: 20px;
+}
+
+.articleContent h2 {
+  font-family: 'Luckiest Guy', cursive;
+  color: #2d5a8c;
+  font-size: 1.8rem;
+  margin: 32px 0 16px 0;
+}
+
+.articleContent h3 {
+  color: #2d5a8c;
+  font-size: 1.4rem;
+  margin: 24px 0 12px 0;
+}
+
+.articleContent ul {
+  margin: 20px 0;
+  padding-left: 24px;
+}
+
+.articleContent li {
+  margin-bottom: 8px;
+}
+
+.articleContent blockquote {
+  border-left: 4px solid #2d5a8c;
+  padding-left: 20px;
+  margin: 24px 0;
+  font-style: italic;
+  color: #555;
+}
+
+.cartoonList {
+  list-style: none;
+  padding-left: 0;
+  margin: 16px 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cartoonList li {
+  background: linear-gradient(135deg, #fffdf5, #f0f8ff);
+  border-radius: 16px;
+  padding: 14px 18px 14px 52px;
+  font-weight: 500;
+  color: #2d3a50;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(45, 90, 140, 0.08);
+}
+
+.cartoonList li::before {
+  content: '★';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: #ff9f43;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.cartoonList a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cartoonList a:hover,
+.cartoonList a:focus-visible {
+  text-decoration: underline;
+}
+
+.cartoonListAlt {
+  list-style: none;
+  padding-left: 0;
+  margin: 20px 0 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cartoonListAlt li {
+  background: linear-gradient(135deg, #eef6ff, #ffeef6);
+  border-radius: 18px;
+  padding: 14px 20px 14px 56px;
+  font-weight: 600;
+  color: #2b3354;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(43, 51, 84, 0.08);
+}
+
+.cartoonListAlt li::before {
+  content: '◆';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%) rotate(10deg);
+  font-size: 1rem;
+  color: #ff6b81;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.cartoonListAlt a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cartoonListAlt a:hover,
+.cartoonListAlt a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .blogContainer {
+    padding: 20px 16px;
+  }
+
+  .heroImage {
+    border-radius: 16px;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .meta {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .articleContainer {
+    padding: 20px 16px;
+  }
+
+  .articleMeta {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
