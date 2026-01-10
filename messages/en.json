@@ -490,7 +490,7 @@
     }
   },
   "dial": {
-    "emergencyNumber": "999/112",
+    "emergencyNumber": "999",
     "title": "Dial {number}",
     "creditsLabel": "Credits:",
     "betaCreditsLabel": "Beta Credits:",

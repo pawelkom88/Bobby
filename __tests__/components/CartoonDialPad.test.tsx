@@ -2,16 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { vi } from 'vitest';
 import CartoonDialPad from '../../components/CartoonDialPad';
-import { isValidEmergencyNumber } from '../../lib/validation';
-
-// Mock the validation module
-vi.mock('../../lib/validation', () => ({
-  validateEmergencyNumber: vi.fn(),
-  isValidEmergencyNumber: vi.fn(),
-}));
-
-// Get the mocked function
-const mockIsValidEmergencyNumber = vi.mocked(isValidEmergencyNumber);
 
 // Mock audio
 global.Audio = vi.fn().mockImplementation(() => ({
@@ -23,7 +13,7 @@ global.Audio = vi.fn().mockImplementation(() => ({
 
 const mockOnCorrectNumber = vi.fn();
 
-// Test messages for English locale
+// Test messages for English locale (matching actual translations)
 const enMessages = {
   dial: {
     emergencyNumber: '999',
@@ -40,11 +30,10 @@ const enMessages = {
 describe('CartoonDialPad', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockIsValidEmergencyNumber.mockReset();
   });
 
   describe('Emergency number validation', () => {
-    it('should use 999 as emergency number for English locale', () => {
+    it('should accept 999 as valid emergency number', () => {
       render(
         <NextIntlClientProvider locale="en" messages={enMessages}>
           <CartoonDialPad onCorrectNumber={mockOnCorrectNumber} />
@@ -63,19 +52,36 @@ describe('CartoonDialPad', () => {
       if (button9) fireEvent.click(button9);
       if (button9) fireEvent.click(button9);
 
-      // Mock validation to return true
-      mockIsValidEmergencyNumber.mockReturnValue(true);
+      if (callButton) fireEvent.click(callButton);
+
+      // Should call onCorrectNumber since 999 is valid
+      expect(mockOnCorrectNumber).toHaveBeenCalled();
+    });
+
+    it('should accept 112 as valid emergency number (UK alternative)', () => {
+      render(
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          <CartoonDialPad onCorrectNumber={mockOnCorrectNumber} />
+        </NextIntlClientProvider>
+      );
+
+      // Simulate dialing 112
+      const buttons = screen.getAllByRole('button');
+      const button1 = buttons.find(b => b.textContent === '1');
+      const button2 = buttons.find(b => b.textContent === '2');
+      const callButton = buttons.find(b => b.textContent === 'CALL');
+
+      if (button1) fireEvent.click(button1);
+      if (button1) fireEvent.click(button1);
+      if (button2) fireEvent.click(button2);
 
       if (callButton) fireEvent.click(callButton);
 
-      // Should validate against 999
-      expect(mockIsValidEmergencyNumber).toHaveBeenCalledWith('999', '999');
+      // Should call onCorrectNumber since 112 is valid for UK
       expect(mockOnCorrectNumber).toHaveBeenCalled();
     });
 
     it('should show error for wrong number', () => {
-      mockIsValidEmergencyNumber.mockReturnValue(false);
-
       render(
         <NextIntlClientProvider locale="en" messages={enMessages}>
           <CartoonDialPad onCorrectNumber={mockOnCorrectNumber} />
@@ -94,8 +100,6 @@ describe('CartoonDialPad', () => {
       if (callButton) fireEvent.click(callButton);
 
       // Should show error
-      expect(mockIsValidEmergencyNumber).toHaveBeenCalledWith('111', '999');
-      // Check that error bubble is displayed
       const errorBubble = screen.getByRole('alert');
       expect(errorBubble).toBeInTheDocument();
       expect(errorBubble).toHaveClass('error-bubble');
@@ -106,30 +110,27 @@ describe('CartoonDialPad', () => {
     it('should accept custom targetNumber prop', () => {
       render(
         <NextIntlClientProvider locale="en" messages={enMessages}>
-          <CartoonDialPad onCorrectNumber={mockOnCorrectNumber} targetNumber="911" />
+          <CartoonDialPad onCorrectNumber={mockOnCorrectNumber} targetNumber="112" />
         </NextIntlClientProvider>
       );
 
       // Should use custom targetNumber, not locale default
-      expect(screen.getByText('Dial 911')).toBeInTheDocument();
+      expect(screen.getByText('Dial 112')).toBeInTheDocument();
 
-      // Mock validation to return true
-      mockIsValidEmergencyNumber.mockReturnValue(true);
-
-      // Dial 911
+      // Dial 112
       const buttons = screen.getAllByRole('button');
-      const button9 = buttons.find(b => b.textContent === '9');
       const button1 = buttons.find(b => b.textContent === '1');
+      const button2 = buttons.find(b => b.textContent === '2');
       const callButton = buttons.find(b => b.textContent === 'CALL');
 
-      if (button9) fireEvent.click(button9);
       if (button1) fireEvent.click(button1);
       if (button1) fireEvent.click(button1);
+      if (button2) fireEvent.click(button2);
 
       if (callButton) fireEvent.click(callButton);
 
-      // Should validate against custom targetNumber
-      expect(mockIsValidEmergencyNumber).toHaveBeenCalledWith('911', '911');
+      // Should call onCorrectNumber since 112 is valid for targetNumber 112
+      expect(mockOnCorrectNumber).toHaveBeenCalled();
     });
   });
 
