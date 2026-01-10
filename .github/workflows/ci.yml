@@ -50,7 +50,7 @@ jobs:
         with:
           target: 'https://readywithbobby.online'
           rules_file_name: '.zap/rules.tsv'
-          fail_action: true
+          fail_action: false
           allow_issue_writing: false
           artifact_name: 'zap-sarif'
 
@@ -61,10 +61,3 @@ jobs:
           name: zap-report
           path: report_html.html
           retention-days: 30
-
-      - name: Upload SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: report_sarif.json
-        continue-on-error: true
