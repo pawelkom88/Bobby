@@ -35,7 +35,8 @@
     "generic": "Ładowanie ...",
     "completionData": "Ładowanie danych ukończenia...",
     "credits": "Ładowanie twoich kredytów...",
-    "pleaseWait": "Proszę czekać..."
+    "pleaseWait": "Proszę czekać...",
+    "signingOut": "Wylogowywanie..."
   },
   "auth": {
     "login": {
@@ -483,7 +484,7 @@
     }
   },
   "dial": {
-    "emergencyNumber": "112",
+    "emergencyNumber": "112/999",
     "title": "Wybierz {number}",
     "creditsLabel": "Kredyty:",
     "betaCreditsLabel": "Kredyty Beta:",

@@ -21,7 +21,11 @@ const DEFAULT_SITUATION: Service = 'fire';
 
 function CompletionPageContent() {
   const { getJourneyState } = useUserData();
-  const { data: sessionData, isLoading: sessionLoading, error: sessionError } = useSession();
+  const {
+    data: sessionData,
+    isLoading: sessionLoading,
+    error: sessionError,
+  } = useSession();
   const { user } = useAuth();
   const router = useRouter();
   const t = useTranslations('completion');
@@ -58,7 +62,10 @@ function CompletionPageContent() {
       }
 
       if (sessionError) {
-        logger.error('🔍 Failed to load session data, redirecting to dial', sessionError);
+        logger.error(
+          '🔍 Failed to load session data, redirecting to dial',
+          sessionError
+        );
         router.replace(ROUTES.DIAL);
         return;
       }
@@ -166,7 +173,9 @@ function CompletionPageContent() {
 
   return (
     <QueryBoundary
-      loadingFallback={<LoadingSpinner text={t('loadingData')} heading={t('loading')} />}
+      loadingFallback={
+        <LoadingSpinner text={t('loadingData')} heading={t('loading')} />
+      }
       errorFallback={({ error, resetErrorBoundary }) => (
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <h2 className="mb-2 text-xl font-semibold text-gray-900">

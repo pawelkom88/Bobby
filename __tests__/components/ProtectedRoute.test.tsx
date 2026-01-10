@@ -3,6 +3,15 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NextIntlClientProvider } from 'next-intl';
 import React from 'react';
 
+// Mock ViewTransition
+vi.mock('react', async () => {
+  const actualReact = await vi.importActual('react');
+  return {
+    ...actualReact,
+    ViewTransition: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+
 // Mock next/navigation
 const mockPush = vi.fn();
 let mockPathname = '/en/app/chats';
@@ -38,12 +47,13 @@ vi.mock('@/components/LoadingSpinner', () => ({
 }));
 
 // Import component after mocks
-import ProtectedRoute from '@/components/ProtectedRoute';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const enMessages = {
   loading: {
     generic: 'Loading...',
     heading: 'Please wait',
+    signingOut: 'Signing out...',
   },
 };
 

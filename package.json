@@ -13,7 +13,8 @@
     "emulator": "firebase emulators:start --import=./emulator-data --export-on-exit",
     "emulator:kill": "pkill -f 'firebase emulators' || echo 'No emulator processes found'",
     "emulator:clean": "pnpm run emulator:kill && firebase emulators:start --only firestore,auth --import=./emulator-data",
-    "seed:beta": "tsx scripts/seed-beta-users.ts"
+    "seed:beta": "tsx scripts/seed-beta-users.ts",
+    "restore:beta-credits": "tsx scripts/restore-beta-credits.ts"
   },
   "dependencies": {
     "@deepgram/sdk": "^4.11.2",

@@ -3057,6 +3057,7 @@ a,
   margin: 0 auto;
   padding: 2rem 1rem;
   box-sizing: border-box;
+  max-width: 600px;
 }
 
 .completion-header {
@@ -3339,11 +3340,6 @@ a,
     text-align: left;
   }
 
-  .completion-content-wrapper {
-    padding: 1.5rem 1rem;
-    gap: 1.5rem;
-  }
-
   .completion-header {
     margin-bottom: 0.5rem;
   }
@@ -3358,10 +3354,6 @@ a,
 
   .completion-section h2 {
     font-size: 1.25rem;
-  }
-
-  .completion-card {
-    padding: 1.25rem;
   }
 
   .completion-message p {
@@ -5476,6 +5468,7 @@ a:focus-visible {
     flex-direction: row;
     justify-content: center;
     align-items: stretch;
+    margin-bottom: 2rem;
   }
 
   .select-package-cards-container .pricing-card {
@@ -6585,5 +6578,55 @@ a:focus-visible {
   .cookie-banner-button {
     transition: none;
     animation: none;
+  }
+}
+
+/* ============================================================================
+   VIEW TRANSITION ANIMATIONS
+   Used with React 19's ViewTransition component for smooth page transitions
+   ============================================================================ */
+
+/* Default page transitions */
+::view-transition-old(root) {
+  animation: vt-fade-out 150ms ease-out;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 150ms ease-in;
+}
+
+/* Named transition class: page-fade */
+::view-transition-old(.page-fade) {
+  animation: vt-fade-out 150ms ease-out;
+}
+
+::view-transition-new(.page-fade) {
+  animation: vt-fade-in 150ms ease-in;
+}
+
+/* View transition keyframes */
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Respect reduced motion preference for view transitions */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01ms !important;
   }
 }

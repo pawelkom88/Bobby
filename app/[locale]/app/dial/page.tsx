@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef } from 'react';
+import { useEffect, useState, Suspense, useRef, startTransition } from 'react';
 import { ViewTransition } from 'react';
 import { Activity } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import DialPad from '@/components/DialPad';
 import PageWrapper from '@/components/PageWrapper';
@@ -46,6 +46,7 @@ const setParentGateAcknowledgement = (): void => {
 };
 
 function DialPageContent() {
+  const router = useRouter();
   const t = useTranslations('dial');
   const tAuth = useTranslations('auth.errors');
   const {
@@ -151,7 +152,9 @@ function DialPageContent() {
 
     const startPractice = () => {
       if (hasParentGateAcknowledgement()) {
-        window.location.href = ROUTES.CONVERSATION;
+        startTransition(() => {
+          router.push(ROUTES.CONVERSATION);
+        });
       } else {
         setShowParentGate(true);
       }
@@ -214,13 +217,17 @@ function DialPageContent() {
   };
 
   const handleBack = () => {
-    window.location.href = ROUTES.CHOOSE_EMERGENCY;
+    startTransition(() => {
+      router.push(ROUTES.CHOOSE_EMERGENCY);
+    });
   };
 
   const handleParentGateConfirm = () => {
     setParentGateAcknowledgement();
     setShowParentGate(false);
-    window.location.href = ROUTES.CONVERSATION;
+    startTransition(() => {
+      router.push(ROUTES.CONVERSATION);
+    });
   };
 
   const handleParentGateCancel = () => {

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, startTransition, useRef } from 'react';
 import { ViewTransition } from 'react';
 import { Activity } from 'react';
+import { useRouter } from 'next/navigation';
 import CreditDeductionIntegration from '@/components/CreditDeductionIntegration';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -10,7 +11,11 @@ import PaidRouteGuard from '@/components/PaidRouteGuard';
 import { useUserData } from '@/context/UserDataContext';
 import { useCredits } from '@/context/CreditsContext';
 import { useSession } from '@/hooks/queries/useSession';
-import { useClearSession, useSetAssessment, useSetConversationId } from '@/hooks/mutations/useSessionMutations';
+import {
+  useClearSession,
+  useSetAssessment,
+  useSetConversationId,
+} from '@/hooks/mutations/useSessionMutations';
 import { AgeTier, ConversationMessage, Service } from '@/types';
 import { assessWithGemini } from '@/lib/assessment';
 import { logger } from '@/lib/logger';
@@ -23,8 +28,10 @@ const DEFAULT_SITUATION: Service = 'fire';
 function ConversationPageContent() {
   logger.log('ConversationPageContent: Component mounted/rendered');
 
+  const router = useRouter();
   const [isComplete, setIsComplete] = useState(false);
   const [isProcessingAssessment, setIsProcessingAssessment] = useState(false);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { getJourneyState } = useUserData();
   const { setConversationActive } = useCredits();
   const { data: sessionData } = useSession();
@@ -45,21 +52,32 @@ function ConversationPageContent() {
       if (sessionData?.conversationComplete && sessionData?.lastAssessment) {
         setIsComplete(true);
         // Clear the flag and redirect after a brief moment to show message
-        setTimeout(async () => {
+        // Store timeout ref so we can cancel on unmount
+        redirectTimeoutRef.current = setTimeout(async () => {
           await clearSession.mutateAsync();
-          window.location.href = ROUTES.APP;
+          startTransition(() => {
+            router.push(ROUTES.APP);
+          });
         }, 2000);
       }
     };
 
     checkConversationStatus();
-  }, [sessionData, clearSession]);
+
+    // Cleanup: cancel timeout if component unmounts
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+        redirectTimeoutRef.current = null;
+      }
+    };
+  }, [sessionData, clearSession, router]);
 
   // Set conversation as active when component mounts
   useEffect(() => {
     logger.log('ConversationPage: Setting conversation as active');
     setConversationActive(true);
-    
+
     // Cleanup: clear conversation active when unmounting or navigating away
     return () => {
       logger.log('ConversationPage: Clearing conversation active');
@@ -122,23 +140,21 @@ function ConversationPageContent() {
       // Store assessment in secure server-side session
       // Generate unique completion ID to prevent duplicate XP awards
       const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const stored = await setAssessment.mutateAsync(
-        {
+      const stored = await setAssessment.mutateAsync({
+        assessment: {
           assessment: {
-            assessment: {
-              score: assessment.score,
-              passed: assessment.passed,
-              positives: assessment.positives,
-              improvements: assessment.improvements,
-              warnings: assessment.warnings,
-              metrics: assessment.metrics,
-            },
+            score: assessment.score,
             passed: assessment.passed,
+            positives: assessment.positives,
+            improvements: assessment.improvements,
+            warnings: assessment.warnings,
+            metrics: assessment.metrics,
           },
-          completionId,
-        }
-      );
-      
+          passed: assessment.passed,
+        },
+        completionId,
+      });
+
       // Store the actual Firestore conversation ID for linking to chat history
       if (conversationId) {
         await setConversationId.mutateAsync(conversationId);
@@ -155,18 +171,24 @@ function ConversationPageContent() {
       });
 
       // Navigate to completion
-      window.location.href = ROUTES.COMPLETION;
+      startTransition(() => {
+        router.push(ROUTES.COMPLETION);
+      });
     } catch (error) {
       logger.error('Error assessing conversation', error);
       // Still navigate to completion even if assessment fails
-      window.location.href = ROUTES.COMPLETION;
+      startTransition(() => {
+        router.push(ROUTES.COMPLETION);
+      });
     } finally {
       setIsProcessingAssessment(false);
     }
   };
 
   const handleBack = () => {
-    window.location.href = ROUTES.DIAL;
+    startTransition(() => {
+      router.push(ROUTES.DIAL);
+    });
   };
 
   return (

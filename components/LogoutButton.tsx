@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
@@ -24,12 +24,20 @@ export default function LogoutButton({
   const handleLogout = async () => {
     if (isLoggingOut) return;
 
+    console.log('[LogoutButton] handleLogout started');
     setIsLoggingOut(true);
     try {
+      console.log('[LogoutButton] Calling signOut...');
       await signOut();
-      router.push(ROUTES.LOGIN);
+      console.log('[LogoutButton] signOut complete, starting transition to login');
+      startTransition(() => {
+        console.log('[LogoutButton] Inside startTransition, calling router.push');
+        router.push(ROUTES.LOGIN);
+      });
+      console.log('[LogoutButton] startTransition initiated');
     } catch (error) {
       logger.error('Logout error:', error);
+      console.log('[LogoutButton] Logout error:', error);
       setIsLoggingOut(false);
     }
   };

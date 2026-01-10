@@ -35,7 +35,8 @@
     "generic": "Loading ...",
     "completionData": "Loading completion data...",
     "credits": "Loading your credits...",
-    "pleaseWait": "Please wait..."
+    "pleaseWait": "Please wait...",
+    "signingOut": "Signing out..."
   },
   "auth": {
     "login": {
@@ -489,7 +490,7 @@
     }
   },
   "dial": {
-    "emergencyNumber": "999",
+    "emergencyNumber": "999/112",
     "title": "Dial {number}",
     "creditsLabel": "Credits:",
     "betaCreditsLabel": "Beta Credits:",

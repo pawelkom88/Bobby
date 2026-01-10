@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { ViewTransition } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
@@ -39,9 +40,16 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // If not authenticated, don't render children (redirect will happen)
+  // If not authenticated, show loading while redirect happens
   if (!user) {
-    return null;
+    return (
+      <ViewTransition>
+        <LoadingSpinner
+          text={tLoading('signingOut')}
+          heading={tLoading('heading')}
+        />
+      </ViewTransition>
+    );
   }
 
   // User is authenticated, render the protected content
