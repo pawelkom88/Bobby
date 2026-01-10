@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 import CartoonDialPad from '../../components/CartoonDialPad';
 
 // Mock audio
-global.Audio = vi.fn().mockImplementation(() => ({
+globalThis.Audio = vi.fn().mockImplementation(() => ({
   play: vi.fn(),
   pause: vi.fn(),
   currentTime: 0,
