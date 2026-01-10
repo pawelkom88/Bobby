@@ -896,101 +896,178 @@
   },
   "betaFeedbackForm": {
     "title": "Bobby – Parent Feedback",
-    "description": "Thank you for trying Bobby! This short form helps us improve the app and make it as safe and useful as possible for children.",
+    "description": "Thank you for trying Bobby! This survey takes about 5-6 minutes and helps us improve the app for all families.",
     "optional": "Optional",
     "submitting": "Submitting...",
     "submit": "Submit Feedback",
     "section1": {
-      "title": "About your child",
-      "age": "How old is your child?",
-      "scenarios": {
-        "label": "Which scenario did your child try?",
-        "police": "Police",
-        "fire": "Fire service",
-        "ambulance": "Ambulance",
-        "notSure": "Not sure / don't remember"
+      "title": "About You & Your Family",
+      "numberOfChildren": {
+        "label": "How many children do you have aged 4-13?",
+        "1": "1",
+        "2": "2",
+        "3plus": "3 or more"
+      },
+      "priorPractice": {
+        "label": "Before Bobby, had your child practiced emergency calls?",
+        "school": "Yes, at school or nursery",
+        "home": "Yes, at home with family",
+        "appOrVideo": "Yes, with another app or video",
+        "firstTime": "No, this was their first experience",
+        "notSure": "I'm not sure"
+      },
+      "discoveryChannels": {
+        "label": "How did you hear about Bobby?",
+        "socialMedia": "Social media (Facebook, Instagram, TikTok)",
+        "friendFamily": "Friend or family member",
+        "googleSearch": "Google search",
+        "school": "School or nursery recommendation",
+        "parentingBlog": "Parenting website or blog",
+        "news": "News article or TV",
+        "other": "Other"
       }
     },
     "section2": {
-      "title": "Experience",
+      "title": "Emotional Journey",
+      "feelingsBefore": {
+        "label": "How did your child feel BEFORE starting the practice call?",
+        "excited": "Excited and curious",
+        "aBitNervous": "A bit nervous but willing",
+        "reluctant": "Reluctant but agreed to try",
+        "anxious": "Anxious or worried",
+        "neutral": "Neutral / no strong feeling"
+      },
+      "feelingsAfter": {
+        "label": "How did your child feel AFTER completing the practice call?",
+        "proudConfident": "Proud and confident",
+        "relieved": "Relieved it went well",
+        "mixed": "Mixed feelings",
+        "stillNervous": "Still nervous",
+        "upset": "Upset or distressed"
+      },
       "ease": {
         "label": "How easy was it for your child to understand what to do?",
         "1": "Very confusing",
         "5": "Very easy"
       },
-      "feelings": {
-        "label": "How did your child feel during the practice call?",
-        "calm": "Calm and confident",
-        "littleNervous": "A little nervous but okay",
-        "nervousThenCalmer": "Nervous at first, calmer later",
-        "overwhelmed": "Confused or overwhelmed"
+      "discomfort": {
+        "label": "Did anything make you or your child uncomfortable?",
+        "nothing": "Nothing - it felt completely appropriate",
+        "minorIssues": "Minor issues but acceptable",
+        "someConcerns": "Some concerns",
+        "significantConcerns": "Significant concerns"
       },
-      "uncomfortable": "Did anything feel uncomfortable, unclear, or inappropriate?"
+      "discomfortDetails": "Please describe your concerns:"
     },
     "section3": {
-      "title": "Safety & Trust",
-      "safety": {
-        "label": "As a parent, did the app feel safe and appropriate?",
-        "1": "Not at all",
-        "5": "Completely safe and appropriate"
+      "title": "Value Perception",
+      "usefulness": {
+        "label": "How useful is this practice for preparing children for real emergencies?",
+        "extremelyUseful": "Extremely useful - could save a life",
+        "veryUseful": "Very useful - builds important skills",
+        "somewhatUseful": "Somewhat useful - good awareness",
+        "slightlyUseful": "Slightly useful - limited practical value",
+        "notUseful": "Not useful"
       },
-      "practiceClarity": {
-        "label": "Was it clear that this was practice only, not a real emergency?",
-        "veryClear": "Yes, very clear",
-        "mostlyClear": "Mostly clear",
-        "notClear": "Not clear enough"
-      }
+      "confidenceChange": {
+        "label": "After this experience, how confident are you that your child could handle a real emergency call?",
+        "muchMore": "Much more confident than before",
+        "somewhatMore": "Somewhat more confident",
+        "same": "About the same",
+        "lessConfident": "Less confident (the practice revealed gaps)",
+        "notSure": "Not sure"
+      },
+      "desiredScenarios": {
+        "label": "Which scenarios would you want your child to practice?",
+        "medical": "Medical emergency at home",
+        "fire": "Fire or smoke in the home",
+        "breakIn": "Suspicious person or break-in",
+        "lostInPublic": "Lost in a public place",
+        "carAccident": "Car accident",
+        "other": "Other"
+      },
+      "desiredScenariosOther": "Please specify other scenarios:"
     },
     "section4": {
-      "title": "Value",
-      "usefulness": {
-        "label": "Do you feel this kind of practice is useful for children?",
-        "veryUseful": "Yes, very useful",
-        "somewhatUseful": "Somewhat useful",
-        "notVeryUseful": "Not very useful"
+      "title": "Pricing Feedback",
+      "pricingIntro": "Bobby offers practice call packs. For each price point, tell us how it feels:",
+      "starterPack": {
+        "label": "Starter Pack: £4.99 for 2 practice calls (up to 5 min each)",
+        "tooCheap": "Too cheap to trust",
+        "bargain": "A bargain",
+        "aboutRight": "About right",
+        "gettingExpensive": "Getting expensive",
+        "tooExpensive": "Too expensive"
       },
-      "useAgain": {
-        "label": "Would you use Bobby again with your child?",
-        "yes": "Yes",
-        "maybe": "Maybe",
-        "no": "No"
+      "heroPack": {
+        "label": "Hero Pack: £7.99 for 5 practice calls (up to 5 min each)",
+        "tooCheap": "Too cheap to trust",
+        "bargain": "A bargain",
+        "aboutRight": "About right",
+        "gettingExpensive": "Getting expensive",
+        "tooExpensive": "Too expensive"
       },
-      "willingToPay": {
-        "label": "Would you pay £2.99 for 2 calls (Rookie Pack) or £4.99 for 5 calls (Hero Pack)?",
-        "yes": "Yes",
-        "maybe": "Maybe",
-        "no": "No"
+      "preferredModel": {
+        "label": "Which pricing model would you prefer?",
+        "payPerCall": "Pay per call (e.g., £1.50 per practice)",
+        "smallPack": "Small pack (2 calls for £4.99 - current Starter)",
+        "largerPack": "Larger pack with savings (5 calls for £7.99 - current Hero)",
+        "monthlySubscription": "Monthly subscription (unlimited for £3.99/month)",
+        "annualSubscription": "Annual subscription (unlimited for £29.99/year)",
+        "oneTimePurchase": "One-time purchase for unlimited access"
       }
     },
     "section5": {
+      "title": "Referral & Recommendations",
       "nps": {
-        "label": "Would you recommend Bobby to another parent?",
-        "0": "Not at all",
-        "10": "Definitely"
+        "label": "How likely are you to recommend Bobby to another parent?",
+        "0": "Not at all likely",
+        "10": "Extremely likely"
       },
-      "openFeedback": "Open feedback",
-      "likedMost": "What did you like most about Bobby?",
-      "improveFirst": "What is the one thing we should improve first?",
-      "contact": {
-        "label": "Would you like to be contacted with follow-up questions?",
-        "yes": "Yes (I'll leave my email below)",
-        "no": "No"
-      },
-      "email": "Email address"
+      "recommendReason": "What ONE thing would make you more likely to recommend Bobby?",
+      "interests": {
+        "label": "Would you be interested in any of the following?",
+        "freeTrialToShare": "A free trial to share with another parent",
+        "earnForReferrals": "Earning free calls for referrals",
+        "earlyAccess": "Early access to new emergency scenarios",
+        "parentCommunity": "A parent community for safety tips",
+        "schoolLicensing": "School licensing (for your child's school)",
+        "none": "None of these"
+      }
     },
-    "thankYou": "Thank you for helping us improve Bobby 💙",
-    "successMessage": "Your feedback directly helps us make the app safer and better for children.",
+    "section6": {
+      "title": "Final Thoughts",
+      "improveFirst": "What ONE thing should we improve first?",
+      "contactMethod": {
+        "label": "May we contact you for a brief follow-up interview? (5-10 minutes)",
+        "email": "Yes, please email me",
+        "phone": "Yes, please call/text me",
+        "no": "No thank you"
+      },
+      "email": "Email address",
+      "phone": "Phone number"
+    },
+    "thankYou": "Thank you for helping us improve Bobby!",
+    "successMessage": "Your feedback directly helps us make the app safer and better for children everywhere.",
     "backToApp": "Back to App",
-    "contactOptInRequired": "Email is required when contact opt-in is selected",
-    "invalidEmail": "Invalid email address",
-    "childAgeRequired": "Please select your child's age",
-    "scenariosRequired": "Please select at least one scenario",
-    "childFeelingsRequired": "Please select how your child felt",
-    "practiceClarityRequired": "Please select if it was clear this was practice",
-    "usefulnessRequired": "Please select if this practice is useful",
-    "wouldUseAgainRequired": "Please select if you would use Bobby again",
-    "willingToPayRequired": "Please select if you would pay for Bobby",
-    "validationErrors": "Please fix the following errors:"
+    "validationErrors": "Please fix the following errors:",
+    "numberOfChildrenRequired": "Please select how many children you have",
+    "priorPracticeRequired": "Please select if your child had prior practice",
+    "discoveryChannelsRequired": "Please select at least one way you heard about Bobby",
+    "childFeelingsBeforeRequired": "Please select how your child felt before the call",
+    "childFeelingsAfterRequired": "Please select how your child felt after the call",
+    "discomfortLevelRequired": "Please select a comfort level",
+    "discomfortDetailsRequired": "Please describe your concerns",
+    "usefulnessRequired": "Please select how useful you found the practice",
+    "confidenceChangeRequired": "Please select how your confidence changed",
+    "starterPriceFeedbackRequired": "Please rate the Starter Pack pricing",
+    "heroPriceFeedbackRequired": "Please rate the Hero Pack pricing",
+    "preferredPricingModelRequired": "Please select your preferred pricing model",
+    "improveFirstRequired": "Please tell us what we should improve first",
+    "contactMethodRequired": "Please select a contact preference",
+    "emailRequired": "Email address is required",
+    "invalidEmail": "Please enter a valid email address",
+    "phoneRequired": "Phone number is required"
   },
   "trainingHistory": {
     "loading": "Loading training history...",
