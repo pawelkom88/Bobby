@@ -1,4 +1,5 @@
 import { convertFloat32ToInt16, downsample } from './audioUtils';
+import { fetchDeepgramToken } from '@/lib/api/deepgram';
 import { logger } from '@/lib/logger';
 
 export const getAuthToken = async (firebaseIdToken: string) => {
@@ -12,38 +13,7 @@ export const getAuthToken = async (firebaseIdToken: string) => {
       'getAuthToken: Sending request with token:',
       firebaseIdToken.substring(0, 20) + '...'
     );
-    const response = await fetch('/api/authenticate', {
-      credentials: 'include',
-      headers: {
-        Authorization: `Bearer ${firebaseIdToken}`,
-      },
-    });
-
-    logger.log('getAuthToken: Response status:', response.status);
-
-    if (!response.ok) {
-      let errorMessage = 'Unknown error';
-      let errorData = null;
-      try {
-        const text = await response.text();
-        logger.log('getAuthToken: Response body:', text);
-        if (text) {
-          errorData = JSON.parse(text);
-          errorMessage = errorData.error || JSON.stringify(errorData);
-        }
-      } catch (e) {
-        logger.error('getAuthToken: Failed to parse error response:', e);
-        errorMessage = response.statusText;
-      }
-      logger.error('Failed to get auth token:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorMessage,
-      });
-      return null;
-    }
-
-    const result = await response.json();
+    const result = await fetchDeepgramToken(firebaseIdToken);
     logger.log('getAuthToken: Success, got token');
     return result.access_token;
   } catch (error) {

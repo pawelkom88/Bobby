@@ -17,27 +17,17 @@ import { AuthProvider } from '@/context/AuthContext';
 
 // Lazy load analytics to prevent Firebase from loading on landing page
 const LazyAnalyticsInitializer = dynamic(
-  () => import('@/lib/analytics-lazy').then(mod => ({
-    default: function LazyAnalyticsInit() {
-      React.useEffect(() => {
-        mod.lazyAnalytics.initialize();
-      }, []);
-      return null;
-    }
-  })),
-  {
-    ssr: false
-  }
-);
-
-const DeepgramContextProvider = dynamic(
   () =>
-    import('@/context/DeepgramContextProvider').then(mod => ({
-      default: mod.DeepgramContextProvider,
+    import('@/lib/analytics-lazy').then(mod => ({
+      default: function LazyAnalyticsInit() {
+        React.useEffect(() => {
+          mod.lazyAnalytics.initialize();
+        }, []);
+        return null;
+      },
     })),
   {
     ssr: false,
-    loading: () => <LoadingSpinner text="Loading..." />,
   }
 );
 
@@ -46,7 +36,6 @@ interface ProvidersProps {
 }
 
 export function OptimizedProviders({ children }: ProvidersProps) {
-  // Initialize Web Vitals monitoring
   useEffect(() => {
     initWebVitals();
   }, []);
@@ -59,9 +48,7 @@ export function OptimizedProviders({ children }: ProvidersProps) {
         <AuthProvider>
           <ServiceWorkerRegistration />
           <SoundProvider>
-            <MicrophoneContextProvider>
-              {children}
-            </MicrophoneContextProvider>
+            <MicrophoneContextProvider>{children}</MicrophoneContextProvider>
           </SoundProvider>
           <CookieBanner />
         </AuthProvider>

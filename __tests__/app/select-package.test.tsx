@@ -103,6 +103,18 @@ vi.mock('@/components/SpeculationRules', () => ({
   SpeculationRules: () => null,
 }));
 
+// Mock checkout mutation
+const mockCheckoutMutation = {
+  mutateAsync: vi.fn(),
+  reset: vi.fn(),
+  isPending: false,
+  error: null as Error | null,
+};
+
+vi.mock('@/hooks/mutations/useCheckoutSession', () => ({
+  useCheckoutSession: () => mockCheckoutMutation,
+}));
+
 // Mock search params state
 let mockSearchParams = { needsCredits: null as string | null, canceled: null as string | null };
 
@@ -188,6 +200,8 @@ describe('SelectPackagePage', () => {
     vi.clearAllMocks();
     mockSearchParams = { needsCredits: null, canceled: null };
     mockGetDialStoryContext.mockReturnValue(null);
+    mockCheckoutMutation.error = null;
+    mockCheckoutMutation.isPending = false;
   });
 
   describe('Story context loading behavior', () => {

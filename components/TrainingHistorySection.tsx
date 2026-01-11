@@ -1,71 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/context/AuthContext';
-import { logger } from '@/lib/logger';
+import { useAssessedConversations } from '@/hooks/queries/useAssessedConversations';
 import listStyles from './ConversationList.module.css';
 
-interface AssessedConversation {
-  id: string;
-  service: 'fire' | 'ambulance' | 'police';
-  ageTier: 1 | 2 | 3;
-  startedAt: string;
-  endedAt?: string;
-  messageCount: number;
-  xpEarned: number;
-  score?: number;
-  feedback?: string[];
-}
-
 export default function TrainingHistorySection() {
-  const { user } = useAuth();
   const t = useTranslations('trainingHistory');
-  const [assessedConversations, setAssessedConversations] = useState<
-    AssessedConversation[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchAssessedConversations() {
-      if (!user) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const token = await user.getIdToken();
-        const response = await fetch('/api/conversations/assessed', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(t('fetchError'));
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          setAssessedConversations(data.conversations || []);
-        } else {
-          setError(
-            data.message ||
-              t('loadError')
-          );
-        }
-      } catch (err) {
-        logger.error('Error fetching assessed conversations:', err);
-        setError(t('loadError'));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchAssessedConversations();
-  }, [user]);
+  const { data, isLoading, error } = useAssessedConversations();
+  const assessedConversations = data || [];
 
   if (isLoading) {
     return (
@@ -86,7 +28,7 @@ export default function TrainingHistorySection() {
     return (
       <div className={`${listStyles.list} ${listStyles.errorState}`}>
         <div className={listStyles.errorMessage}>
-          <p>{error}</p>
+          <p>{t('loadError')}</p>
         </div>
       </div>
     );

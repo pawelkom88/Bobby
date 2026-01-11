@@ -18,6 +18,7 @@ import {
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { logger } from '@/lib/logger';
+import { resetPassword as requestPasswordReset } from '@/lib/api/auth';
 import { analyticsService } from '@/lib/analytics';
 
 interface AuthContextType {
@@ -176,23 +177,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = async (email: string): Promise<void> => {
     try {
       logger.log('Sending password reset request for:', email);
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      logger.log('Password reset response status:', response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        logger.error('Password reset error response:', errorData);
-        throw new Error(errorData.error || 'Failed to send reset email');
+      const responseData = await requestPasswordReset({ email });
+      if (!responseData.success) {
+        throw new Error(responseData.error || 'Failed to send reset email');
       }
-
-      const responseData = await response.json();
       logger.log('Password reset success:', responseData);
       logger.info('Password reset email sent to:', email);
     } catch (error) {

@@ -12,7 +12,6 @@ import { useUserData } from '@/context/UserDataContext';
 import { useCredits } from '@/context/CreditsContext';
 import { useSession } from '@/hooks/queries/useSession';
 import {
-  useClearSession,
   useSetAssessment,
   useSetConversationId,
 } from '@/hooks/mutations/useSessionMutations';
@@ -35,7 +34,6 @@ function ConversationPageContent() {
   const { getJourneyState } = useUserData();
   const { setConversationActive } = useCredits();
   const { data: sessionData } = useSession();
-  const clearSession = useClearSession();
   const setAssessment = useSetAssessment();
   const setConversationId = useSetConversationId();
 
@@ -49,11 +47,10 @@ function ConversationPageContent() {
       if (sessionData?.conversationComplete && sessionData?.lastAssessment) {
         setIsComplete(true);
         redirectTimeoutRef.current = setTimeout(async () => {
-          await clearSession.mutateAsync();
           startTransition(() => {
-            router.push(ROUTES.APP);
+            router.push(ROUTES.COMPLETION);
           });
-        }, 2000);
+        }, 200);
       }
     };
 
@@ -66,7 +63,7 @@ function ConversationPageContent() {
         redirectTimeoutRef.current = null;
       }
     };
-  }, [sessionData, clearSession, router]);
+  }, [sessionData, router]);
 
   useEffect(() => {
     logger.log('ConversationPage: Setting conversation as active');
@@ -87,7 +84,7 @@ function ConversationPageContent() {
               <div style={{ textAlign: 'center', padding: '2rem' }}>
                 <h1>Conversation Complete</h1>
                 <p>Your emergency call practice has finished.</p>
-                <p>Redirecting you to start a new practice...</p>
+                <p>Redirecting you to your completion summary...</p>
               </div>
             </main>
           </ErrorBoundary>

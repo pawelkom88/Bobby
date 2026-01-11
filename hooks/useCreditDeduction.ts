@@ -5,6 +5,12 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { ApiError } from '@/lib/api/errors';
+import {
+  useDeductCredits,
+  useEndConversation,
+  useStartConversation,
+} from '@/hooks/mutations/useConversationMutations';
 import { logger } from '@/lib/logger';
 import type { ConversationMessage } from '@/types';
 
@@ -98,6 +104,9 @@ export function useCreditDeduction() {
     newCredits: null,
     charged: false,
   });
+  const startConversationMutation = useStartConversation();
+  const endConversationMutation = useEndConversation();
+  const deductCreditsMutation = useDeductCredits();
 
   // Restore active conversation ID for this session if it exists
   useEffect(() => {
@@ -112,24 +121,6 @@ export function useCreditDeduction() {
       }));
     }
   }, [user?.uid, state.conversationId]);
-
-  /**
-   * Get Firebase ID token
-   */
-  const getToken = useCallback(async (): Promise<string | null> => {
-    if (!user) {
-      logger.warn('User not authenticated');
-      return null;
-    }
-
-    try {
-      const token = await user.getIdToken();
-      return token;
-    } catch (error) {
-      logger.error('Failed to get ID token:', error);
-      return null;
-    }
-  }, [user]);
 
   /**
    * Start a conversation
@@ -166,34 +157,13 @@ export function useCreditDeduction() {
       }));
 
       try {
-        const token = await getToken();
-        if (!token) {
-          throw new Error('Failed to get authentication token');
-        }
+        logger.log('[useCreditDeduction] Starting conversation');
 
-        const requestBody = JSON.stringify({
+        startConversationMutation.reset();
+        const data = await startConversationMutation.mutateAsync({
           ageTier,
           service,
         });
-
-        logger.log('[useCreditDeduction] Starting conversation');
-
-        const response = await fetch('/api/conversation/start', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: requestBody,
-        });
-
-        if (!response.ok) {
-          const errorData = (await response.json()) as StartConversationResponse;
-          throw new Error(errorData.message || 'Failed to start conversation');
-        }
-
-        const data = (await response.json()) as StartConversationResponse;
 
         logger.log(`Conversation started: ${data.conversationId}`);
         setStoredConversationId(user.uid, data.conversationId);
@@ -219,7 +189,7 @@ export function useCreditDeduction() {
         return null;
       }
     },
-    [user, getToken, state.conversationId]
+    [user, state.conversationId, startConversationMutation]
   );
 
   /**
@@ -242,30 +212,11 @@ export function useCreditDeduction() {
       }));
 
       try {
-        const token = await getToken();
-        if (!token) {
-          throw new Error('Failed to get authentication token');
-        }
-
-        const response = await fetch('/api/conversation/end', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            conversationId,
-            messages,
-          }),
+        endConversationMutation.reset();
+        const data = await endConversationMutation.mutateAsync({
+          conversationId,
+          messages,
         });
-
-        if (!response.ok) {
-          const errorData = (await response.json()) as EndConversationResponse;
-          throw new Error(errorData.message || 'Failed to end conversation');
-        }
-
-        const data = (await response.json()) as EndConversationResponse;
 
         logger.log(`Conversation ended: ${data.conversationId}`);
         clearStoredConversationId(user.uid);
@@ -290,7 +241,7 @@ export function useCreditDeduction() {
         return false;
       }
     },
-    [user, getToken]
+    [user, endConversationMutation]
   );
 
   /**
@@ -313,38 +264,8 @@ export function useCreditDeduction() {
       }));
 
       try {
-        const token = await getToken();
-        if (!token) {
-          throw new Error('Failed to get authentication token');
-        }
-
-        const response = await fetch('/api/deduct-credits', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            conversationId,
-          }),
-        });
-
-        const data = (await response.json()) as DeductCreditsResponse;
-
-        if (!response.ok) {
-          // Handle specific error codes
-          if (response.status === 402) {
-            throw new Error('Insufficient credits');
-          }
-          if (response.status === 403) {
-            throw new Error('Not authorized to deduct credits for this conversation');
-          }
-          if (response.status === 404) {
-            throw new Error('Conversation not found');
-          }
-          throw new Error(data.message || 'Failed to deduct credits');
-        }
+        deductCreditsMutation.reset();
+        const data = await deductCreditsMutation.mutateAsync(conversationId);
 
         // Handle expected errors (already charged, duration too short)
         if (!data.success) {
@@ -371,7 +292,17 @@ export function useCreditDeduction() {
 
         return true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        let message = error instanceof Error ? error.message : 'Unknown error';
+        if (error instanceof ApiError) {
+          if (error.status === 402) {
+            message = 'Insufficient credits';
+          } else if (error.status === 403) {
+            message =
+              'Not authorized to deduct credits for this conversation';
+          } else if (error.status === 404) {
+            message = 'Conversation not found';
+          }
+        }
         logger.error('Error deducting credits:', message);
 
         setState((prev) => ({
@@ -383,7 +314,7 @@ export function useCreditDeduction() {
         return false;
       }
     },
-    [user, getToken]
+    [user, deductCreditsMutation]
   );
 
   /**

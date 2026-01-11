@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/context/AuthContext';
+import { useSendWelcomeEmail } from '@/hooks/mutations/useSendWelcomeEmail';
 import { ROUTES } from '@/lib/routes';
 import { logger } from '@/lib/logger';
 import { validatePassword, validateEmail } from '@/lib/validation';
@@ -82,6 +83,7 @@ function SignUpForm() {
   const t = useTranslations('auth');
   const tLoading = useTranslations('loading');
   const { user, signUp, loading: authLoading } = useAuth();
+  const sendWelcomeEmailMutation = useSendWelcomeEmail();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -154,23 +156,14 @@ function SignUpForm() {
       const idToken = await userCredential.user.getIdToken();
 
       // Send welcome email (don't block signup if email fails)
-      try {
-        const response = await fetch('/api/send-welcome-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({}),
-        });
-        if (!response.ok) {
-          logger.error('Welcome email failed:', { status: response.status });
-        } else {
+      sendWelcomeEmailMutation
+        .mutateAsync({ token: idToken })
+        .then(() => {
           logger.info('Welcome email sent successfully');
-        }
-      } catch (emailError) {
-        logger.error('Welcome email error:', emailError);
-      }
+        })
+        .catch((emailError) => {
+          logger.error('Welcome email error:', emailError);
+        });
 
       router.push(redirectUrl);
     } catch (error) {

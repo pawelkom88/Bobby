@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
+import { useBetaFeedback } from '@/hooks/mutations/useBetaFeedback';
+import { ApiError } from '@/lib/api/errors';
 import PageWrapper from './PageWrapper';
 import CartoonButton from './CartoonButton';
 import { BetaFeedbackSchema } from '@/lib/schemas/beta-feedback';
@@ -71,17 +73,43 @@ interface BetaFeedbackData {
   contactPhone: string;
 }
 
+const getFieldLabel = (
+  fieldPath: string,
+  t: (key: string) => string
+): string => {
+  const labelMap: Record<string, string> = {
+    numberOfChildren: t('section1.numberOfChildren.label'),
+    priorPractice: t('section1.priorPractice.label'),
+    discoveryChannels: t('section1.discoveryChannels.label'),
+    childFeelingsBefore: t('section2.feelingsBefore.label'),
+    childFeelingsAfter: t('section2.feelingsAfter.label'),
+    discomfortLevel: t('section2.discomfort.label'),
+    discomfortDetails: t('section2.discomfortDetails'),
+    usefulness: t('section3.usefulness.label'),
+    confidenceChange: t('section3.confidenceChange.label'),
+    starterPriceFeedback: t('section4.starterPack.label'),
+    heroPriceFeedback: t('section4.heroPack.label'),
+    preferredPricingModel: t('section4.preferredModel.label'),
+    improveFirst: t('section6.improveFirst'),
+    contactMethod: t('section6.contactMethod.label'),
+    contactEmail: t('section6.email'),
+    contactPhone: t('section6.phone'),
+  };
+  return labelMap[fieldPath] || fieldPath;
+};
+
 export default function BetaFeedbackForm() {
   const t = useTranslations('betaFeedbackForm');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const betaFeedbackMutation = useBetaFeedback();
+  const isSubmitting = betaFeedbackMutation.isPending;
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<BetaFeedbackData>(DEFAULT_FORM_DATA);
-  const conversationId = searchParams.get('conversationId');
+  const conversationId = searchParams.get('conversationId') ?? undefined;
 
   // todo Paw: refactor naming
   const handleInputChange = (field: keyof BetaFeedbackData, value: any) => {
@@ -122,28 +150,6 @@ export default function BetaFeedbackForm() {
       </span>
     </>
   );
-
-  const getFieldLabel = (fieldPath: string): string => {
-    const labelMap: Record<string, string> = {
-      numberOfChildren: t('section1.numberOfChildren.label'),
-      priorPractice: t('section1.priorPractice.label'),
-      discoveryChannels: t('section1.discoveryChannels.label'),
-      childFeelingsBefore: t('section2.feelingsBefore.label'),
-      childFeelingsAfter: t('section2.feelingsAfter.label'),
-      discomfortLevel: t('section2.discomfort.label'),
-      discomfortDetails: t('section2.discomfortDetails'),
-      usefulness: t('section3.usefulness.label'),
-      confidenceChange: t('section3.confidenceChange.label'),
-      starterPriceFeedback: t('section4.starterPack.label'),
-      heroPriceFeedback: t('section4.heroPack.label'),
-      preferredPricingModel: t('section4.preferredModel.label'),
-      improveFirst: t('section6.improveFirst'),
-      contactMethod: t('section6.contactMethod.label'),
-      contactEmail: t('section6.email'),
-      contactPhone: t('section6.phone'),
-    };
-    return labelMap[fieldPath] || fieldPath;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,23 +244,16 @@ export default function BetaFeedbackForm() {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
-      const response = await fetch('/api/beta-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${await user.getIdToken()}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          conversationId,
-        }),
+      betaFeedbackMutation.reset();
+      await betaFeedbackMutation.mutateAsync({
+        ...formData,
+        conversationId,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
+      setIsSubmitted(true);
+    } catch (error) {
+      if (error instanceof ApiError && error.data) {
+        const errorData = error.data as { error?: string; message?: string };
         if (errorData.error === 'invalid-request' && errorData.message) {
           const [fieldPath, errorCode] = errorData.message.split(': ');
           setFieldErrors({});
@@ -288,16 +287,11 @@ export default function BetaFeedbackForm() {
               }
             }, 100);
           }
-        } else {
-          throw new Error('Failed to submit feedback');
+          return;
         }
       }
 
-      setIsSubmitted(true);
-    } catch (error) {
       logger.error('Error submitting feedback:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -345,7 +339,7 @@ export default function BetaFeedbackForm() {
                   <span className={styles['beta-feedback-error-number']}>
                     {index + 1}.
                   </span>
-                  <strong>{getFieldLabel(fieldPath)}</strong>
+                  <strong>{getFieldLabel(fieldPath, t)}</strong>
                   <p className={styles['beta-feedback-error-paragraph']}>
                     {error}
                   </p>

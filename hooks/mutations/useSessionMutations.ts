@@ -2,17 +2,13 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
-import { authenticatedFetch } from '@/lib/fetcher';
-import { 
-  SessionSetResponseSchema,
-  SetAssessmentRequestSchema,
-  SetConversationIdRequestSchema,
-  SetConversationCompleteRequestSchema,
-  type AssessmentData,
-  type SetAssessmentRequest,
-  type SetConversationIdRequest,
-  type SetConversationCompleteRequest
-} from '@/schemas/session.schema';
+import {
+  clearSession as clearSessionRequest,
+  setAssessment as setAssessmentRequest,
+  setConversationComplete as setConversationCompleteRequest,
+  setConversationId as setConversationIdRequest,
+} from '@/lib/api/session';
+import type { AssessmentData } from '@/schemas/session.schema';
 import { sessionKeys } from '@/hooks/queries/useSession';
 import { logger } from '@/lib/logger';
 
@@ -30,26 +26,7 @@ export function useSetAssessment() {
   
   return useMutation({
     mutationFn: async (data: { assessment: AssessmentData; completionId: string }) => {
-      const request: SetAssessmentRequest = {
-        assessment: data.assessment,
-        completionId: data.completionId,
-      };
-      
-      const response = await authenticatedFetch(
-        '/api/session/assessment',
-        SessionSetResponseSchema,
-        getAuthToken,
-        {
-          method: 'POST',
-          body: JSON.stringify(request),
-        }
-      );
-      
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to store assessment');
-      }
-      
-      return response;
+      return setAssessmentRequest(data, getAuthToken);
     },
     onSuccess: () => {
       // Invalidate session query to refetch updated data
@@ -76,25 +53,7 @@ export function useSetConversationId() {
   
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      const request: SetConversationIdRequest = {
-        conversationId,
-      };
-      
-      const response = await authenticatedFetch(
-        '/api/session/conversation-id',
-        SessionSetResponseSchema,
-        getAuthToken,
-        {
-          method: 'POST',
-          body: JSON.stringify(request),
-        }
-      );
-      
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to set conversation ID');
-      }
-      
-      return response;
+      return setConversationIdRequest(conversationId, getAuthToken);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.data() });
@@ -120,25 +79,7 @@ export function useSetConversationComplete() {
   
   return useMutation({
     mutationFn: async (complete: boolean) => {
-      const request: SetConversationCompleteRequest = {
-        complete,
-      };
-      
-      const response = await authenticatedFetch(
-        '/api/session/complete',
-        SessionSetResponseSchema,
-        getAuthToken,
-        {
-          method: 'POST',
-          body: JSON.stringify(request),
-        }
-      );
-      
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to update conversation status');
-      }
-      
-      return response;
+      return setConversationCompleteRequest(complete, getAuthToken);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.data() });
@@ -164,20 +105,7 @@ export function useClearSession() {
   
   return useMutation({
     mutationFn: async () => {
-      const response = await authenticatedFetch(
-        '/api/session/clear',
-        SessionSetResponseSchema,
-        getAuthToken,
-        {
-          method: 'POST',
-        }
-      );
-      
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to clear session');
-      }
-      
-      return response;
+      return clearSessionRequest(getAuthToken);
     },
     onSuccess: () => {
       // Clear the session data from cache

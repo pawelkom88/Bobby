@@ -2,6 +2,13 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useCallback } from 'react';
+import {
+  clearSession as clearSessionRequest,
+  fetchSession as fetchSessionRequest,
+  setAssessment as setAssessmentRequest,
+  setConversationComplete as setConversationCompleteRequest,
+  setConversationId as setConversationIdRequest,
+} from '@/lib/api/session';
 import type { AssessmentData, SessionData } from '@/schemas/session.schema';
 import { logger } from '@/lib/logger';
 
@@ -49,21 +56,10 @@ export function useSecureSession() {
       }
 
       try {
-        const response = await fetch('/api/session/assessment', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: authHeader,
-          },
-          body: JSON.stringify({ assessment, completionId }),
-        });
-
-        if (!response.ok) {
-          logger.error('Failed to store assessment:', response.statusText);
-          return false;
-        }
-
+        await setAssessmentRequest(
+          { assessment, completionId },
+          () => Promise.resolve(authHeader)
+        );
         return true;
       } catch (error) {
         logger.error('Error storing assessment:', error);
@@ -83,25 +79,12 @@ export function useSecureSession() {
       return null;
     }
 
-    try {
-      const response = await fetch('/api/session/get', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          Authorization: authHeader,
-        },
-      });
-
-      if (!response.ok) {
-        logger.error('Failed to get session:', response.statusText);
+      try {
+        return await fetchSessionRequest(() => Promise.resolve(authHeader));
+      } catch (error) {
+        logger.error('Error getting session:', error);
         return null;
       }
-
-      return await response.json();
-    } catch (error) {
-      logger.error('Error getting session:', error);
-      return null;
-    }
   }, [getAuthHeader]);
 
   /**
@@ -114,32 +97,19 @@ export function useSecureSession() {
       return false;
     }
 
-    try {
-      const response = await fetch('/api/session/clear', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          Authorization: authHeader,
-        },
-      });
-
-      if (!response.ok) {
-        // If unauthorized, the session is effectively "cleared" since user can't access it
-        if (response.status === 401) {
+      try {
+        await clearSessionRequest(() => Promise.resolve(authHeader));
+        return true;
+      } catch (error: any) {
+        if (error?.status === 401) {
           logger.warn(
             'Session clear failed due to authentication - treating as cleared'
           );
           return true;
         }
-        logger.error('Failed to clear session:', response.statusText);
+        logger.error('Error clearing session:', error);
         return false;
       }
-
-      return true;
-    } catch (error) {
-      logger.error('Error clearing session:', error);
-      return false;
-    }
   }, [getAuthHeader]);
 
   /**
@@ -154,21 +124,10 @@ export function useSecureSession() {
       }
 
       try {
-        const response = await fetch('/api/session/complete', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: authHeader,
-          },
-          body: JSON.stringify({ complete }),
-        });
-
-        if (!response.ok) {
-          logger.error('Failed to set conversation complete:', response.statusText);
-          return false;
-        }
-
+        await setConversationCompleteRequest(
+          complete,
+          () => Promise.resolve(authHeader)
+        );
         return true;
       } catch (error) {
         logger.error('Error setting conversation complete:', error);
@@ -190,21 +149,10 @@ export function useSecureSession() {
       }
 
       try {
-        const response = await fetch('/api/session/conversation-id', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: authHeader,
-          },
-          body: JSON.stringify({ conversationId }),
-        });
-
-        if (!response.ok) {
-          logger.error('Failed to set conversation ID:', response.statusText);
-          return false;
-        }
-
+        await setConversationIdRequest(
+          conversationId,
+          () => Promise.resolve(authHeader)
+        );
         return true;
       } catch (error) {
         logger.error('Error setting conversation ID:', error);

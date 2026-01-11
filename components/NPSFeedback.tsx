@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useCredits } from '@/context/CreditsContext';
+import { useNpsFeedback } from '@/hooks/mutations/useNpsFeedback';
 import { logger } from '@/lib/logger';
 
 interface NPSFeedbackProps {
@@ -13,11 +13,11 @@ interface NPSFeedbackProps {
 export default function NPSFeedback({ conversationId }: NPSFeedbackProps) {
   const { user } = useAuth();
   const { isBetaUser } = useCredits();
-  const t = useTranslations('feedback');
+  const npsMutation = useNpsFeedback();
   const [score, setScore] = useState<number | null>(null);
   const [comment, setComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const isSubmitting = npsMutation.isPending;
 
   // Only show for beta users
   if (!isBetaUser || !user) {
@@ -44,33 +44,18 @@ export default function NPSFeedback({ conversationId }: NPSFeedbackProps) {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await user.getIdToken()}`,
-        },
-        body: JSON.stringify({
-          score,
-          comment: comment.trim() || undefined,
-          conversationId,
-        }),
+      npsMutation.reset();
+      await npsMutation.mutateAsync({
+        score,
+        comment: comment.trim() || undefined,
+        conversationId: conversationId ?? undefined,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit feedback');
-      }
-
       logger.log('NPS feedback submitted', { userId: user.uid, score, hasComment: !!comment });
       setIsSubmitted(true);
     } catch (error) {
       logger.error('Error submitting NPS feedback:', error);
       // Could show error toast here
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

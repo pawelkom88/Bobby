@@ -9,7 +9,7 @@
  * 4. Conversation completes → Call /api/deduct-credits
  */
 
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import VoiceConversation from './VoiceConversation';
 import { useCreditDeduction } from '@/hooks/useCreditDeduction';
 import { useAuth } from '@/context/AuthContext';
@@ -44,33 +44,38 @@ export default function CreditDeductionIntegration({
   const setConversationComplete = useSetConversationComplete();
   const [isInitialized, setIsInitialized] = useState(false);
   const [deductionError, setDeductionError] = useState<string | null>(null);
+  const initAttemptKeyRef = useRef<string | null>(null);
 
   /**
    * Initialize conversation when component mounts
    */
   useEffect(() => {
-    if (!isInitialized && autoStart && user) {
-      const initializeConversation = async () => {
-        try {
-          logger.log('Initializing conversation with credit tracking');
-          const conversationId = await startConversation(ageTier, situation);
+    if (isInitialized || !autoStart || !user) return;
 
-          if (!conversationId) {
-            logger.error('Failed to initialize conversation');
-            setDeductionError('Failed to start conversation tracking');
-            return;
-          }
+    const attemptKey = `${user.uid}:${ageTier}:${situation}`;
+    if (initAttemptKeyRef.current === attemptKey) return;
+    initAttemptKeyRef.current = attemptKey;
 
-          logger.log(`Conversation initialized: ${conversationId}`);
-          setIsInitialized(true);
-        } catch (error) {
-          logger.error('Error initializing conversation:', error);
-          setDeductionError('Failed to initialize conversation');
+    const initializeConversation = async () => {
+      try {
+        logger.log('Initializing conversation with credit tracking');
+        const conversationId = await startConversation(ageTier, situation);
+
+        if (!conversationId) {
+          logger.error('Failed to initialize conversation');
+          setDeductionError('Failed to start conversation tracking');
+          return;
         }
-      };
 
-      initializeConversation();
-    }
+        logger.log(`Conversation initialized: ${conversationId}`);
+        setIsInitialized(true);
+      } catch (error) {
+        logger.error('Error initializing conversation:', error);
+        setDeductionError('Failed to initialize conversation');
+      }
+    };
+
+    initializeConversation();
   }, [isInitialized, autoStart, user, ageTier, situation, startConversation]);
 
   /**

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
@@ -27,6 +27,7 @@ import {
   getStorySummaryFromJourney,
   hasStorySelection,
 } from '@/utils/select-package';
+import { useCheckoutSession } from '@/hooks/mutations/useCheckoutSession';
 
 function SelectPackagePageContent() {
   const t = useTranslations('selectPackage');
@@ -34,10 +35,7 @@ function SelectPackagePageContent() {
   const tAge = useTranslations('yourAge');
   const tEmergency = useTranslations('chooseEmergency');
   const locale = useLocale();
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-
-  const { user, loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   const {
     hasCredits,
     loading: creditsLoading,
@@ -52,6 +50,7 @@ function SelectPackagePageContent() {
   const router = useRouter();
 
   const storedStoryContext = needsCredits ? getDialStoryContext() : null;
+  const checkoutMutation = useCheckoutSession();
 
   useEffect(() => {
     if (isServerConfirmed && hasCredits) {
@@ -95,48 +94,30 @@ function SelectPackagePageContent() {
   };
 
   const handleSelectPackage = async (packType: PackType) => {
-    if (!user) {
-      setCheckoutError(t('errors.loginRequired'));
-      return;
-    }
-
-    setCheckoutLoading(true);
-    setCheckoutError(null);
+    checkoutMutation.reset();
 
     try {
-      const idToken = await user.getIdToken(true);
-
-      const response = await fetch(
-        `/api/checkout_sessions?locale=${locale}&packType=${packType}`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const data = await response.json();
-      if (!data.url) {
-        throw new Error('Failed to get checkout URL');
-      }
-
+      const data = await checkoutMutation.mutateAsync({
+        locale,
+        packType,
+      });
       window.location.href = data.url;
     } catch (error) {
       logger.error('Checkout error:', error);
-      setCheckoutError(t('errors.checkoutFailed'));
-      setCheckoutLoading(false);
     }
   };
 
   const handleBack = () => {
     window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
+
+  const checkoutError = checkoutMutation.error
+    ? t(
+        checkoutMutation.error.message === 'AUTH_REQUIRED'
+          ? 'errors.loginRequired'
+          : 'errors.checkoutFailed'
+      )
+    : null;
 
   if (authLoading || creditsLoading || !isServerConfirmed) {
     return <LoadingSpinner />;
@@ -217,7 +198,7 @@ function SelectPackagePageContent() {
                   key={pkg.id}
                   pkg={pkg}
                   handleSelectPackage={handleSelectPackage}
-                  checkoutLoading={checkoutLoading}
+                  checkoutLoading={checkoutMutation.isPending}
                 />
               ))}
             </div>
@@ -226,7 +207,7 @@ function SelectPackagePageContent() {
               <CartoonButton
                 containerClassName="select-package-back-button-container"
                 onClick={handleBack}
-                disabled={checkoutLoading}
+                disabled={checkoutMutation.isPending}
               >
                 {tCommon('back')}
               </CartoonButton>

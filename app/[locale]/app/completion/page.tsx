@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ViewTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import CompletionScreen from '@/components/CompletionScreen';
@@ -153,13 +152,11 @@ function CompletionPageContent() {
 
   if (isSessionValid === null) {
     return (
-      <ViewTransition>
-        <PageWrapper>
-          <ErrorBoundary>
-            <LoadingSpinner text={t('loading')} heading={t('loadingData')} />
-          </ErrorBoundary>
-        </PageWrapper>
-      </ViewTransition>
+      <PageWrapper>
+        <ErrorBoundary>
+          <LoadingSpinner text={t('loading')} heading={t('loadingData')} />
+        </ErrorBoundary>
+      </PageWrapper>
     );
   }
 
@@ -183,20 +180,18 @@ function CompletionPageContent() {
         </div>
       )}
     >
-      <ViewTransition>
-        <PageWrapper>
-          <ErrorBoundary>
-            <main className="app-page" role="main">
-              <CompletionScreen
-                service={selectedSituation}
-                ageTier={selectedAgeTier}
-                performance={performance}
-                conversationId={conversationId}
-              />
-            </main>
-          </ErrorBoundary>
-        </PageWrapper>
-      </ViewTransition>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <CompletionScreen
+              service={selectedSituation}
+              ageTier={selectedAgeTier}
+              performance={performance}
+              conversationId={conversationId}
+            />
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
     </QueryBoundary>
   );
 }
