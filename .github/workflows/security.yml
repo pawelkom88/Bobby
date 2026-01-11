@@ -3,19 +3,30 @@ name: Security
 on:
   push:
     branches:
-      - '**'
+      - "**"
   schedule:
     # Run daily at 6 AM UTC
-    - cron: '0 6 * * *'
+    - cron: "0 6 * * *"
 
+# ✅ Least-privilege baseline for ALL jobs
+# Note: when you define `permissions`, anything not listed becomes `none`
+# (except `metadata`, which is always read). :contentReference[oaicite:2]{index=2}
 permissions:
   contents: read
-  security-events: write
+
+concurrency:
+  # ✅ Prevent overlapping scheduled security runs
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   dependency-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest
+
+    # ✅ Only needs read access to repository contents
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -27,8 +38,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -40,6 +51,11 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
+
+    # ✅ CodeQL uploads results to code scanning, needs security-events: write :contentReference[oaicite:3]{index=3}
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout code
@@ -57,37 +73,51 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: '/language:javascript-typescript'
+          category: "/language:javascript-typescript"
 
   scheduled-zap-scan:
     name: Scheduled ZAP Full Scan
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
+    timeout-minutes: 60
+
+    # ✅ This is the important bit:
+    # ZAP action uploads artifacts -> requires Actions API write access.
+    permissions:
+      contents: read
+      security-events: write
+      actions: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.11.0
+        # ✅ Update to latest (v0.13.0 at time of writing)
+        # Also: artifact_name controls the artifact name ZAP attaches. :contentReference[oaicite:4]{index=4}
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
-          target: 'https://readywithbobby.online'
-          rules_file_name: '.zap/rules.tsv'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: "https://readywithbobby.online"
+          rules_file_name: ".zap/rules.tsv"
           allow_issue_writing: false
-          artifact_name: 'zap-full-sarif'
+          artifact_name: "zap-full-sarif-${{ github.run_id }}"
 
-      - name: Upload ZAP Full Report
-        uses: actions/upload-artifact@v4
+      # Optional: keep this if you want a separate, easy-to-find HTML artifact.
+      # (ZAP already uploads an artifact containing the reports too.)
+      - name: Upload ZAP Full Report (HTML)
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: zap-full-report
+          name: zap-full-report-${{ github.run_id }}
           path: report_html.html
           retention-days: 30
 
       - name: Upload SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        # ✅ SARIF upload needs `security-events: write`
         if: always()
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report_sarif.json
-          category: 'zap-full-scan'
+          category: "zap-full-scan"
         continue-on-error: true

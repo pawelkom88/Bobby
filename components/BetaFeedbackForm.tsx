@@ -10,6 +10,31 @@ import { BetaFeedbackSchema } from '@/lib/schemas/beta-feedback';
 import { logger } from '@/lib/logger';
 import styles from './BetaFeedbackForm.module.css';
 
+const DEFAULT_FORM_DATA: BetaFeedbackData = {
+  numberOfChildren: '',
+  priorPractice: '',
+  discoveryChannels: [],
+  childFeelingsBefore: '',
+  childFeelingsAfter: '',
+  easeOfUnderstanding: 3,
+  discomfortLevel: '',
+  discomfortDetails: '',
+  usefulness: '',
+  confidenceChange: '',
+  desiredScenarios: [],
+  desiredScenariosOther: '',
+  starterPriceFeedback: '',
+  heroPriceFeedback: '',
+  preferredPricingModel: '',
+  npsScore: 5,
+  recommendReason: '',
+  interests: [],
+  improveFirst: '',
+  contactMethod: '',
+  contactEmail: '',
+  contactPhone: '',
+};
+
 interface BetaFeedbackData {
   // Section 1: Segmentation
   numberOfChildren: string;
@@ -55,34 +80,10 @@ export default function BetaFeedbackForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  const [formData, setFormData] = useState<BetaFeedbackData>({
-    numberOfChildren: '',
-    priorPractice: '',
-    discoveryChannels: [],
-    childFeelingsBefore: '',
-    childFeelingsAfter: '',
-    easeOfUnderstanding: 3,
-    discomfortLevel: '',
-    discomfortDetails: '',
-    usefulness: '',
-    confidenceChange: '',
-    desiredScenarios: [],
-    desiredScenariosOther: '',
-    starterPriceFeedback: '',
-    heroPriceFeedback: '',
-    preferredPricingModel: '',
-    npsScore: 5,
-    recommendReason: '',
-    interests: [],
-    improveFirst: '',
-    contactMethod: '',
-    contactEmail: '',
-    contactPhone: '',
-  });
-
+  const [formData, setFormData] = useState<BetaFeedbackData>(DEFAULT_FORM_DATA);
   const conversationId = searchParams.get('conversationId');
 
+  // todo Paw: refactor naming
   const handleInputChange = (field: keyof BetaFeedbackData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (fieldErrors[field as string]) {
@@ -357,7 +358,10 @@ export default function BetaFeedbackForm() {
 
         <section className={styles['beta-feedback-section']}>
           <div className={styles['beta-feedback-card']}>
-            <form onSubmit={handleSubmit} className={styles['beta-feedback-form']}>
+            <form
+              onSubmit={handleSubmit}
+              className={styles['beta-feedback-form']}
+            >
               {/* Section 1: Segmentation */}
               <section className={styles['beta-feedback-section']}>
                 <h2 className={styles['beta-feedback-section-title']}>
@@ -393,7 +397,10 @@ export default function BetaFeedbackForm() {
                           value={count}
                           checked={formData.numberOfChildren === count}
                           onChange={e =>
-                            handleInputChange('numberOfChildren', e.target.value)
+                            handleInputChange(
+                              'numberOfChildren',
+                              e.target.value
+                            )
                           }
                         />
                         <span>{t(`section1.numberOfChildren.${count}`)}</span>
@@ -423,27 +430,31 @@ export default function BetaFeedbackForm() {
                     role="radiogroup"
                     aria-labelledby="priorPractice-label"
                   >
-                    {['school', 'home', 'appOrVideo', 'firstTime', 'notSure'].map(
-                      practice => (
-                        <label
-                          key={practice}
-                          className={styles['beta-feedback-radio-label']}
-                          htmlFor={`priorPractice-${practice}`}
-                        >
-                          <input
-                            type="radio"
-                            id={`priorPractice-${practice}`}
-                            name="priorPractice"
-                            value={practice}
-                            checked={formData.priorPractice === practice}
-                            onChange={e =>
-                              handleInputChange('priorPractice', e.target.value)
-                            }
-                          />
-                          <span>{t(`section1.priorPractice.${practice}`)}</span>
-                        </label>
-                      )
-                    )}
+                    {[
+                      'school',
+                      'home',
+                      'appOrVideo',
+                      'firstTime',
+                      'notSure',
+                    ].map(practice => (
+                      <label
+                        key={practice}
+                        className={styles['beta-feedback-radio-label']}
+                        htmlFor={`priorPractice-${practice}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`priorPractice-${practice}`}
+                          name="priorPractice"
+                          value={practice}
+                          checked={formData.priorPractice === practice}
+                          onChange={e =>
+                            handleInputChange('priorPractice', e.target.value)
+                          }
+                        />
+                        <span>{t(`section1.priorPractice.${practice}`)}</span>
+                      </label>
+                    ))}
                   </div>
                   {fieldErrors.priorPractice && (
                     <span className={styles['beta-feedback-error']}>
@@ -490,7 +501,9 @@ export default function BetaFeedbackForm() {
                             handleCheckboxToggle('discoveryChannels', channel)
                           }
                         />
-                        <span>{t(`section1.discoveryChannels.${channel}`)}</span>
+                        <span>
+                          {t(`section1.discoveryChannels.${channel}`)}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -524,30 +537,34 @@ export default function BetaFeedbackForm() {
                     role="radiogroup"
                     aria-labelledby="feelingsBefore-label"
                   >
-                    {['excited', 'aBitNervous', 'reluctant', 'anxious', 'neutral'].map(
-                      feeling => (
-                        <label
-                          key={feeling}
-                          className={styles['beta-feedback-radio-label']}
-                          htmlFor={`feelingsBefore-${feeling}`}
-                        >
-                          <input
-                            type="radio"
-                            id={`feelingsBefore-${feeling}`}
-                            name="childFeelingsBefore"
-                            value={feeling}
-                            checked={formData.childFeelingsBefore === feeling}
-                            onChange={e =>
-                              handleInputChange(
-                                'childFeelingsBefore',
-                                e.target.value
-                              )
-                            }
-                          />
-                          <span>{t(`section2.feelingsBefore.${feeling}`)}</span>
-                        </label>
-                      )
-                    )}
+                    {[
+                      'excited',
+                      'aBitNervous',
+                      'reluctant',
+                      'anxious',
+                      'neutral',
+                    ].map(feeling => (
+                      <label
+                        key={feeling}
+                        className={styles['beta-feedback-radio-label']}
+                        htmlFor={`feelingsBefore-${feeling}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`feelingsBefore-${feeling}`}
+                          name="childFeelingsBefore"
+                          value={feeling}
+                          checked={formData.childFeelingsBefore === feeling}
+                          onChange={e =>
+                            handleInputChange(
+                              'childFeelingsBefore',
+                              e.target.value
+                            )
+                          }
+                        />
+                        <span>{t(`section2.feelingsBefore.${feeling}`)}</span>
+                      </label>
+                    ))}
                   </div>
                   {fieldErrors.childFeelingsBefore && (
                     <span className={styles['beta-feedback-error']}>
@@ -591,7 +608,10 @@ export default function BetaFeedbackForm() {
                           value={feeling}
                           checked={formData.childFeelingsAfter === feeling}
                           onChange={e =>
-                            handleInputChange('childFeelingsAfter', e.target.value)
+                            handleInputChange(
+                              'childFeelingsAfter',
+                              e.target.value
+                            )
                           }
                         />
                         <span>{t(`section2.feelingsAfter.${feeling}`)}</span>
@@ -607,7 +627,10 @@ export default function BetaFeedbackForm() {
 
                 {/* Q6: Ease of understanding */}
                 <div className={styles['beta-feedback-field']}>
-                  <label className={styles['beta-feedback-label']} id="ease-label">
+                  <label
+                    className={styles['beta-feedback-label']}
+                    id="ease-label"
+                  >
                     {t('section2.ease.label')}
                   </label>
                   <div
@@ -812,7 +835,10 @@ export default function BetaFeedbackForm() {
                           value={level}
                           checked={formData.confidenceChange === level}
                           onChange={e =>
-                            handleInputChange('confidenceChange', e.target.value)
+                            handleInputChange(
+                              'confidenceChange',
+                              e.target.value
+                            )
                           }
                         />
                         <span>{t(`section3.confidenceChange.${level}`)}</span>
@@ -860,7 +886,9 @@ export default function BetaFeedbackForm() {
                             handleCheckboxToggle('desiredScenarios', scenario)
                           }
                         />
-                        <span>{t(`section3.desiredScenarios.${scenario}`)}</span>
+                        <span>
+                          {t(`section3.desiredScenarios.${scenario}`)}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -881,7 +909,10 @@ export default function BetaFeedbackForm() {
                       className={styles['beta-feedback-input']}
                       value={formData.desiredScenariosOther}
                       onChange={e =>
-                        handleInputChange('desiredScenariosOther', e.target.value)
+                        handleInputChange(
+                          'desiredScenariosOther',
+                          e.target.value
+                        )
                       }
                       placeholder={t('optional')}
                     />
@@ -985,7 +1016,10 @@ export default function BetaFeedbackForm() {
                           value={feedback}
                           checked={formData.heroPriceFeedback === feedback}
                           onChange={e =>
-                            handleInputChange('heroPriceFeedback', e.target.value)
+                            handleInputChange(
+                              'heroPriceFeedback',
+                              e.target.value
+                            )
                           }
                         />
                         <span>{t(`section4.heroPack.${feedback}`)}</span>
@@ -1061,7 +1095,10 @@ export default function BetaFeedbackForm() {
 
                 {/* Q13: NPS */}
                 <div className={styles['beta-feedback-field']}>
-                  <label className={styles['beta-feedback-label']} id="nps-label">
+                  <label
+                    className={styles['beta-feedback-label']}
+                    id="nps-label"
+                  >
                     {t('section5.nps.label')}
                   </label>
                   <div
@@ -1082,7 +1119,10 @@ export default function BetaFeedbackForm() {
                           value={num}
                           checked={formData.npsScore === num}
                           onChange={e =>
-                            handleInputChange('npsScore', parseInt(e.target.value))
+                            handleInputChange(
+                              'npsScore',
+                              parseInt(e.target.value)
+                            )
                           }
                         />
                         <span>{num}</span>

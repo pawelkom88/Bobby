@@ -30,7 +30,7 @@
   },
   "loading": {
     "heading": "Just a moment ...",
-    "default": "Bobby is getting ready to chat!",
+    "default": "Loading ...",
     "redirecting": "Redirecting to app...",
     "generic": "Loading ...",
     "completionData": "Loading completion data...",
@@ -1168,9 +1168,9 @@
     "retry": "Retry"
   },
   "loadingSpinner": {
-    "defaultText": "Bobby is getting ready to chat!",
+    "defaultText": "Loading ...",
     "defaultHeading": "Just a moment ...",
-    "alt": "Bobby is getting ready to chat"
+    "alt": "Loading ..."
   },
   "app": {
     "welcomeTitle": "Hello, Hero!",
