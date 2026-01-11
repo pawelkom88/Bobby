@@ -115,6 +115,35 @@
   margin-bottom: 25px;
 }
 
+.password-strength {
+  margin-top: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 220px;
+}
+
+.password-strength-image {
+  display: block;
+  width: 160px;
+  height: 170px;
+  max-width: 100%;
+  margin: 0 auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.password-strength-quote {
+  margin: 8px 0 0;
+  color: #4a4a5e;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.4;
+  min-height: 2.8em;
+}
+
 .login-input-container {
   display: flex;
   align-items: center;

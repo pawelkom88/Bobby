@@ -63,6 +63,18 @@
       "confirmPasswordLabel": "Confirm Password",
       "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*(),.?\":()|<>)",
       "passwordStrength": "Password strength",
+      "strength": {
+        "weak": "weak",
+        "fair": "fair",
+        "good": "good",
+        "strong": "strong"
+      },
+      "passwordStrengthQuotes": {
+        "weak": "Bobby says: 'Every hero starts somewhere. Add a number and a symbol!'",
+        "fair": "Bobby says: 'Nice! One more twist and you will level up.'",
+        "good": "Bobby says: 'That is a sturdy shield. Want to make it legendary?'",
+        "strong": "Bobby says: 'Boom! That password is a fortress.'"
+      },
       "termsAgreementPrefix": "I agree to the",
       "termsAgreementTerms": "Terms & Conditions",
       "termsAgreementConnector": "and acknowledge the",
@@ -864,6 +876,12 @@
       "fair": "fair",
       "good": "good",
       "strong": "strong"
+    },
+    "passwordStrengthQuotes": {
+      "weak": "Bobby says: 'Every hero starts somewhere. Add a number and a symbol!'",
+      "fair": "Bobby says: 'Nice! One more twist and you will level up.'",
+      "good": "Bobby says: 'That is a sturdy shield. Want to make it legendary?'",
+      "strong": "Bobby says: 'Boom! That password is a fortress.'"
     },
     "success": {
       "title": "Password Reset Successful!",

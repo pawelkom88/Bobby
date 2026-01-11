@@ -63,6 +63,18 @@
       "confirmPasswordLabel": "Potwierdź hasło",
       "passwordRequirements": "Hasło musi mieć co najmniej 8 znaków, zawierać wielką i małą literę, cyfrę oraz znak specjalny (!@#$%^&*(),.?\":()|<>)",
       "passwordStrength": "Siła hasła",
+      "strength": {
+        "weak": "słabe",
+        "fair": "akceptowalne",
+        "good": "dobre",
+        "strong": "silne"
+      },
+      "passwordStrengthQuotes": {
+        "weak": "Bobby mówi: 'Każdy bohater gdzieś zaczyna. Dodaj cyfrę i znak!'",
+        "fair": "Bobby mówi: 'Jest nieźle! Jeden zwrot akcji i level wyżej.'",
+        "good": "Bobby mówi: 'To już solidna tarcza. Zrobimy z niej legendę?'",
+        "strong": "Bobby mówi: 'Boom! To hasło to prawdziwa forteca.'"
+      },
       "termsAgreementPrefix": "Zgadzam się z",
       "termsAgreementTerms": "Regulaminem",
       "termsAgreementConnector": "i potwierdzam zapoznanie się z",
@@ -858,6 +870,12 @@
       "fair": "akceptowalne",
       "good": "dobre",
       "strong": "silne"
+    },
+    "passwordStrengthQuotes": {
+      "weak": "Bobby mówi: 'Każdy bohater gdzieś zaczyna. Dodaj cyfrę i znak!'",
+      "fair": "Bobby mówi: 'Jest nieźle! Jeden zwrot akcji i level wyżej.'",
+      "good": "Bobby mówi: 'To już solidna tarcza. Zrobimy z niej legendę?'",
+      "strong": "Bobby mówi: 'Boom! To hasło to prawdziwa forteca.'"
     },
     "success": {
       "title": "Hasło Zresetowane Pomyślnie!",

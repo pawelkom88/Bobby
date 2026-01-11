@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, FormEvent, Suspense, useEffect } from 'react';
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -18,25 +19,59 @@ import AuthPageLayout, {
 import AuthInput from '@/components/AuthInput';
 import AuthPasswordInput from '@/components/AuthPasswordInput';
 
+const PASSWORD_STRENGTH_IMAGES = {
+  weak: {
+    src: '/password-strength-weak.webp',
+    width: 694,
+    height: 724,
+  },
+  fair: {
+    src: '/password-strength-medium.webp',
+    width: 628,
+    height: 668,
+  },
+  good: {
+    src: '/password-strength-medium.webp',
+    width: 628,
+    height: 668,
+  },
+  strong: {
+    src: '/password-strength-good.webp',
+    width: 588,
+    height: 494,
+  },
+} as const;
+
 function PasswordStrengthIndicator({
   strength,
-  label,
 }: {
   strength: 'weak' | 'fair' | 'good' | 'strong' | null;
-  label: string;
 }) {
+  const t = useTranslations('auth');
   if (!strength) return null;
+
+  const strengthLabel = t(`signup.strength.${strength}`);
 
   return (
     <div
       className={`password-strength password-strength-${strength}`}
       aria-live="polite"
     >
-      <br />
-      {label}:{' '}
-      <strong style={{ color: strength === 'weak' ? 'red' : 'green' }}>
-        {strength}
-      </strong>
+      <span className="sr-only">
+        {t('signup.passwordStrength')}: {strengthLabel}
+      </span>
+      <Image
+        src={PASSWORD_STRENGTH_IMAGES[strength].src}
+        width={PASSWORD_STRENGTH_IMAGES[strength].width}
+        height={PASSWORD_STRENGTH_IMAGES[strength].height}
+        alt={`${t('signup.passwordStrength')}: ${strengthLabel}`}
+        className="password-strength-image"
+        loading="eager"
+        unoptimized
+      />
+      <p className="password-strength-quote">
+        {t(`signup.passwordStrengthQuotes.${strength}`)}
+      </p>
     </div>
   );
 }
@@ -240,10 +275,7 @@ function SignUpForm() {
           autoComplete="new-password"
           describedBy={errors.password ? undefined : 'password-requirements'}
         >
-          <PasswordStrengthIndicator
-            strength={passwordStrength}
-            label={t('signup.passwordStrength')}
-          />
+          <PasswordStrengthIndicator strength={passwordStrength} />
           <div id="password-requirements" className="sr-only">
             {t('signup.passwordRequirements')}
           </div>

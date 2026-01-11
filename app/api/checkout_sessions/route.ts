@@ -37,6 +37,29 @@ function toStripeLocale(locale: string) {
   return undefined;
 }
 
+const DEV_PRICE_METADATA = [
+  {
+    envVar: 'STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK',
+    locale: 'en',
+    packType: 'rookie',
+  },
+  {
+    envVar: 'STRIPE_BOBBY_PRICE_ID_HERO_PACK',
+    locale: 'en',
+    packType: 'hero',
+  },
+  {
+    envVar: 'STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN',
+    locale: 'pl',
+    packType: 'rookie',
+  },
+  {
+    envVar: 'STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN',
+    locale: 'pl',
+    packType: 'hero',
+  },
+];
+
 function getCreditPacks(locale: string) {
   const currency = getCurrencyConfig(locale);
 
@@ -45,12 +68,10 @@ function getCreditPacks(locale: string) {
     return {
       rookie: {
         priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN!,
-        credits: 1,
         name: 'Pakiet Początkujący',
       },
       hero: {
         priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN!,
-        credits: 2,
         name: 'Paket Bohater',
       },
     };
@@ -60,12 +81,10 @@ function getCreditPacks(locale: string) {
   return {
     rookie: {
       priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK!,
-      credits: 1,
       name: 'Rookie Pack',
     },
     hero: {
       priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK!,
-      credits: 2,
       name: 'Hero Pack',
     },
   };
@@ -81,6 +100,89 @@ function isValidPackType(
 
 type PackType = 'rookie' | 'hero';
 
+let devCreditsValidation: Promise<void> | null = null;
+
+async function validateCreditsMetadataOnce() {
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  if (!devCreditsValidation) {
+    devCreditsValidation = (async () => {
+      await Promise.all(
+        DEV_PRICE_METADATA.map(async entry => {
+          const priceId = process.env[entry.envVar];
+
+          if (!priceId) {
+            logger.warn('Missing Stripe price env var for credits validation', {
+              ...entry,
+            });
+            return;
+          }
+
+          try {
+            const price = await stripe.prices.retrieve(priceId, {
+              expand: ['product'],
+            });
+            const priceCredits = price.metadata?.credits;
+            const productCredits =
+              typeof price.product === 'string'
+                ? undefined
+                : price.product.metadata?.credits;
+            const creditsStr = priceCredits ?? productCredits ?? '';
+            const credits = parseInt(creditsStr, 10);
+
+            if (!creditsStr || Number.isNaN(credits) || credits <= 0) {
+              logger.warn(
+                'Missing or invalid credits metadata on Stripe price',
+                {
+                  ...entry,
+                  priceId,
+                  priceCredits,
+                  productCredits,
+                }
+              );
+            }
+          } catch (error) {
+            logger.warn('Failed to validate Stripe price metadata', {
+              ...entry,
+              priceId,
+              error:
+                error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
+        })
+      );
+    })();
+  }
+
+  await devCreditsValidation;
+}
+
+async function getCreditsForPrice(priceId: string) {
+  const price = await stripe.prices.retrieve(priceId, {
+    expand: ['product'],
+  });
+  const priceCredits = price.metadata?.credits;
+  const productCredits =
+    typeof price.product === 'string'
+      ? undefined
+      : price.product.metadata?.credits;
+  const creditsStr = priceCredits ?? productCredits ?? '';
+  const credits = parseInt(creditsStr, 10);
+
+  if (!creditsStr || Number.isNaN(credits) || credits <= 0) {
+    logger.error('Missing or invalid credits metadata for price', {
+      priceId,
+      priceCredits,
+      productCredits,
+    });
+    throw new Error('Missing or invalid credits metadata for price');
+  }
+
+  return credits;
+}
+
 export async function POST(request: NextRequest) {
   const localeParam = request.nextUrl.searchParams.get('locale') || 'en';
   const stripeLocale = toStripeLocale(localeParam);
@@ -89,6 +191,9 @@ export async function POST(request: NextRequest) {
   const packType = request.nextUrl.searchParams.get('packType');
 
   try {
+    // Dev-only preflight to catch missing Stripe credits metadata early.
+    await validateCreditsMetadataOnce();
+
     const idToken = extractAndValidateToken(request, 'checkout_sessions');
 
     if (!idToken) {
@@ -131,6 +236,7 @@ export async function POST(request: NextRequest) {
     // 5. Get pack configuration from server-side config (NEVER trust client)
     const CREDIT_PACKS = getCreditPacks(localeParam);
     const pack = CREDIT_PACKS[packType];
+    const credits = await getCreditsForPrice(pack.priceId);
 
     // 6. Get origin for redirect URLs (use forwarded headers for Netlify/proxies)
     const headersList = await headers();
@@ -158,11 +264,11 @@ export async function POST(request: NextRequest) {
       invoice_creation: {
         enabled: true,
         invoice_data: {
-          description: `${localizedText.descriptionPrefix} ${pack.name} - ${pack.credits} Credit${pack.credits > 1 ? 's' : ''}`,
+          description: `${localizedText.descriptionPrefix} ${pack.name} - ${credits} Credit${credits > 1 ? 's' : ''}`,
           metadata: {
             userId,
             packType,
-            credits: pack.credits.toString(),
+            credits: credits.toString(),
             platform: 'bobby-app',
             locale: localeParam,
           },
@@ -178,7 +284,7 @@ export async function POST(request: NextRequest) {
             },
             {
               name: localizedText.creditsPurchased,
-              value: `${pack.credits} Credit${pack.credits > 1 ? 's' : ''}`,
+              value: `${credits} Credit${credits > 1 ? 's' : ''}`,
             },
           ],
         },
@@ -190,7 +296,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         userId,
         packType,
-        credits: pack.credits.toString(),
+        credits: credits.toString(),
       },
       // Session expires in 30 minutes
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,

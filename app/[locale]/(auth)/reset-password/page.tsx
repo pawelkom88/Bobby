@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
   getAuth,
@@ -20,6 +21,29 @@ import AuthPageLayout, {
 } from '@/components/AuthPageLayout';
 import AuthPasswordInput from '@/components/AuthPasswordInput';
 
+const PASSWORD_STRENGTH_IMAGES = {
+  weak: {
+    src: '/password-strength-weak.webp',
+    width: 694,
+    height: 724,
+  },
+  fair: {
+    src: '/password-strength-medium.webp',
+    width: 628,
+    height: 668,
+  },
+  good: {
+    src: '/password-strength-medium.webp',
+    width: 628,
+    height: 668,
+  },
+  strong: {
+    src: '/password-strength-good.webp',
+    width: 588,
+    height: 494,
+  },
+} as const;
+
 function PasswordStrengthIndicator({
   strength,
 }: {
@@ -28,16 +52,28 @@ function PasswordStrengthIndicator({
   const t = useTranslations('resetPassword');
   if (!strength) return null;
 
+  const strengthLabel = t(`strength.${strength}`);
+
   return (
     <div
       className={`password-strength password-strength-${strength}`}
       aria-live="polite"
     >
-      <br />
-      {t('passwordStrength')}:{' '}
-      <strong style={{ color: strength === 'weak' ? 'red' : 'green' }}>
-        {t(`strength.${strength}`)}
-      </strong>
+      <span className="sr-only">
+        {t('passwordStrength')}: {strengthLabel}
+      </span>
+      <Image
+        src={PASSWORD_STRENGTH_IMAGES[strength].src}
+        width={PASSWORD_STRENGTH_IMAGES[strength].width}
+        height={PASSWORD_STRENGTH_IMAGES[strength].height}
+        alt={`${t('passwordStrength')}: ${strengthLabel}`}
+        className="password-strength-image"
+        loading="eager"
+        unoptimized
+      />
+      <p className="password-strength-quote">
+        {t(`passwordStrengthQuotes.${strength}`)}
+      </p>
     </div>
   );
 }
