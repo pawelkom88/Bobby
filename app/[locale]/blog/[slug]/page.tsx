@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getArticleBySlug, blogArticles } from '../blog-data';
 import { articleContentMap } from '../article-content';
 import styles from '../Blog.module.css';
+import { ViewTransition } from 'react';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -57,7 +58,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <br />
         <br />
         <header className={styles.articleHeader}>
-          <h1 className={styles.articleTitle}>{article.title}</h1>
+          <ViewTransition name={article.title}>
+            <h1 className={styles.articleTitle}>{article.title}</h1>
+          </ViewTransition>
           <div className={styles.articleMeta}>
             <span>
               Published on{' '}
@@ -71,14 +74,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
-        <Image
-          src={article.image}
-          alt={article.title}
-          width={800}
-          height={400}
-          className={styles.articleImage}
-          priority
-        />
+        <ViewTransition name={article.slug}>
+          <Image
+            src={article.image}
+            alt={article.title}
+            width={800}
+            height={400}
+            className={styles.articleImage}
+            priority
+          />
+        </ViewTransition>
 
         <div className={styles.articleContent}>
           {articleContent ?? (

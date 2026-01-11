@@ -205,7 +205,9 @@
 
 .articleImage {
   width: 100%;
-  height: 500px;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  min-height: 320px;
   object-fit: cover;
   border-radius: 20px;
   margin-bottom: 32px;
