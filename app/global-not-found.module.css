@@ -73,12 +73,6 @@ body {
     font-size: 1rem;
 }
 
-.cartoonBtn:active {
-    top: 0.25rem;
-    box-shadow: calc(var(--direction) * 0.1rem) 0.2rem 0rem 0.05rem
-    var(--btn-text-color);
-}
-
 .cartoonBtn::after {
     content: '';
     position: absolute;

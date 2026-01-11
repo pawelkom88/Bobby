@@ -21,7 +21,7 @@ export default function NotFound() {
         />
       </div>
       <Link className={styles.cartoonBtn} href={ROUTES.HOME}>
-        <span> Go home</span>
+        <span>Go home</span>
       </Link>
     </div>
   );
