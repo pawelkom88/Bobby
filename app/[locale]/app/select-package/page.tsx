@@ -23,6 +23,10 @@ import {
   getDialStoryContext,
   clearDialStoryContext,
 } from '@/lib/dialStoryContext';
+import {
+  getStorySummaryFromJourney,
+  hasStorySelection,
+} from '@/utils/select-package';
 
 function SelectPackagePageContent() {
   const t = useTranslations('selectPackage');
@@ -47,7 +51,7 @@ function SelectPackagePageContent() {
   const journeyState = getJourneyState();
   const router = useRouter();
 
-  const storyContext = needsCredits ? getDialStoryContext() : null;
+  const storedStoryContext = needsCredits ? getDialStoryContext() : null;
 
   useEffect(() => {
     if (isServerConfirmed && hasCredits) {
@@ -73,31 +77,17 @@ function SelectPackagePageContent() {
     }
   }, [needsCredits]);
 
-  // todo Paw: refactor to simpler code and extract to func and test
-  const fallbackStory =
-    journeyState &&
-    (journeyState.selectedAgeTier || journeyState.selectedService)
-      ? {
-          ageTier: journeyState.selectedAgeTier,
-          service: journeyState.selectedService,
-        }
-      : null;
-
-  const storyForDisplay = storyContext ?? fallbackStory;
-
-  // todo Paw: refactor to simpler code and extract to func and test
+  const journeyStoryContext = getStorySummaryFromJourney(journeyState);
+  const storySummary = storedStoryContext ?? journeyStoryContext;
   const shouldShowStorySummary =
-    needsCredits &&
-    !!storyForDisplay &&
-    (storyForDisplay.ageTier !== undefined ||
-      storyForDisplay.service !== undefined);
+    needsCredits && hasStorySelection(storySummary);
 
-  const ageLabel = storyForDisplay?.ageTier
-    ? tAge(`ages.tier${storyForDisplay.ageTier}`)
+  const ageLabel = storySummary?.ageTier
+    ? tAge(`ages.tier${storySummary.ageTier}`)
     : null;
 
-  const scenarioLabel = storyForDisplay?.service
-    ? tEmergency(`services.${storyForDisplay.service}`)
+  const scenarioLabel = storySummary?.service
+    ? tEmergency(`services.${storySummary.service}`)
     : null;
 
   const handleChangeStory = () => {
@@ -116,7 +106,6 @@ function SelectPackagePageContent() {
     try {
       const idToken = await user.getIdToken(true);
 
-      // Use query param for packType - Netlify strips POST bodies
       const response = await fetch(
         `/api/checkout_sessions?locale=${locale}&packType=${packType}`,
         {

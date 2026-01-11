@@ -66,9 +66,10 @@ export default function CartoonDialPad({
   buttonLabel = 'CALL',
 }: CartoonDialPadProps) {
   const t = useTranslations('dial');
-  // Use locale-specific emergency number if no targetNumber provided
+  // todo Paw: teribly much state
   const emergencyNumber = targetNumber || t('emergencyNumber');
   const [input, setInput] = useState('');
+  // do nto need boolean when can derive state from errorMessage ?
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isWrongNumber, setIsWrongNumber] = useState(false);
@@ -120,6 +121,7 @@ export default function CartoonDialPad({
     }
   };
 
+  // todo Paw: what is the point of this useEffect ?
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress as EventListener);
     return () => {
@@ -138,7 +140,9 @@ export default function CartoonDialPad({
 
       <div>
         {/* Heading */}
-        <h1 className="dial-heading">{t('title', { number: emergencyNumber })}</h1>
+        <h1 className="dial-heading">
+          {t('title', { number: emergencyNumber })}
+        </h1>
 
         {/* Number display */}
         <div
@@ -156,7 +160,9 @@ export default function CartoonDialPad({
                 key={key}
                 onClick={() => handleNumberClick(key)}
                 className={`dial-key ${key === '*' || key === '#' ? 'dial-key-symbol' : ''}`}
-                aria-label={key === '*' ? 'Star' : key === '#' ? 'Hash' : `Number ${key}`}
+                aria-label={
+                  key === '*' ? 'Star' : key === '#' ? 'Hash' : `Number ${key}`
+                }
               >
                 {key}
               </button>
