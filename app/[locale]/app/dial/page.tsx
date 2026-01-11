@@ -30,6 +30,7 @@ import {
   hasParentGateAcknowledgement,
   setParentGateAcknowledgement,
 } from '@/lib/parent-gate';
+import { getDialButtonLabelKey, getStableUserId } from '@/utils/dial';
 
 type UiState = {
   checkout: 'idle' | 'redirecting';
@@ -37,21 +38,6 @@ type UiState = {
   error: string | null;
   showParentGate: boolean;
 };
-
-// todo Paw: extrac and add tests
-function getDialButtonLabelKey(args: {
-  hasCredits: boolean;
-  isBusy: boolean;
-}): 'buttons.call' | 'buttons.loading' | 'buttons.buyAndCall' {
-  if (args.isBusy) return 'buttons.loading';
-  return args.hasCredits ? 'buttons.call' : 'buttons.buyAndCall';
-}
-
-function getStableUserId(user: any): string | null {
-  return (
-    user?.id ?? user?.uid ?? user?.userId ?? user?.sub ?? user?.email ?? null
-  );
-}
 
 function DialPageContent() {
   const router = useRouter();

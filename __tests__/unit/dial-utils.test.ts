@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDialButtonLabelKey } from '../../lib/dial-ui';
+import { getDialButtonLabelKey, getStableUserId } from '../../utils/dial';
 
 describe('getDialButtonLabelKey', () => {
   it('returns loading when busy regardless of credits', () => {
@@ -21,5 +21,21 @@ describe('getDialButtonLabelKey', () => {
     expect(getDialButtonLabelKey({ hasCredits: false, isBusy: false })).toBe(
       'buttons.buyAndCall'
     );
+  });
+});
+
+describe('getStableUserId', () => {
+  it('returns null for non-objects', () => {
+    expect(getStableUserId(null)).toBeNull();
+    expect(getStableUserId(undefined)).toBeNull();
+    expect(getStableUserId('user')).toBeNull();
+  });
+
+  it('returns the first matching id field', () => {
+    expect(getStableUserId({ id: 'a', uid: 'b' })).toBe('a');
+    expect(getStableUserId({ uid: 'b', userId: 'c' })).toBe('b');
+    expect(getStableUserId({ userId: 'c', sub: 'd' })).toBe('c');
+    expect(getStableUserId({ sub: 'd', email: 'e' })).toBe('d');
+    expect(getStableUserId({ email: 'e' })).toBe('e');
   });
 });
