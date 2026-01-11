@@ -130,7 +130,7 @@ function ConversationPageContent() {
 
       const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // todo Paw: refactor to simpler code and extract to func and test
+      // : refactor to simpler code and extract to func and test
       const stored = await setAssessment.mutateAsync({
         assessment: {
           assessment: {

@@ -18,32 +18,10 @@ import { persistDialStoryContext } from '@/lib/dialStoryContext';
 import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { logger } from '@/lib/logger';
-
-const PARENT_GATE_SESSION_KEY = 'bobby_parent_gate_ack';
-
-const getParentGateDateKey = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const hasParentGateAcknowledgement = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return (
-    window.sessionStorage.getItem(PARENT_GATE_SESSION_KEY) ===
-    getParentGateDateKey()
-  );
-};
-
-const setParentGateAcknowledgement = (): void => {
-  if (typeof window === 'undefined') return;
-  window.sessionStorage.setItem(
-    PARENT_GATE_SESSION_KEY,
-    getParentGateDateKey()
-  );
-};
+import {
+  hasParentGateAcknowledgement,
+  setParentGateAcknowledgement,
+} from '@/lib/parent-gate';
 
 function DialPageContent() {
   const router = useRouter();
@@ -61,7 +39,7 @@ function DialPageContent() {
   const searchParams = useSearchParams();
   const { getJourneyState } = useUserData();
   const journeyState = getJourneyState();
-  // todo Paw Paw: too much state / maybe use transition instead of checkout loading ? and boolean crap
+  // todo Paw Paw: too much state / maybe use transition instead of checkout loading ? and boolean crap / derive ? / one state with object and string like : { loading: "idle" / "processing" / "error" / "success"}
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -70,7 +48,6 @@ function DialPageContent() {
   const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
   const [showParentGate, setShowParentGate] = useState(false);
 
-  // Clear session data before starting conversation
   useSessionClear();
 
   logger.log('DialPageContent: Component rendered/updated', {
@@ -82,7 +59,6 @@ function DialPageContent() {
     user: !!user,
   });
 
-  // Check for query parameters
   const canceled = searchParams.get('canceled') === 'true';
   const needsCredits = searchParams.get('needsCredits') === 'true';
   const fromSuccess = searchParams.get('fromSuccess') === 'true';
@@ -96,6 +72,7 @@ function DialPageContent() {
   useEffect(() => {
     const refreshCreditsAfterPayment = async () => {
       if (fromSuccess && user && !hasRefreshedRef.current) {
+        // todo Paw: why we use both ref and state ?
         hasRefreshedRef.current = true;
         setIsRefreshingFromPayment(true);
         logger.log(
@@ -139,6 +116,7 @@ function DialPageContent() {
         creditsLoading,
       }
     );
+
     if (needsCredits && hasCredits && !creditsLoading) {
       logger.log('DialPageContent: Cleaning up needsCredits param from URL');
       const url = new URL(window.location.href);
@@ -178,7 +156,7 @@ function DialPageContent() {
     // Double-check: fetch credits directly to avoid stale state
     logger.log('Final verification: hasCredits =', hasCredits);
 
-    // todo Paw: should this be first thing in this function ? early return
+    // todo Paw: should this be first thing in this function ? early return should be first and used more often - morgan's law ?
     if (!hasCredits) {
       logger.log(
         'No credits available after verification, staying on dial page'
@@ -207,6 +185,7 @@ function DialPageContent() {
     setCheckoutError(null);
 
     const storyContext = journeyState;
+
     if (storyContext?.selectedAgeTier || storyContext?.selectedService) {
       persistDialStoryContext({
         ageTier: storyContext.selectedAgeTier,
