@@ -146,7 +146,6 @@ export default function HomePage() {
                               sizes="64px"
                               className={styles.landingTrustStripIconImage}
                               aria-hidden="true"
-                              fetchPriority="high"
                               preload
                             />
                           </span>
@@ -177,7 +176,6 @@ export default function HomePage() {
                   alt="Hero Image - smiling Bobby"
                   sizes="(max-width: 768px) 100vw, 392px"
                   preload
-                  fetchPriority="high"
                   className={styles.heroImage}
                 />
               </div>

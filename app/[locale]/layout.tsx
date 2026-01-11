@@ -113,6 +113,24 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="preconnect" href="https://www.google.com" />
         <link rel="dns-prefetch" href="https://www.gstatic.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link
+          rel="preload"
+          as="audio"
+          href="/sfx/bttf-dial-1.mp3"
+          type="audio/mpeg"
+        />
+        <link
+          rel="preload"
+          as="audio"
+          href="/sfx/bttf-dial-2.mp3"
+          type="audio/mpeg"
+        />
+        <link
+          rel="preload"
+          as="audio"
+          href="/sfx/bttf-dial-3.mp3"
+          type="audio/mpeg"
+        />
         {nonce ? (
           <script
             id="structured-data"
