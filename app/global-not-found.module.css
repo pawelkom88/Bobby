@@ -1,0 +1,126 @@
+
+/* ============================================================================
+   NOT FOUND PAGE STYLES
+   ============================================================================ */
+
+:root {
+    --direction: 1;
+    --btn-color: #fccb39;
+    --btn-border-color: #eb6934;
+    --btn-text-color: #9a431f;
+    --btn-light-color: #ffda66;
+    --font-luckiest-guy: 'Luckiest Guy', cursive;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.planetContainer {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(
+            to bottom,
+            #a8d5e2 0%,
+            #b8dce8 30%,
+            #d4e5f0 50%,
+            #e8d8e8 70%,
+            #c5b8d8 100%
+    );
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.planet {
+    position: absolute;
+    width: 80%;
+    height: 75%;
+    top: 10%;
+    left: 10%;
+}
+
+
+.planetImage {
+    width: 60%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    object-fit: cover;
+}
+
+.cartoonBtn {
+    border: 0.25rem solid var(--btn-border-color);
+    padding: 0.5rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: calc(var(--direction) * 0.1rem) 0.5rem 0 0.05rem var(--btn-text-color);
+    background-color: var(--btn-color);
+    text-decoration: none;
+    color: var(--btn-text-color);
+    font-family: var(--font-luckiest-guy), system-ui;
+    outline: 0;
+    position: relative;
+    overflow: hidden;
+    transition: all ease 0.15s;
+    top: 20%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.cartoonBtn:active {
+    top: 0.25rem;
+    box-shadow: calc(var(--direction) * 0.1rem) 0.2rem 0rem 0.05rem
+    var(--btn-text-color);
+}
+
+.cartoonBtn::after {
+    content: '';
+    position: absolute;
+    height: 80%;
+    width: 99%;
+    background-color: var(--btn-light-color);
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 1;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+}
+
+.cartoonBtn:focus {
+    outline: 0;
+}
+
+.cartoonBtn span {
+    position: relative;
+    z-index: 2;
+    font-size: 2rem;
+}
+
+.cartoonBtn:focus-visible {
+    outline: 3px solid var(--btn-text-color);
+    outline-offset: 2px;
+}
+
+
+
+@media (max-width: 768px) {
+    .planet {
+        height: 15%;
+        top: 30%;
+    }
+    .planetImage {
+        width: 100%;
+    }
+
+    .cartoonBtn {
+        top: 10%;
+    }
+}

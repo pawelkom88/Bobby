@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizeCss: true,
+    globalNotFound: true,
   },
   // Optimize for modern browsers
   compiler: {
