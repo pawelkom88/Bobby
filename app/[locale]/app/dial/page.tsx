@@ -31,11 +31,6 @@ import {
   setParentGateAcknowledgement,
 } from '@/lib/parent-gate';
 
-/**
- * Key concept: replace many booleans with small "status enums"
- * - fewer invalid combinations
- * - easier to reason about
- */
 type UiState = {
   checkout: 'idle' | 'redirecting';
   refresh: 'idle' | 'refreshing';
@@ -43,19 +38,15 @@ type UiState = {
   showParentGate: boolean;
 };
 
+// todo Paw: extrac and add tests
 function getDialButtonLabelKey(args: {
   hasCredits: boolean;
   isBusy: boolean;
 }): 'buttons.call' | 'buttons.loading' | 'buttons.buyAndCall' {
-  // Key concept: keep this pure so it's easy to unit test.
   if (args.isBusy) return 'buttons.loading';
   return args.hasCredits ? 'buttons.call' : 'buttons.buyAndCall';
 }
 
-/**
- * Key concept: depend on a stable identifier rather than the whole user object
- * to prevent effects retriggering due to object identity changes.
- */
 function getStableUserId(user: any): string | null {
   return (
     user?.id ?? user?.uid ?? user?.userId ?? user?.sub ?? user?.email ?? null
@@ -101,23 +92,11 @@ function DialPageContent() {
   const needsCredits = searchParams.get('needsCredits') === 'true';
   const fromSuccess = searchParams.get('fromSuccess') === 'true';
 
-  /**
-   * Key concept: dedupe async refresh work with a promise ref.
-   * Prevents double refresh if:
-   * - effects re-run
-   * - user clicks mid-refresh
-   */
   const refreshPromiseRef = useRef<Promise<void> | null>(null);
-
-  /**
-   * Key concept: prevent infinite loops while the URL still contains fromSuccess=true
-   * (Next router.replace can lag behind state updates).
-   */
   const handledFromSuccessRef = useRef(false);
 
   const replaceSearchParams = useCallback(
     (mutate: (sp: URLSearchParams) => void) => {
-      // Client component, safe to use window
       const currentUrl = new URL(window.location.href);
       const nextUrl = new URL(window.location.href);
 
@@ -164,14 +143,6 @@ function DialPageContent() {
     return refreshPromiseRef.current;
   }, [forceRefreshCredits]);
 
-  /**
-   * Post-payment behaviour:
-   * - if URL has fromSuccess=true, refresh credits exactly once
-   * - then remove fromSuccess/needsCredits via router.replace (so useSearchParams updates)
-   *
-   * The handledFromSuccessRef guard is the critical part that prevents the infinite loop
-   * you’re seeing.
-   */
   useEffect(() => {
     if (!fromSuccess || !userId) return;
 
@@ -195,10 +166,6 @@ function DialPageContent() {
     if (!fromSuccess) handledFromSuccessRef.current = false;
   }, [fromSuccess]);
 
-  /**
-   * If needsCredits is present but we now have credits, clean it up.
-   * Uses router.replace so useSearchParams stays in sync.
-   */
   useEffect(() => {
     if (!needsCredits) return;
     if (creditsLoading) return;

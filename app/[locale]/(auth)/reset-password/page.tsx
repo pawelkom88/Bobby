@@ -18,7 +18,7 @@ import AuthPageLayout, {
   AuthPageHeader,
   AuthErrorMessage,
 } from '@/components/AuthPageLayout';
-import AuthInput from '@/components/AuthInput';
+import AuthPasswordInput from '@/components/AuthPasswordInput';
 
 function PasswordStrengthIndicator({
   strength,
@@ -58,8 +58,6 @@ function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const code = searchParams.get('oobCode');
@@ -235,41 +233,31 @@ function ResetPasswordForm() {
       </p>
 
       <form onSubmit={handleSubmit} noValidate>
-        <AuthInput
+        <AuthPasswordInput
           id="newPassword"
-          type="password"
           placeholder={t('newPasswordPlaceholder')}
           value={newPassword}
           onChange={handleNewPasswordChange}
           error={errors.newPassword}
           errorId="newPassword-error"
           label={t('newPasswordLabel')}
-          icon="lock"
           autoComplete="new-password"
           autoFocus
-          showPasswordToggle
-          showPassword={showPassword}
-          onTogglePassword={() => setShowPassword(!showPassword)}
         >
           <PasswordStrengthIndicator
             strength={newPassword ? passwordStrength : null}
           />
-        </AuthInput>
+        </AuthPasswordInput>
 
-        <AuthInput
+        <AuthPasswordInput
           id="confirmPassword"
-          type="password"
           placeholder={t('confirmPasswordPlaceholder')}
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
           error={errors.confirmPassword}
           errorId="confirmPassword-error"
           label={t('confirmPasswordLabel')}
-          icon="lock"
           autoComplete="new-password"
-          showPasswordToggle
-          showPassword={showConfirmPassword}
-          onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
         />
 
         <AuthErrorMessage error={errors.general} />

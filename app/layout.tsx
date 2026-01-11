@@ -9,7 +9,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${nunito.variable} ${luckiestGuy.variable} font-sans`}>
         {children}
       </body>

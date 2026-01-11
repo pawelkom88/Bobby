@@ -15,6 +15,7 @@ import AuthPageLayout, {
   AuthErrorMessage,
 } from '@/components/AuthPageLayout';
 import AuthInput from '@/components/AuthInput';
+import AuthPasswordInput from '@/components/AuthPasswordInput';
 
 function LoginForm() {
   const router = useRouter();
@@ -134,16 +135,14 @@ function LoginForm() {
           autoFocus
         />
 
-        <AuthInput
+        <AuthPasswordInput
           id="password"
-          type="password"
           placeholder={t('login.passwordPlaceholder')}
           value={password}
           onChange={handlePasswordChange}
           error={errors.password}
           errorId="password-error"
           label={t('login.passwordLabel')}
-          icon="lock"
           autoComplete="current-password"
         />
 

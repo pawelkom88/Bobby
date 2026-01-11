@@ -16,6 +16,7 @@ import AuthPageLayout, {
   AuthErrorMessage,
 } from '@/components/AuthPageLayout';
 import AuthInput from '@/components/AuthInput';
+import AuthPasswordInput from '@/components/AuthPasswordInput';
 
 function PasswordStrengthIndicator({
   strength,
@@ -228,16 +229,14 @@ function SignUpForm() {
           autoFocus
         />
 
-        <AuthInput
+        <AuthPasswordInput
           id="password"
-          type="password"
           placeholder={t('signup.passwordPlaceholder')}
           value={password}
           onChange={handlePasswordChange}
           error={errors.password}
           errorId="password-error"
           label={t('signup.passwordLabel')}
-          icon="lock"
           autoComplete="new-password"
           describedBy={errors.password ? undefined : 'password-requirements'}
         >
@@ -248,18 +247,16 @@ function SignUpForm() {
           <div id="password-requirements" className="sr-only">
             {t('signup.passwordRequirements')}
           </div>
-        </AuthInput>
+        </AuthPasswordInput>
 
-        <AuthInput
+        <AuthPasswordInput
           id="confirm-password"
-          type="password"
           placeholder={t('signup.confirmPasswordPlaceholder')}
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
           error={errors.confirmPassword}
           errorId="confirm-password-error"
           label={t('signup.confirmPasswordLabel')}
-          icon="lock"
           autoComplete="new-password"
         />
 
