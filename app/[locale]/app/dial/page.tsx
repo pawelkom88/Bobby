@@ -61,6 +61,7 @@ function DialPageContent() {
   const searchParams = useSearchParams();
   const { getJourneyState } = useUserData();
   const journeyState = getJourneyState();
+  // todo Paw Paw: too much state / maybe use transition instead of checkout loading ? and boolean crap
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -92,7 +93,6 @@ function DialPageContent() {
     fromSuccess,
   });
 
-  // Force refresh credits when returning from successful payment
   useEffect(() => {
     const refreshCreditsAfterPayment = async () => {
       if (fromSuccess && user && !hasRefreshedRef.current) {
@@ -121,15 +121,15 @@ function DialPageContent() {
     refreshCreditsAfterPayment();
   }, [fromSuccess, user, forceRefreshCredits]);
 
-  // Reset verification state when credits change
+  // todo Paw: do we need that ? is it only initialisation ?
   useEffect(() => {
     logger.log(
       'DialPageContent: useEffect - credits changed, resetting hasVerifiedCredits'
     );
+    // todo Paw: can we somehow derive this state ?
     setHasVerifiedCredits(false);
   }, [credits]);
 
-  // Clean up needsCredits param if user actually has credits
   useEffect(() => {
     logger.log(
       'DialPageContent: useEffect - checking if needsCredits param should be cleaned up',
@@ -178,7 +178,7 @@ function DialPageContent() {
     // Double-check: fetch credits directly to avoid stale state
     logger.log('Final verification: hasCredits =', hasCredits);
 
-    // CRITICAL: If we don't have credits, don't navigate
+    // todo Paw: should this be first thing in this function ? early return
     if (!hasCredits) {
       logger.log(
         'No credits available after verification, staying on dial page'
@@ -201,6 +201,7 @@ function DialPageContent() {
       return;
     }
 
+    // todo Paw: 3 states ? maybe one with and object ?
     setCheckoutLoading(true);
     setIsProcessingCheckout(true);
     setCheckoutError(null);
@@ -290,6 +291,7 @@ function DialPageContent() {
                 onBack={handleBack}
                 isLoading={checkoutLoading || isLoading}
                 buttonLabel={
+                  // todo Paw: refactor to simpler code and extract to func and test
                   hasCredits
                     ? t('buttons.call')
                     : isLoading

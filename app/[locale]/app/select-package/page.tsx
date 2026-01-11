@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { ViewTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
@@ -48,17 +47,14 @@ function SelectPackagePageContent() {
   const journeyState = getJourneyState();
   const router = useRouter();
 
-  // Derive storyContext during render - no need for useState + useEffect
   const storyContext = needsCredits ? getDialStoryContext() : null;
 
-  // Redirect when credits are CONFIRMED from server and user has credits
   useEffect(() => {
     if (isServerConfirmed && hasCredits) {
       window.location.href = ROUTES.DIAL;
     }
   }, [isServerConfirmed, hasCredits]);
 
-  // Clean up canceled parameter after 3 seconds
   useEffect(() => {
     if (!canceled) return;
 
@@ -71,13 +67,13 @@ function SelectPackagePageContent() {
     return () => clearTimeout(timeout);
   }, [canceled]);
 
-  // Clear story context from storage when needsCredits is false (side effect only)
   useEffect(() => {
     if (!needsCredits) {
       clearDialStoryContext();
     }
   }, [needsCredits]);
 
+  // todo Paw: refactor to simpler code and extract to func and test
   const fallbackStory =
     journeyState &&
     (journeyState.selectedAgeTier || journeyState.selectedService)
@@ -88,17 +84,22 @@ function SelectPackagePageContent() {
       : null;
 
   const storyForDisplay = storyContext ?? fallbackStory;
+
+  // todo Paw: refactor to simpler code and extract to func and test
   const shouldShowStorySummary =
     needsCredits &&
     !!storyForDisplay &&
-    (storyForDisplay.ageTier !== undefined || storyForDisplay.service !== undefined);
+    (storyForDisplay.ageTier !== undefined ||
+      storyForDisplay.service !== undefined);
 
   const ageLabel = storyForDisplay?.ageTier
     ? tAge(`ages.tier${storyForDisplay.ageTier}`)
     : null;
+
   const scenarioLabel = storyForDisplay?.service
     ? tEmergency(`services.${storyForDisplay.service}`)
     : null;
+
   const handleChangeStory = () => {
     router.push(ROUTES.YOUR_AGE);
   };
@@ -148,8 +149,6 @@ function SelectPackagePageContent() {
     window.location.href = ROUTES.CHOOSE_EMERGENCY;
   };
 
-  // KEY FIX: Don't render UI until we have SERVER-CONFIRMED credits state
-  // This prevents the flash of package selection UI
   if (authLoading || creditsLoading || !isServerConfirmed) {
     return <LoadingSpinner />;
   }
@@ -161,95 +160,92 @@ function SelectPackagePageContent() {
 
   return (
     <>
-      <ViewTransition>
-        <PageWrapper>
-          <ErrorBoundary>
-            <main className="app-page" role="main">
-              {/* Header */}
-              <div className="select-package-header">
-                <h1 className="select-package-title">{t('title')}</h1>
-                <p className="select-package-subtitle">{t('subtitle')}</p>
-              </div>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            {/* Header */}
+            <div className="select-package-header">
+              <h1 className="select-package-title">{t('title')}</h1>
+              <p className="select-package-subtitle">{t('subtitle')}</p>
+            </div>
 
-              {shouldShowStorySummary && (
-                <section
-                  className="select-package-story-summary"
-                  aria-live="polite"
-                >
-                  <p className="select-package-story-title">
-                    {t('storySummary.title')}
-                  </p>
-                  <div className="select-package-story-pills">
-                    {ageLabel && (
-                      <span className="select-package-story-pill">
-                        {t('storySummary.ageLabel')}: {ageLabel}
-                      </span>
-                    )}
-                    {scenarioLabel && (
-                      <span className="select-package-story-pill">
-                        {t('storySummary.scenarioLabel')}:{' '}
-                        {scenarioLabel}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    className="select-package-story-link"
-                    onClick={handleChangeStory}
-                  >
-                    {t('storySummary.changeSelection')}
-                  </button>
-                </section>
-              )}
-
-              <br />
-
-              {/* Canceled message */}
-              {canceled && (
-                <div
-                  className="select-package-message select-package-message-warning"
-                  role="alert"
-                >
-                  {t('messages.canceled')}
+            {shouldShowStorySummary && (
+              <section
+                className="select-package-story-summary"
+                aria-live="polite"
+              >
+                <p className="select-package-story-title">
+                  {t('storySummary.title')}
+                </p>
+                <div className="select-package-story-pills">
+                  {ageLabel && (
+                    <span className="select-package-story-pill">
+                      {t('storySummary.ageLabel')}: {ageLabel}
+                    </span>
+                  )}
+                  {scenarioLabel && (
+                    <span className="select-package-story-pill">
+                      {t('storySummary.scenarioLabel')}: {scenarioLabel}
+                    </span>
+                  )}
                 </div>
-              )}
-
-              {/* Error message */}
-              {checkoutError && (
-                <div
-                  className="select-package-message select-package-message-error"
-                  role="alert"
+                <button
+                  type="button"
+                  className="select-package-story-link"
+                  onClick={handleChangeStory}
                 >
-                  {checkoutError}
-                </div>
-              )}
+                  {t('storySummary.changeSelection')}
+                </button>
+              </section>
+            )}
 
-              {/* Package cards */}
-              <div className="select-package-cards-container">
-                {Object.values(DISPLAY_PACKAGES).map(pkg => (
-                  <PackCard
-                    key={pkg.id}
-                    pkg={pkg}
-                    handleSelectPackage={handleSelectPackage}
-                    checkoutLoading={checkoutLoading}
-                  />
-                ))}
-              </div>
+            <br />
 
-              <div className="select-package-back-button">
-                <CartoonButton
-                  containerClassName="select-package-back-button-container"
-                  onClick={handleBack}
-                  disabled={checkoutLoading}
-                >
-                  {tCommon('back')}
-                </CartoonButton>
+            {/* Canceled message */}
+            {canceled && (
+              <div
+                className="select-package-message select-package-message-warning"
+                role="alert"
+              >
+                {t('messages.canceled')}
               </div>
-              <br />
-            </main>
-          </ErrorBoundary>
-        </PageWrapper>
-      </ViewTransition>
+            )}
+
+            {/* Error message */}
+            {checkoutError && (
+              <div
+                className="select-package-message select-package-message-error"
+                role="alert"
+              >
+                {checkoutError}
+              </div>
+            )}
+
+            {/* Package cards */}
+            <div className="select-package-cards-container">
+              {Object.values(DISPLAY_PACKAGES).map(pkg => (
+                <PackCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  handleSelectPackage={handleSelectPackage}
+                  checkoutLoading={checkoutLoading}
+                />
+              ))}
+            </div>
+
+            <div className="select-package-back-button">
+              <CartoonButton
+                containerClassName="select-package-back-button-container"
+                onClick={handleBack}
+                disabled={checkoutLoading}
+              >
+                {tCommon('back')}
+              </CartoonButton>
+            </div>
+            <br />
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
       <SpeculationRules prerenderPaths={[ROUTES.DIAL]} />
     </>
   );

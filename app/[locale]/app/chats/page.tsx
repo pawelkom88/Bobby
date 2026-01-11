@@ -13,34 +13,27 @@ import styles from './ChatsPage.module.css';
 
 function ChatsPageContent() {
   const t = useTranslations('chats');
-  const {
-    data: conversations = [],
-    isLoading,
-    error,
-  } = useConversations();
+  const { data: conversations = [], isLoading, error } = useConversations();
 
-  // Convert Error object to string for ConversationList
   const errorMessage = error ? t('loadingError') : null;
 
   return (
-    <ViewTransition>
-      <PageWrapper>
-        <ErrorBoundary>
-          <main className="app-page" role="main">
-            <div className={styles.page}>
-              <h1 className={styles.title}>{t('title')}</h1>
-              <p className={styles.subtitle}>{t('subtitle')}</p>
+    <PageWrapper>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <div className={styles.page}>
+            <h1 className={styles.title}>{t('title')}</h1>
+            <p className={styles.subtitle}>{t('subtitle')}</p>
 
-              <ConversationList
-                conversations={conversations}
-                isLoading={isLoading}
-                error={errorMessage}
-              />
-            </div>
-          </main>
-        </ErrorBoundary>
-      </PageWrapper>
-    </ViewTransition>
+            <ConversationList
+              conversations={conversations}
+              isLoading={isLoading}
+              error={errorMessage}
+            />
+          </div>
+        </main>
+      </ErrorBoundary>
+    </PageWrapper>
   );
 }
 
@@ -48,7 +41,10 @@ export default function ChatsPage() {
   return (
     <ProtectedRoute>
       <ChatsPageContent />
-      <SpeculationRules prefetchPaths={[ROUTES.APP, ROUTES.ACHIEVEMENTS, ROUTES.SETTINGS]} eagerness="moderate" />
+      <SpeculationRules
+        prefetchPaths={[ROUTES.APP, ROUTES.ACHIEVEMENTS, ROUTES.SETTINGS]}
+        eagerness="moderate"
+      />
     </ProtectedRoute>
   );
 }

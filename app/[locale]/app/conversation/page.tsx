@@ -44,15 +44,10 @@ function ConversationPageContent() {
   const selectedAgeTier = journeyState?.selectedAgeTier ?? DEFAULT_AGE_TIER;
   const selectedSituation = journeyState?.selectedService ?? DEFAULT_SITUATION;
 
-  // Check if user is trying to return to a completed conversation
   useEffect(() => {
     const checkConversationStatus = () => {
-      // Only redirect if conversation is complete AND assessment is already stored
-      // This allows the completion flow to work properly
       if (sessionData?.conversationComplete && sessionData?.lastAssessment) {
         setIsComplete(true);
-        // Clear the flag and redirect after a brief moment to show message
-        // Store timeout ref so we can cancel on unmount
         redirectTimeoutRef.current = setTimeout(async () => {
           await clearSession.mutateAsync();
           startTransition(() => {
@@ -73,19 +68,16 @@ function ConversationPageContent() {
     };
   }, [sessionData, clearSession, router]);
 
-  // Set conversation as active when component mounts
   useEffect(() => {
     logger.log('ConversationPage: Setting conversation as active');
     setConversationActive(true);
 
-    // Cleanup: clear conversation active when unmounting or navigating away
     return () => {
       logger.log('ConversationPage: Clearing conversation active');
       setConversationActive(false);
     };
   }, [setConversationActive]);
 
-  // Show message if trying to return to completed conversation
   if (isComplete) {
     return (
       <ViewTransition>
@@ -103,6 +95,7 @@ function ConversationPageContent() {
       </ViewTransition>
     );
   }
+
   const handleConversationComplete = async (
     conversation: ConversationMessage[],
     conversationId: string
@@ -125,21 +118,19 @@ function ConversationPageContent() {
         conversation.filter(m => m.type === 'user').map(m => m.text)
       );
 
-      // Assess the conversation using Gemini
       const assessment = await assessWithGemini(conversation, {
         ageTier: selectedAgeTier,
         situation: selectedSituation,
       });
 
-      // DEBUG: Log assessment results
       logger.log('🔍 ASSESSMENT RESULTS:', assessment);
       logger.log('🔍 Score:', assessment.score);
       logger.log('🔍 User turns:', assessment.metrics.userTurns);
       logger.log('🔍 Duration:', assessment.metrics.durationSeconds);
 
-      // Store assessment in secure server-side session
-      // Generate unique completion ID to prevent duplicate XP awards
       const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      // todo Paw: refactor to simpler code and extract to func and test
       const stored = await setAssessment.mutateAsync({
         assessment: {
           assessment: {

@@ -38,7 +38,6 @@ function CompletionPageContent() {
   const [conversationId, setConversationId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get selected values from journey state
     const journeyState = getJourneyState();
     const ageTier = journeyState?.selectedAgeTier ?? DEFAULT_AGE_TIER;
     const situation = journeyState?.selectedService ?? DEFAULT_SITUATION;
@@ -47,15 +46,12 @@ function CompletionPageContent() {
   }, [getJourneyState]);
 
   useEffect(() => {
-    // Retrieve assessment from secure server-side session
     const loadAssessment = () => {
-      // Wait for user authentication to resolve
       if (!user) {
         logger.log('🔍 User not authenticated yet, waiting...');
         return;
       }
 
-      // Wait for session query to resolve before making redirect decisions
       if (sessionLoading) {
         logger.log('🔍 Session still loading, waiting...');
         return;
@@ -75,7 +71,6 @@ function CompletionPageContent() {
       logger.log('🔍 completionId:', sessionData?.completionId);
       logger.log('🔍 processedId:', sessionData?.processedCompletionId);
 
-      // Check if session has expired (24-hour limit)
       if (sessionData?.expiresAt) {
         const expiresAtMs =
           typeof sessionData.expiresAt === 'number'
@@ -89,7 +84,6 @@ function CompletionPageContent() {
         }
       }
 
-      // CRITICAL: Validate that session belongs to the authenticated user
       if (sessionData?.userId && user && sessionData.userId !== user.uid) {
         logger.warn('🔍 Session userId mismatch, redirecting to dial', {
           sessionUserId: sessionData.userId,
@@ -99,14 +93,13 @@ function CompletionPageContent() {
         return;
       }
 
-      // Check if conversation was completed
       if (!sessionData?.conversationComplete) {
         logger.log('🔍 No completed conversation found, redirecting to dial');
         router.replace(ROUTES.DIAL);
         return;
       }
 
-      // Set session as valid
+      // todo Paw: can we derive this state somehow ?
       setIsSessionValid(true);
 
       // Capture conversation ID if available
@@ -158,7 +151,6 @@ function CompletionPageContent() {
     loadAssessment();
   }, [router, sessionData, sessionError, sessionLoading, user]);
 
-  // Show loading while checking session
   if (isSessionValid === null) {
     return (
       <ViewTransition>

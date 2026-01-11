@@ -22,7 +22,10 @@ function ConversationDetailContent({ params }: ConversationDetailPageProps) {
   const { conversationId } = paramsResolved;
   const { user } = useAuth();
   const t = useTranslations('conversationDetail');
-  const [conversation, setConversation] = useState<StoredConversation | null>(null);
+  const [conversation, setConversation] = useState<StoredConversation | null>(
+    null
+  );
+  // todo Paw: can we derive loading and error ?
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,24 +69,24 @@ function ConversationDetailContent({ params }: ConversationDetailPageProps) {
   };
 
   return (
-    <ViewTransition>
-      <PageWrapper>
-        <ErrorBoundary>
-          <main className="app-page" role="main">
-            <ConversationDetail
-              conversation={conversation}
-              isLoading={isLoading}
-              error={error}
-              onBack={handleBack}
-            />
-          </main>
-        </ErrorBoundary>
-      </PageWrapper>
-    </ViewTransition>
+    <PageWrapper>
+      <ErrorBoundary>
+        <main className="app-page" role="main">
+          <ConversationDetail
+            conversation={conversation}
+            isLoading={isLoading}
+            error={error}
+            onBack={handleBack}
+          />
+        </main>
+      </ErrorBoundary>
+    </PageWrapper>
   );
 }
 
-export default function ConversationDetailPage(props: ConversationDetailPageProps) {
+export default function ConversationDetailPage(
+  props: ConversationDetailPageProps
+) {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <ProtectedRoute>
