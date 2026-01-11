@@ -34,7 +34,7 @@ function PasswordStrengthIndicator({
       aria-live="polite"
     >
       <br />
-      {t('passwordStrength')}: {' '}
+      {t('passwordStrength')}:{' '}
       <strong style={{ color: strength === 'weak' ? 'red' : 'green' }}>
         {t(`strength.${strength}`)}
       </strong>
@@ -63,6 +63,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const code = searchParams.get('oobCode');
+    console.log('oobCode has space?', code?.includes(' '));
     if (!code) {
       setErrors({ general: t('errors.invalidLink') });
       setIsLoading(false);
@@ -171,12 +172,16 @@ function ResetPasswordForm() {
 
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewPassword(e.target.value);
-    if (errors.newPassword) setErrors(prev => ({ ...prev, newPassword: undefined }));
+    if (errors.newPassword)
+      setErrors(prev => ({ ...prev, newPassword: undefined }));
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setConfirmPassword(e.target.value);
-    if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+    if (errors.confirmPassword)
+      setErrors(prev => ({ ...prev, confirmPassword: undefined }));
   };
 
   const passwordValidation = validatePassword(newPassword);
@@ -197,7 +202,11 @@ function ResetPasswordForm() {
         <p style={{ textAlign: 'center', marginBottom: '30px' }}>
           {t('success.message')}
         </p>
-        <Link href="/login" className="ach-button" style={{ textDecoration: 'none', display: 'inline-block' }}>
+        <Link
+          href="/login"
+          className="ach-button"
+          style={{ textDecoration: 'none', display: 'inline-block' }}
+        >
           {t('success.continue')}
         </Link>
       </AuthPageLayout>
@@ -242,7 +251,9 @@ function ResetPasswordForm() {
           showPassword={showPassword}
           onTogglePassword={() => setShowPassword(!showPassword)}
         >
-          <PasswordStrengthIndicator strength={newPassword ? passwordStrength : null} />
+          <PasswordStrengthIndicator
+            strength={newPassword ? passwordStrength : null}
+          />
         </AuthInput>
 
         <AuthInput
@@ -263,11 +274,19 @@ function ResetPasswordForm() {
 
         <AuthErrorMessage error={errors.general} />
 
-        <AuthButton type="submit" disabled={isSubmitting} style={{ marginTop: '10px' }}>
+        <AuthButton
+          type="submit"
+          disabled={isSubmitting}
+          style={{ marginTop: '10px' }}
+        >
           {isSubmitting ? t('resetting') : t('resetButton')}
         </AuthButton>
 
-        <Link style={{ marginTop: '20px' }} href="/login" className="ach-button">
+        <Link
+          style={{ marginTop: '20px' }}
+          href="/login"
+          className="ach-button"
+        >
           {t('backToLogin')}
         </Link>
       </form>

@@ -7,46 +7,7 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 import { sendPasswordResetEmail } from '@/lib/mailer';
-
-// Constants
-const MAX_EMAIL_LENGTH = 254;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// Helpers
-function isValidEmail(email: unknown): email is string {
-  return (
-    typeof email === 'string' &&
-    email.length > 0 &&
-    email.length <= MAX_EMAIL_LENGTH &&
-    EMAIL_REGEX.test(email)
-  );
-}
-
-function maskEmail(email: string): string {
-  const [local, domain] = email.split('@');
-  if (!domain) return '***@***';
-  
-  const maskedLocal = local.length > 2
-    ? `${local[0]}${'*'.repeat(Math.min(local.length - 2, 5))}${local[local.length - 1]}` 
-    : '**';
-  
-  const domainParts = domain.split('.');
-  const maskedDomain = domainParts.length > 1
-    ? `${domainParts[0][0]}***${domainParts[0][domainParts[0].length - 1]}.${domainParts.slice(1).join('.')}` 
-    : '***';
-    
-  return `${maskedLocal}@${maskedDomain}`;
-}
-
-async function hashForRateLimit(value: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(value.toLowerCase());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .slice(0, 12)
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
+import { hashForRateLimit, isValidEmail, maskEmail } from '@/lib/email-utils';
 
 /**
  * POST /api/auth/reset-password
@@ -78,13 +39,13 @@ export async function POST(request: NextRequest) {
     const ipRateLimit = await rateLimiters.auth.isRateLimited(
       `reset-password:ip:${clientIp}`
     );
-    
+
     if (ipRateLimit.limited) {
       logger.warn('Password reset IP rate limit exceeded', {
         ip: clientIp,
         userAgent: request.headers.get('user-agent'),
       });
-      
+
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
         {
@@ -130,13 +91,13 @@ export async function POST(request: NextRequest) {
     const emailRateLimit = await rateLimiters.passwordReset.isRateLimited(
       `reset-password:email:${emailHash}`
     );
-    
+
     if (emailRateLimit.limited) {
       logger.warn('Password reset email rate limit exceeded', {
         emailHash,
         ip: clientIp,
       });
-      
+
       // Return success to prevent enumeration
       return NextResponse.json({
         message:
@@ -156,22 +117,26 @@ export async function POST(request: NextRequest) {
     let resetLink: string;
 
     try {
-      const firebaseResetLink = await auth.generatePasswordResetLink(normalizedEmail, {
-        url: `${appUrl}/reset-password`,
-        handleCodeInApp: false, // Changed to false so we get the oobCode
-      });
-      
-      // Extract oobCode from Firebase link and create direct link to our app
+      const firebaseResetLink = await auth.generatePasswordResetLink(
+        normalizedEmail,
+        {
+          url: `${appUrl}/reset-password`,
+          handleCodeInApp: false, // Changed to false so we get the oobCode
+        }
+      );
+
       const url = new URL(firebaseResetLink);
       const oobCode = url.searchParams.get('oobCode');
-      
-      if (!oobCode) {
-        throw new Error('Failed to extract oobCode from reset link');
-      }
-      
+      if (!oobCode) throw new Error('Missing oobCode');
+
+      const appResetUrl = new URL('/en/reset-password', appUrl); // include locale
+      appResetUrl.searchParams.set('oobCode', oobCode);
+      resetLink = appResetUrl.toString();
+
       // Create direct link to our app
-      resetLink = `${appUrl}/reset-password?oobCode=${oobCode}`;
-      
+      resetLink = `${appUrl}/en/reset-password?oobCode=${oobCode}`;
+      // resetLink = `${appUrl}/${locale}/reset-password?oobCode=${oobCode}`;
+
       logger.info('Generated password reset link', {
         emailMasked: maskEmail(normalizedEmail),
         emailHash,
@@ -187,7 +152,7 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error',
         ip: clientIp,
       });
-      
+
       return NextResponse.json({
         message:
           'If an account exists, a password reset link has been sent to your email.',
@@ -197,7 +162,7 @@ export async function POST(request: NextRequest) {
     // 8. Send email
     try {
       await sendPasswordResetEmail(normalizedEmail, resetLink);
-      
+
       logger.info('Password reset email sent', {
         emailMasked: maskEmail(normalizedEmail),
         emailHash,
@@ -210,7 +175,7 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error',
         ip: clientIp,
       });
-      
+
       // Return error instead of success
       return NextResponse.json(
         { error: 'Failed to send reset email. Please try again.' },
@@ -223,7 +188,6 @@ export async function POST(request: NextRequest) {
       message:
         'If an account exists, a password reset link has been sent to your email.',
     });
-
   } catch (error) {
     logger.error('Password reset request failed', {
       error: error instanceof Error ? error.message : 'Unknown error',

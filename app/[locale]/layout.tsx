@@ -10,8 +10,9 @@ import { notFound } from 'next/navigation';
 import { OptimizedProviders } from '@/components/OptimizedProviders';
 import { nunito, luckiestGuy } from '@/lib/fonts';
 import { routing } from '@/i18n/routing';
-import { locales, type Locale } from '@/i18n/locales';
+import { locales } from '@/i18n/locales';
 import CspNonceDebugger from '@/components/CspNonceDebugger';
+import { ViewTransition } from 'react';
 
 type Props = {
   children: React.ReactNode;
@@ -126,7 +127,8 @@ export default async function LocaleLayout({ children, params }: Props) {
                 description: t('description'),
                 applicationCategory: 'EducationalApplication',
                 operatingSystem: t('structuredData.operatingSystem'),
-                url: process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
+                url:
+                  process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
                 author: {
                   '@type': 'Organization',
                   name: t('structuredData.authorName'),
@@ -143,7 +145,9 @@ export default async function LocaleLayout({ children, params }: Props) {
       </head>
       <body className={`${nunito.variable} ${luckiestGuy.variable} font-sans`}>
         <NextIntlClientProvider messages={messages}>
-          <OptimizedProviders>{children}</OptimizedProviders>
+          <ViewTransition>
+            <OptimizedProviders>{children}</OptimizedProviders>
+          </ViewTransition>
         </NextIntlClientProvider>
         <CspNonceDebugger />
       </body>
