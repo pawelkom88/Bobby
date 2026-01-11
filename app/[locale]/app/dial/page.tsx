@@ -1,32 +1,73 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef, startTransition } from 'react';
-import { ViewTransition } from 'react';
-import { Activity } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  Suspense,
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Activity, ViewTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+
 import DialPad from '@/components/DialPad';
-import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import ParentGateModal from '@/components/ParentGateModal';
-import { useSessionClear } from '@/hooks/useSessionClear';
-import { ROUTES } from '@/lib/routes';
-import { useCredits } from '@/context/CreditsContext';
-import { useAuth } from '@/context/AuthContext';
-import { useUserData } from '@/context/UserDataContext';
-import { persistDialStoryContext } from '@/lib/dialStoryContext';
-import { SpeculationRules } from '@/components/SpeculationRules';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import PageWrapper from '@/components/PageWrapper';
+import ParentGateModal from '@/components/ParentGateModal';
+import { SpeculationRules } from '@/components/SpeculationRules';
+import { useAuth } from '@/context/AuthContext';
+import { useCredits } from '@/context/CreditsContext';
+import { useUserData } from '@/context/UserDataContext';
+import { useSessionClear } from '@/hooks/useSessionClear';
 import { logger } from '@/lib/logger';
+import { ROUTES } from '@/lib/routes';
+import { persistDialStoryContext } from '@/lib/dialStoryContext';
 import {
   hasParentGateAcknowledgement,
   setParentGateAcknowledgement,
 } from '@/lib/parent-gate';
 
+/**
+ * Key concept: replace many booleans with small "status enums"
+ * - fewer invalid combinations
+ * - easier to reason about
+ */
+type UiState = {
+  checkout: 'idle' | 'redirecting';
+  refresh: 'idle' | 'refreshing';
+  error: string | null;
+  showParentGate: boolean;
+};
+
+function getDialButtonLabelKey(args: {
+  hasCredits: boolean;
+  isBusy: boolean;
+}): 'buttons.call' | 'buttons.loading' | 'buttons.buyAndCall' {
+  // Key concept: keep this pure so it's easy to unit test.
+  if (args.isBusy) return 'buttons.loading';
+  return args.hasCredits ? 'buttons.call' : 'buttons.buyAndCall';
+}
+
+/**
+ * Key concept: depend on a stable identifier rather than the whole user object
+ * to prevent effects retriggering due to object identity changes.
+ */
+function getStableUserId(user: any): string | null {
+  return (
+    user?.id ?? user?.uid ?? user?.userId ?? user?.sub ?? user?.email ?? null
+  );
+}
+
 function DialPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations('dial');
   const tAuth = useTranslations('auth.errors');
+
   const {
     credits,
     betaCredits,
@@ -35,204 +76,252 @@ function DialPageContent() {
     loading: creditsLoading,
     forceRefreshCredits,
   } = useCredits();
-  const { user, loading: authLoading } = useAuth();
-  const searchParams = useSearchParams();
+
+  const { user } = useAuth();
   const { getJourneyState } = useUserData();
-  const journeyState = getJourneyState();
-  // todo Paw Paw: too much state / maybe use transition instead of checkout loading ? and boolean crap / derive ? / one state with object and string like : { loading: "idle" / "processing" / "error" / "success"}
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [isRefreshingFromPayment, setIsRefreshingFromPayment] = useState(false);
-  const hasRefreshedRef = useRef(false);
-  const [hasVerifiedCredits, setHasVerifiedCredits] = useState(false);
-  const [showParentGate, setShowParentGate] = useState(false);
 
   useSessionClear();
 
-  logger.log('DialPageContent: Component rendered/updated', {
-    credits,
-    hasCredits,
-    creditsLoading,
-    isRefreshingFromPayment,
-    hasVerifiedCredits,
-    user: !!user,
+  const [ui, setUi] = useState<UiState>({
+    checkout: 'idle',
+    refresh: 'idle',
+    error: null,
+    showParentGate: false,
   });
+
+  // Keep latest hasCredits in a ref so async handlers can read the newest value
+  const hasCreditsRef = useRef(hasCredits);
+  useEffect(() => {
+    hasCreditsRef.current = hasCredits;
+  }, [hasCredits]);
+
+  const userId = useMemo(() => getStableUserId(user), [user]);
 
   const canceled = searchParams.get('canceled') === 'true';
   const needsCredits = searchParams.get('needsCredits') === 'true';
   const fromSuccess = searchParams.get('fromSuccess') === 'true';
 
-  logger.log('DialPageContent: URL params -', {
-    canceled,
-    needsCredits,
-    fromSuccess,
-  });
+  /**
+   * Key concept: dedupe async refresh work with a promise ref.
+   * Prevents double refresh if:
+   * - effects re-run
+   * - user clicks mid-refresh
+   */
+  const refreshPromiseRef = useRef<Promise<void> | null>(null);
 
-  useEffect(() => {
-    const refreshCreditsAfterPayment = async () => {
-      if (fromSuccess && user && !hasRefreshedRef.current) {
-        // todo Paw: why we use both ref and state ?
-        hasRefreshedRef.current = true;
-        setIsRefreshingFromPayment(true);
-        logger.log(
-          'Returning from successful payment, forcing credits refresh'
-        );
+  /**
+   * Key concept: prevent infinite loops while the URL still contains fromSuccess=true
+   * (Next router.replace can lag behind state updates).
+   */
+  const handledFromSuccessRef = useRef(false);
 
-        try {
-          await forceRefreshCredits();
+  const replaceSearchParams = useCallback(
+    (mutate: (sp: URLSearchParams) => void) => {
+      // Client component, safe to use window
+      const currentUrl = new URL(window.location.href);
+      const nextUrl = new URL(window.location.href);
 
-          // Clean up URL params after successful refresh
-          const url = new URL(window.location.href);
-          url.searchParams.delete('fromSuccess');
-          url.searchParams.delete('needsCredits');
-          window.history.replaceState({}, '', url.toString());
-        } catch (error) {
-          logger.error('Failed to refresh credits after payment');
-        } finally {
-          setIsRefreshingFromPayment(false);
-        }
+      mutate(nextUrl.searchParams);
+
+      const current =
+        currentUrl.pathname +
+        (currentUrl.search ? currentUrl.search : '') +
+        (currentUrl.hash ? currentUrl.hash : '');
+
+      const next =
+        nextUrl.pathname +
+        (nextUrl.searchParams.toString()
+          ? `?${nextUrl.searchParams.toString()}`
+          : '') +
+        (nextUrl.hash ? nextUrl.hash : '');
+
+      // Avoid replace spam if nothing actually changes
+      if (current === next) return;
+
+      startTransition(() => {
+        router.replace(next);
+      });
+    },
+    [router]
+  );
+
+  const refreshCreditsOnce = useCallback(async () => {
+    if (refreshPromiseRef.current) return refreshPromiseRef.current;
+
+    setUi(prev => ({ ...prev, refresh: 'refreshing' }));
+
+    refreshPromiseRef.current = (async () => {
+      try {
+        await forceRefreshCredits();
+      } catch (e) {
+        logger.error('Failed to refresh credits', e);
+      } finally {
+        setUi(prev => ({ ...prev, refresh: 'idle' }));
+        refreshPromiseRef.current = null;
       }
-    };
+    })();
 
-    refreshCreditsAfterPayment();
-  }, [fromSuccess, user, forceRefreshCredits]);
+    return refreshPromiseRef.current;
+  }, [forceRefreshCredits]);
 
-  // todo Paw: do we need that ? is it only initialisation ?
+  /**
+   * Post-payment behaviour:
+   * - if URL has fromSuccess=true, refresh credits exactly once
+   * - then remove fromSuccess/needsCredits via router.replace (so useSearchParams updates)
+   *
+   * The handledFromSuccessRef guard is the critical part that prevents the infinite loop
+   * you’re seeing.
+   */
   useEffect(() => {
-    logger.log(
-      'DialPageContent: useEffect - credits changed, resetting hasVerifiedCredits'
-    );
-    // todo Paw: can we somehow derive this state ?
-    setHasVerifiedCredits(false);
-  }, [credits]);
+    if (!fromSuccess || !userId) return;
 
+    if (handledFromSuccessRef.current) return;
+    handledFromSuccessRef.current = true;
+
+    logger.log('Returning from successful payment, forcing credits refresh');
+
+    (async () => {
+      await refreshCreditsOnce();
+
+      replaceSearchParams(sp => {
+        sp.delete('fromSuccess');
+        sp.delete('needsCredits');
+      });
+    })();
+  }, [fromSuccess, userId, refreshCreditsOnce, replaceSearchParams]);
+
+  // Reset the "handled" flag when fromSuccess is no longer present
   useEffect(() => {
-    logger.log(
-      'DialPageContent: useEffect - checking if needsCredits param should be cleaned up',
-      {
-        needsCredits,
-        hasCredits,
-        creditsLoading,
-      }
-    );
+    if (!fromSuccess) handledFromSuccessRef.current = false;
+  }, [fromSuccess]);
 
-    if (needsCredits && hasCredits && !creditsLoading) {
-      logger.log('DialPageContent: Cleaning up needsCredits param from URL');
-      const url = new URL(window.location.href);
-      url.searchParams.delete('needsCredits');
-      window.history.replaceState({}, '', url.toString());
+  /**
+   * If needsCredits is present but we now have credits, clean it up.
+   * Uses router.replace so useSearchParams stays in sync.
+   */
+  useEffect(() => {
+    if (!needsCredits) return;
+    if (creditsLoading) return;
+    if (!hasCredits) return;
+
+    replaceSearchParams(sp => {
+      sp.delete('needsCredits');
+    });
+  }, [needsCredits, creditsLoading, hasCredits, replaceSearchParams]);
+
+  const startPractice = useCallback(() => {
+    if (hasParentGateAcknowledgement()) {
+      startTransition(() => {
+        router.push(ROUTES.CONVERSATION);
+      });
+    } else {
+      setUi(prev => ({ ...prev, showParentGate: true }));
     }
-  }, [needsCredits, hasCredits, creditsLoading]);
+  }, [router]);
 
-  const handleCorrectNumber = async () => {
-    logger.log('handleCorrectNumber called - user should have credits');
+  const handleCorrectNumber = useCallback(async () => {
+    logger.log('handleCorrectNumber called');
 
-    const startPractice = () => {
-      if (hasParentGateAcknowledgement()) {
-        startTransition(() => {
-          router.push(ROUTES.CONVERSATION);
-        });
-      } else {
-        setShowParentGate(true);
-      }
-    };
-
-    // If we've already verified credits, proceed directly
-    if (hasVerifiedCredits && hasCredits) {
-      logger.log('Credits already verified, navigating to conversation');
-      startPractice();
+    // Fail fast
+    if (!hasCreditsRef.current) {
+      logger.log('No credits available; staying on dial page');
       return;
     }
 
-    logger.log('Starting credit verification process...');
-
-    // Force a fresh check of credits before proceeding
+    // Only force refresh when we have a concrete reason (post-payment redirect)
     if (fromSuccess) {
-      logger.log('Post-payment: forcing fresh credit check');
-      await forceRefreshCredits();
+      logger.log('Post-payment: ensuring credits are fresh before continuing');
+      await refreshCreditsOnce();
     }
 
-    // Double-check: fetch credits directly to avoid stale state
-    logger.log('Final verification: hasCredits =', hasCredits);
-
-    // todo Paw: should this be first thing in this function ? early return should be first and used more often - morgan's law ?
-    if (!hasCredits) {
+    // Re-check using ref so we read the latest value after refresh completes
+    if (!hasCreditsRef.current) {
       logger.log(
-        'No credits available after verification, staying on dial page'
+        'Credits still not available after refresh; staying on dial page'
       );
       return;
     }
 
-    // If user has credits, navigate to conversation and mark as verified
-    logger.log('User has credits, navigating to conversation');
-    setHasVerifiedCredits(true);
     startPractice();
-  };
+  }, [fromSuccess, refreshCreditsOnce, startPractice]);
 
-  const handleCheckoutNeeded = () => {
+  const handleCheckoutNeeded = useCallback(() => {
     logger.log('No credits available, redirecting to package selection');
 
-    if (!user) {
+    if (!userId) {
       logger.error('No user found when trying to checkout');
-      setCheckoutError(tAuth('pleaseLogin'));
+      setUi(prev => ({ ...prev, error: tAuth('pleaseLogin') }));
       return;
     }
 
-    // todo Paw: 3 states ? maybe one with and object ?
-    setCheckoutLoading(true);
-    setIsProcessingCheckout(true);
-    setCheckoutError(null);
+    setUi(prev => ({ ...prev, checkout: 'redirecting', error: null }));
 
-    const storyContext = journeyState;
-
-    if (storyContext?.selectedAgeTier || storyContext?.selectedService) {
+    // Only pull journey state at the moment we need it
+    const journeyState = getJourneyState();
+    if (journeyState?.selectedAgeTier || journeyState?.selectedService) {
       persistDialStoryContext({
-        ageTier: storyContext.selectedAgeTier,
-        service: storyContext.selectedService,
+        ageTier: journeyState.selectedAgeTier,
+        service: journeyState.selectedService,
       });
     }
 
-    window.location.href = `${ROUTES.SELECT_PACKAGE}?needsCredits=true`;
-  };
+    // Prefer Next navigation so app state/searchParams are consistent
+    startTransition(() => {
+      router.push(`${ROUTES.SELECT_PACKAGE}?needsCredits=true`);
+    });
+  }, [getJourneyState, router, tAuth, userId]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     startTransition(() => {
       router.push(ROUTES.CHOOSE_EMERGENCY);
     });
-  };
+  }, [router]);
 
-  const handleParentGateConfirm = () => {
+  const handleParentGateConfirm = useCallback(() => {
     setParentGateAcknowledgement();
-    setShowParentGate(false);
+    setUi(prev => ({ ...prev, showParentGate: false }));
     startTransition(() => {
       router.push(ROUTES.CONVERSATION);
     });
-  };
+  }, [router]);
 
-  const handleParentGateCancel = () => {
-    setShowParentGate(false);
-  };
+  const handleParentGateCancel = useCallback(() => {
+    setUi(prev => ({ ...prev, showParentGate: false }));
+  }, []);
 
-  const isLoading = creditsLoading || isRefreshingFromPayment;
+  const isBusy =
+    creditsLoading ||
+    ui.refresh === 'refreshing' ||
+    ui.checkout === 'redirecting';
+
+  const buttonLabelKey = getDialButtonLabelKey({
+    hasCredits,
+    isBusy,
+  });
 
   return (
     <>
       <ViewTransition>
         <PageWrapper>
           <ErrorBoundary>
-            <main className="app-page" role="main" aria-hidden={showParentGate}>
+            <main
+              className="app-page"
+              role="main"
+              aria-hidden={ui.showParentGate}
+            >
               {canceled && (
                 <div className="dial-message dial-message-warning" role="alert">
                   {t('messages.canceled')}
                 </div>
               )}
-              {needsCredits && !hasCredits && !isLoading && (
+
+              {needsCredits && !hasCredits && !isBusy && (
                 <div className="dial-message dial-message-info" role="alert">
                   {t('messages.needsCredits')}
                 </div>
               )}
-              {isRefreshingFromPayment && (
+
+              {ui.refresh === 'refreshing' && (
                 <div
                   className="dial-message dial-message-success"
                   role="status"
@@ -240,14 +329,17 @@ function DialPageContent() {
                   {t('messages.loadingCredits')}
                 </div>
               )}
-              {checkoutError && (
+
+              {ui.error && (
                 <div className="dial-message dial-message-warning" role="alert">
-                  {checkoutError}
+                  {ui.error}
                 </div>
               )}
 
-              <Activity mode={isProcessingCheckout ? 'hidden' : 'visible'}>
-                {isLoading ? (
+              <Activity
+                mode={ui.checkout === 'redirecting' ? 'hidden' : 'visible'}
+              >
+                {isBusy ? (
                   <div className="skeleton">
                     <div className="shimmer" />
                   </div>
@@ -268,25 +360,20 @@ function DialPageContent() {
                   hasCredits ? handleCorrectNumber : handleCheckoutNeeded
                 }
                 onBack={handleBack}
-                isLoading={checkoutLoading || isLoading}
-                buttonLabel={
-                  // todo Paw: refactor to simpler code and extract to func and test
-                  hasCredits
-                    ? t('buttons.call')
-                    : isLoading
-                      ? t('buttons.loading')
-                      : t('buttons.buyAndCall')
-                }
+                isLoading={isBusy}
+                buttonLabel={t(buttonLabelKey)}
               />
             </main>
+
             <ParentGateModal
-              isOpen={showParentGate}
+              isOpen={ui.showParentGate}
               onConfirm={handleParentGateConfirm}
               onCancel={handleParentGateCancel}
             />
           </ErrorBoundary>
         </PageWrapper>
       </ViewTransition>
+
       <SpeculationRules prerenderPaths={[ROUTES.CONVERSATION]} />
     </>
   );
