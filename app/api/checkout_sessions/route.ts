@@ -126,7 +126,9 @@ async function validateCreditsMetadataOnce() {
             });
             const priceCredits = price.metadata?.credits;
             const productCredits =
-              typeof price.product === 'string'
+              typeof price.product === 'string' ||
+              !price.product ||
+              ('deleted' in price.product && price.product.deleted)
                 ? undefined
                 : price.product.metadata?.credits;
             const creditsStr = priceCredits ?? productCredits ?? '';
@@ -165,7 +167,9 @@ async function getCreditsForPrice(priceId: string) {
   });
   const priceCredits = price.metadata?.credits;
   const productCredits =
-    typeof price.product === 'string'
+    typeof price.product === 'string' ||
+    !price.product ||
+    ('deleted' in price.product && price.product.deleted)
       ? undefined
       : price.product.metadata?.credits;
   const creditsStr = priceCredits ?? productCredits ?? '';
