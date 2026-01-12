@@ -925,6 +925,7 @@
   "trainingHistory": {
     "loading": "Ładowanie historii treningów...",
     "noHistory": "Brak sesji treningowych. Rozpocznij swój pierwszy scenariusz!",
+    "score": "Wynik",
     "fetchError": "Nie udało się pobrać ocenionych rozmów",
     "loadError": "Nie udało się załadować historii treningów. Spróbuj ponownie."
   },

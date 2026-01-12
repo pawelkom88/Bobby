@@ -1107,6 +1107,7 @@
   "trainingHistory": {
     "loading": "Loading training history...",
     "noHistory": "No training sessions yet. Start your first scenario!",
+    "score": "Score",
     "fetchError": "Failed to fetch assessed conversations",
     "loadError": "Failed to load your training history. Please try again."
   },

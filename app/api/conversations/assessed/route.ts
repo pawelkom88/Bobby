@@ -68,7 +68,10 @@ async function verifyUserFromToken(
   }
 }
 
-async function getUserAssessedConversations(userId: string, db: ReturnType<typeof getAdminDb>) {
+async function getUserAssessedConversations(
+  userId: string,
+  db: ReturnType<typeof getAdminDb>
+) {
   try {
     const userDoc = await db.collection('users').doc(userId).get();
 
@@ -137,7 +140,10 @@ export async function GET(
     const limitParam = searchParams.get('limit');
     const limit = Math.min(parseInt(limitParam || '50', 10) || 50, 100);
 
-    const assessedConversations = await getUserAssessedConversations(userId, db);
+    const assessedConversations = await getUserAssessedConversations(
+      userId,
+      db
+    );
 
     const assessmentMap = new Map();
     assessedConversations.forEach((conv: Conversation) => {
@@ -172,7 +178,7 @@ export async function GET(
           })
         );
 
-        legacyConversations.sort((a, b) => {
+        legacyConversations.sort((a: string, b: string) => {
           const aTime = new Date(a.endedAt || a.startedAt).getTime();
           const bTime = new Date(b.endedAt || b.startedAt).getTime();
           return bTime - aTime;

@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAssessedConversations } from '@/hooks/queries/useAssessedConversations';
 import listStyles from './ConversationList.module.css';
@@ -45,14 +46,37 @@ export default function TrainingHistorySection() {
   return (
     <ul className={listStyles.list} role="list">
       {assessedConversations.slice(0, 10).map(conv => (
-        <li key={conv.id} className={listStyles.historyItem} role="listitem">
-          <div className={listStyles.historyService}>
-            {conv.service.toUpperCase()}
+        <li
+          key={conv.id}
+          className={listStyles.historyItem}
+          role="listitem"
+          style={
+            {
+              '--service-color':
+                conv.service === 'fire'
+                  ? '#ef4444'
+                  : conv.service === 'police'
+                    ? '#3b82f6'
+                    : '#22c55e',
+            } as CSSProperties
+          }
+        >
+          <div className={listStyles.historyHeader}>
+            <span className={listStyles.historyServicePill}>
+              {conv.service.toUpperCase()}
+            </span>
+            <span className={listStyles.historyDate}>
+              {new Date(conv.endedAt || conv.startedAt).toLocaleDateString()}
+            </span>
           </div>
-          <div className={listStyles.historyDate}>
-            {new Date(conv.endedAt || conv.startedAt).toLocaleDateString()}
+          <div className={listStyles.historyStats}>
+            <span className={listStyles.historyXp}>+{conv.xpEarned} XP</span>
+            {typeof conv.score === 'number' ? (
+              <span className={listStyles.historyScore}>
+                {t('score')} {conv.score}
+              </span>
+            ) : null}
           </div>
-          <div className={listStyles.historyXp}>+{conv.xpEarned} XP</div>
         </li>
       ))}
     </ul>

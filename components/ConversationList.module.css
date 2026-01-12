@@ -91,60 +91,74 @@
 }
 
 .historyItem {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  align-items: center;
-  padding: 1rem;
   position: relative;
-  padding-bottom: calc(1rem + 15px);
+  padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .historyItem {
-    grid-template-columns: 1fr;
-    place-items: center;
-  }
-}
-
-.historyItem::after {
+.historyItem::before {
   content: '';
   position: absolute;
-  bottom: 0;
   left: 0;
-  right: 0;
-  height: 15px;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.1) 0px,
-    rgba(0, 0, 0, 0.1) 7.5px,
-    transparent 7.5px,
-    transparent 15px
-  );
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--service-color, #ff6b35);
 }
 
-.historyItem:last-child::after {
-  display: none;
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
 }
 
-.historyService {
-  font-weight: 600;
-  color: #ff6b35;
-  font-size: 1.2rem;
+.historyServicePill {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--service-color, #0f172a);
+  background: color-mix(in srgb, var(--service-color, #ff6b35) 18%, white);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
 }
 
 .historyDate {
-  font-size: 1.2rem;
-  text-align: center;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.historyStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .historyXp {
-  color: #10b981;
+  color: #0f172a;
   font-weight: 700;
-  font-size: 1.2rem;
-  text-align: right;
+  font-size: 1.1rem;
+}
+
+.historyScore {
+  font-size: 0.95rem;
+  color: #008000;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .historyHeader,
+  .historyStats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @keyframes spinnerBounce {
