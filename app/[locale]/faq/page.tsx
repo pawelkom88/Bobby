@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -8,79 +7,21 @@ import { ROUTES } from '@/lib/routes';
 import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
-
-const FAQ_CATEGORIES = {
-  'getting-started': {
-    title: 'Getting Started',
-    ids: [1, 2, 3, 4]
-  },
-  'payments': {
-    title: 'Payments & Credits',
-    ids: [5, 6, 7, 8, 9]
-  },
-  'technical': {
-    title: 'Technical Requirements',
-    ids: [10, 11]
-  },
-  'privacy': {
-    title: 'Privacy & Safety',
-    ids: [12, 13]
-  },
-  'learning': {
-    title: 'Learning & Progress',
-    ids: [14, 15, 16, 17]
-  },
-  'accessibility': {
-    title: 'Accessibility',
-    ids: [18, 19]
-  },
-  'account': {
-    title: 'Account Management',
-    ids: [20, 21, 22, 23]
-  },
-  'troubleshooting': {
-    title: 'Troubleshooting',
-    ids: [24, 25]
-  }
-};
+import FaqAccordion from '@/components/FaqAccordion';
 
 export default function FAQPage() {
   const t = useTranslations('faq');
+  const tLanding = useTranslations('landing');
   const tCommon = useTranslations('common');
   const router = useRouter();
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-
-  const toggleQuestion = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, id: number, index: number) => {
-    const allIds = Object.values(FAQ_CATEGORIES).flatMap(cat => cat.ids);
-    let targetIndex: number;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        targetIndex = (index + 1) % allIds.length;
-        document.getElementById(`faq-question-${allIds[targetIndex]}`)?.focus();
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        targetIndex = (index - 1 + allIds.length) % allIds.length;
-        document.getElementById(`faq-question-${allIds[targetIndex]}`)?.focus();
-        break;
-      case 'Home':
-        e.preventDefault();
-        document.getElementById(`faq-question-${allIds[0]}`)?.focus();
-        break;
-      case 'End':
-        e.preventDefault();
-        document.getElementById(`faq-question-${allIds[allIds.length - 1]}`)?.focus();
-        break;
-      default:
-        break;
-    }
-  };
+  const faqItems = tLanding.raw('faq.items') as Record<
+    string,
+    { question: string; answer: string }
+  >;
+  const faqIds = Object.keys(faqItems)
+    .map(id => Number(id))
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
 
   return (
     <ViewTransition>
@@ -108,65 +49,11 @@ export default function FAQPage() {
               <h2 id="faq-questions-heading" className="sr-only">
                 {t('questionsTitle')}
               </h2>
-              {Object.entries(FAQ_CATEGORIES).map(([categoryKey, category]) => (
-                <div key={categoryKey} className="faq-category">
-                  <h3 className="faq-category-title">{category.title}</h3>
-                  <div className="faq-accordion" role="list">
-                    {category.ids.map((id, index) => {
-                      const globalIndex = Object.values(FAQ_CATEGORIES)
-                        .slice(0, Object.keys(FAQ_CATEGORIES).indexOf(categoryKey))
-                        .reduce((acc, cat) => acc + cat.ids.length, 0) + index;
-                      
-                      return (
-                        <div
-                          key={id}
-                          className={`faq-accordion-item ${expandedId === id ? 'expanded' : ''}`}
-                          role="listitem"
-                        >
-                          <h3 className="faq-accordion-heading">
-                            <button
-                              type="button"
-                              id={`faq-question-${id}`}
-                              className="faq-accordion-trigger"
-                              onClick={() => toggleQuestion(id)}
-                              onKeyDown={(e) => handleKeyDown(e, id, globalIndex)}
-                              aria-expanded={expandedId === id}
-                              aria-controls={`faq-answer-${id}`}
-                            >
-                              <span className="faq-accordion-question">
-                                {t(`items.${id}.question`)}
-                              </span>
-                              <span className="faq-accordion-icon" aria-hidden="true">
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="3"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                  focusable="false"
-                                >
-                                  <path d="m9 6 6 6-6 6" />
-                                </svg>
-                              </span>
-                            </button>
-                          </h3>
-                          <div
-                            id={`faq-answer-${id}`}
-                            className="faq-accordion-content"
-                            role="region"
-                            aria-labelledby={`faq-question-${id}`}
-                            hidden={expandedId !== id}
-                          >
-                            <p>{t(`items.${id}.answer`)}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+              <FaqAccordion
+                ids={faqIds}
+                getQuestion={id => tLanding(`faq.items.${id}.question`)}
+                getAnswer={id => tLanding(`faq.items.${id}.answer`)}
+              />
             </section>
 
             <section

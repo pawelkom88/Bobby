@@ -421,6 +421,14 @@
         "20": {
           "question": "Voice isn't working - what should I do?",
           "answer": "Check that your microphone is connected and permissions are granted. Try refreshing the page or using a different browser."
+        },
+        "21": {
+          "question": "Can I install Bobby like an app?",
+          "answer": "Yes. Bobby can be installed as a PWA, which means it acts like a regular app but runs from your browser. You get a home screen icon and it opens full-screen for quick access."
+        },
+        "22": {
+          "question": "What if the conversation drops?",
+          "answer": "If the conversation suddenly drops without reason, contact us."
         }
       }
     }
@@ -660,6 +668,14 @@
       "25": {
         "question": "The app seems stuck or frozen.",
         "answer": "Try refreshing the page. If problems persist, clear your browser cache or contact support."
+      },
+      "26": {
+        "question": "Can I install Bobby like an app?",
+        "answer": "Yes. Bobby can be installed as a PWA, which means it acts like a regular app but runs from your browser. You get a home screen icon and it opens full-screen for quick access."
+      },
+      "27": {
+        "question": "What if the conversation drops?",
+        "answer": "If the conversation suddenly drops without reason, contact us."
       }
     }
   },

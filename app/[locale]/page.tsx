@@ -1,7 +1,7 @@
 'use client';
 
-import { ViewTransition, useState, useEffect, type CSSProperties } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect, type CSSProperties } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import PageWrapper from '@/components/PageWrapper';
@@ -10,13 +10,11 @@ import { ScenarioCarousel } from './landing-page';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import MobileNav from '@/components/MobileNav';
+import FaqAccordion from '@/components/FaqAccordion';
 import { HowItWorksSection } from '@/app/[locale]/landing-page/HowItWorksSection';
 import { BeforeFirstCallSection } from '@/app/[locale]/landing-page/BeforeFirstCallSection';
 import { VideoDemoSection } from '@/app/[locale]/landing-page/VideoDemoSection';
 import styles from './LandingPage.module.css';
-
-const ALL_FAQ_IDS = Array.from({ length: 20 }, (_, i) => i + 1);
-const INITIAL_FAQ_IDS = [1, 2, 3, 4, 5];
 
 const trustStripItems = [
   {
@@ -60,6 +58,7 @@ const trustStripItems = [
 export default function HomePage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const locale = useLocale();
 
   // Redirect authenticated users to /app
   useEffect(() => {
@@ -69,21 +68,27 @@ export default function HomePage() {
   }, [user, loading, router]);
 
   const t = useTranslations('landing');
-  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showAllFAQs, setShowAllFAQs] = useState(false);
 
-  const toggleQuestion = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
+  const faqItems = t.raw('faq.items') as Record<
+    string,
+    { question: string; answer: string }
+  >;
+
+  // todo Paw - should be function with tests
+  const faqIds = Object.keys(faqItems)
+    .map(id => Number(id))
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+
+  const initialFaqIds = faqIds.slice(0, 5);
 
   const toggleAllFAQs = () => {
     setShowAllFAQs(!showAllFAQs);
-    setExpandedId(null); // Close any expanded question when toggling
   };
 
   return (
-    // <ViewTransition>
-    <PageWrapper>
+    <PageWrapper scrollRestorationKey={`landing:${locale}`}>
       <ErrorBoundary>
         <div className={styles.landingContainer}>
           <div className={styles.landingWrapper}>
@@ -186,54 +191,12 @@ export default function HomePage() {
               <ScenarioCarousel />
               <section id="faq" className={styles.landingFaqSection}>
                 <h2 className={styles.landingFaqTitle}>{t('faq.title')}</h2>
-                <div className={styles.faqAccordion} role="list">
-                  {(showAllFAQs ? ALL_FAQ_IDS : INITIAL_FAQ_IDS).map(id => {
-                    const isExpanded = expandedId === id;
-                    const itemClassName = `${styles.faqAccordionItem} ${
-                      isExpanded ? styles.faqAccordionItemExpanded : ''
-                    }`.trim();
-
-                    return (
-                      <div key={id} className={itemClassName} role="listitem">
-                        <button
-                          type="button"
-                          className={styles.faqAccordionTrigger}
-                          onClick={() => toggleQuestion(id)}
-                          aria-expanded={isExpanded}
-                          aria-controls={`faq-answer-${id}`}
-                        >
-                          <span className={styles.faqAccordionQuestion}>
-                            {t(`faq.items.${id}.question`)}
-                          </span>
-                          <span
-                            className={styles.faqAccordionIcon}
-                            aria-hidden="true"
-                          >
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="black"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="m9 6 6 6-6 6" />
-                            </svg>
-                          </span>
-                        </button>
-                        <div
-                          id={`faq-answer-${id}`}
-                          className={styles.faqAccordionContent}
-                          role="region"
-                          aria-labelledby={`faq-question-${id}`}
-                          hidden={!isExpanded}
-                        >
-                          <p>{t(`faq.items.${id}.answer`)}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <FaqAccordion
+                  ids={showAllFAQs ? faqIds : initialFaqIds}
+                  getQuestion={id => t(`faq.items.${id}.question`)}
+                  getAnswer={id => t(`faq.items.${id}.answer`)}
+                  resetKey={showAllFAQs}
+                />
                 <button
                   type="button"
                   className={styles.faqToggleButton}
@@ -241,7 +204,7 @@ export default function HomePage() {
                 >
                   {showAllFAQs
                     ? t('faq.toggle.showLess')
-                    : t('faq.toggle.showAll', { count: ALL_FAQ_IDS.length })}
+                    : t('faq.toggle.showAll', { count: faqIds.length })}
                 </button>
               </section>
             </main>
@@ -270,6 +233,5 @@ export default function HomePage() {
         </div>
       </ErrorBoundary>
     </PageWrapper>
-    // </ViewTransition>
   );
 }

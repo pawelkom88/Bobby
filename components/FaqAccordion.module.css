@@ -1,0 +1,130 @@
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accordionItem {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.accordionItem:nth-child(4n + 1) {
+  background: linear-gradient(135deg, #b7e0ff 0%, #89c4ff 100%);
+}
+
+.accordionItem:nth-child(4n + 2) {
+  background: linear-gradient(135deg, #c5e7e0 0%, #9dd4c8 100%);
+}
+
+.accordionItem:nth-child(4n + 3) {
+  background: linear-gradient(135deg, #f4f1d9 0%, #e8e4b8 100%);
+}
+
+.accordionItem:nth-child(4n + 4) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.accordionItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.accordionItemExpanded {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.accordionTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 16px;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.accordionTrigger:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.accordionQuestion {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: black;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.accordionItem:nth-child(4n + 4) .accordionQuestion {
+  color: #fff;
+}
+
+.accordionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.accordionItem:nth-child(4n + 4) .accordionIcon {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.accordionIcon svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.accordionItemExpanded .accordionIcon svg {
+  transform: rotate(90deg);
+}
+
+.accordionContent {
+  padding: 0 24px 24px;
+  animation: faq-slide-down 0.3s ease;
+}
+
+.accordionContent[hidden] {
+  display: none;
+}
+
+.accordionContent p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.accordionItem:nth-child(4n + 4) .accordionContent p {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes faq-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -415,6 +415,14 @@
         "20": {
           "question": "Głos nie działa - co robić?",
           "answer": "Sprawdź, czy mikrofon jest podłączony i czy przyznałeś aplikacji wymagane uprawnienia. Spróbuj odświeżyć stronę lub użyć innej przeglądarki."
+        },
+        "21": {
+          "question": "Czy mogę zainstalować Bobby jak aplikację?",
+          "answer": "Tak. Bobby można zainstalować jako PWA, czyli działa jak zwykła aplikacja, ale uruchamia się z przeglądarki. Dostajesz ikonę na ekranie głównym i szybki, pełnoekranowy dostęp."
+        },
+        "22": {
+          "question": "Co jeśli rozmowa nagle się urwie?",
+          "answer": "Jeśli rozmowa nagle się urwie bez powodu, skontaktuj się z nami."
         }
       }
     }
@@ -654,6 +662,14 @@
       "25": {
         "question": "Aplikacja się zawiesiła lub zablokowała.",
         "answer": "Spróbuj odświeżyć stronę. Jeśli problemy będą się powtarzać, wyczyść pamięć podręczną przeglądarki lub skontaktuj się z pomocą techniczną."
+      },
+      "26": {
+        "question": "Czy mogę zainstalować Bobby jak aplikację?",
+        "answer": "Tak. Bobby można zainstalować jako PWA, czyli działa jak zwykła aplikacja, ale uruchamia się z przeglądarki. Dostajesz ikonę na ekranie głównym i szybki, pełnoekranowy dostęp."
+      },
+      "27": {
+        "question": "Co jeśli rozmowa nagle się urwie?",
+        "answer": "Jeśli rozmowa nagle się urwie bez powodu, skontaktuj się z nami."
       }
     }
   },
