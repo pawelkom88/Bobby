@@ -17,28 +17,7 @@ interface CartoonDialPadProps {
 // Maximum digits allowed (lets kids type more to ensure they get it right)
 const MAX_INPUT_LENGTH = 6;
 
-const DIAL_SOUNDS = [
-  '/sfx/bttf-dial-1.mp3',
-  '/sfx/bttf-dial-2.mp3',
-  '/sfx/bttf-dial-3.mp3',
-];
-
 // Sound mapping for each key (1-9, *, 0, #)
-const KEY_SOUNDS: Record<string, string> = {
-  '1': DIAL_SOUNDS[0],
-  '2': DIAL_SOUNDS[1],
-  '3': DIAL_SOUNDS[2],
-  '4': DIAL_SOUNDS[0],
-  '5': DIAL_SOUNDS[1],
-  '6': DIAL_SOUNDS[2],
-  '7': DIAL_SOUNDS[0],
-  '8': DIAL_SOUNDS[1],
-  '9': DIAL_SOUNDS[2],
-  '*': DIAL_SOUNDS[0],
-  '0': DIAL_SOUNDS[1],
-  '#': DIAL_SOUNDS[2],
-};
-
 // Phone keypad layout (standard phone layout)
 const KEYPAD_BUTTONS = [
   ['1', '2', '3'],
@@ -80,12 +59,6 @@ export default function CartoonDialPad({
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
-      }
-      const soundUrl = KEY_SOUNDS[digit as keyof typeof KEY_SOUNDS];
-      if (soundUrl) {
-        audioRef.current = new Audio(soundUrl);
-        audioRef.current.volume = 0.5;
-        void audioRef.current.play();
       }
     } catch (error) {
       logger.error('Error playing sound:', error);
