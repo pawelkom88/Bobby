@@ -726,8 +726,42 @@
       "faq": "FAQs",
       "faqDesc": "Find quick answers"
     },
+    "support": {
+      "title": "What we can help with",
+      "description": "These are the most common reasons families reach out:",
+      "items": [
+        "Account access, billing, and pack questions",
+        "Audio or microphone troubleshooting",
+        "Feedback on scenarios, tone, or difficulty",
+        "School, partnership, or press inquiries"
+      ]
+    },
+    "details": {
+      "title": "Helpful details to include",
+      "description": "Sharing these helps us resolve issues faster:",
+      "items": [
+        "Device and browser (for example: iPad + Safari)",
+        "The page where the issue happened",
+        "Any error message or screenshot",
+        "Which scenario or age level you were practicing"
+      ]
+    },
+    "emergencyNote": "For real emergencies, call 999 (UK) or 112 (EU). Bobby is for practice only.",
     "responseTimeTitle": "Response Time",
     "responseTime": "We typically respond within 24 hours."
+  },
+  "blog": {
+    "title": "Blog",
+    "intro": "Emergency readiness starts with small, repeatable practice at home.",
+    "summary": "We turn research into simple routines so kids can stay calm, clear, and confident in a real emergency.",
+    "topicsTitle": "What you'll find here",
+    "topics": [
+      "Emergency call scripts and role-play prompts",
+      "Age-specific practice ideas for families",
+      "Safety and privacy guidance for parents",
+      "Printable checklists and readiness tips"
+    ],
+    "cta": "Want a topic covered? Email contact@readywithbobby.online."
   },
   "settings": {
     "title": "SETTINGS",

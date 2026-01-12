@@ -5,6 +5,7 @@ import BlogCard from './BlogCard';
 import styles from './Blog.module.css';
 import { Link } from '@/i18n/routing';
 import { getPageMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -21,11 +22,14 @@ export async function generateMetadata({
   });
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const t = await getTranslations('blog');
+  const topics = t.raw('topics') as string[];
+
   return (
     <div className={styles.blogContainer}>
       <div className={styles.heroSection}>
-        <h1 className={styles.pageTitle}>Blog</h1>
+        <h1 className={styles.pageTitle}>{t('title')}</h1>
         <Image
           src="/blog1.webp"
           alt="Blog"
@@ -51,6 +55,19 @@ export default function BlogPage() {
             <li> Calm-in-a-crisis tips</li>
           </ul>
         </div>
+        <div className={styles.heroIntro}>
+          <p className={styles.heroIntroText}>{t('intro')}</p>
+          <p className={styles.heroIntroText}>{t('summary')}</p>
+        </div>
+        <div className={styles.heroHighlights}>
+          <h2 className={styles.heroHighlightsTitle}>{t('topicsTitle')}</h2>
+          <ul className={styles.heroHighlightsList}>
+            {topics.map(topic => (
+              <li key={topic}>{topic}</li>
+            ))}
+          </ul>
+        </div>
+        <p className={styles.heroFooterText}>{t('cta')}</p>
         <br />
       </div>
 

@@ -20,6 +20,7 @@ const trustStripItems = [
   {
     id: 1,
     translation: 'hero.trustStrip.practiceOnly',
+    altTranslation: 'hero.trustStrip.practiceOnly',
     imageSrc: '/icon1.webp',
     width: 400,
     height: 441,
@@ -28,6 +29,7 @@ const trustStripItems = [
   {
     id: 2,
     translation: 'hero.trustStrip.realEmergencies',
+    altTranslation: 'hero.trustStrip.realEmergencies',
     imageSrc: '/icon2.webp',
     width: 400,
     height: 393,
@@ -35,6 +37,7 @@ const trustStripItems = [
   {
     id: 3,
     translation: 'hero.trustStrip.noRecordings',
+    altTranslation: 'hero.trustStrip.noRecordings',
     imageSrc: '/icon3.webp',
     width: 400,
     height: 305,
@@ -42,6 +45,7 @@ const trustStripItems = [
   {
     id: 4,
     translation: 'hero.trustStrip.parentSupervision',
+    altTranslation: 'hero.trustStrip.parentSupervision',
     imageSrc: '/icon4.webp',
     width: 400,
     height: 350,
@@ -49,6 +53,7 @@ const trustStripItems = [
   {
     id: 5,
     translation: 'hero.trustStrip.noScaryContent',
+    altTranslation: 'hero.trustStrip.noScaryContent',
     imageSrc: '/icon5.webp',
     width: 400,
     height: 338,
@@ -145,12 +150,11 @@ export default function HomePageClient() {
                           >
                             <Image
                               src={item.imageSrc}
-                              alt=""
+                              alt={t(item.altTranslation)}
                               width={item.width}
                               height={item.height}
                               sizes="64px"
                               className={styles.landingTrustStripIconImage}
-                              aria-hidden="true"
                               preload
                             />
                           </span>

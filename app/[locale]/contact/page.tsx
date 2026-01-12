@@ -12,6 +12,8 @@ export default function ContactPage() {
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const homePath = `/${locale}`;
+  const supportItems = t.raw('support.items') as string[];
+  const detailItems = t.raw('details.items') as string[];
 
   return (
     <ViewTransition>
@@ -70,6 +72,37 @@ export default function ContactPage() {
                   </span>
                 </Link>
               </div>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="contact-support-heading"
+            >
+              <h2 id="contact-support-heading" className="settings-section-heading">
+                {t('support.title')}
+              </h2>
+              <p className="mb-3">{t('support.description')}</p>
+              <ul className="settings-list space-y-2">
+                {supportItems.map(item => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section
+              className="settings-section"
+              aria-labelledby="contact-details-heading"
+            >
+              <h2 id="contact-details-heading" className="settings-section-heading">
+                {t('details.title')}
+              </h2>
+              <p className="mb-3">{t('details.description')}</p>
+              <ul className="settings-list space-y-2">
+                {detailItems.map(item => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p className="mb-3">{t('emergencyNote')}</p>
             </section>
 
             <section

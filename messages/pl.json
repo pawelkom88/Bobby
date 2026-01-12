@@ -720,8 +720,42 @@
       "faq": "FAQ",
       "faqDesc": "Znajdź odpowiedź"
     },
+    "support": {
+      "title": "W czym możemy pomóc",
+      "description": "Najczęstsze powody kontaktu:",
+      "items": [
+        "Dostęp do konta, płatności i pakiety",
+        "Problemy z dźwiękiem lub mikrofonem",
+        "Opinie o scenariuszach, tonie lub poziomie trudności",
+        "Zapytania o szkoły, partnerstwa lub media"
+      ]
+    },
+    "details": {
+      "title": "Warto podać",
+      "description": "Te informacje pomagają szybciej rozwiązać problem:",
+      "items": [
+        "Urządzenie i przeglądarka (np. iPad + Safari)",
+        "Strona, na której wystąpił problem",
+        "Komunikat błędu lub zrzut ekranu",
+        "Scenariusz lub poziom wieku, który był ćwiczony"
+      ]
+    },
+    "emergencyNote": "W prawdziwych nagłych wypadkach dzwoń 112 (EU) lub 999 (UK). Bobby służy tylko do ćwiczeń.",
     "responseTimeTitle": "Czas odpowiedzi",
     "responseTime": "Zazwyczaj odpowiadamy w ciągu 24 godzin."
+  },
+  "blog": {
+    "title": "Blog",
+    "intro": "Gotowość na sytuacje alarmowe zaczyna się od małych, powtarzalnych ćwiczeń w domu.",
+    "summary": "Zamieniamy badania w proste rutyny, aby dzieci potrafiły zachować spokój i mówić jasno w prawdziwej sytuacji.",
+    "topicsTitle": "Co znajdziesz na blogu",
+    "topics": [
+      "Skrypty rozmów alarmowych i pomysły na odgrywanie ról",
+      "Ćwiczenia dopasowane do wieku dziecka",
+      "Wskazówki o bezpieczeństwie i prywatności dla rodziców",
+      "Listy kontrolne i porady gotowości rodzinnej"
+    ],
+    "cta": "Masz pomysł na temat? Napisz na contact@readywithbobby.online."
   },
   "settings": {
     "title": "USTAWIENIA",

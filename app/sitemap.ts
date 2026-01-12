@@ -1,10 +1,17 @@
 import { MetadataRoute } from 'next';
 import { blogArticles } from './[locale]/blog/blog-data';
 import { locales } from '@/i18n/locales';
-import { getAbsoluteUrl } from '@/lib/site';
+import { BASE_URL } from '@/lib/site';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
+  const baseUrl = BASE_URL.replace(/\/$/, '');
+  const supportedLocales = locales.length > 0 ? locales : (['en'] as const);
+  const buildUrl = (path: string) =>
+    `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
 
   const staticRoutes = [
     { path: '', changeFrequency: 'weekly', priority: 1 },
@@ -27,10 +34,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const entries: MetadataRoute.Sitemap = [];
 
-  for (const locale of locales) {
+  for (const locale of supportedLocales) {
     for (const route of staticRoutes) {
       entries.push({
-        url: getAbsoluteUrl(`/${locale}${route.path}`),
+        url: buildUrl(`/${locale}${route.path}`),
         lastModified,
         changeFrequency: route.changeFrequency,
         priority: route.priority,
@@ -39,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     for (const route of articleRoutes) {
       entries.push({
-        url: getAbsoluteUrl(`/${locale}${route.path}`),
+        url: buildUrl(`/${locale}${route.path}`),
         lastModified: route.lastModified,
         changeFrequency: route.changeFrequency,
         priority: route.priority,
