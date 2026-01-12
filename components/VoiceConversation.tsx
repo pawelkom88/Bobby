@@ -357,8 +357,11 @@ export default function VoiceConversation({
       });
     }
     return () => {
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
+      const audioContext = audioContextRef.current;
+      if (audioContext) {
+        void audioContext.close().catch((error) => {
+          logger.error('VoiceConversation: Failed to close AudioContext', error);
+        });
         audioContextRef.current = null;
       }
     };
@@ -366,7 +369,9 @@ export default function VoiceConversation({
 
   // Setup Microphone on mount
   useEffect(() => {
-    setupMicrophone();
+    void setupMicrophone().catch((error) => {
+      logger.error('VoiceConversation: Failed to setup microphone', error);
+    });
     return () => {
       // Cleanup audio sources
       scheduledAudioSources.current.forEach(source => {
@@ -387,7 +392,7 @@ export default function VoiceConversation({
     ) {
       hasAutoStartedRef.current = true;
       const timer = setTimeout(() => {
-        startConversation();
+        void startConversation();
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -400,7 +405,7 @@ export default function VoiceConversation({
     const interval = setInterval(() => {
       setRemainingTime(prev => {
         if (prev <= 1) {
-          endConversation();
+          void endConversation();
           return 0;
         }
         return prev - 1;
@@ -595,7 +600,7 @@ export default function VoiceConversation({
                 if (isFarewell) {
                   // End conversation after agent finishes speaking
                   setTimeout(() => {
-                    endConversation();
+                    void endConversation();
                   }, 3000); // 3 second delay to allow farewell message to be spoken
                 }
               }

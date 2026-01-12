@@ -98,7 +98,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    initUser();
+    void initUser();
 
     const unsubscribe = subscribeToUserData(user.uid, (data) => {
       setUserData(data);

@@ -26,7 +26,9 @@ export function useCookieConsent() {
         setConsent(data.consent);
         
         // Initialize analytics with stored consent
-        analyticsService.initialize(data.consent === 'accepted');
+        void analyticsService.initialize(data.consent === 'accepted').catch((error) => {
+          logger.error('Failed to initialize analytics with stored consent', error);
+        });
       } catch (error) {
         logger.error('Failed to parse cookie consent data:', error);
         localStorage.removeItem(STORAGE_KEY);
@@ -45,7 +47,9 @@ export function useCookieConsent() {
     setConsent('accepted');
     
     // Initialize analytics with consent
-    analyticsService.initialize(true);
+    void analyticsService.initialize(true).catch((error) => {
+      logger.error('Failed to initialize analytics after consent', error);
+    });
   };
 
   const rejectCookies = () => {
@@ -58,7 +62,9 @@ export function useCookieConsent() {
     setConsent('rejected');
     
     // Disable analytics
-    analyticsService.initialize(false);
+    void analyticsService.initialize(false).catch((error) => {
+      logger.error('Failed to disable analytics after rejection', error);
+    });
 
     Object.keys(cookies).forEach(cookieName => {
       removeCookie(cookieName, { path: '/' });

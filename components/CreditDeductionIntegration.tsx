@@ -75,7 +75,7 @@ export default function CreditDeductionIntegration({
       }
     };
 
-    initializeConversation();
+    void initializeConversation();
   }, [isInitialized, autoStart, user, ageTier, situation, startConversation]);
 
   /**

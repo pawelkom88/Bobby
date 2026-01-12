@@ -13,6 +13,7 @@ import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { AuthProvider } from '@/context/AuthContext';
+import { logger } from '@/lib/logger';
 
 // Lazy load analytics to prevent Firebase from loading on landing page
 const LazyAnalyticsInitializer = dynamic(
@@ -20,7 +21,9 @@ const LazyAnalyticsInitializer = dynamic(
     import('@/lib/analytics-lazy').then(mod => ({
       default: function LazyAnalyticsInit() {
         React.useEffect(() => {
-          mod.lazyAnalytics.initialize();
+          void mod.lazyAnalytics.initialize().catch((error) => {
+            logger.error('Analytics initialization failed', error);
+          });
         }, []);
         return null;
       },

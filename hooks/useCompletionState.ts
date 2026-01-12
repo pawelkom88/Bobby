@@ -50,7 +50,7 @@ export function useCompletionState({
   const feedbackSummary = getFeedbackSummary(assessment);
 
   useEffect(() => {
-    processCompletion();
+    void processCompletion();
   }, [service, ageTier, performance.assessment, sessionData]);
 
   async function processCompletion() {

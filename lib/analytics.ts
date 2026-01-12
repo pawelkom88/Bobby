@@ -337,7 +337,7 @@ class AnalyticsService {
   // ============ UTILITY ============
   enableTracking(): void {
     if (!this.hasConsent) {
-      this.initialize(true);
+      void this.initialize(true);
     }
   }
 

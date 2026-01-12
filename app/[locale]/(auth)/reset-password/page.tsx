@@ -105,7 +105,7 @@ function ResetPasswordForm() {
     }
 
     setOobCode(code);
-    verifyCode(code);
+    void verifyCode(code);
   }, [searchParams]);
 
   const verifyCode = async (code: string) => {

@@ -38,7 +38,7 @@ self.addEventListener('install', (event) => {
     })
   );
   // Force the waiting service worker to become the active service worker
-  self.skipWaiting();
+  event.waitUntil(self.skipWaiting());
 });
 
 // Activate event - clean up old caches
@@ -55,7 +55,7 @@ self.addEventListener('activate', (event) => {
     })
   );
   // Take control of all pages immediately
-  self.clients.claim();
+  event.waitUntil(self.clients.claim());
 });
 
 // Fetch event - implement caching strategies

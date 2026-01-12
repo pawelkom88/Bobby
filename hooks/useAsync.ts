@@ -44,7 +44,7 @@ export function useAsync<T>(
 
   useEffect(() => {
     if (immediate) {
-      execute();
+      void execute();
     }
   }, [execute, immediate]);
 
