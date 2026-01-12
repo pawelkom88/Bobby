@@ -176,6 +176,7 @@ export default function HomePage() {
                   alt="Hero Image - smiling Bobby"
                   sizes="(max-width: 768px) 100vw, 392px"
                   preload
+                  fetchPriority="high"
                   className={styles.heroImage}
                 />
               </div>
