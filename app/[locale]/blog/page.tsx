@@ -1,8 +1,25 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import type { Metadata } from 'next';
 import { blogArticles } from './blog-data';
 import BlogCard from './BlogCard';
 import styles from './Blog.module.css';
+import { Link } from '@/i18n/routing';
+import { getPageMetadata } from '@/lib/seo';
+
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return getPageMetadata({
+    locale,
+    pageKey: 'blog',
+    pathname: `/${locale}/blog`,
+  });
+}
 
 export default function BlogPage() {
   return (

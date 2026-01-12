@@ -249,12 +249,12 @@ li {
 }
 
 html {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: var(--font-size-base);
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -321,7 +321,7 @@ h6,
 /* Dyslexia-friendly font class - uses Nunito across entire app */
 .dyslexia-font {
   font-family:
-    'Nunito',
+    var(--font-nunito),
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -331,7 +331,7 @@ h6,
 
 .dyslexia-font * {
   font-family:
-    'Nunito',
+    var(--font-nunito),
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -347,7 +347,7 @@ h6,
 .dyslexia-font h5,
 .dyslexia-font h6 {
   font-family:
-    'Nunito',
+    var(--font-nunito),
     'Segoe UI',
     -apple-system,
     BlinkMacSystemFont,
@@ -1111,7 +1111,7 @@ a,
   transition: all 0.1s;
   user-select: none;
   border: none;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
 }
 
 .key:active {
@@ -1256,7 +1256,7 @@ a,
   font-weight: 700;
   text-align: center;
   line-height: 1.5;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   position: relative;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1496,7 +1496,7 @@ a,
   font-size: 1.3rem;
   font-weight: 600;
   color: #333;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   margin: 0.6rem 0;
 }
 
@@ -1511,7 +1511,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1595,7 +1595,7 @@ a,
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
@@ -1656,7 +1656,7 @@ a,
   text-align: center;
   color: black;
   margin: 0;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
 }
 
 .welcome-image {
@@ -1771,7 +1771,7 @@ a,
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   border: none;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   min-height: 60px;
 }
 
@@ -2122,7 +2122,7 @@ a,
   color: #333;
   cursor: pointer;
   transition: color 0.2s ease;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   user-select: none;
 }
 
@@ -2242,7 +2242,7 @@ a,
   font-size: 0.95rem;
   font-weight: 600;
   color: #333;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -2256,7 +2256,7 @@ a,
   background: linear-gradient(135deg, var(--btn-light-color), var(--btn-color));
   color: var(--btn-text-color);
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -2377,7 +2377,7 @@ a,
 .select-package-message-error {
   color: #dc2626 !important;
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   padding: 1rem;
   background-color: rgba(225, 225, 225, 0.3);
   border-left: 4px solid #dc2626;
@@ -2386,7 +2386,7 @@ a,
 
 .select-package-message-warning {
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   padding: 1rem;
   background-color: rgba(245, 158, 11, 0.6);
   border-left: 4px solid #f59e0b;
@@ -2416,7 +2416,7 @@ a,
   font-size: 1.1rem;
   line-height: 1.6;
   text-align: center;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   margin: 0;
 }
 
@@ -2472,7 +2472,7 @@ a,
 
 .faq-subtitle-text {
   font-size: 1.1rem;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   line-height: 1.6;
   text-align: center;
   margin: 0;
@@ -2555,7 +2555,7 @@ a,
 }
 
 .faq-accordion-question {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
   color: black;
@@ -3224,7 +3224,7 @@ a,
 }
 
 .practice-address-value {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
   color: #1f2937;
@@ -3232,7 +3232,7 @@ a,
 }
 
 .practice-address-hint {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 0.95rem;
   color: #475569;
 }
@@ -3446,7 +3446,7 @@ a,
 .age-subtitle,
 .emergency-subtitle,
 .select-package-subtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.3rem;
   font-weight: 500;
   text-align: center;
@@ -3520,7 +3520,7 @@ a,
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   min-height: 100px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -5369,14 +5369,14 @@ a:focus-visible {
 
 /* Package card enhancements */
 .card-subtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1rem;
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .card-ideal-for {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -5393,7 +5393,7 @@ a:focus-visible {
 }
 
 .price-microcopy {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
@@ -5403,7 +5403,7 @@ a:focus-visible {
 }
 
 .features-title {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -5416,7 +5416,7 @@ a:focus-visible {
 }
 
 .feature-item {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   margin-bottom: 0.5rem;
   padding-left: 1.5rem;
   position: relative;
@@ -5439,21 +5439,21 @@ a:focus-visible {
 }
 
 .desc-title {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-weight: 600;
   margin-bottom: 0.5rem;
   font-size: 1.2rem;
 }
 
 .desc-text {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1rem;
   line-height: 1.4;
   text-wrap: balance;
 }
 
 .card-microcopy-bottom {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   text-align: center;
   margin-top: 1rem;
   padding-top: 1rem;
@@ -5570,7 +5570,7 @@ a:focus-visible {
 
 .conversation-detail__subtitle {
   font-size: 1rem;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   margin: 0;
 }
 
@@ -5991,7 +5991,7 @@ a:focus-visible {
 }
 
 .cookie-banner-title {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   font-size: 28px;
   font-weight: bold;
   color: var(--primary-purple, #667eea);
@@ -6024,7 +6024,7 @@ a:focus-visible {
 
 .cookie-banner-button {
   position: relative;
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   padding: 16px 24px;
   font-size: 16px;
   border-radius: 16px;

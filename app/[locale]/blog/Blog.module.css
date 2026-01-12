@@ -22,7 +22,7 @@
 }
 
 .pageTitle {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   font-size: clamp(2.5rem, 5vw, 4rem);
   color: #2d5a8c;
   margin: 0 0 16px 0;
@@ -82,7 +82,7 @@
 }
 
 .title {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   font-size: 1.5rem;
   color: #2d5a8c;
   margin: 0 0 12px 0;
@@ -187,7 +187,7 @@
 }
 
 .articleTitle {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   font-size: clamp(2rem, 4vw, 3rem);
   color: #2d5a8c;
   margin: 0 0 16px 0;
@@ -225,7 +225,7 @@
 }
 
 .articleContent h2 {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: var(--font-luckiest-guy), cursive;
   color: #2d5a8c;
   font-size: 1.8rem;
   margin: 32px 0 16px 0;

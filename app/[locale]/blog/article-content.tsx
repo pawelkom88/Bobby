@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import type { ReactNode } from 'react';
 import styles from './Blog.module.css';
 
@@ -17,9 +17,7 @@ const teachKidsEmergencyContent = (
         That’s the problem this article solves: how to teach kids emergency
         response skills in a way that actually sticks—using interactive
         technology like apps, games, VR, and{' '}
-        <Link href="/en#how-it-works">
-          Bobby (our kid-friendly emergency call simulation app)
-        </Link>
+        <Link href="/">Bobby (our kid-friendly emergency call simulation app)</Link>
         .
       </p>
       <p>
@@ -337,36 +335,23 @@ const teachKidsEmergencyContent = (
         videos, and first aid refreshers—so the sequence becomes second nature.
       </p>
 
-      <h3>Internal links (for your Bobby site)</h3>
+      <h3>Internal links (live Bobby pages)</h3>
       <p>Use 3–6 internal links to build topical authority:</p>
       <ul className={styles.cartoonListAlt}>
         <li>
-          <Link href="/how-bobby-works/">/how-bobby-works/</Link>
+          <Link href="/parent-guide">Parent guide for emergency practice</Link>
         </li>
         <li>
-          <Link href="/999-call-script-for-kids/">
-            /999-call-script-for-kids/
-          </Link>
+          <Link href="/faq">Emergency training FAQ</Link>
         </li>
         <li>
-          <Link href="/family-emergency-plan-template/">
-            /family-emergency-plan-template/
-          </Link>
+          <Link href="/safety-privacy">Safety & privacy</Link>
         </li>
         <li>
-          <Link href="/kids-fire-safety-at-home/">
-            /kids-fire-safety-at-home/
-          </Link>
+          <Link href="/blog">Emergency readiness blog</Link>
         </li>
         <li>
-          <Link href="/first-aid-basics-for-children/">
-            /first-aid-basics-for-children/
-          </Link>
-        </li>
-        <li>
-          <Link href="/printable-emergency-contact-card/">
-            /printable-emergency-contact-card/
-          </Link>
+          <Link href="/contact">Contact the Bobby team</Link>
         </li>
       </ul>
 

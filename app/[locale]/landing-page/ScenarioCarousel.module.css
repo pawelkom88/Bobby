@@ -24,7 +24,7 @@
 }
 
 .subtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 20px;
   line-height: 1.6;
   color: #475569;

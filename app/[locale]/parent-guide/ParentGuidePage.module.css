@@ -31,7 +31,7 @@
 }
 
 .parentGuideSubtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   color: #334155;
   max-width: 600px;
@@ -63,7 +63,7 @@
 }
 
 .guideCard h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: #1e293b;
@@ -71,14 +71,14 @@
 }
 
 .guideCard p {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #475569;
   line-height: 1.6;
 }
 
 .sectionIntro {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #475569;
   margin-bottom: 20px;
@@ -94,7 +94,7 @@
   background: white;
   border-radius: 12px;
   padding: 20px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #1e293b;
   font-style: italic;
@@ -103,7 +103,7 @@
 }
 
 .phraseNote {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 14px;
   color: #64748b;
   text-align: center;
@@ -124,7 +124,7 @@
 }
 
 .roleCard h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #1e293b;
@@ -137,7 +137,7 @@
 }
 
 .roleCard li {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 15px;
   color: #475569;
   margin-bottom: 10px;
@@ -162,7 +162,7 @@
 }
 
 .confidenceCard h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #1e293b;
@@ -175,7 +175,7 @@
 }
 
 .confidenceCard li {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 15px;
   color: #475569;
   margin-bottom: 10px;
@@ -199,7 +199,7 @@
 }
 
 .successSigns h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #166534;
@@ -212,7 +212,7 @@
 }
 
 .successSigns li {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 15px;
   color: #166534;
   margin-bottom: 10px;
@@ -240,7 +240,7 @@
 }
 
 .frequencyCard li {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #475569;
   margin-bottom: 15px;
@@ -271,7 +271,7 @@
 }
 
 .numberCard h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #4c51bf;
@@ -279,14 +279,14 @@
 }
 
 .numberCard p {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #1e293b;
 }
 
 .comingSoon {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 14px;
   color: #64748b;
   text-align: center;

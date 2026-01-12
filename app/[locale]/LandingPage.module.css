@@ -88,6 +88,7 @@
 }
 
 .heroImage {
+  width: 100%;
   max-width: 100%;
   height: auto;
   object-fit: contain;
@@ -156,7 +157,7 @@
 }
 
 .landingSubtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 40px;
@@ -176,7 +177,7 @@
 }
 
 .landingTrustStripTitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-weight: 800;
   color: #0f172a;
   margin-bottom: 10px;
@@ -219,7 +220,7 @@
 }
 
 .landingTrustStripText {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   color: #334155;
   line-height: 1.35;
 }
@@ -339,7 +340,7 @@
 }
 
 .faqAccordionQuestion {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: black;

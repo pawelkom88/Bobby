@@ -12,7 +12,7 @@
 }
 
 .subtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   text-align: center;
   margin-bottom: 2rem;
 }

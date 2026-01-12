@@ -13,6 +13,7 @@ import { routing } from '@/i18n/routing';
 import { locales } from '@/i18n/locales';
 import CspNonceDebugger from '@/components/CspNonceDebugger';
 import { ViewTransition } from 'react';
+import { BASE_URL } from '@/lib/site';
 
 type Props = {
   children: React.ReactNode;
@@ -34,17 +35,16 @@ export async function generateMetadata({
 
   const title = t('title');
   const description = t('description');
+  const languageAlternates = Object.fromEntries(
+    locales.map(supportedLocale => [supportedLocale, `/${supportedLocale}`])
+  );
 
   return {
-    metadataBase: new URL('http://readywithbobby.online/'),
+    metadataBase: new URL(BASE_URL),
     title,
     description,
     alternates: {
-      canonical: 'http://readywithbobby.online/',
-      languages: {
-        en: '/en',
-        pl: '/pl',
-      },
+      languages: languageAlternates,
     },
     openGraph: {
       title,
@@ -59,6 +59,7 @@ export async function generateMetadata({
       ],
       type: 'website',
       locale: locale === 'pl' ? 'pl_PL' : 'en_GB',
+      siteName: title,
     },
     twitter: {
       card: 'summary_large_image',
@@ -81,6 +82,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const messages = await getMessages();
   const t = await getTranslations({ locale, namespace: 'metadata' });
+  const siteUrl = BASE_URL.replace(/\/$/, '');
 
   return (
     <html lang={locale}>
@@ -101,12 +103,6 @@ export default async function LocaleLayout({ children, params }: Props) {
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
-        />
         <link rel="preconnect" href="https://firebase.googleapis.com" />
         <link rel="preconnect" href="https://firestore.googleapis.com" />
         <link rel="preconnect" href="https://bobby-11d45.firebaseapp.com" />
@@ -122,22 +118,26 @@ export default async function LocaleLayout({ children, params }: Props) {
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 '@context': 'https://schema.org',
-                '@type': 'SoftwareApplication',
-                name: t('title'),
-                description: t('description'),
-                applicationCategory: 'EducationalApplication',
-                operatingSystem: t('structuredData.operatingSystem'),
-                url:
-                  process.env.NEXT_PUBLIC_BASE_URL || 'https://bobby-app.com',
-                author: {
-                  '@type': 'Organization',
-                  name: t('structuredData.authorName'),
-                },
-                offers: {
-                  '@type': 'Offer',
-                  price: '0',
-                  priceCurrency: locale === 'pl' ? 'PLN' : 'GBP',
-                },
+                '@graph': [
+                  {
+                    '@type': 'Organization',
+                    '@id': `${siteUrl}/#organization`,
+                    name: t('structuredData.authorName'),
+                    url: siteUrl,
+                    logo: `${siteUrl}/bobby-OG-image.png`,
+                  },
+                  {
+                    '@type': 'WebSite',
+                    '@id': `${siteUrl}/#website`,
+                    url: siteUrl,
+                    name: t('title'),
+                    description: t('description'),
+                    publisher: {
+                      '@id': `${siteUrl}/#organization`,
+                    },
+                    inLanguage: locale === 'pl' ? 'pl-PL' : 'en-GB',
+                  },
+                ],
               }),
             }}
           />

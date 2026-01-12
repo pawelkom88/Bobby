@@ -60,7 +60,7 @@
 }
 
 .accordionQuestion {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: black;

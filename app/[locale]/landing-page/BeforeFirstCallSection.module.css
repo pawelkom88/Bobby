@@ -20,7 +20,7 @@
 }
 
 .subtitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: #334155;
@@ -67,7 +67,7 @@
 }
 
 .prepCard h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: #1e293b;
@@ -82,7 +82,7 @@
 }
 
 .prepListItem {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #475569;
   margin-bottom: 10px;
@@ -119,7 +119,7 @@
 }
 
 .safetyNotice p {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 15px;
   color: #92400e;
   margin: 0;

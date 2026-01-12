@@ -24,7 +24,7 @@ export default function Icon() {
           justifyContent: 'center',
           color: 'white',
           borderRadius: '50%',
-          fontFamily: 'Luckiest Guy, system-ui',
+          fontFamily: 'var(--font-luckiest-guy), system-ui',
         }}
       >
         B

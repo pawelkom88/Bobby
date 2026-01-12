@@ -1,17 +1,17 @@
 'use client';
 
 import { ViewTransition } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ROUTES } from '@/lib/routes';
-import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 
 export default function ContactPage() {
   const t = useTranslations('contact');
   const tCommon = useTranslations('common');
-  const router = useRouter();
+  const locale = useLocale();
+  const homePath = `/${locale}`;
 
   return (
     <ViewTransition>
@@ -82,7 +82,7 @@ export default function ContactPage() {
           </div>
 
           <div className="settings-back-button">
-            <CartoonButton onClick={() => router.push(ROUTES.HOME)}>
+            <CartoonButton asLink href={homePath}>
               {tCommon('back')}
             </CartoonButton>
           </div>

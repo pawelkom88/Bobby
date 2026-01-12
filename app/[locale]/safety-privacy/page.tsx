@@ -1,16 +1,16 @@
 'use client';
 
 import { ViewTransition } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';
 
 export default function SafetyPrivacyPage() {
   const t = useTranslations('safetyPrivacy');
   const tCommon = useTranslations('common');
-  const router = useRouter();
+  const locale = useLocale();
+  const homePath = `/${locale}`;
 
   return (
     <ViewTransition>
@@ -163,7 +163,7 @@ export default function SafetyPrivacyPage() {
           </div>
 
           <div className="settings-back-button">
-            <CartoonButton onClick={() => router.push('/')}>
+            <CartoonButton asLink href={homePath}>
               {tCommon('back')}
             </CartoonButton>
           </div>

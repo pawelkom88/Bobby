@@ -1,17 +1,23 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getArticleBySlug, blogArticles } from '../blog-data';
 import { articleContentMap } from '../article-content';
 import styles from '../Blog.module.css';
 import { ViewTransition } from 'react';
+import { Link } from '@/i18n/routing';
+import { getAbsoluteUrl } from '@/lib/site';
+import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 interface ArticlePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
-export async function generateMetadata({ params }: ArticlePageProps) {
-  const { slug } = await params;
+export async function generateMetadata({
+  params,
+}: ArticlePageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
   const article = getArticleBySlug(slug);
 
   if (!article) {
@@ -20,15 +26,26 @@ export async function generateMetadata({ params }: ArticlePageProps) {
     };
   }
 
+  const title = article.seoTitle ?? `${article.title} | Bobby Blog`;
+  const description = article.seoDescription ?? article.excerpt;
+
   return {
-    title: `${article.title} | Bobby Blog`,
-    description: article.excerpt,
+    title,
+    description,
+    alternates: {
+      canonical: getAbsoluteUrl(`/${locale}/blog/${article.slug}`),
+    },
     openGraph: {
-      title: article.title,
-      description: article.excerpt,
+      title,
+      description,
       images: [article.image],
       type: 'article',
       publishedTime: article.publishedAt,
+    },
+    twitter: {
+      title,
+      description,
+      images: [article.image],
     },
   };
 }
@@ -40,9 +57,11 @@ export async function generateStaticParams() {
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const article = getArticleBySlug(slug);
   const articleContent = articleContentMap[slug];
+  const t = await getTranslations({ locale, namespace: 'metadata' });
+  const nonce = (await headers()).get('x-csp-nonce') ?? undefined;
 
   if (!article) {
     notFound();
@@ -50,6 +69,38 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div className={styles.blogContainer}>
+      {nonce ? (
+        <script
+          type="application/ld+json"
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              headline: article.title,
+              description: article.excerpt,
+              datePublished: article.publishedAt,
+              image: [getAbsoluteUrl(article.image)],
+              author: {
+                '@type': 'Organization',
+                name: t('structuredData.authorName'),
+              },
+              publisher: {
+                '@type': 'Organization',
+                name: t('structuredData.authorName'),
+                logo: {
+                  '@type': 'ImageObject',
+                  url: getAbsoluteUrl('/bobby-OG-image.png'),
+                },
+              },
+              mainEntityOfPage: getAbsoluteUrl(
+                `/${locale}/blog/${article.slug}`
+              ),
+            }),
+          }}
+        />
+      ) : null}
       <article className={styles.articleContainer}>
         <Link href="/blog" className={styles.backLink}>
           <span aria-hidden="true">←</span>

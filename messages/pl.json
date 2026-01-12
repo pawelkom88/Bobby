@@ -12,6 +12,44 @@
     "structuredData": {
       "operatingSystem": "Przeglądarka internetowa",
       "authorName": "Zespół Bobby"
+    },
+    "pages": {
+      "home": {
+        "title": "Bobby | Trening alarmowy dla dzieci",
+        "description": "Pomóż dzieciom bezpiecznie ćwiczyć rozmowy alarmowe dzięki prowadzonej, rodzicielskiej symulacji Bobby."
+      },
+      "blog": {
+        "title": "Blog Bobby | Przygotowanie rodzin na sytuacje alarmowe",
+        "description": "Poradniki i wskazówki oparte na badaniach, które pomagają dzieciom zachować spokój w nagłych sytuacjach."
+      },
+      "parentGuide": {
+        "title": "Poradnik dla rodziców | Ćwiczenie rozmów alarmowych",
+        "description": "Krok po kroku: jak uczyć dzieci spokojnego i bezpiecznego ćwiczenia rozmów alarmowych."
+      },
+      "faq": {
+        "title": "FAQ | Bobby trening alarmowy dla dzieci",
+        "description": "Odpowiedzi o bezpieczeństwie, prywatności i działaniu Bobby."
+      },
+      "contact": {
+        "title": "Kontakt | Bobby",
+        "description": "Skontaktuj się z zespołem Bobby w sprawie wsparcia, opinii lub współpracy."
+      },
+      "privacyPolicy": {
+        "title": "Polityka prywatności | Bobby",
+        "description": "Jak Bobby chroni dane, prywatność i bezpieczeństwo dzieci podczas ćwiczeń."
+      },
+      "cookiesPolicy": {
+        "title": "Polityka cookies | Bobby",
+        "description": "Jak Bobby używa plików cookies i jak zarządzać preferencjami."
+      },
+      "termsConditions": {
+        "title": "Regulamin | Bobby",
+        "description": "Zasady korzystania z platformy treningu alarmowego Bobby."
+      },
+      "safetyPrivacy": {
+        "title": "Bezpieczeństwo i prywatność | Bobby",
+        "description": "Zasady bezpieczeństwa, ochrona prywatności i bezpieczny trening z Bobby."
+      }
     }
   },
   "common": {

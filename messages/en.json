@@ -12,6 +12,44 @@
     "structuredData": {
       "operatingSystem": "Web Browser",
       "authorName": "Bobby App Team"
+    },
+    "pages": {
+      "home": {
+        "title": "Bobby | Emergency Training for Kids",
+        "description": "Help kids practice emergency calls safely with Bobby's guided, parent-led simulations."
+      },
+      "blog": {
+        "title": "Bobby Blog | Emergency Prep for Families",
+        "description": "Guides, tips, and research-backed advice to help kids stay calm and ready in emergencies."
+      },
+      "parentGuide": {
+        "title": "Parent Guide | Help Kids Practice Emergency Calls",
+        "description": "Step-by-step guidance for parents to teach calm, safe emergency call practice at home."
+      },
+      "faq": {
+        "title": "FAQ | Bobby Emergency Training for Kids",
+        "description": "Answers about safety, privacy, and how Bobby helps kids practice emergency calls."
+      },
+      "contact": {
+        "title": "Contact Bobby | Support and Questions",
+        "description": "Get in touch with the Bobby team for support, feedback, or partnership questions."
+      },
+      "privacyPolicy": {
+        "title": "Privacy Policy | Bobby",
+        "description": "How Bobby handles data, privacy, and child safety in practice sessions."
+      },
+      "cookiesPolicy": {
+        "title": "Cookies Policy | Bobby",
+        "description": "Details on how Bobby uses cookies and how you can manage preferences."
+      },
+      "termsConditions": {
+        "title": "Terms & Conditions | Bobby",
+        "description": "The terms that govern using Bobby's emergency training platform."
+      },
+      "safetyPrivacy": {
+        "title": "Safety & Privacy | Bobby",
+        "description": "Parent-focused safety practices, privacy safeguards, and how Bobby keeps training safe."
+      }
     }
   },
   "common": {

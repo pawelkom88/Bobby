@@ -68,7 +68,7 @@
 }
 
 .service {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--service-color, #3b82f6);
@@ -90,7 +90,7 @@
 }
 
 .sectionTitle {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: #334155;
@@ -98,7 +98,7 @@
 }
 
 .description {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 16px;
   color: #475569;
   line-height: 1.6;
@@ -112,7 +112,7 @@
 }
 
 .listItem {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   font-size: 15px;
   color: #475569;
   padding: 8px 0 8px 28px;
