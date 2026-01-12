@@ -187,10 +187,10 @@ export default function VoiceConversation({
   const {
     setupMicrophone,
     startMicrophone,
-    microphone,
     microphoneState,
     microphoneError,
     processor,
+    microphoneAudioContext,
   } = useMicrophone();
 
   // Refs
@@ -417,28 +417,30 @@ export default function VoiceConversation({
 
   // Monitor microphone data for audio levels
   useEffect(() => {
-    if (microphone && socket && socketState === 1 && processor) {
-      const originalOnaudioprocess = processor.onaudioprocess;
+    if (!processor) return;
 
-      processor.onaudioprocess = event => {
-        // Get audio data for silence detection
-        const inputBuffer = event.inputBuffer;
-        const channelData = inputBuffer.getChannelData(0);
-        checkAudioLevels(channelData);
+    const inputSampleRate = microphoneAudioContext?.sampleRate ?? 48000;
+    const sendAudio =
+      socket && socketState === 1
+        ? sendMicToSocket(socket, inputSampleRate)
+        : null;
 
-        // Call original handler
-        if (originalOnaudioprocess) {
-          originalOnaudioprocess.call(processor, event);
-        }
-      };
-    }
+    const handleWorkletMessage = (event: MessageEvent<Float32Array>) => {
+      const channelData = event.data;
+      if (!channelData) return;
 
-    return () => {
-      if (processor) {
-        processor.onaudioprocess = sendMicToSocket(socket!);
+      checkAudioLevels(channelData);
+      if (sendAudio) {
+        sendAudio(channelData);
       }
     };
-  }, [microphone, socket, socketState, processor, checkAudioLevels]);
+
+    processor.port.onmessage = handleWorkletMessage;
+
+    return () => {
+      processor.port.onmessage = null;
+    };
+  }, [processor, socket, socketState, microphoneAudioContext, checkAudioLevels]);
 
   // Start/stop silence monitoring with conversation
   useEffect(() => {
@@ -653,15 +655,7 @@ export default function VoiceConversation({
     return () => socket.removeEventListener('message', onMessage);
   }, [socket]);
 
-  // Send Mic Data to Socket
-  useEffect(() => {
-    if (microphone && socket && socketState === 1 && processor) {
-      processor.onaudioprocess = sendMicToSocket(socket);
-    }
-    return () => {
-      if (processor) processor.onaudioprocess = null;
-    };
-  }, [microphone, socket, socketState, processor]);
+  // Send Mic Data to Socket (handled via AudioWorklet port)
 
   const startConversation = async () => {
     try {

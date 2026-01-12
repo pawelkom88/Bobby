@@ -66,13 +66,14 @@ export async function encrypt(data: string): Promise<string> {
  * Expects input in format: iv:authTag:encryptedData
  */
 export async function decrypt(encryptedData: string): Promise<string> {
+  const parts = encryptedData.split(':');
+  if (parts.length !== 3) {
+    logger.error('Decryption error: invalid encrypted data format');
+    throw new Error('Failed to decrypt data');
+  }
+
   try {
     const key = getEncryptionKey();
-    const parts = encryptedData.split(':');
-
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted data format');
-    }
 
     const iv = Buffer.from(parts[0], 'base64');
     const authTag = Buffer.from(parts[1], 'base64');

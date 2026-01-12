@@ -122,7 +122,7 @@ function ConversationPageContent() {
       logger.log('🔍 User turns:', assessment.metrics.userTurns);
       logger.log('🔍 Duration:', assessment.metrics.durationSeconds);
 
-      const completionId = `completion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const completionId = `completion-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
       // : refactor to simpler code and extract to func and test
       const stored = await setAssessment.mutateAsync({

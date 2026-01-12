@@ -1,64 +1,13 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NextIntlClientProvider } from 'next-intl';
-import React from 'react';
-
-// Mock next/navigation
-const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: mockPush,
-    replace: vi.fn(),
-    prefetch: vi.fn(),
-  }),
-}));
-
-// Mock next/image
-vi.mock('next/image', () => ({
-  __esModule: true,
-  default: function MockImage(props: { src: string; alt: string }) {
-    return React.createElement('img', { src: props.src, alt: props.alt });
-  },
-}));
-
-// Mock react ViewTransition
-vi.mock('react', async () => {
-  const actual = await vi.importActual('react');
-  return {
-    ...actual,
-    ViewTransition: ({ children }: { children: React.ReactNode }) => children,
-  };
-});
-
-// Mock session mutation
-const mockClearSessionMutate = vi.fn();
-vi.mock('@/hooks/mutations/useSessionMutations', () => ({
-  useClearSession: () => ({
-    mutate: mockClearSessionMutate,
-    isPending: false,
-    isSuccess: false,
-  }),
-}));
-
-vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({
-    user: { uid: 'test-user' },
-    loading: false,
-  }),
-}));
+import { mockPush, mockClearSessionMutate } from '../utils/app-page-mocks';
 
 const mockSetSelectedService = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/context/UserDataContext', () => ({
   useUserData: () => ({
     setSelectedService: mockSetSelectedService,
   }),
-}));
-
-// Mock components
-vi.mock('@/components/PageWrapper', () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="page-wrapper">{children}</div>
-  ),
 }));
 
 vi.mock('@/components/CartoonButton', () => ({
@@ -73,17 +22,6 @@ vi.mock('@/components/CartoonButton', () => ({
       {children}
     </button>
   ),
-}));
-
-vi.mock('@/components/SpeculationRules', () => ({
-  SpeculationRules: () => null,
-}));
-
-vi.mock('@/lib/logger', () => ({
-  logger: {
-    log: vi.fn(),
-    error: vi.fn(),
-  },
 }));
 
 // Import component after mocks

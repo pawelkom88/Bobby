@@ -17,7 +17,7 @@ interface MicrophoneContextType {
   microphoneState: number | null; // null=not setup, 0=setting up, 1=ready, 2=open
   microphoneError: string | null;
   microphoneAudioContext: AudioContext | undefined;
-  processor: ScriptProcessorNode | undefined;
+  processor: AudioWorkletNode | undefined;
 }
 
 const MicrophoneContext = createContext<MicrophoneContextType | undefined>(
@@ -36,7 +36,7 @@ export const MicrophoneContextProvider = ({
   const [microphoneAudioContext, setMicrophoneAudioContext] = useState<
     AudioContext | undefined
   >(undefined);
-  const [processor, setProcessor] = useState<ScriptProcessorNode | undefined>(
+  const [processor, setProcessor] = useState<AudioWorkletNode | undefined>(
     undefined
   );
 
@@ -57,12 +57,14 @@ export const MicrophoneContextProvider = ({
 
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
+      await audioContext.audioWorklet.addModule('/worklets/mic-processor.js');
+
       const micSource = audioContext.createMediaStreamSource(stream);
-      const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+      const workletNode = new AudioWorkletNode(audioContext, 'mic-processor');
 
       setMicrophone(micSource);
       setMicrophoneAudioContext(audioContext);
-      setProcessor(scriptProcessor);
+      setProcessor(workletNode);
       setMicrophoneState(1); // Ready
     } catch (err) {
       logger.error('Error setting up microphone:', err);

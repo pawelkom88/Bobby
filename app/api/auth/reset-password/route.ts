@@ -213,7 +213,20 @@ export async function POST(request: NextRequest) {
 
       const url = new URL(firebaseResetLink);
       const oobCode = url.searchParams.get('oobCode');
-      if (!oobCode) throw new Error('Missing oobCode');
+      if (!oobCode) {
+        logger.warn('Password reset link generation failed', {
+          emailMasked: maskEmail(normalizedEmail),
+          emailHash,
+          errorCode: 'missing-oobcode',
+          error: 'Missing oobCode',
+          ip: clientIp,
+        });
+        return NextResponse.json({
+          success: true,
+          message:
+            'If an account exists, a password reset link has been sent to your email.',
+        });
+      }
 
       const appResetUrl = new URL('/en/reset-password', appUrl); // include locale
       appResetUrl.searchParams.set('oobCode', oobCode);

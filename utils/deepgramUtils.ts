@@ -23,15 +23,14 @@ export const getAuthToken = async (firebaseIdToken: string) => {
 };
 
 export const sendMicToSocket =
-  (socket: WebSocket) => (event: AudioProcessingEvent) => {
+  (socket: WebSocket, inputSampleRate: number) => (inputData: Float32Array) => {
     logger.log(
       'deepgramUtils: sendMicToSocket called, socket readyState:',
       socket.readyState
     );
     if (socket.readyState === WebSocket.OPEN) {
       logger.log('deepgramUtils: Socket open, processing audio data');
-      const inputData = event.inputBuffer.getChannelData(0);
-      const downsampledData = downsample(inputData, 48000, 16000);
+      const downsampledData = downsample(inputData, inputSampleRate, 16000);
       const audioDataToSend = convertFloat32ToInt16(downsampledData);
       logger.log(
         'deepgramUtils: Sending audio data, length:',
