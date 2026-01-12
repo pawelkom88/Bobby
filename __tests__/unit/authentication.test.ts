@@ -81,8 +81,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'expired-token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/id-token-expired');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/id-token-expired');
       }
     });
 
@@ -99,8 +99,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'malformed-token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-token');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/invalid-token');
       }
     });
 
@@ -113,8 +113,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, '');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-token');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/invalid-token');
       }
     });
 
@@ -147,8 +147,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'revoked-token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/id-token-revoked');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/id-token-revoked');
       }
     });
 
@@ -165,8 +165,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'invalid-signature');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-token-signature');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/invalid-token-signature');
       }
     });
   });
@@ -180,9 +180,9 @@ describe('Authentication - Token Verification', () => {
       try {
         await verifyToken(mockVerifyFn, 'token');
         expect.fail('Should have thrown error');
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(TokenVerificationError);
-        expect(error.name).toBe('TokenVerificationError');
+        expect((error as TokenVerificationError).name).toBe('TokenVerificationError');
       }
     });
 
@@ -193,9 +193,9 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toHaveProperty('code');
-        expect(error.code).toBeTruthy();
+        expect((error as TokenVerificationError).code).toBeTruthy();
       }
     });
 
@@ -206,9 +206,9 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toHaveProperty('message');
-        expect(error.message).toContain('expired');
+        expect((error as TokenVerificationError).message).toContain('expired');
       }
     });
   });
@@ -292,8 +292,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/id-token-expired');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/id-token-expired');
       }
     });
 
@@ -304,8 +304,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/id-token-revoked');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/id-token-revoked');
       }
     });
 
@@ -316,8 +316,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-token');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/invalid-token');
       }
     });
 
@@ -328,8 +328,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-token-signature');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/invalid-token-signature');
       }
     });
 
@@ -340,8 +340,8 @@ describe('Authentication - Token Verification', () => {
 
       try {
         await verifyToken(mockVerifyFn, 'token');
-      } catch (error: any) {
-        expect(error.code).toBe('auth/token-verification-failed');
+      } catch (error: unknown) {
+        expect((error as TokenVerificationError).code).toBe('auth/token-verification-failed');
       }
     });
   });

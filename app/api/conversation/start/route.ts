@@ -11,14 +11,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase-admin';
 import { getAdminDb } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
 import { logger } from '@/lib/logger';
-import { extractBearerToken } from '@/lib/auth-utils';
 import {
   rateLimiters,
   getClientIP,
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
+import { verifyBearerUser } from '@/lib/bearer-auth';
 
 // Force Node.js runtime for proper body handling
 export const runtime = 'nodejs';
@@ -59,41 +58,6 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
 }
 
 /**
- * Extracts and verifies user from token
- */
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-  
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'conversation/start'
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(
-      (token) => auth.verifyIdToken(token),
-      tokenResult.token
-    );
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
-    return { error: 'Invalid token', status: 401 };
-  }
-}
-
-/**
  * Main handler
  */
 export async function POST(request: NextRequest): Promise<NextResponse<StartConversationResponse>> {
@@ -106,7 +70,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
     logger.log('[conversation/start] Firebase Admin initialized');
 
     logger.log('[conversation/start] Verifying token...');
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(
+      request,
+      auth,
+      'conversation/start'
+    );
 
     if ('error' in userResult) {
       logger.error('[conversation/start] Token verification failed:', userResult.error);
@@ -167,8 +135,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
 
       body = JSON.parse(rawBody);
       logger.log('[conversation/start] Body parsed successfully');
-    } catch (parseError: any) {
-      logger.error('[conversation/start] JSON parse error:', parseError?.message);
+    } catch (parseError: unknown) {
+      const parseErrorMessage =
+        parseError instanceof Error ? parseError.message : String(parseError);
+      logger.error('[conversation/start] JSON parse error:', parseErrorMessage);
       return NextResponse.json(
         {
           conversationId: '',
@@ -223,7 +193,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartConv
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error in conversation/start:', error);
 
     return NextResponse.json(

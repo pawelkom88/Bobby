@@ -84,16 +84,18 @@ export async function validateOwnership(
       conversationId,
       reason: 'owner',
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If it's already our custom error, re-throw it
     if (error instanceof OwnershipValidationError) {
       throw error;
     }
 
     // Otherwise, wrap it
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
     throw new OwnershipValidationError(
       'validation/error',
-      `Failed to validate ownership: ${error.message}`
+      `Failed to validate ownership: ${errorMessage}`
     );
   }
 }

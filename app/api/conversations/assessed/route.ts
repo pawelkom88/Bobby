@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase-admin';
 import { getAdminDb } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
 import { logger } from '@/lib/logger';
-import { extractBearerToken } from '@/lib/auth-utils';
 import {
   rateLimiters,
   getClientIP,
@@ -11,6 +9,7 @@ import {
 } from '@/lib/rateLimit';
 import type { Service, AgeTier, Conversation } from '@/types';
 import { FieldPath } from 'firebase-admin/firestore';
+import { verifyBearerUser } from '@/lib/bearer-auth';
 
 interface AssessedConversation {
   id: string;
@@ -29,43 +28,6 @@ interface AssessedConversationsResponse {
   conversations?: AssessedConversation[];
   error?: string;
   message?: string;
-}
-
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'conversations/assessed',
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(
-      token => auth.verifyIdToken(token),
-      tokenResult.token
-    );
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.warn('Token verification error:', {
-      error: errorMessage,
-      code: error.code,
-      stack: error.stack,
-    });
-    return { error: 'Invalid token', status: 401 };
-  }
 }
 
 async function getUserAssessedConversations(
@@ -100,7 +62,11 @@ export async function GET(
     const auth = getAdminAuth();
     const db = getAdminDb();
 
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(
+      request,
+      auth,
+      'conversations/assessed'
+    );
 
     if ('error' in userResult) {
       return NextResponse.json(

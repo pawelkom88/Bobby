@@ -25,47 +25,27 @@ import type {
   JourneyState,
 } from '@/types';
 import {logger} from "@/lib/logger";
+import { getDefaultUserData } from './user-data-defaults';
 
 const STORAGE_KEY = 'bobby-app-data';
-
-/**
- * Get default data structure
- */
-function getDefaultData(): UserData {
-  return {
-    userName: '',
-    totalXP: 0,
-    level: 1,
-    conversations: [],
-    badges: [],
-    settings: {
-      subtitles: true,
-      slowedSpeech: false,
-      reducedSensory: false,
-      fontSize: 'medium',
-      colorMode: 'default',
-      dyslexiaFont: false,
-    },
-  };
-}
 
 /**
  * Get all user data from localStorage
  */
 export function getUserData(): UserData {
   if (typeof window === 'undefined') {
-    return getDefaultData();
+    return getDefaultUserData();
   }
 
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
-      return getDefaultData();
+      return getDefaultUserData();
     }
     return JSON.parse(data) as UserData;
   } catch (error) {
     logger.error('Error reading from localStorage:', error);
-    return getDefaultData();
+    return getDefaultUserData();
   }
 }
 
@@ -251,7 +231,7 @@ export function resetProgress(): void {
   }
 
   try {
-    const data = getDefaultData();
+    const data = getDefaultUserData();
     // Preserve settings if desired, or reset everything
     // For now, reset everything
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));

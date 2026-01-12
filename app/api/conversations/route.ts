@@ -10,57 +10,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
 import { getConversationsForUser } from '@/lib/conversation-storage';
 import { logger } from '@/lib/logger';
-import { extractBearerToken } from '@/lib/auth-utils';
 import type { ConversationListItem } from '@/types';
 import {
   rateLimiters,
   getClientIP,
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
+import { verifyBearerUser } from '@/lib/bearer-auth';
 
 interface ConversationsListResponse {
   success: boolean;
   conversations?: ConversationListItem[];
   error?: string;
   message?: string;
-}
-
-/**
- * Extracts and verifies user from token
- */
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-  
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'conversations/list'
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(
-      (token) => auth.verifyIdToken(token),
-      tokenResult.token
-    );
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
-    return { error: 'Invalid token', status: 401 };
-  }
 }
 
 /**
@@ -74,7 +38,11 @@ export async function GET(
     const auth = getAdminAuth();
 
     // 1. Verify user from token
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(
+      request,
+      auth,
+      'conversations/list'
+    );
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -129,7 +97,7 @@ export async function GET(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error fetching conversations:', error);
 
     return NextResponse.json(

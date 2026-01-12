@@ -87,13 +87,18 @@ async function verifyUserFromToken(
     }
 
     return { userId: result.uid, isBeta };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
+  } catch (error: unknown) {
+    const errorCode =
+      typeof error === 'object' && error !== null && 'code' in error
+        ? (error as { code?: string }).code
+        : undefined;
 
-    if (error.code === 'auth/id-token-expired') {
+    logger.warn('Token verification error:', errorCode);
+
+    if (errorCode === 'auth/id-token-expired') {
       return { error: 'Token has expired', status: 401 };
     }
-    if (error.code === 'auth/id-token-revoked') {
+    if (errorCode === 'auth/id-token-revoked') {
       return { error: 'Token has been revoked', status: 401 };
     }
 
@@ -226,7 +231,7 @@ export async function POST(
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error storing feedback:', error);
 
     // Generic server error

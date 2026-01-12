@@ -100,8 +100,13 @@ export function useSecureSession() {
       try {
         await clearSessionRequest(() => Promise.resolve(authHeader));
         return true;
-      } catch (error: any) {
-        if (error?.status === 401) {
+      } catch (error: unknown) {
+        const errorStatus =
+          typeof error === 'object' && error !== null && 'status' in error
+            ? (error as { status?: number }).status
+            : undefined;
+
+        if (errorStatus === 401) {
           logger.warn(
             'Session clear failed due to authentication - treating as cleared'
           );

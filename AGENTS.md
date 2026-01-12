@@ -27,6 +27,7 @@
 - Components use `PascalCase.tsx`; hooks use `useThing.ts`; helpers use `camelCase`.
 - CSS Modules use `*.module.css` alongside components where needed.
 - When extracting logic into functions, move them into an existing helper module (or a new helper file) and add unit tests.
+- Prefer simple `if` statements with early returns for error handling and message extraction. Avoid nested ternaries, especially patterns like `error instanceof Error ? ... : ...`.
 
 ## Testing Guidelines
 

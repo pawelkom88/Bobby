@@ -35,27 +35,8 @@ import type {
   Badge,
   LevelUpResult,
 } from '@/types';
-
-/**
- * Get default data structure for new users
- */
-export function getDefaultUserData(): UserData {
-  return {
-    userName: '',
-    totalXP: 0,
-    level: 1,
-    conversations: [],
-    badges: [],
-    settings: {
-      subtitles: true,
-      slowedSpeech: false,
-      reducedSensory: false,
-      fontSize: 'medium',
-      colorMode: 'default',
-      dyslexiaFont: false,
-    },
-  };
-}
+import { getDefaultUserData } from './user-data-defaults';
+export { getDefaultUserData } from './user-data-defaults';
 
 /**
  * Get user data from Firestore

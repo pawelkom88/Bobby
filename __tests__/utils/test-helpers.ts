@@ -18,11 +18,13 @@ export async function expectErrorWithMessage(
       await result;
     }
     throw new Error('Expected function to throw an error');
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
     if (expectedMessage instanceof RegExp) {
-      expect(error.message).toMatch(expectedMessage);
+      expect(errorMessage).toMatch(expectedMessage);
     } else {
-      expect(error.message).toContain(expectedMessage);
+      expect(errorMessage).toContain(expectedMessage);
     }
   }
 }
@@ -40,8 +42,12 @@ export async function expectErrorWithCode(
       await result;
     }
     throw new Error('Expected function to throw an error');
-  } catch (error: any) {
-    expect(error.code).toBe(expectedCode);
+  } catch (error: unknown) {
+    const errorCode =
+      typeof error === 'object' && error !== null && 'code' in error
+        ? (error as { code?: string }).code
+        : undefined;
+    expect(errorCode).toBe(expectedCode);
   }
 }
 

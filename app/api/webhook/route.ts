@@ -39,8 +39,10 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.text();
     logger.log('[webhook] Body read successfully, length:', body.length);
-  } catch (bodyError: any) {
-    logger.error('[webhook] Failed to read body:', bodyError.message);
+  } catch (bodyError: unknown) {
+    const bodyErrorMessage =
+      bodyError instanceof Error ? bodyError.message : String(bodyError);
+    logger.error('[webhook] Failed to read body:', bodyErrorMessage);
     return NextResponse.json(
       { error: 'Failed to read request body' },
       { status: 400 }
@@ -71,8 +73,9 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     logger.log('[webhook] Signature verification successful');
-  } catch (err: any) {
-    logger.error('[webhook] Signature verification failed:', err.message);
+  } catch (err: unknown) {
+    const errMessage = err instanceof Error ? err.message : String(err);
+    logger.error('[webhook] Signature verification failed:', errMessage);
     return NextResponse.json(
       { error: 'Webhook signature verification failed' },
       { status: 400 }

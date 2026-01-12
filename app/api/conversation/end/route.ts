@@ -11,10 +11,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase-admin';
 import { getAdminDb } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
 import { validateOwnership, OwnershipValidationError } from '@/lib/ownership-validator';
 import { logger } from '@/lib/logger';
-import { extractBearerToken } from '@/lib/auth-utils';
 import { redactConversation } from '@/lib/redaction';
 import {
   rateLimiters,
@@ -22,6 +20,7 @@ import {
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
 import { ConversationMessage } from '@/types';
+import { verifyBearerUser } from '@/lib/bearer-auth';
 
 interface EndConversationRequest {
   conversationId: string;
@@ -67,41 +66,6 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
 }
 
 /**
- * Extracts and verifies user from token
- */
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-  
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'conversation/end'
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(
-      (token) => auth.verifyIdToken(token),
-      tokenResult.token
-    );
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
-    return { error: 'Invalid token', status: 401 };
-  }
-}
-
-/**
  * Fetches conversation from Firestore
  */
 async function getConversation(conversationId: string, db: ReturnType<typeof getAdminDb>) {
@@ -126,7 +90,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
     const auth = getAdminAuth();
     const db = getAdminDb();
 
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(
+      request,
+      auth,
+      'conversation/end'
+    );
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -201,7 +169,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
     // 3. Verify user owns conversation
     try {
       await validateOwnership(userId, conversationId, (id) => getConversation(id, db));
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof OwnershipValidationError) {
         if (error.code === 'conversation/not-found') {
           logger.warn(`Conversation ${conversationId} not found`);
@@ -262,7 +230,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EndConver
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error in conversation/end:', error);
 
     return NextResponse.json(

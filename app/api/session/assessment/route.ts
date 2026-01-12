@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAssessmentData, setCompletionId } from '@/lib/session-storage';
-import { verifyIdToken } from '@/lib/firebase-admin';
 import type { AssessmentData } from '@/schemas/session.schema';
 import { logger } from '@/lib/logger';
-import { extractAndValidateToken } from '@/lib/auth-utils';
-import {
-  rateLimiters,
-  getClientIP,
-  createRateLimitHeaders,
-} from '@/lib/rateLimit';
+import { rateLimiters } from '@/lib/rateLimit';
+import { requireSessionUser } from '@/lib/session-request';
 
 // Force Node.js runtime - Netlify Edge doesn't forward POST bodies correctly
 export const runtime = 'nodejs';
@@ -35,42 +30,14 @@ export const runtime = 'nodejs';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const idToken = extractAndValidateToken(request, 'session/assessment');
-    
-    if (!idToken) {
-      return NextResponse.json(
-        { error: 'Invalid or missing authorization token' },
-        { status: 401 }
-      );
-    }
-
-    let decodedToken: { uid: string };
-    try {
-      decodedToken = await verifyIdToken(idToken);
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      );
-    }
-
-    const userId = decodedToken.uid;
-    const clientIp = getClientIP(request);
-    const rateLimitIdentifier = `session-assessment:${userId}:${clientIp}`;
-    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
-
-    if (rateLimit.limited) {
-      return NextResponse.json(
-        {
-          error: 'Too many requests',
-          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
-        },
-        {
-          status: 429,
-          headers: createRateLimitHeaders(rateLimit),
-        }
-      );
+    const sessionUser = await requireSessionUser(
+      request,
+      'session/assessment',
+      'session-assessment',
+      rateLimiters.strict
+    );
+    if (sessionUser instanceof NextResponse) {
+      return sessionUser;
     }
 
     // Parse request body

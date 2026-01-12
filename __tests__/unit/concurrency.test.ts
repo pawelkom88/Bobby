@@ -412,25 +412,36 @@ describe('Concurrency - Race Condition Prevention', () => {
     });
 
     it('should_support_delay', async () => {
+      vi.useFakeTimers();
       const tx = createControllableTransaction();
       tx.setDelay(10);
       tx.setResult({ success: true });
 
-      const startTime = Date.now();
-      await tx.execute();
-      const duration = Date.now() - startTime;
+      try {
+        let resolved = false;
+        const executePromise = tx.execute().then(() => {
+          resolved = true;
+        });
 
-      expect(duration).toBeGreaterThanOrEqual(10);
+        await vi.advanceTimersByTimeAsync(9);
+        expect(resolved).toBe(false);
+
+        await vi.advanceTimersByTimeAsync(1);
+        await executePromise;
+        expect(resolved).toBe(true);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
-    it('should_clear_state', () => {
+    it('should_clear_state', async () => {
       const tx = createControllableTransaction();
       tx.setShouldFail(true);
       tx.setDelay(100);
       tx.clear();
 
       // After clear, should execute successfully
-      expect(tx.execute()).resolves.toBeDefined();
+      await expect(tx.execute()).resolves.toBeDefined();
     });
   });
 

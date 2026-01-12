@@ -51,8 +51,8 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership(userId, conversationId, getConversationFn);
-      } catch (error: any) {
-        expect(error.code).toBe('auth/not-authorized');
+      } catch (error: unknown) {
+        expect((error as OwnershipValidationError).code).toBe('auth/not-authorized');
       }
     });
 
@@ -68,8 +68,8 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership(userId, conversationId, getConversationFn);
-      } catch (error: any) {
-        expect(error.code).toBe('conversation/not-found');
+      } catch (error: unknown) {
+        expect((error as OwnershipValidationError).code).toBe('conversation/not-found');
       }
     });
 
@@ -83,8 +83,8 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership(userId, '', getConversationFn);
-      } catch (error: any) {
-        expect(error.code).toBe('validation/invalid-conversation-id');
+      } catch (error: unknown) {
+        expect((error as OwnershipValidationError).code).toBe('validation/invalid-conversation-id');
       }
     });
 
@@ -98,8 +98,8 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership('', conversationId, getConversationFn);
-      } catch (error: any) {
-        expect(error.code).toBe('auth/invalid-user-id');
+      } catch (error: unknown) {
+        expect((error as OwnershipValidationError).code).toBe('auth/invalid-user-id');
       }
     });
 
@@ -152,8 +152,8 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership(userId, conversationId, getConversationFn);
-      } catch (error: any) {
-        expect(error.code).toBe('validation/error');
+      } catch (error: unknown) {
+        expect((error as OwnershipValidationError).code).toBe('validation/error');
       }
     });
   });
@@ -273,9 +273,9 @@ describe('Authorization - Ownership Validation', () => {
       try {
         await validateOwnership(userId, conversationId, getConversationFn);
         expect.fail('Should have thrown error');
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(OwnershipValidationError);
-        expect(error.name).toBe('OwnershipValidationError');
+        expect((error as OwnershipValidationError).name).toBe('OwnershipValidationError');
       }
     });
 
@@ -291,9 +291,9 @@ describe('Authorization - Ownership Validation', () => {
 
       try {
         await validateOwnership(userId, conversationId, getConversationFn);
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toHaveProperty('code');
-        expect(error.code).toBeTruthy();
+        expect((error as OwnershipValidationError).code).toBeTruthy();
       }
     });
   });

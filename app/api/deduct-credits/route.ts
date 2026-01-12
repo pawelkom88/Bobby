@@ -14,7 +14,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase-admin';
 import { getAdminDb } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
 import {
   validateOwnership,
   OwnershipValidationError,
@@ -23,12 +22,11 @@ import { CreditTransactionError } from '@/lib/credit-transaction';
 import { calculateDuration } from '@/lib/duration-calculator';
 import { isEligibleForCharge } from '@/lib/charge-eligibility';
 import { logger } from '@/lib/logger';
-import { extractBearerToken } from '@/lib/auth-utils';
 import {
   rateLimiters,
-  getClientIP,
   createRateLimitHeaders,
 } from '@/lib/rateLimit';
+import { verifyBearerUser, enforceBearerRateLimit } from '@/lib/bearer-auth';
 
 interface DeductCreditsRequest {
   conversationId: string;
@@ -76,46 +74,6 @@ function validateRequest(body: any): { valid: boolean; error?: string } {
   }
 
   return { valid: true };
-}
-
-/**
- * Extracts and verifies user from token
- */
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-  
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'deduct-credits'
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(token => auth.verifyIdToken(token), tokenResult.token);
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
-
-    if (error.code === 'auth/id-token-expired') {
-      return { error: 'Token has expired', status: 401 };
-    }
-    if (error.code === 'auth/id-token-revoked') {
-      return { error: 'Token has been revoked', status: 401 };
-    }
-
-    return { error: 'Invalid token', status: 401 };
-  }
 }
 
 /**
@@ -298,7 +256,11 @@ export async function POST(
     const { conversationId } = body as DeductCreditsRequest;
 
     // 2. Verify user from token
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(
+      request,
+      auth,
+      'deduct-credits'
+    );
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -310,29 +272,35 @@ export async function POST(
     const userId = userResult.userId;
 
     // 3. Rate limiting
-    const clientIp = getClientIP(request);
-    const rateLimitIdentifier = `deduct-credits:${userId}:${clientIp}`;
-    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+    const rateLimitResponse = await enforceBearerRateLimit(
+      request,
+      userId,
+      rateLimiters.strict,
+      'deduct-credits',
+      (rateLimit) => {
+        logger.warn('Rate limit exceeded for deduct-credits endpoint', {
+          userId,
+          remaining: rateLimit.remaining,
+          resetTime: rateLimit.resetTime,
+        });
 
-    if (rateLimit.limited) {
-      logger.warn('Rate limit exceeded for deduct-credits endpoint', {
-        userId,
-        remaining: rateLimit.remaining,
-        resetTime: rateLimit.resetTime,
-      });
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'rate-limited',
+            message: 'Too many requests',
+            retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+          },
+          {
+            status: 429,
+            headers: createRateLimitHeaders(rateLimit),
+          }
+        );
+      }
+    );
 
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'rate-limited',
-          message: 'Too many requests',
-          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
-        },
-        {
-          status: 429,
-          headers: createRateLimitHeaders(rateLimit),
-        }
-      );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     logger.log(
@@ -342,7 +310,7 @@ export async function POST(
     // 4. Verify user owns conversation
     try {
       await validateOwnership(userId, conversationId, (id) => getConversation(id, db));
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof OwnershipValidationError) {
         if (error.code === 'conversation/not-found') {
           logger.warn(`Conversation ${conversationId} not found`);
@@ -472,7 +440,7 @@ export async function POST(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error in deduct-credits:', error);
 
     // Handle specific error types

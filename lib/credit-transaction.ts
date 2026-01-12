@@ -133,16 +133,18 @@ export async function deductCredit(
       charged: true,
       durationSeconds,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If it's already our custom error, re-throw it
     if (error instanceof CreditTransactionError) {
       throw error;
     }
 
     // Otherwise, wrap it
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
     throw new CreditTransactionError(
       'transaction/failed',
-      `Credit deduction failed: ${error.message}`
+      `Credit deduction failed: ${errorMessage}`
     );
   }
 }

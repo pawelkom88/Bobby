@@ -1,20 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fetchSession, setAssessment } from '../../lib/api/session';
+import {
+  clearSession,
+  fetchSession,
+  setAssessment,
+  setConversationComplete,
+  setConversationId,
+} from '../../lib/api/session';
+import * as fetcher from '@/lib/fetcher';
 
-const fetchMock = vi.fn();
+vi.mock('@/lib/fetcher', () => ({
+  authenticatedFetch: vi.fn(),
+}));
 
 beforeEach(() => {
-  fetchMock.mockReset();
-  globalThis.fetch = fetchMock as unknown as typeof fetch;
+  vi.clearAllMocks();
 });
 
 describe('session api', () => {
   it('fetchSession returns data', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      json: async () => ({ success: true, data: {} }),
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: true,
+      data: {},
     });
 
     const data = await fetchSession(async () => 'Bearer token');
@@ -22,12 +28,20 @@ describe('session api', () => {
     expect(data).toEqual({});
   });
 
+  it('fetchSession throws when response is not successful', async () => {
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: false,
+      error: 'nope',
+    });
+
+    await expect(fetchSession(async () => 'Bearer token')).rejects.toThrow(
+      'nope'
+    );
+  });
+
   it('setAssessment posts payload', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      json: async () => ({ success: true }),
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: true,
     });
 
     const response = await setAssessment(
@@ -49,5 +63,38 @@ describe('session api', () => {
     );
 
     expect(response.success).toBe(true);
+  });
+
+  it('setConversationId throws on failure', async () => {
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: false,
+      error: 'failed',
+    });
+
+    await expect(
+      setConversationId('conv-1', async () => 'Bearer token')
+    ).rejects.toThrow('failed');
+  });
+
+  it('setConversationComplete throws on failure', async () => {
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: false,
+      error: 'failed',
+    });
+
+    await expect(
+      setConversationComplete(true, async () => 'Bearer token')
+    ).rejects.toThrow('failed');
+  });
+
+  it('clearSession throws on failure', async () => {
+    vi.mocked(fetcher.authenticatedFetch).mockResolvedValue({
+      success: false,
+      error: 'failed',
+    });
+
+    await expect(clearSession(async () => 'Bearer token')).rejects.toThrow(
+      'failed'
+    );
   });
 });

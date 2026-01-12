@@ -51,7 +51,7 @@ export async function verifyToken(
       uid: decodedToken.uid,
       decodedToken,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Map Firebase errors to standard error codes
     const errorCode = mapFirebaseErrorCode(error);
     const errorMessage = mapFirebaseErrorMessage(error);
@@ -96,8 +96,8 @@ export function isTokenExpired(decodedToken: DecodedIdToken): boolean {
 /**
  * Maps Firebase error messages to standard error codes
  */
-function mapFirebaseErrorCode(error: any): string {
-  const message = error.message || '';
+function mapFirebaseErrorCode(error: unknown): string {
+  const message = getErrorMessage(error);
 
   if (message.includes('expired')) {
     return 'auth/id-token-expired';
@@ -118,8 +118,8 @@ function mapFirebaseErrorCode(error: any): string {
 /**
  * Maps Firebase error messages to user-friendly messages
  */
-function mapFirebaseErrorMessage(error: any): string {
-  const message = error.message || '';
+function mapFirebaseErrorMessage(error: unknown): string {
+  const message = getErrorMessage(error);
 
   if (message.includes('expired')) {
     return 'Firebase ID token has expired. Get a fresh ID token from your client.';
@@ -135,4 +135,20 @@ function mapFirebaseErrorMessage(error: any): string {
   }
 
   return 'Token verification failed.';
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+  return '';
 }

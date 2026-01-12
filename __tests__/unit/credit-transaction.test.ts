@@ -159,8 +159,8 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
-        expect(error.code).toBe('transaction/already-charged');
+      } catch (error: unknown) {
+        expect((error as CreditTransactionError).code).toBe('transaction/already-charged');
       }
     });
 
@@ -195,8 +195,8 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
-        expect(error.code).toBe('payment/insufficient-credits');
+      } catch (error: unknown) {
+        expect((error as CreditTransactionError).code).toBe('payment/insufficient-credits');
       }
     });
 
@@ -280,9 +280,9 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(CreditTransactionError);
-        expect(error.code).toBe('transaction/failed');
+        expect((error as CreditTransactionError).code).toBe('transaction/failed');
       }
     });
   });
@@ -528,7 +528,7 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toBeInstanceOf(CreditTransactionError);
         expect(error.name).toBe('CreditTransactionError');
       }
@@ -548,9 +548,9 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toHaveProperty('code');
-        expect(error.code).toBeTruthy();
+        expect((error as CreditTransactionError).code).toBeTruthy();
       }
     });
 
@@ -568,9 +568,9 @@ describe('Credit Transaction', () => {
           deductCreditFn,
           recordDeductionFn
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toHaveProperty('message');
-        expect(error.message).toBeTruthy();
+        expect((error as CreditTransactionError).message).toBeTruthy();
       }
     });
   });

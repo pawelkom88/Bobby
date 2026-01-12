@@ -1,20 +1,18 @@
 // Service Worker for Bobby App
 // Implements cache-first strategy with stale-while-revalidate for static assets
 
-const CACHE_NAME = 'bobby-cache-v1';
-const STATIC_CACHE_NAME = 'bobby-static-v1';
+const CACHE_VERSION = 'v2';
+const CACHE_NAME = `bobby-cache-${CACHE_VERSION}`;
+const STATIC_CACHE_NAME = `bobby-static-${CACHE_VERSION}`;
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
-  '/',
   '/favicon.ico',
   '/icon2.webp',
 ];
 
 // Cache-first strategy for these file types
 const CACHE_FIRST_PATTERNS = [
-  /\.js$/,
-  /\.css$/,
   /\.woff2?$/,
   /\.png$/,
   /\.jpg$/,
@@ -39,6 +37,13 @@ self.addEventListener('install', (event) => {
   );
   // Force the waiting service worker to become the active service worker
   event.waitUntil(self.skipWaiting());
+});
+
+// Allow the page to trigger immediate activation on updates
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    event.waitUntil(self.skipWaiting());
+  }
 });
 
 // Activate event - clean up old caches
@@ -70,6 +75,22 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension and other non-http(s) requests
   if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Only cache same-origin requests
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Let Next.js handle its own asset caching
+  if (url.pathname.startsWith('/_next/')) {
+    return;
+  }
+
+  // Always fetch documents from network (cache only for offline fallback)
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(networkFirst(request));
     return;
   }
 

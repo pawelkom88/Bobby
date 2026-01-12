@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
-import { verifyToken } from '@/lib/token-verifier';
-import { extractBearerToken } from '@/lib/auth-utils';
+import { verifyBearerUser, enforceBearerRateLimit } from '@/lib/bearer-auth';
 import { clearAllSessionValues } from '@/lib/session-storage';
 import { logger } from '@/lib/logger';
-import {
-  rateLimiters,
-  getClientIP,
-  createRateLimitHeaders,
-} from '@/lib/rateLimit';
+import { rateLimiters, createRateLimitHeaders } from '@/lib/rateLimit';
 import { sendGoodbyeEmail } from '@/lib/mailer';
 
 const BATCH_SIZE = 500;
@@ -18,46 +13,6 @@ interface DeleteAccountResponse {
   error?: string;
   message?: string;
   retryAfter?: number;
-}
-
-async function verifyUserFromToken(
-  request: NextRequest,
-  auth: ReturnType<typeof getAdminAuth>
-): Promise<{ userId: string } | { error: string; status: number }> {
-  const tokenResult = extractBearerToken(request);
-
-  if (!tokenResult.success) {
-    logger.warn('Token extraction failed', {
-      error: tokenResult.error,
-      endpoint: 'account/delete',
-    });
-    return { error: tokenResult.message, status: 401 };
-  }
-
-  try {
-    const result = await verifyToken(
-      token => auth.verifyIdToken(token),
-      tokenResult.token
-    );
-
-    if (!result.success || !result.uid) {
-      logger.warn('Token verification failed');
-      return { error: 'Invalid token', status: 401 };
-    }
-
-    return { userId: result.uid };
-  } catch (error: any) {
-    logger.warn('Token verification error:', error.code);
-
-    if (error.code === 'auth/id-token-expired') {
-      return { error: 'Token has expired', status: 401 };
-    }
-    if (error.code === 'auth/id-token-revoked') {
-      return { error: 'Token has been revoked', status: 401 };
-    }
-
-    return { error: 'Invalid token', status: 401 };
-  }
 }
 
 async function deleteUserDocumentsFromCollection(
@@ -101,7 +56,10 @@ async function deleteUserDocumentsFromCollection(
   }
 }
 
-async function deleteUserDocument(userId: string, db: ReturnType<typeof getAdminDb>): Promise<void> {
+async function deleteUserDocument(
+  userId: string,
+  db: ReturnType<typeof getAdminDb>
+): Promise<void> {
   try {
     await db.collection('users').doc(userId).delete();
     logger.log(`Deleted user document for ${userId}`);
@@ -111,7 +69,10 @@ async function deleteUserDocument(userId: string, db: ReturnType<typeof getAdmin
   }
 }
 
-async function deleteAuthUser(userId: string, auth: ReturnType<typeof getAdminAuth>): Promise<void> {
+async function deleteAuthUser(
+  userId: string,
+  auth: ReturnType<typeof getAdminAuth>
+): Promise<void> {
   try {
     await auth.deleteUser(userId);
     logger.log(`Deleted Firebase Auth user ${userId}`);
@@ -129,7 +90,7 @@ export async function POST(
     const auth = getAdminAuth();
     const db = getAdminDb();
 
-    const userResult = await verifyUserFromToken(request, auth);
+    const userResult = await verifyBearerUser(request, auth, 'account/delete');
 
     if ('error' in userResult) {
       return NextResponse.json(
@@ -141,29 +102,35 @@ export async function POST(
     const userId = userResult.userId;
 
     // Rate limiting - strict limit for destructive operation
-    const clientIp = getClientIP(request);
-    const rateLimitIdentifier = `account-delete:${userId}:${clientIp}`;
-    const rateLimit = await rateLimiters.strict.isRateLimited(rateLimitIdentifier);
+    const rateLimitResponse = await enforceBearerRateLimit(
+      request,
+      userId,
+      rateLimiters.strict,
+      'account-delete',
+      rateLimit => {
+        logger.warn('Rate limit exceeded for account/delete endpoint', {
+          userId,
+          remaining: rateLimit.remaining,
+          resetTime: rateLimit.resetTime,
+        });
 
-    if (rateLimit.limited) {
-      logger.warn('Rate limit exceeded for account/delete endpoint', {
-        userId,
-        remaining: rateLimit.remaining,
-        resetTime: rateLimit.resetTime,
-      });
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'rate-limited',
+            message: 'Too many requests',
+            retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+          },
+          {
+            status: 429,
+            headers: createRateLimitHeaders(rateLimit),
+          }
+        );
+      }
+    );
 
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'rate-limited',
-          message: 'Too many requests',
-          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
-        },
-        {
-          status: 429,
-          headers: createRateLimitHeaders(rateLimit),
-        }
-      );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     logger.log(`User ${userId} requesting account deletion`);
@@ -218,10 +185,15 @@ export async function POST(
 
     try {
       await deleteAuthUser(userId, auth);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error deleting Firebase Auth user:', error);
 
-      if (error.code !== 'auth/user-not-found') {
+      const errorCode =
+        typeof error === 'object' && error !== null && 'code' in error
+          ? (error as { code?: string }).code
+          : undefined;
+
+      if (errorCode !== 'auth/user-not-found') {
         return NextResponse.json(
           {
             success: false,
@@ -246,7 +218,10 @@ export async function POST(
         await sendGoodbyeEmail(userEmail, userName || 'there');
         logger.info('Goodbye email sent successfully', { userId });
       } catch (emailError) {
-        logger.error('Failed to send goodbye email', { userId, error: emailError });
+        logger.error('Failed to send goodbye email', {
+          userId,
+          error: emailError,
+        });
       }
     }
 
@@ -263,7 +238,7 @@ export async function POST(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error in account/delete:', error);
 
     return NextResponse.json(
