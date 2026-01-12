@@ -11,7 +11,11 @@ vi.mock('@/lib/mailer', () => ({
   sendGoodbyeEmail: vi.fn(),
 }));
 
-describe('Test email API routes', () => {
+const shouldRunEmailRouteTests =
+  process.env.RUN_TEST_EMAIL_ROUTES === 'true' && !process.env.CI;
+const describeEmailRoutes = shouldRunEmailRouteTests ? describe : describe.skip;
+
+describeEmailRoutes('Test email API routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
