@@ -31,7 +31,7 @@ export function createMockQuerySnapshot(docs: any[] = []) {
       id: `doc-${index}`,
     })),
     forEach: vi.fn((callback) => {
-      docs.forEach((data, index) => {
+      docs.forEach((data) => {
         callback(createMockDocSnapshot(data, true));
       });
     }),

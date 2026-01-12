@@ -9,7 +9,7 @@ interface CookieBannerProps {
 const BANNER_DELAY_MS = 3500;
 
 export default function CookieBanner({ className = '' }: CookieBannerProps) {
-  const { consent, isLoading, acceptCookies, rejectCookies, hasConsented } = useCookieConsent();
+  const { isLoading, acceptCookies, rejectCookies, hasConsented } = useCookieConsent();
   const t = useTranslations('cookies');
   const bannerRef = useRef<HTMLDivElement>(null);
   const acceptButtonRef = useRef<HTMLButtonElement>(null);

@@ -39,9 +39,7 @@ export function calculateDuration(startTime: Date, endTime: Date): number {
   validateTimestamps(startTime, endTime);
 
   const durationMs = endTime.getTime() - startTime.getTime();
-  const durationSeconds = Math.floor(durationMs / 1000);
-
-  return durationSeconds;
+  return Math.floor(durationMs / 1000);
 }
 
 /**

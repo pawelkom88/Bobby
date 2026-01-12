@@ -151,9 +151,6 @@ const mockLocation = {
   origin: 'http://localhost:3000',
 };
 
-// Store original location
-const originalLocation = window.location;
-
 const enMessages = {
   dial: {
     creditsLabel: 'Credits:',

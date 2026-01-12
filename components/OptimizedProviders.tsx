@@ -11,7 +11,6 @@ import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { initWebVitals } from '@/lib/web-vitals';
 import { queryClient } from '@/lib/queryClient';
 import dynamic from 'next/dynamic';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import React from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 

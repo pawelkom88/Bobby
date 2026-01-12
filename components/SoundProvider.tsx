@@ -38,7 +38,7 @@ function loadAudio(url: string): Promise<HTMLAudioElement> {
       resolve(audio);
     }, { once: true });
 
-    audio.addEventListener('error', (e) => {
+    audio.addEventListener('error', () => {
       reject(new Error(`Failed to load audio: ${url}`));
     }, { once: true });
 

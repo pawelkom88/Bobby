@@ -84,7 +84,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     const userDocRef = doc(db, 'users', user.uid);
 
     // KEY FIX: Use includeMetadataChanges to detect cache vs server
-    const unsubscribe = onSnapshot(
+    unsubscribeRef.current = onSnapshot(
       userDocRef,
       { includeMetadataChanges: true },
       docSnapshot => {
@@ -153,8 +153,6 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         setIsServerConfirmed(true); // Treat error as "confirmed" to unblock UI
       }
     );
-
-    unsubscribeRef.current = unsubscribe;
 
     // Safety timeout: If server doesn't respond within 15s, use cached data
     const timeoutId = setTimeout(() => {

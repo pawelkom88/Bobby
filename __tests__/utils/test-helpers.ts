@@ -63,8 +63,7 @@ export function expectDatesApproxEqual(
 export function expectInRange(
   value: number,
   min: number,
-  max: number,
-  message?: string
+  max: number
 ) {
   expect(value).toBeGreaterThanOrEqual(min);
   expect(value).toBeLessThanOrEqual(max);
@@ -138,7 +137,7 @@ export function createMockRequest(overrides?: any) {
  * Creates a mock HTTP response object
  */
 export function createMockResponse() {
-  const response = {
+  return {
     status: 200,
     statusCode: 200,
     headers: {},
@@ -161,7 +160,6 @@ export function createMockResponse() {
       return this;
     },
   };
-  return response;
 }
 
 /**

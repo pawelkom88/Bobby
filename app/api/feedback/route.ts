@@ -40,24 +40,6 @@ const betaFeedbackSchema = z.object({
   contactEmail: z.string().email().optional(),
 });
 
-interface FeedbackRequest {
-  conversationId?: string;
-  childAge: string;
-  scenarios: string[];
-  easeOfUnderstanding: number;
-  childFeelings: string;
-  uncomfortable?: string;
-  safetyRating: number;
-  practiceClarity: string;
-  usefulness: string;
-  wouldUseAgain: string;
-  npsScore: number;
-  likedMost?: string;
-  improveFirst?: string;
-  contactOptIn: boolean;
-  contactEmail?: string;
-}
-
 interface FeedbackResponse {
   success: boolean;
   error?: string;

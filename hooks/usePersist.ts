@@ -2,7 +2,7 @@
  * Hook for persisting state to localStorage
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import {logger} from "@/lib/logger";
 
 /**

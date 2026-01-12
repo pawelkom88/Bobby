@@ -292,9 +292,6 @@ const PASS_THRESHOLD_BY_TIER: Record<AgeTier, number> = {
   3: 70,
 };
 
-// Minimum conversation duration in seconds
-const MIN_DURATION_SECONDS = 30;
-
 function normalizeText(text: string): string {
   return text
     .toLowerCase()

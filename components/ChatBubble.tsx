@@ -17,8 +17,6 @@ function formatTime(timestamp: string): string {
 }
 
 export default function ChatBubble({ message, showTimestamp = false }: ChatBubbleProps) {
-  const isAgent = message.type === 'agent';
-  
   return (
     <div className={`chat-bubble-wrapper chat-bubble-wrapper--${message.type}`}>
       <div className={`chat-bubble chat-bubble--${message.type}`}>

@@ -16,7 +16,6 @@ import { db } from '@/lib/firebase';
 import { logger } from '@/lib/logger';
 import {
   calculateLevel,
-  getXPToNextLevel,
   getBadgeForLevel,
   getBadgeForScore,
   getBadgeForFirstCall,
@@ -35,7 +34,6 @@ import type {
   AgeTier,
   Badge,
   LevelUpResult,
-  JourneyState,
 } from '@/types';
 
 /**

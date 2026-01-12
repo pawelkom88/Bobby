@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useUserData } from '@/context/UserDataContext';
@@ -37,8 +37,6 @@ export default function BadgeDisplay({
   const visibleBadges = isExpanded
     ? displayedBadges
     : displayedBadges.slice(0, maxVisible);
-  const hiddenCount = displayedBadges.length - maxVisible;
-
   // Hide all badges if user has no earned badges
   if (badges.length === 0) {
     return (

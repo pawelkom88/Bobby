@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import CartoonButton from './CartoonButton';
 import type { Situation, Service } from '@/types';
 
@@ -33,13 +32,9 @@ interface SituationSelectorProps {
  */
 export default function SituationSelector({
   onSelect,
-  selectedSituation = null,
   onBack,
 }: SituationSelectorProps) {
-  const [selected, setSelected] = useState<Service | null>(selectedSituation);
-
   const handleSelect = (situation: Situation) => {
-    setSelected(situation.id);
     if (onSelect) {
       onSelect(situation);
     }

@@ -3,8 +3,6 @@
  * Utilities for simulating concurrent transactions and race conditions
  */
 
-import { vi } from 'vitest';
-
 export interface TransactionResult {
   success: boolean;
   error?: Error;
@@ -43,7 +41,7 @@ export async function simulateDelayedTransaction(
  */
 export async function simulatePartialFailureTransaction(
   setupFn: () => Promise<any>,
-  commitFn: () => Promise<any>
+  _commitFn: () => Promise<any>
 ): Promise<any> {
   try {
     await setupFn();

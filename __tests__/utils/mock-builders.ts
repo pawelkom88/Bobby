@@ -4,7 +4,6 @@
  */
 
 import { vi } from 'vitest';
-import { createMockDocumentReference, createMockFirestoreTransaction } from '../mocks/firestore';
 
 /**
  * Builds a mock Firestore conversation repository

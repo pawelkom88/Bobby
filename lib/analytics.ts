@@ -94,7 +94,7 @@ class AnalyticsService {
       }, 50);
 
       // Timeout after 5 seconds
-      const timeoutId = setTimeout(() => {
+      setTimeout(() => {
         clearInterval(checkInterval); // Clean up interval to prevent memory leak
         logger.warn(
           '%c⚠️ gtag not available after 5 seconds',

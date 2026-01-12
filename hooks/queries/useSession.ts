@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { fetchSession } from '@/lib/api/session';
-import type { SessionData } from '@/schemas/session.schema';
 import { createQueryKeyFactory } from '@/lib/queryClient';
 
 /**
@@ -37,6 +36,6 @@ export function useSession(options?: { enabled?: boolean }) {
     queryKey: sessionKeys.data(),
     queryFn: () => fetchSession(getAuthToken),
     enabled: options?.enabled ?? !!user,
-    staleTime: 1000 * 60 * 1, // 1 minute
+    staleTime: 1000 * 60, // 1 minute
   });
 }

@@ -12,7 +12,7 @@ import SuccessPageLayout, {
 export default async function Success({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const t = await getTranslations('success');
   const params = await searchParams;
@@ -113,7 +113,6 @@ export default async function Success({
     if (status === 'complete') {
       const sessionEmail = customer_details?.email;
       const credits = parseInt(metadata?.credits || '0', 10);
-      const packType = metadata?.packType || 'credits';
       logger.log('SuccessPage: Payment complete, credits:', credits);
 
       return (

@@ -2,7 +2,6 @@
 
 import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import CartoonButton from '@/components/CartoonButton';

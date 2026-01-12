@@ -13,7 +13,7 @@ interface ConsentData {
 const STORAGE_KEY = 'cookieConsent';
 
 export function useCookieConsent() {
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [cookies, removeCookie] = useCookies();
   const [consent, setConsent] = useState<ConsentStatus>('pending');
   const [isLoading, setIsLoading] = useState(true);
 

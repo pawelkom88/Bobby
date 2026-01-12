@@ -22,11 +22,9 @@ export default function BetaFeedbackCTA({
   }
 
   const handleFeedbackClick = () => {
-    const feedbackUrl = conversationId
+    window.location.href = conversationId
       ? `${ROUTES.BETA_FEEDBACK}?conversationId=${conversationId}`
       : ROUTES.BETA_FEEDBACK;
-
-    window.location.href = feedbackUrl;
   };
 
   return (

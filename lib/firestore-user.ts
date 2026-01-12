@@ -17,7 +17,7 @@
  *     - achievements: array (optional)
  */
 
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, DocumentData } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { logger } from '@/lib/logger';
 
@@ -205,4 +205,3 @@ export async function syncLocalDataToFirestore(
     throw error;
   }
 }
-

@@ -1,14 +1,3 @@
-// Dynamic imports for route-specific dependencies
-import { lazy } from 'react';
-
-// Stripe - Only load on checkout/payment pages
-export const loadStripe = () => import('@stripe/stripe-js').then(mod => mod.default);
-
-// Deepgram - Only load in conversation
-export const loadDeepgram = () => import('@deepgram/sdk').then(mod => mod.Deepgram);
-
-// Mailersend - Only server-side, no client import needed
-
 // Firebase modular imports (tree-shakable)
 export { 
   getAuth,

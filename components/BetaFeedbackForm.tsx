@@ -163,7 +163,7 @@ export default function BetaFeedbackForm() {
       const errors: Record<string, string> = {};
       validationResult.error.issues.forEach(issue => {
         const fieldPath = issue.path.join('.');
-        let errorMessage = '';
+        let errorMessage = issue.message;
 
         switch (issue.message) {
           case 'Number of children is required':
@@ -217,8 +217,6 @@ export default function BetaFeedbackForm() {
           case 'PHONE_REQUIRED':
             errorMessage = t('phoneRequired');
             break;
-          default:
-            errorMessage = issue.message;
         }
 
         errors[fieldPath] = errorMessage;
@@ -258,7 +256,7 @@ export default function BetaFeedbackForm() {
           const [fieldPath, errorCode] = errorData.message.split(': ');
           setFieldErrors({});
 
-          let errorMessage = '';
+          let errorMessage = errorData.message;
           switch (errorCode) {
             case 'EMAIL_REQUIRED':
               errorMessage = t('emailRequired');
@@ -269,8 +267,6 @@ export default function BetaFeedbackForm() {
             case 'PHONE_REQUIRED':
               errorMessage = t('phoneRequired');
               break;
-            default:
-              errorMessage = errorData.message;
           }
 
           if (fieldPath) {

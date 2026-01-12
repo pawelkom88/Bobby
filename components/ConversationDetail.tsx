@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import ChatBubble from './ChatBubble';
-import type { StoredConversation, Service } from '@/types';
+import type { StoredConversation } from '@/types';
 import CartoonButton from '@/components/CartoonButton';
 
 interface ConversationDetailProps {

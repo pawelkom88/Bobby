@@ -1,6 +1,5 @@
 'use client';
 
-import { ViewTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';

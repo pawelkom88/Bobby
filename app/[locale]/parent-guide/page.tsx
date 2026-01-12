@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import PageWrapper from '@/components/PageWrapper';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import Image from 'next/image';
 import styles from './ParentGuidePage.module.css';
 
 export default function ParentGuidePage() {

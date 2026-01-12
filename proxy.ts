@@ -18,8 +18,6 @@ const intlMiddleware = createIntlMiddleware(routing);
 // i18n Configuration
 // TODO: Re-enable Polish locale when translations are complete
 const LOCALES = ['en'] as const;
-const DEFAULT_LOCALE = 'en';
-const LOCALE_COOKIE = 'NEXT_LOCALE';
 
 // Routes that are always public (without locale prefix)
 const PUBLIC_ROUTES = [
@@ -60,15 +58,6 @@ function toBase64(bytes: Uint8Array): string {
   }
 
   return Buffer.from(bytes).toString('base64');
-}
-
-/**
- * Check if pathname has a locale prefix
- */
-function pathnameHasLocale(pathname: string): boolean {
-  return LOCALES.some(
-    locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
 }
 
 /**
@@ -165,9 +154,6 @@ export async function proxy(request: NextRequest) {
   // Use next-intl middleware for locale handling
   // This properly sets the locale context for useTranslations hook
   const response = intlMiddleware(requestWithNonce);
-
-  // Get pathname without locale for route checks
-  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
 
   // Apply security headers to all responses
   // Skip further processing for public routes but still add headers

@@ -3,9 +3,6 @@
 import { logger } from '@/lib/logger';
 import { analyticsService } from './analytics';
 
-// Analytics log styling to match analytics.ts
-const analyticsLogStyle = 'color: #4285f4; font-weight: bold; font-size: 12px;';
-
 /**
  * Web Vitals monitoring utility
  * Tracks Core Web Vitals (LCP, FID, CLS, FCP, TTFB) and reports them

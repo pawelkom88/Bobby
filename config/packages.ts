@@ -6,8 +6,6 @@
  * in app/api/checkout_sessions/route.ts
  */
 
-import { formatPrice } from '@/lib/currency';
-
 export type PackType = 'rookie' | 'hero';
 
 export interface DisplayPackage {

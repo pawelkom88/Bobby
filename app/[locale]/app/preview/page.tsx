@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 export default async function PreviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { canceled } = await searchParams;
 
