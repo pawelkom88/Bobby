@@ -391,6 +391,23 @@ export const rateLimiters = {
 
   // Password reset: 3 per hour per email (prevents email bombing)
   passwordReset: createRateLimiter(3, 60 * 60 * 1000, 'password_reset'),
+
+  // Password reset cooldown: 1 per minute per email (prevents rapid retries)
+  passwordResetCooldown: createRateLimiter(
+    1,
+    60 * 1000,
+    'password_reset_cooldown'
+  ),
+
+  // Password reset per IP: 5 per 10 minutes (prevents IP-based spamming)
+  passwordResetIp: createRateLimiter(5, 10 * 60 * 1000, 'password_reset_ip'),
+
+  // Password reset per IP+email: 2 per 10 minutes (prevents targeted spam)
+  passwordResetIpEmail: createRateLimiter(
+    2,
+    10 * 60 * 1000,
+    'password_reset_ip_email'
+  ),
 };
 
 // ============================================

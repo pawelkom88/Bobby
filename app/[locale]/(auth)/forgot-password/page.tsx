@@ -62,6 +62,7 @@ export default function ForgotPasswordPage() {
   const { resetPassword } = useAuth();
   const t = useTranslations('forgotPassword');
   const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
   const [errors, setErrors] = useState<{ email?: string; general?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -87,7 +88,7 @@ export default function ForgotPasswordPage() {
     setErrors({});
 
     try {
-      await resetPassword(email);
+      await resetPassword(email, company);
       setEmailSent(true);
     } catch (error) {
       logger.error('Password reset error:', error);
@@ -122,6 +123,7 @@ export default function ForgotPasswordPage() {
   const handleTryAgain = () => {
     setEmailSent(false);
     setEmail('');
+    setCompany('');
   };
 
   if (emailSent) {
@@ -156,6 +158,29 @@ export default function ForgotPasswordPage() {
           autoComplete="email"
           autoFocus
         />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: '-10000px',
+            top: 'auto',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+          }}
+        >
+          <label htmlFor="company">Company</label>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            value={company}
+            onChange={e => setCompany(e.target.value)}
+            autoComplete="off"
+            tabIndex={-1}
+          />
+        </div>
 
         <AuthButton type="submit" disabled={isSubmitting} aria-describedby="forgot-password-description">
           {isSubmitting ? t('sending') : t('sendButton')}

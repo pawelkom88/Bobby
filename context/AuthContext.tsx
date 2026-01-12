@@ -31,7 +31,7 @@ interface AuthContextType {
     name?: string
   ) => Promise<UserCredential>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string, company?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -174,10 +174,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const resetPassword = async (email: string): Promise<void> => {
+  const resetPassword = async (
+    email: string,
+    company?: string
+  ): Promise<void> => {
     try {
       logger.log('Sending password reset request for:', email);
-      const responseData = await requestPasswordReset({ email });
+      const responseData = await requestPasswordReset({ email, company });
       if (!responseData.success) {
         throw new Error(responseData.error || 'Failed to send reset email');
       }

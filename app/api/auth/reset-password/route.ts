@@ -75,8 +75,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Validate email
-    const { email } = body;
+    // 4. Honeypot check (basic bot filter)
+    const { email, company } = body;
+    if (typeof company === 'string' && company.trim().length > 0) {
+      logger.warn('Password reset honeypot triggered', {
+        ip: clientIp,
+        userAgent: request.headers.get('user-agent'),
+      });
+      return NextResponse.json({
+        success: true,
+        message:
+          'If an account exists, a password reset link has been sent to your email.',
+      });
+    }
+
+    // 5. Validate email
     if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: 'Valid email address is required' },
@@ -87,7 +100,79 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = email.trim().toLowerCase();
     const emailHash = await hashForRateLimit(normalizedEmail);
 
-    // 5. Email-based rate limiting (prevents email bombing)
+    // 6. IP-based rate limiting for this endpoint
+    const ipResetLimit = await rateLimiters.passwordResetIp.isRateLimited(
+      `reset-password:ip:${clientIp}`
+    );
+
+    if (ipResetLimit.limited) {
+      logger.warn('Password reset IP rate limit exceeded (reset endpoint)', {
+        ip: clientIp,
+      });
+
+      // Return success to prevent enumeration
+      return NextResponse.json(
+        {
+          success: true,
+          message:
+            'If an account exists, a password reset link has been sent to your email.',
+        },
+        {
+          headers: createRateLimitHeaders(ipResetLimit),
+        }
+      );
+    }
+
+    // 7. IP+email rate limiting (prevents targeted spam)
+    const ipEmailLimit = await rateLimiters.passwordResetIpEmail.isRateLimited(
+      `reset-password:ip-email:${clientIp}:${emailHash}`
+    );
+
+    if (ipEmailLimit.limited) {
+      logger.warn('Password reset IP+email rate limit exceeded', {
+        emailHash,
+        ip: clientIp,
+      });
+
+      // Return success to prevent enumeration
+      return NextResponse.json(
+        {
+          success: true,
+          message:
+            'If an account exists, a password reset link has been sent to your email.',
+        },
+        {
+          headers: createRateLimitHeaders(ipEmailLimit),
+        }
+      );
+    }
+
+    // 8. Email-based cooldown (prevents rapid retries)
+    const emailCooldownLimit =
+      await rateLimiters.passwordResetCooldown.isRateLimited(
+        `reset-password:cooldown:${emailHash}`
+      );
+
+    if (emailCooldownLimit.limited) {
+      logger.warn('Password reset email cooldown exceeded', {
+        emailHash,
+        ip: clientIp,
+      });
+
+      // Return success to prevent enumeration
+      return NextResponse.json(
+        {
+          success: true,
+          message:
+            'If an account exists, a password reset link has been sent to your email.',
+        },
+        {
+          headers: createRateLimitHeaders(emailCooldownLimit),
+        }
+      );
+    }
+
+    // 9. Email-based rate limiting (prevents email bombing)
     const emailRateLimit = await rateLimiters.passwordReset.isRateLimited(
       `reset-password:email:${emailHash}`
     );
@@ -100,19 +185,20 @@ export async function POST(request: NextRequest) {
 
       // Return success to prevent enumeration
       return NextResponse.json({
+        success: true,
         message:
           'If an account exists, a password reset link has been sent to your email.',
       });
     }
 
-    // 6. Validate app URL configuration
+    // 10. Validate app URL configuration
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {
       logger.error('NEXT_PUBLIC_APP_URL not configured');
       throw new Error('Server configuration error');
     }
 
-    // 7. Generate password reset link
+    // 11. Generate password reset link
     const auth = getAdminAuth();
     let resetLink: string;
 
@@ -154,12 +240,13 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json({
+        success: true,
         message:
           'If an account exists, a password reset link has been sent to your email.',
       });
     }
 
-    // 8. Send email
+    // 12. Send email
     try {
       await sendPasswordResetEmail(normalizedEmail, resetLink);
 
@@ -183,8 +270,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 9. Success response
+    // 13. Success response
     return NextResponse.json({
+      success: true,
       message:
         'If an account exists, a password reset link has been sent to your email.',
     });
