@@ -126,6 +126,8 @@ export async function proxy(request: NextRequest) {
     'wss://*.deepgram.com',
     'https://*.firebaseapp.com',
     'https://*.googleapis.com',
+    'https://region1.google-analytics.com',
+    'https://www.google-analytics.com',
     'https://firestore.googleapis.com',
     'https://identitytoolkit.googleapis.com',
     'https://securetoken.googleapis.com',

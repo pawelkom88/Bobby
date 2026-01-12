@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, startTransition, useRef } from 'react';
-import { ViewTransition } from 'react';
 import { Activity } from 'react';
 import { useRouter } from 'next/navigation';
 import CreditDeductionIntegration from '@/components/CreditDeductionIntegration';
@@ -77,19 +76,17 @@ function ConversationPageContent() {
 
   if (isComplete) {
     return (
-      <ViewTransition>
-        <PageWrapper>
-          <ErrorBoundary>
-            <main className="app-page" role="main">
-              <div style={{ textAlign: 'center', padding: '2rem' }}>
-                <h1>Conversation Complete</h1>
-                <p>Your emergency call practice has finished.</p>
-                <p>Redirecting you to your completion summary...</p>
-              </div>
-            </main>
-          </ErrorBoundary>
-        </PageWrapper>
-      </ViewTransition>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <h1>Conversation Complete</h1>
+              <p>Your emergency call practice has finished.</p>
+              <p>Redirecting you to your completion summary...</p>
+            </div>
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
     );
   }
 
@@ -180,23 +177,21 @@ function ConversationPageContent() {
   };
 
   return (
-    <ViewTransition>
-      <Activity mode={isProcessingAssessment ? 'hidden' : 'visible'}>
-        <PageWrapper>
-          <ErrorBoundary>
-            <main className="app-page" role="main">
-              <CreditDeductionIntegration
-                ageTier={selectedAgeTier}
-                situation={selectedSituation}
-                onComplete={handleConversationComplete}
-                onBack={handleBack}
-                autoStart={true}
-              />
-            </main>
-          </ErrorBoundary>
-        </PageWrapper>
-      </Activity>
-    </ViewTransition>
+    <Activity mode={isProcessingAssessment ? 'hidden' : 'visible'}>
+      <PageWrapper>
+        <ErrorBoundary>
+          <main className="app-page" role="main">
+            <CreditDeductionIntegration
+              ageTier={selectedAgeTier}
+              situation={selectedSituation}
+              onComplete={handleConversationComplete}
+              onBack={handleBack}
+              autoStart={true}
+            />
+          </main>
+        </ErrorBoundary>
+      </PageWrapper>
+    </Activity>
   );
 }
 

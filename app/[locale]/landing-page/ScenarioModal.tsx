@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import type { Scenario } from './scenarios';
 import { ServiceIcon, useServiceLabel, getServiceColor } from './ServiceIcon';
@@ -67,14 +68,10 @@ export function ScenarioModal({
     };
   }, [isOpen, handleKeyDown]);
 
-  if (!isOpen || !scenario) return null;
+  if (!isOpen || !scenario || typeof document === 'undefined') return null;
 
-  return (
-    <div
-      className={styles.overlay}
-      onClick={onClose}
-      role="presentation"
-    >
+  return createPortal(
+    <div className={styles.overlay} onClick={onClose} role="presentation">
       <div
         ref={modalRef}
         className={styles.modal}
@@ -110,10 +107,7 @@ export function ScenarioModal({
         </button>
 
         <header className={styles.header}>
-          <ServiceIcon
-            service={scenario.service}
-            className={styles.icon}
-          />
+          <ServiceIcon service={scenario.service} className={styles.icon} />
           <span className={styles.service}>{serviceLabel}</span>
         </header>
 
@@ -122,14 +116,10 @@ export function ScenarioModal({
         </h2>
 
         <section className={styles.body}>
-          <h3 className={styles.sectionTitle}>
-            {t('scenarioTitle')}
-          </h3>
+          <h3 className={styles.sectionTitle}>{t('scenarioTitle')}</h3>
           <p className={styles.description}>{scenario.description}</p>
 
-          <h3 className={styles.sectionTitle}>
-            {t('practiceTitle')}
-          </h3>
+          <h3 className={styles.sectionTitle}>{t('practiceTitle')}</h3>
           <ul className={styles.list}>
             {scenario.practicePoints.map((point, index) => (
               <li key={index} className={styles.listItem}>
@@ -156,6 +146,7 @@ export function ScenarioModal({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

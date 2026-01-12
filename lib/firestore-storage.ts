@@ -167,7 +167,8 @@ export async function saveConversation(
   ageTier: AgeTier,
   xpEarned: number,
   score?: number,
-  feedback?: string[]
+  feedback?: string[],
+  conversationId?: string
 ): Promise<void> {
   // Validate inputs
   if (!validateTimestamp(timestamp)) {
@@ -196,6 +197,7 @@ export async function saveConversation(
       xpEarned,
       ...(typeof score === 'number' ? { score } : {}),
       ...(feedback && feedback.length ? { feedback } : {}),
+      ...(conversationId ? { conversationId } : {}),
     };
 
     data.conversations.push(conversationEntry);

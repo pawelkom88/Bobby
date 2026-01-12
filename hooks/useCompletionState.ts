@@ -118,7 +118,8 @@ export function useCompletionState({
           ageTier,
           xp,
           assessment?.score,
-          feedbackSummary.slice(0, 3)
+          feedbackSummary.slice(0, 3),
+          sessionData?.conversationId
         );
       }
     } catch (error) {
@@ -159,4 +160,3 @@ function logCompletionDebug(data: {
   logger.log('🔍 ageTier:', data.ageTier);
   logger.log('🔍 performance.assessment:', data.performance.assessment);
 }
-

@@ -153,6 +153,40 @@ export async function GET(
     const conversationIds = Array.from(assessmentMap.keys());
 
     if (conversationIds.length === 0) {
+      if (assessedConversations.length > 0) {
+        logger.log(
+          `No conversation IDs found for user ${userId}, returning legacy entries`
+        );
+
+        const legacyConversations = assessedConversations.map(
+          (conv: Conversation) => ({
+            id: conv.conversationId || conv.timestamp,
+            service: conv.service || 'fire',
+            ageTier: conv.ageTier || 1,
+            startedAt: conv.timestamp,
+            endedAt: conv.timestamp,
+            messageCount: 0,
+            xpEarned: conv.xpEarned || 0,
+            score: conv.score,
+            feedback: conv.feedback,
+          })
+        );
+
+        legacyConversations.sort((a, b) => {
+          const aTime = new Date(a.endedAt || a.startedAt).getTime();
+          const bTime = new Date(b.endedAt || b.startedAt).getTime();
+          return bTime - aTime;
+        });
+
+        return NextResponse.json(
+          {
+            success: true,
+            conversations: legacyConversations.slice(0, limit),
+          },
+          { status: 200 }
+        );
+      }
+
       logger.log(`No assessed conversations found for user ${userId}`);
       return NextResponse.json(
         {

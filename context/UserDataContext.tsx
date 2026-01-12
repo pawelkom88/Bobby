@@ -43,7 +43,8 @@ interface UserDataContextType {
     ageTier: AgeTier,
     xpEarned: number,
     score?: number,
-    feedback?: string[]
+    feedback?: string[],
+    conversationId?: string
   ) => Promise<void>;
   addXP: (amount: number) => Promise<LevelUpResult>;
   updateSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
@@ -115,7 +116,8 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     ageTier: AgeTier,
     xpEarned: number,
     score?: number,
-    feedback?: string[]
+    feedback?: string[],
+    conversationId?: string
   ) => {
     if (!user) {
       throw new Error('User must be authenticated to save conversation');
@@ -127,7 +129,8 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
       ageTier,
       xpEarned,
       score,
-      feedback
+      feedback,
+      conversationId
     );
   };
 
@@ -236,4 +239,3 @@ export function useUserData(): UserDataContextType {
   }
   return context;
 }
-
