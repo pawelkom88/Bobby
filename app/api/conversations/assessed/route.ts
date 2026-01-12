@@ -71,7 +71,7 @@ async function verifyUserFromToken(
 async function getUserAssessedConversations(
   userId: string,
   db: ReturnType<typeof getAdminDb>
-) {
+): Promise<Conversation[]> {
   try {
     const userDoc = await db.collection('users').doc(userId).get();
 
@@ -81,7 +81,7 @@ async function getUserAssessedConversations(
     }
 
     const userData = userDoc.data();
-    return userData?.conversations || [];
+    return (userData?.conversations as Conversation[]) || [];
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('Error fetching user assessed conversations:', {
@@ -145,7 +145,10 @@ export async function GET(
       db
     );
 
-    const assessmentMap = new Map();
+    const assessmentMap = new Map<
+      string,
+      { xpEarned: number; score?: number; feedback?: string[] }
+    >();
     assessedConversations.forEach((conv: Conversation) => {
       if (conv.conversationId) {
         assessmentMap.set(conv.conversationId, {

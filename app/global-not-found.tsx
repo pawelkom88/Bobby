@@ -1,14 +1,16 @@
 import Image from 'next/image';
-import { ROUTES } from '@/lib/routes';
+import { getLocale } from 'next-intl/server';
 import styles from './global-not-found.module.css';
-import Link from 'next/link';
 
 export const metadata = {
   title: '404 - Page Not Found',
   description: 'The page you are looking for does not exist.',
 };
 
-export default function NotFound() {
+export default async function NotFound() {
+  const locale = await getLocale();
+  const homeHref = `/${locale}`;
+
   return (
     <div className={styles.planetContainer}>
       <div className={styles.planet}>
@@ -20,9 +22,9 @@ export default function NotFound() {
           height={575}
         />
       </div>
-      <Link className={styles.cartoonBtn} href={ROUTES.HOME}>
+      <a className={styles.cartoonBtn} href={homeHref}>
         <span>Go home</span>
-      </Link>
+      </a>
     </div>
   );
 }
