@@ -164,7 +164,8 @@ export async function GET(
           `No conversation IDs found for user ${userId}, returning legacy entries`
         );
 
-        const legacyConversations = assessedConversations.map(
+        const legacyConversations: AssessedConversation[] =
+          assessedConversations.map(
           (conv: Conversation) => ({
             id: conv.conversationId || conv.timestamp,
             service: conv.service || 'fire',
@@ -178,7 +179,7 @@ export async function GET(
           })
         );
 
-        legacyConversations.sort((a: string, b: string) => {
+        legacyConversations.sort((a, b) => {
           const aTime = new Date(a.endedAt || a.startedAt).getTime();
           const bTime = new Date(b.endedAt || b.startedAt).getTime();
           return bTime - aTime;
