@@ -5,9 +5,9 @@ import { verifyIdToken } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger';
 import { extractAndValidateToken } from '@/lib/auth-utils';
 import { getCurrencyConfig } from '@/lib/currency';
+import { getServerEnv } from '@/lib/env';
 
 // Force Node.js runtime - Netlify Edge doesn't forward POST bodies correctly
- 
 export const runtime = 'nodejs';
 
 function getLocalizedInvoiceText(locale: string) {
@@ -67,12 +67,14 @@ function getCreditPacks(locale: string) {
   if (currency.code === 'PLN') {
     return {
       rookie: {
-        priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN!,
+        priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN'),
         name: 'Pakiet Początkujący',
+        credits: 2,
       },
       hero: {
-        priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN!,
+        priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN'),
         name: 'Paket Bohater',
+        credits: 5,
       },
     };
   }
@@ -80,12 +82,14 @@ function getCreditPacks(locale: string) {
   // Default to GBP
   return {
     rookie: {
-      priceId: process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK!,
+      priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK'),
       name: 'Rookie Pack',
+      credits: 2,
     },
     hero: {
-      priceId: process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK!,
+      priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_HERO_PACK'),
       name: 'Hero Pack',
+      credits: 5,
     },
   };
 }
@@ -161,32 +165,6 @@ async function validateCreditsMetadataOnce() {
   await devCreditsValidation;
 }
 
-async function getCreditsForPrice(priceId: string) {
-  const price = await stripe.prices.retrieve(priceId, {
-    expand: ['product'],
-  });
-  const priceCredits = price.metadata?.credits;
-  const productCredits =
-    typeof price.product === 'string' ||
-    !price.product ||
-    ('deleted' in price.product && price.product.deleted)
-      ? undefined
-      : price.product.metadata?.credits;
-  const creditsStr = priceCredits ?? productCredits ?? '';
-  const credits = parseInt(creditsStr, 10);
-
-  if (!creditsStr || Number.isNaN(credits) || credits <= 0) {
-    logger.error('Missing or invalid credits metadata for price', {
-      priceId,
-      priceCredits,
-      productCredits,
-    });
-    throw new Error('Missing or invalid credits metadata for price');
-  }
-
-  return credits;
-}
-
 export async function POST(request: NextRequest) {
   const localeParam = request.nextUrl.searchParams.get('locale') || 'en';
   const stripeLocale = toStripeLocale(localeParam);
@@ -240,7 +218,7 @@ export async function POST(request: NextRequest) {
     // 5. Get pack configuration from server-side config (NEVER trust client)
     const CREDIT_PACKS = getCreditPacks(localeParam);
     const pack = CREDIT_PACKS[packType];
-    const credits = await getCreditsForPrice(pack.priceId);
+    const credits = pack.credits;
 
     // 6. Get origin for redirect URLs (use forwarded headers for Netlify/proxies)
     const headersList = await headers();
