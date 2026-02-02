@@ -58,7 +58,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     const debugStorage = window.localStorage?.getItem('debugCredits') === '1';
     debugEnabledRef.current = debugParam || debugStorage;
     if (debugEnabledRef.current) {
-      console.log('[CreditsDebug] enabled', {
+      logger.log('[CreditsDebug] enabled', {
         debugParam,
         debugStorage,
         href: window.location.href,
@@ -68,7 +68,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
   const debugLog = (...args: any[]) => {
     if (!debugEnabledRef.current) return;
-    console.log('[CreditsDebug]', ...args);
+    logger.log('[CreditsDebug]', ...args);
   };
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
           userCredits = typeof data.credits === 'number' ? data.credits : 0;
           userBetaCredits =
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;
-          
+
           // Check if user is a beta user (user-level flag, not global env)
           isBetaMode = data.betaUser === true && userBetaCredits > 0;
 
@@ -225,14 +225,14 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;
           const isBetaMode = data.betaUser === true && userBetaCredits > 0;
           const effective = isBetaMode ? userBetaCredits : userCredits;
-          
+
           debugLog('Server returned credits', {
             userCredits,
             userBetaCredits,
             isBetaMode,
             effective,
           });
-          
+
           setCredits(userCredits);
           setBetaCredits(userBetaCredits);
           setIsBetaUser(isBetaMode);
