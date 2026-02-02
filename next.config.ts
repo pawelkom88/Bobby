@@ -18,12 +18,9 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   // Optimize for modern browsers
-  // compiler: {
-  //   removeConsole:
-  //     process.env.NODE_ENV === 'production'
-  //       ? { exclude: ['warn', 'error'] }
-  //       : false,
-  // },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },
