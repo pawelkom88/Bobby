@@ -58,14 +58,10 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     const debugStorage = window.localStorage?.getItem('debugCredits') === '1';
     debugEnabledRef.current = debugParam || debugStorage;
     if (debugEnabledRef.current) {
-      console.warn('[CreditsDebug] enabled', {
+      console.log('[CreditsDebug] enabled', {
         debugParam,
         debugStorage,
         href: window.location.href,
-      });
-      console.warn('[CreditsDebug] firebase config', {
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
       });
     }
   }, []);
