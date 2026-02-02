@@ -63,24 +63,7 @@ const DEV_PRICE_METADATA = [
 function getCreditPacks(locale: string) {
   const currency = getCurrencyConfig(locale);
 
-  // Map locale to appropriate Stripe price IDs
-  if (currency.code === 'PLN') {
-    return {
-      rookie: {
-        priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN'),
-        name: 'Pakiet Początkujący',
-        credits: 2,
-      },
-      hero: {
-        priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN'),
-        name: 'Paket Bohater',
-        credits: 5,
-      },
-    };
-  }
-
-  // Default to GBP
-  return {
+  const gbpPacks = {
     rookie: {
       priceId: getServerEnv('STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK'),
       name: 'Rookie Pack',
@@ -92,6 +75,36 @@ function getCreditPacks(locale: string) {
       credits: 5,
     },
   };
+
+  // Map locale to appropriate Stripe price IDs
+  if (currency.code === 'PLN') {
+    const rookiePln = process.env.STRIPE_BOBBY_PRICE_ID_ROOKIE_PACK_PLN;
+    const heroPln = process.env.STRIPE_BOBBY_PRICE_ID_HERO_PACK_PLN;
+
+    if (!rookiePln || !heroPln) {
+      logger.warn(
+        'PLN pricing requested but PLN price IDs are missing. Falling back to GBP.',
+        { locale }
+      );
+      return gbpPacks;
+    }
+
+    return {
+      rookie: {
+        priceId: rookiePln,
+        name: 'Pakiet Początkujący',
+        credits: 2,
+      },
+      hero: {
+        priceId: heroPln,
+        name: 'Paket Bohater',
+        credits: 5,
+      },
+    };
+  }
+
+  // Default to GBP
+  return gbpPacks;
 }
 
 function isValidPackType(

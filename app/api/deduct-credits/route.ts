@@ -135,10 +135,11 @@ async function getUserCredits(userId: string, db: ReturnType<typeof getAdminDb>)
       return { credits: 0, isBeta: false, betaCredits: 0 };
     }
     const data = doc.data();
+    const betaCredits = data?.betaCredits ?? 0;
     return {
       credits: data?.credits ?? 0,
-      isBeta: data?.betaUser === true,
-      betaCredits: data?.betaCredits ?? 0,
+      isBeta: data?.betaUser === true && betaCredits > 0,
+      betaCredits,
     };
   } catch (error) {
     logger.error('Error fetching user credits:', error);
@@ -168,15 +169,10 @@ async function performDeduction(
     const currentCredits = data?.credits ?? 0;
     const currentBetaCredits = data?.betaCredits ?? 0;
     const isBeta = data?.betaUser === true;
+    const useBetaCredits = isBeta && currentBetaCredits > 0;
 
     // 2. Verify sufficient credits (check beta first)
-    if (isBeta) {
-      if (currentBetaCredits <= 0) {
-        throw new CreditTransactionError(
-          'payment/insufficient-credits',
-          'User has insufficient beta credits'
-        );
-      }
+    if (useBetaCredits) {
       // Deduct from beta credits
       const newBetaCredits = currentBetaCredits - 1;
       transaction.update(userRef, { betaCredits: newBetaCredits });
@@ -197,36 +193,36 @@ async function performDeduction(
       transaction.update(conversationRef, { charged: true });
 
       return { newCredits: currentCredits, newBetaCredits, isBeta: true };
-    } else {
-      // Regular credit deduction
-      if (currentCredits <= 0) {
-        throw new CreditTransactionError(
-          'payment/insufficient-credits',
-          'User has insufficient credits'
-        );
-      }
-
-      // 3. Deduct credit
-      const newCredits = currentCredits - 1;
-      transaction.update(userRef, { credits: newCredits });
-
-      // 4. Record deduction for audit trail
-      const deductionRef = db.collection('creditDeductions').doc(conversationId);
-      transaction.set(deductionRef, {
-        conversationId,
-        userId,
-        durationSeconds,
-        creditsDeducted: 1,
-        deductedAt: new Date().toISOString(),
-        isBetaDeduction: false,
-      });
-
-      // 5. Mark conversation as charged
-      const conversationRef = db.collection('conversations').doc(conversationId);
-      transaction.update(conversationRef, { charged: true });
-
-      return { newCredits, newBetaCredits: currentBetaCredits, isBeta: false };
     }
+
+    // Regular credit deduction
+    if (currentCredits <= 0) {
+      throw new CreditTransactionError(
+        'payment/insufficient-credits',
+        'User has insufficient credits'
+      );
+    }
+
+    // 3. Deduct credit
+    const newCredits = currentCredits - 1;
+    transaction.update(userRef, { credits: newCredits });
+
+    // 4. Record deduction for audit trail
+    const deductionRef = db.collection('creditDeductions').doc(conversationId);
+    transaction.set(deductionRef, {
+      conversationId,
+      userId,
+      durationSeconds,
+      creditsDeducted: 1,
+      deductedAt: new Date().toISOString(),
+      isBetaDeduction: false,
+    });
+
+    // 5. Mark conversation as charged
+    const conversationRef = db.collection('conversations').doc(conversationId);
+    transaction.update(conversationRef, { charged: true });
+
+    return { newCredits, newBetaCredits: currentBetaCredits, isBeta: false };
   });
 }
 

@@ -91,28 +91,32 @@ export async function GET(request: NextRequest) {
     // Check if user is a beta user (user-level flag)
     const isBetaUser = userData?.betaUser === true;
 
-    let totalCredits = 0;
+    const betaCredits = userData?.betaCredits || 0;
+    const paidCredits = userData?.credits || 0;
+    const useBetaCredits = isBetaUser && betaCredits > 0;
+    const totalCredits = useBetaCredits ? betaCredits : paidCredits;
 
-    if (isBetaUser) {
-      // Beta user: Use beta credits
-      const betaCredits = userData?.betaCredits || 0;
-      totalCredits = betaCredits;
-
+    if (useBetaCredits) {
       logger.info('Beta user: Using beta credits', {
         userId,
         betaCredits,
         totalCredits,
       });
     } else {
-      // Regular user: Use paid credits
-      const credits = userData?.credits || 0;
-      totalCredits = credits;
-
-      logger.info('Regular user: Using paid credits', {
-        userId,
-        credits,
-        totalCredits,
-      });
+      if (isBetaUser && betaCredits <= 0 && paidCredits > 0) {
+        logger.info('Beta user: No beta credits, using paid credits', {
+          userId,
+          betaCredits,
+          paidCredits,
+          totalCredits,
+        });
+      } else {
+        logger.info('Regular user: Using paid credits', {
+          userId,
+          paidCredits,
+          totalCredits,
+        });
+      }
     }
 
     if (totalCredits <= 0) {
