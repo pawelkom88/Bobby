@@ -68,7 +68,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
   const debugLog = (...args: any[]) => {
     if (!debugEnabledRef.current) return;
-    console.log('[CreditsDebug]', ...args);
+    console.warn('[CreditsDebug]', ...args);
   };
 
   useEffect(() => {
