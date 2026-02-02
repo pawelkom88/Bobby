@@ -49,6 +49,27 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const serverConfirmedRef = useRef<boolean>(false);
+  const debugEnabledRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const search = window.location.search;
+    const debugParam = search.includes('debugCredits=1');
+    const debugStorage = window.localStorage?.getItem('debugCredits') === '1';
+    debugEnabledRef.current = debugParam || debugStorage;
+    if (debugEnabledRef.current) {
+      console.log('[CreditsDebug] enabled', {
+        debugParam,
+        debugStorage,
+        href: window.location.href,
+      });
+    }
+  }, []);
+
+  const debugLog = (...args: any[]) => {
+    if (!debugEnabledRef.current) return;
+    console.log('[CreditsDebug]', ...args);
+  };
 
   useEffect(() => {
     // Cleanup previous listener
@@ -62,12 +83,12 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     setIsServerConfirmed(false);
 
     if (authLoading) {
-      logger.log('CreditsContext: Auth still loading, waiting...');
+      debugLog('Auth still loading, waiting...');
       return;
     }
 
     if (!user) {
-      logger.log('CreditsContext: No user, resetting credits to 0');
+      debugLog('No user, resetting credits to 0');
       setCredits(0);
       setLoading(false);
       setError(null);
@@ -76,7 +97,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
       return;
     }
 
-    logger.log('CreditsContext: Setting up credits for user:', user.uid);
+    debugLog('Setting up credits for user:', user.uid);
     setLoading(true);
     setIsInitialized(false);
     setIsServerConfirmed(false);
@@ -92,7 +113,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
         const fromCache = metadata.fromCache;
         const hasPendingWrites = metadata.hasPendingWrites;
 
-        logger.log('CreditsContext: onSnapshot triggered', {
+        debugLog('onSnapshot triggered', {
           userId: user.uid,
           fromCache,
           hasPendingWrites,
@@ -107,7 +128,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          logger.log('CreditsContext: User data:', data);
+          debugLog('User data:', data);
           userCredits = typeof data.credits === 'number' ? data.credits : 0;
           userBetaCredits =
             typeof data.betaCredits === 'number' ? data.betaCredits : 0;
@@ -119,9 +140,13 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
           effectiveCredits = isBetaMode ? userBetaCredits : userCredits;
         }
 
-        logger.log(
-          `CreditsContext: Credits = ${userCredits}, BetaCredits = ${userBetaCredits}, Mode = ${isBetaMode ? 'BETA' : 'PAID'}, Effective = ${effectiveCredits} (from ${fromCache ? 'CACHE' : 'SERVER'})`
-        );
+        debugLog('Computed credits', {
+          userCredits,
+          userBetaCredits,
+          isBetaMode,
+          effectiveCredits,
+          source: fromCache ? 'CACHE' : 'SERVER',
+        });
 
         // Always update all credit values
         setCredits(userCredits);
@@ -132,21 +157,19 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
         // KEY LOGIC: Only finalize loading state when we have SERVER data
         if (!fromCache && !hasPendingWrites) {
-          logger.log('CreditsContext: ✓ SERVER data confirmed');
+          debugLog('SERVER data confirmed');
           serverConfirmedRef.current = true;
           setIsServerConfirmed(true);
           setLoading(false);
           setIsInitialized(true);
         } else if (fromCache && !serverConfirmedRef.current) {
-          logger.log(
-            'CreditsContext: ⏳ Cache data received, waiting for server confirmation...'
-          );
+          debugLog('Cache data received, waiting for server confirmation...');
           // Keep loading = true, don't mark as initialized yet
           // But we can show the cached value as a preview
         }
       },
       err => {
-        logger.error('CreditsContext: Error listening to credits:', err);
+        debugLog('Error listening to credits:', err);
         setError('Failed to load credits');
         setLoading(false);
         setIsInitialized(true);
@@ -157,9 +180,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     // Safety timeout: If server doesn't respond within 15s, use cached data
     const timeoutId = setTimeout(() => {
       if (!serverConfirmedRef.current) {
-        logger.warn(
-          'CreditsContext: ⚠️ Server timeout (15s), using available data'
-        );
+        debugLog('Server timeout (15s), using available data');
         setLoading(false);
         setIsInitialized(true);
         setIsServerConfirmed(true);
@@ -167,7 +188,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
     }, 15000);
 
     return () => {
-      logger.log('CreditsContext: Cleaning up listener');
+      debugLog('Cleaning up listener');
       clearTimeout(timeoutId);
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
@@ -178,13 +199,11 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
 
   const forceRefreshCredits = useCallback(async (): Promise<void> => {
     if (!user) {
-      logger.log(
-        'CreditsContext: Cannot refresh credits: no authenticated user'
-      );
+      debugLog('Cannot refresh credits: no authenticated user');
       return;
     }
 
-    logger.log('CreditsContext: Starting force refresh for user:', user.uid);
+    debugLog('Starting force refresh for user:', user.uid);
 
     try {
       const userDocRef = doc(db, 'users', user.uid);
@@ -194,9 +213,7 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
       const delayMs = 1000;
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        logger.log(
-          `CreditsContext: Force refresh attempt ${attempt}/${maxAttempts}`
-        );
+        debugLog(`Force refresh attempt ${attempt}/${maxAttempts}`);
 
         const docSnapshot = await getDocFromServer(userDocRef);
 
@@ -209,7 +226,12 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
           const isBetaMode = data.betaUser === true && userBetaCredits > 0;
           const effective = isBetaMode ? userBetaCredits : userCredits;
           
-          logger.log(`CreditsContext: Server returned credits: ${userCredits}, betaCredits: ${userBetaCredits}, mode: ${isBetaMode ? 'BETA' : 'PAID'}, effective: ${effective}`);
+          debugLog('Server returned credits', {
+            userCredits,
+            userBetaCredits,
+            isBetaMode,
+            effective,
+          });
           
           setCredits(userCredits);
           setBetaCredits(userBetaCredits);
@@ -218,26 +240,20 @@ export function CreditsProvider({ children }: CreditsProviderProps) {
           setError(null);
 
           if (effective > 0) {
-            logger.log(
-              'CreditsContext: ✓ Credits found, force refresh complete'
-            );
+            debugLog('Credits found, force refresh complete');
             return;
           }
         }
 
         if (attempt < maxAttempts) {
-          logger.log(
-            `CreditsContext: No credits yet, waiting ${delayMs}ms before retry...`
-          );
+          debugLog(`No credits yet, waiting ${delayMs}ms before retry...`);
           await new Promise(resolve => setTimeout(resolve, delayMs));
         }
       }
 
-      logger.log(
-        'CreditsContext: Force refresh complete (no credits after retries)'
-      );
+      debugLog('Force refresh complete (no credits after retries)');
     } catch (error) {
-      logger.error('CreditsContext: Error force refreshing credits:', error);
+      debugLog('Error force refreshing credits:', error);
       setError('Failed to refresh credits');
     }
   }, [user]);
