@@ -14,22 +14,6 @@ const redactId = (value?: string) => {
   return `${value.slice(0, 4)}...${value.slice(-4)}`;
 };
 
-const getAdminProjectId = () => {
-  if (process.env.FIREBASE_PROJECT_ID) {
-    return process.env.FIREBASE_PROJECT_ID;
-  }
-  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!serviceAccountJson) {
-    return undefined;
-  }
-  try {
-    const serviceAccount = JSON.parse(serviceAccountJson);
-    return serviceAccount.project_id as string | undefined;
-  } catch {
-    return undefined;
-  }
-};
-
 /**
  * POST /api/webhook
  *
@@ -178,7 +162,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   const db = getAdminDb();
-  console.warn('[webhook] Firestore project:', getAdminProjectId());
+  console.warn('[webhook] Firestore project:', db.app.options.projectId);
   const purchasesRef = db.collection('purchases');
   const userRef = db.doc(`users/${userId}`);
 
