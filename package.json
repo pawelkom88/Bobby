@@ -32,7 +32,7 @@
     "firebase-admin": "^13.6.0",
     "mailersend": "^2.6.0",
     "negotiator": "^1.0.0",
-    "next": "^16.0.10",
+    "next": "^16.2.3",
     "next-intl": "^4.6.0",
     "react": "^19.2.0",
     "react-cookie": "^8.0.1",
